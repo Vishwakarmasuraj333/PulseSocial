@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <!-- Deep Sapphire Base Gradient -->
+    <linearGradient id="psNavy" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A" />
+      <stop offset="50%" stop-color="#1D4ED8" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+
+    <!-- Electric Cyan Accent Gradient for 'S' -->
+    <linearGradient id="psCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#60A5FA" />
+    </linearGradient>
+
+    <filter id="cyanGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="#0284C7" flood-opacity="0.5" />
+    </filter>
+
+    <filter id="baseShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3.5" flood-color="#0F172A" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Squircle Rounded Base (Professional Dark Sapphire) -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#psNavy)" filter="url(#baseShadow)" />
+
+  <!-- Glass Highlight Overlay -->
+  <path d="M4 18 C4 10 10 4 18 4 L46 4 C54 4 60 10 60 18 L60 22 C40 20 20 25 4 30 Z" fill="white" fill-opacity="0.14" />
+
+  <!-- Letter 'P' in Pure Crisp White -->
+  <path d="M18 46 L18 18 L28 18 C33.5 18 37 21.5 37 26.5 C37 31.5 33.5 35 28 35 L18 35" 
+        fill="none" 
+        stroke="#FFFFFF" 
+        stroke-width="5.5" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" />
+
+  <!-- Letter 'S' in Electric Cyan/Sky Blue -->
+  <path d="M46 22 C43 18 37 18 34 21 C31 24 33.5 28 39.5 30.5 C45.5 33 47.5 36.5 45.5 41 C43.5 45.5 36.5 46.5 30.5 44" 
+        fill="none" 
+        stroke="url(#psCyan)" 
+        stroke-width="5.5" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"
+        filter="url(#cyanGlow)" />
+
+  <!-- Connecting Pulse Nodes in Cyan & White -->
+  <circle cx="28" cy="26.5" r="2.8" fill="#38BDF8" />
+  <circle cx="45" cy="41" r="2.8" fill="#38BDF8" stroke="#FFFFFF" stroke-width="1" />
+  <circle cx="18" cy="46" r="2" fill="#FFFFFF" />
+</svg>

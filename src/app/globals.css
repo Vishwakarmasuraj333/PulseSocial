@@ -1,0 +1,231 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* PulseSocial Design Tokens */
+    --primary-purple: #8B6BD6;
+    --primary-purple-hover: #795BC2;
+    --primary-purple-deep: #6F52B5;
+    --primary-purple-dark: #59409A;
+    --primary-purple-soft: #A78BDF;
+    --primary-purple-light: #F4F0FC;
+    --border-purple: #DDD3F4;
+    --lavender-background: #F8F7FB;
+    --surface: #FFFFFF;
+    --surface-secondary: #F4F1FA;
+    --surface-hover: #F0EBF9;
+    --text-primary: #17132B;
+    --text-secondary: #68627A;
+    --text-muted: #9690A5;
+    --link: #6F52B5;
+    --border: #E7E2F0;
+    --success: #218A62;
+    --warning: #B7791F;
+    --error: #D64545;
+
+    /* Legacy CSS Variable Aliases */
+    --primary: #6F52B5;
+    --primary-hover: #59409A;
+    --background: #F8F7FB;
+    --surface-hover: #F0EBF9;
+    --text: #17132B;
+    --muted: #68627A;
+    --danger: #D64545;
+
+    /* Tailwind HSL mappings */
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --secondary: 260 40% 97%;
+    --secondary-foreground: 260 47% 11%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 260 40% 96%;
+    --accent-foreground: 260 47% 11%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 254 44% 47%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --primary-purple: #7c68ce;
+    --primary-purple-hover: #6c57bf;
+    --primary-purple-light: #9d8de6;
+    --primary-purple-soft: #1e1b4b;
+    --lavender-background: #0b0f19;
+    --surface: #111827;
+    --surface-secondary: #1a1f33;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --border: #1e293b;
+    --border-purple: #2e2850;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+
+    --primary: #7c68ce;
+    --primary-hover: #6c57bf;
+    --background: #0b0f19;
+    --surface-hover: #1f2937;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --danger: #ef4444;
+
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 6.5%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 6.5%;
+    --popover-foreground: 210 40% 98%;
+    --secondary: 260 30% 18%;
+    --secondary-foreground: 210 40% 98%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 260 30% 18%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 254 44% 57%;
+  }
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text);
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Custom modern scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+}
+
+/* ============================================================ */
+/* ANIMATION SYSTEM & UTILITIES                                 */
+/* ============================================================ */
+
+@keyframes pulseFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pulseSlideUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseSlideRight {
+  from { opacity: 0; transform: translateX(-18px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulseScale {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulseFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+@keyframes pulseDash {
+  to { stroke-dashoffset: -40; }
+}
+
+.animate-fade-in {
+  animation: pulseFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-up {
+  animation: pulseSlideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-right {
+  animation: pulseSlideRight 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scale {
+  animation: pulseScale 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-float {
+  animation: pulseFloat 4s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+.connection-line {
+  stroke-dasharray: 6 6;
+  animation: pulseDash 2s linear infinite;
+}
+
+@keyframes shakeKeyframe {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.animate-shake {
+  animation: shakeKeyframe 0.45s ease-in-out;
+}
+
+/* Card hover and elevation */
+.card-interactive {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+}
+.card-interactive:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.08), 0 6px 12px -4px rgba(0, 0, 0, 0.04);
+}
+
+.dark .card-interactive:hover {
+  box-shadow: 0 12px 32px -6px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.15);
+}
+
+/* Button press feedback */
+.btn-press {
+  transition: transform 0.1s ease, filter 0.15s ease;
+}
+.btn-press:active {
+  transform: scale(0.97);
+}
+
+/* Respect user reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

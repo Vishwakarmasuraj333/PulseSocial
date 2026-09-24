@@ -1,0 +1,480 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                    String                 @id @default(cuid())
+  email                 String                 @unique
+  passwordHash          String
+  name                  String?
+  avatarUrl             String?
+  emailVerified         Boolean                @default(false)
+  emailVerifiedAt       DateTime?
+  status                String                 @default("ACTIVE")
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
+  memberships           OrganizationMember[]
+  otps                  EmailVerificationOTP[]
+  resetTokens           PasswordResetToken[]
+  postsCreated          SocialPost[]
+  auditLogs             AuditLog[]
+  assignedComments      SocialComment[]
+  assignedMessages      SocialMessage[]
+}
+
+model Organization {
+  id                    String                 @id @default(cuid())
+  name                  String
+  slug                  String                 @unique
+  logoUrl               String?
+  timezone              String                 @default("UTC")
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
+  members               OrganizationMember[]
+  socialAccounts        SocialAccount[]
+  posts                 SocialPost[]
+  drafts                Draft[]
+  publishingQueues      PublishingQueue[]
+  socialMonitors        SocialMonitor[]
+  campaigns             Campaign[]
+  mediaAssets           MediaAsset[]
+  teamInvitations       TeamInvitation[]
+  auditLogs             AuditLog[]
+  settings              Settings?
+}
+
+model OrganizationMember {
+  id              String       @id @default(cuid())
+  organizationId  String
+  userId          String
+  role            String       @default("MEMBER")
+  channelsAccess  String       @default("ALL")
+  isApprover      Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  category    String
+  createdAt   DateTime @default(now())
+}
+
+model EmailVerificationOTP {
+  id        String   @id @default(cuid())
+  userId    String
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SocialAccount {
+  id                String            @id @default(cuid())
+  organizationId    String
+  provider          String
+  providerAccountId String
+  displayName       String
+  username          String?
+  profileImageUrl   String?
+  accountType       String?
+  status            String            @default("CONNECTED")
+  scopes            String
+  metadata          String?
+  connectedAt       DateTime          @default(now())
+  lastSyncedAt      DateTime?
+  tokenExpiresAt    DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  organization      Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  token             SocialToken?
+  profile           SocialProfile?
+  postTargets       SocialPostTarget[]
+  comments          SocialComment[]
+  messages          SocialMessage[]
+  analytics         SocialAnalytics[]
+  snapshots         AnalyticsSnapshot[]
+
+  @@unique([organizationId, provider, providerAccountId])
+}
+
+model SocialProfile {
+  id              String        @id @default(cuid())
+  socialAccountId String        @unique
+  bio             String?
+  followersCount  Int           @default(0)
+  followingCount  Int           @default(0)
+  postsCount      Int           @default(0)
+  websiteUrl      String?
+  rawProfileJson  String?
+  updatedAt       DateTime      @updatedAt
+
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+}
+
+model SocialToken {
+  id                 String        @id @default(cuid())
+  socialAccountId    String        @unique
+  encryptedAccessToken String
+  encryptedRefreshToken String?
+  iv                 String
+  tag                String
+  expiresAt          DateTime?
+  refreshTokenExpiresAt DateTime?
+  updatedAt          DateTime      @updatedAt
+
+  socialAccount      SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+}
+
+model SocialPost {
+  id              String             @id @default(cuid())
+  organizationId  String
+  creatorId       String
+  campaignId      String?
+  content         String
+  status          String             @default("DRAFT")
+  approvalNote    String?
+  scheduledFor    DateTime?
+  publishedAt     DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator         User               @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  campaign        Campaign?          @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  targets         SocialPostTarget[]
+  media           PostMedia[]
+  scheduledPost   ScheduledPost?
+  attempts        PublishingAttempt[]
+}
+
+model SocialPostTarget {
+  id              String        @id @default(cuid())
+  postId          String
+  socialAccountId String
+  customContent   String?
+  platformPostId  String?
+  status          String        @default("PENDING")
+  errorMessage    String?
+  publishedAt     DateTime?
+
+  post            SocialPost    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+}
+
+model PostMedia {
+  id          String     @id @default(cuid())
+  postId      String
+  mediaType   String
+  url         String
+  altText     String?
+  mimeType    String?
+  sizeBytes   Int?
+  width       Int?
+  height      Int?
+  durationSec Int?
+  orderIndex  Int        @default(0)
+
+  post        SocialPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model ScheduledPost {
+  id        String     @id @default(cuid())
+  postId    String     @unique
+  runAt     DateTime
+  timezone  String     @default("UTC")
+  isLocked  Boolean    @default(false)
+  createdAt DateTime   @default(now())
+
+  post      SocialPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Draft {
+  id             String       @id @default(cuid())
+  organizationId String
+  title          String?
+  content        String
+  targetChannels String?
+  mediaUrls      String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model PublishingQueue {
+  id             String       @id @default(cuid())
+  organizationId String
+  name           String
+  dayOfWeek      Int
+  timeSlot       String
+  isActive       Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model PublishingAttempt {
+  id          String     @id @default(cuid())
+  postId      String
+  provider    String
+  status      String
+  requestPayload String?
+  responsePayload String?
+  errorMessage String?
+  attemptedAt DateTime   @default(now())
+
+  post        SocialPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model SocialComment {
+  id              String        @id @default(cuid())
+  socialAccountId String
+  platformCommentId String
+  platformPostId  String?
+  authorName      String
+  authorAvatarUrl String?
+  authorUsername  String?
+  content         String
+  isReplied       Boolean       @default(false)
+  isRead          Boolean       @default(false)
+  assignedUserId  String?
+  sentiment       String?
+  postedAt        DateTime
+  createdAt       DateTime      @default(now())
+
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+  assignedUser    User?         @relation(fields: [assignedUserId], references: [id], onDelete: SetNull)
+}
+
+model SocialMessage {
+  id              String        @id @default(cuid())
+  socialAccountId String
+  platformMessageId String
+  senderName      String
+  senderAvatarUrl String?
+  senderUsername  String?
+  content         String
+  isRead          Boolean       @default(false)
+  assignedUserId  String?
+  sentAt          DateTime
+  createdAt       DateTime      @default(now())
+
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+  assignedUser    User?         @relation(fields: [assignedUserId], references: [id], onDelete: SetNull)
+}
+
+model SocialNotification {
+  id             String   @id @default(cuid())
+  organizationId String
+  title          String
+  message        String
+  type           String
+  isRead         Boolean  @default(false)
+  metadata       String?
+  createdAt      DateTime @default(now())
+}
+
+model SocialAnalytics {
+  id              String        @id @default(cuid())
+  socialAccountId String
+  metricDate      DateTime
+  followers       Int           @default(0)
+  following       Int           @default(0)
+  impressions     Int           @default(0)
+  reach           Int           @default(0)
+  engagementCount Int           @default(0)
+  engagementRate  Float         @default(0.0)
+  clicks          Int           @default(0)
+  shares          Int           @default(0)
+  saves           Int           @default(0)
+  isCalculated    Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+
+  @@unique([socialAccountId, metricDate])
+}
+
+model AnalyticsSnapshot {
+  id              String        @id @default(cuid())
+  socialAccountId String
+  periodType      String
+  startDate       DateTime
+  endDate         DateTime
+  dataJson        String
+  createdAt       DateTime      @default(now())
+
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+}
+
+model ContentCalendar {
+  id             String   @id @default(cuid())
+  organizationId String
+  title          String
+  startDate      DateTime
+  endDate        DateTime
+  color          String?  @default("#6366f1")
+  notes          String?
+  createdAt      DateTime @default(now())
+}
+
+model SavedReply {
+  id             String   @id @default(cuid())
+  organizationId String
+  title          String
+  content        String
+  tags           String?
+  createdAt      DateTime @default(now())
+}
+
+model SocialMonitor {
+  id             String           @id @default(cuid())
+  organizationId String
+  name           String
+  platform       String
+  isActive       Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  keywords       MonitorKeyword[]
+}
+
+model MonitorKeyword {
+  id        String        @id @default(cuid())
+  monitorId String
+  keyword   String
+  type      String
+
+  monitor   SocialMonitor @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+}
+
+model TeamInvitation {
+  id             String       @id @default(cuid())
+  organizationId String
+  email          String
+  role           String       @default("MEMBER")
+  channelsAccess String       @default("ALL")
+  isApprover     Boolean      @default(false)
+  token          String       @unique
+  status         String       @default("PENDING")
+  expiresAt      DateTime
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id             String        @id @default(cuid())
+  organizationId String?
+  userId         String?
+  action         String
+  resourceType   String
+  resourceId     String?
+  details        String?
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime      @default(now())
+
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  user           User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model WebhookEvent {
+  id             String   @id @default(cuid())
+  provider       String
+  eventId        String?  @unique
+  eventType      String
+  payload        String
+  isProcessed    Boolean  @default(false)
+  processedAt    DateTime?
+  error          String?
+  createdAt      DateTime @default(now())
+}
+
+model MediaAsset {
+  id             String       @id @default(cuid())
+  organizationId String
+  fileName       String
+  url            String
+  fileType       String
+  mimeType       String
+  sizeBytes      Int
+  folder         String       @default("general")
+  tags           String?
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model Tag {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  color          String?  @default("#64748b")
+  createdAt      DateTime @default(now())
+}
+
+model Campaign {
+  id             String       @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  color          String       @default("#3b82f6")
+  startDate      DateTime?
+  endDate        DateTime?
+  status         String       @default("ACTIVE")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  posts          SocialPost[]
+}
+
+model Settings {
+  id                 String       @id @default(cuid())
+  organizationId     String       @unique
+  defaultTimezone    String       @default("UTC")
+  requireApproval    Boolean      @default(false)
+  aiAutoSuggest      Boolean      @default(true)
+  notificationsEmail Boolean      @default(true)
+  brandColor         String       @default("#4f46e5")
+  updatedAt          DateTime     @updatedAt
+
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}

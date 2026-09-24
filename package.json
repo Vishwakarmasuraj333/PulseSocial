@@ -1,0 +1,46 @@
+{
+  "name": "pulsesocial",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node --max-old-space-size=4096 ./node_modules/next/dist/bin/next dev",
+    "build": "node --max-old-space-size=4096 ./node_modules/next/dist/bin/next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:push": "prisma db push",
+    "db:generate": "prisma generate",
+    "db:seed": "npx tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.9.1",
+    "@prisma/client": "^6.4.1",
+    "bcryptjs": "^2.4.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "jose": "^5.9.6",
+    "lucide-react": "^0.468.0",
+    "next": "^15.1.7",
+    "nodemailer": "^6.9.16",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.2",
+    "recharts": "^2.15.0",
+    "tailwind-merge": "^2.6.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.17.10",
+    "@types/nodemailer": "^6.4.17",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "autoprefixer": "^10.6.1",
+    "postcss": "^8.4.49",
+    "prisma": "^6.4.1",
+    "sharp": "^0.35.4",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

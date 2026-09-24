@@ -1,0 +1,554 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                    String                 @id @default(cuid())
+  googleSubjectId       String?                @unique
+  email                 String                 @unique
+  passwordHash          String?
+  name                  String?
+  firstName             String?
+  lastName              String?
+  avatarUrl             String?
+  locale                String?
+  emailVerified         Boolean                @default(false)
+  emailVerifiedAt       DateTime?
+  status                String                 @default("ACTIVE") // ACTIVE, SUSPENDED, PENDING
+  lastLoginAt           DateTime?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
+  memberships           OrganizationMember[]
+  otps                  EmailVerificationOTP[]
+  resetTokens           PasswordResetToken[]
+  postsCreated          SocialPost[]
+  auditLogs             AuditLog[]
+  assignedComments      SocialComment[]
+  assignedMessages      SocialMessage[]
+}
+
+model Organization {
+  id                    String                 @id @default(cuid())
+  name                  String
+  slug                  String                 @unique
+  logoUrl               String?
+  coverUrl              String?
+  description           String?
+  timezone              String                 @default("UTC")
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
+  members               OrganizationMember[]
+  socialAccounts        SocialAccount[]
+  posts                 SocialPost[]
+  drafts                Draft[]
+  publishingQueues      PublishingQueue[]
+  socialMonitors        SocialMonitor[]
+  campaigns             Campaign[]
+  mediaAssets           MediaAsset[]
+  teamInvitations       TeamInvitation[]
+  auditLogs             AuditLog[]
+  settings              Settings?
+}
+
+model OrganizationMember {
+  id              String       @id @default(cuid())
+  organizationId  String
+  userId          String
+  role            String       @default("MEMBER") // OWNER, ADMIN, MANAGER, EDITOR, ANALYST, VIEWER
+  channelsAccess  String       @default("ALL") // ALL or comma-separated account IDs
+  isApprover      Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique // e.g. "posts:publish", "accounts:manage"
+  description String?
+  category    String
+  createdAt   DateTime @default(now())
+}
+
+model EmailVerificationOTP {
+  id        String   @id @default(cuid())
+  userId    String
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SocialAccount {
+  id                String            @id @default(cuid())
+  organizationId    String
+  provider          String            // facebook, instagram, linkedin, x, youtube, tiktok, pinterest, google_business, mastodon
+  providerAccountId String
+  displayName       String
+  username          String?
+  profileImageUrl   String?
+  accountType       String?           // PAGE, PROFILE, BUSINESS, CHANNEL
+  status            String            @default("CONNECTED") // CONNECTED, DISCONNECTED, RECONNECT_REQUIRED, EXPIRED
+  scopes            String            // JSON string array of authorized scopes
+  metadata          String?           // JSON string of provider-specific metadata
+  connectedAt       DateTime          @default(now())
+  lastSyncedAt      DateTime?
+  tokenExpiresAt    DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  organization      Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  token             SocialToken?
+  profile           SocialProfile?
+  postTargets       SocialPostTarget[]
+  comments          SocialComment[]
+  messages          SocialMessage[]
+  analytics         SocialAnalytics[]
+  snapshots         AnalyticsSnapshot[]
+
+  @@unique([organizationId, provider, providerAccountId])
+}
+
+model SocialProfile {
+  id              String        @id @default(cuid())
+  socialAccountId String        @unique
+  bio             String?
+  followersCount  Int           @default(0)
+  followingCount  Int           @default(0)
+  postsCount      Int           @default(0)
+  websiteUrl      String?
+  rawProfileJson  String?
+  updatedAt       DateTime      @updatedAt
+
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+}
+
+model SocialToken {
+  id                 String        @id @default(cuid())
+  socialAccountId    String        @unique
+  encryptedAccessToken String
+  encryptedRefreshToken String?
+  iv                 String
+  tag                String
+  expiresAt          DateTime?
+  refreshTokenExpiresAt DateTime?
+  updatedAt          DateTime      @updatedAt
+
+  socialAccount      SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+}
+
+model SocialPost {
+  id              String             @id @default(cuid())
+  organizationId  String
+  creatorId       String
+  campaignId      String?
+  content         String
+  status          String             @default("DRAFT") // DRAFT, IN_REVIEW, APPROVED, REJECTED, QUEUED, SCHEDULED, PUBLISHING, PUBLISHED, PARTIALLY_PUBLISHED, FAILED, CANCELLED
+  approvalNote    String?
+  scheduledFor    DateTime?
+  publishedAt     DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator         User               @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  campaign        Campaign?          @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  targets         SocialPostTarget[]
+  media           PostMedia[]
+  scheduledPost   ScheduledPost?
+  attempts        PublishingAttempt[]
+}
+
+model SocialPostTarget {
+  id              String        @id @default(cuid())
+  postId          String
+  socialAccountId String
+  customContent   String?
+  platformPostId  String?       // Remote ID returned by social network API
+  status          String        @default("PENDING") // PENDING, PUBLISHED, FAILED
+  errorMessage    String?
+  publishedAt     DateTime?
+
+  post            SocialPost    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+}
+
+model PostMedia {
+  id          String     @id @default(cuid())
+  postId      String
+  mediaType   String     // IMAGE, VIDEO, GIF
+  url         String
+  altText     String?
+  mimeType    String?
+  sizeBytes   Int?
+  width       Int?
+  height      Int?
+  durationSec Int?
+  orderIndex  Int        @default(0)
+
+  post        SocialPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model ScheduledPost {
+  id        String     @id @default(cuid())
+  postId    String     @unique
+  runAt     DateTime
+  timezone  String     @default("UTC")
+  isLocked  Boolean    @default(false)
+  createdAt DateTime   @default(now())
+
+  post      SocialPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Draft {
+  id             String       @id @default(cuid())
+  organizationId String
+  title          String?
+  content        String
+  targetChannels String?      // JSON array of account IDs
+  mediaUrls      String?      // JSON array
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model PublishingQueue {
+  id             String       @id @default(cuid())
+  organizationId String
+  name           String
+  dayOfWeek      Int          // 0 = Sunday, 6 = Saturday
+  timeSlot       String       // e.g. "09:00", "15:30"
+  isActive       Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model PublishingAttempt {
+  id          String     @id @default(cuid())
+  postId      String
+  provider    String
+  status      String     // SUCCESS, FAILED
+  requestPayload String?
+  responsePayload String?
+  errorMessage String?
+  attemptedAt DateTime   @default(now())
+
+  post        SocialPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model SocialComment {
+  id              String        @id @default(cuid())
+  socialAccountId String
+  platformCommentId String
+  platformPostId  String?
+  authorName      String
+  authorAvatarUrl String?
+  authorUsername  String?
+  content         String
+  isReplied       Boolean       @default(false)
+  isRead          Boolean       @default(false)
+  assignedUserId  String?
+  sentiment       String?       // POSITIVE, NEUTRAL, NEGATIVE
+  postedAt        DateTime
+  createdAt       DateTime      @default(now())
+
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+  assignedUser    User?         @relation(fields: [assignedUserId], references: [id], onDelete: SetNull)
+}
+
+model SocialMessage {
+  id              String        @id @default(cuid())
+  socialAccountId String
+  platformMessageId String
+  senderName      String
+  senderAvatarUrl String?
+  senderUsername  String?
+  content         String
+  isRead          Boolean       @default(false)
+  assignedUserId  String?
+  sentAt          DateTime
+  createdAt       DateTime      @default(now())
+
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+  assignedUser    User?         @relation(fields: [assignedUserId], references: [id], onDelete: SetNull)
+}
+
+model SocialNotification {
+  id             String   @id @default(cuid())
+  organizationId String
+  title          String
+  message        String
+  type           String   // POST_PUBLISHED, POST_FAILED, TOKEN_EXPIRED, APPROVAL_REQUEST, COMMENT_RECEIVED
+  isRead         Boolean  @default(false)
+  metadata       String?
+  createdAt      DateTime @default(now())
+}
+
+model SocialAnalytics {
+  id              String        @id @default(cuid())
+  socialAccountId String
+  metricDate      DateTime
+  followers       Int           @default(0)
+  following       Int           @default(0)
+  impressions     Int           @default(0)
+  reach           Int           @default(0)
+  engagementCount Int           @default(0)
+  engagementRate  Float         @default(0.0)
+  clicks          Int           @default(0)
+  shares          Int           @default(0)
+  saves           Int           @default(0)
+  isCalculated    Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+
+  @@unique([socialAccountId, metricDate])
+}
+
+model AnalyticsSnapshot {
+  id              String        @id @default(cuid())
+  socialAccountId String
+  periodType      String        // DAILY, WEEKLY, MONTHLY
+  startDate       DateTime
+  endDate         DateTime
+  dataJson        String
+  createdAt       DateTime      @default(now())
+
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+}
+
+model ContentCalendar {
+  id             String   @id @default(cuid())
+  organizationId String
+  title          String
+  startDate      DateTime
+  endDate        DateTime
+  color          String?  @default("#6366f1")
+  notes          String?
+  createdAt      DateTime @default(now())
+}
+
+model SavedReply {
+  id             String   @id @default(cuid())
+  organizationId String
+  title          String
+  content        String
+  tags           String?  // comma separated
+  createdAt      DateTime @default(now())
+}
+
+model SocialMonitor {
+  id             String           @id @default(cuid())
+  organizationId String
+  name           String
+  platform       String           // all, x, instagram, facebook
+  isActive       Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  keywords       MonitorKeyword[]
+}
+
+model MonitorKeyword {
+  id        String        @id @default(cuid())
+  monitorId String
+  keyword   String
+  type      String        // KEYWORD, HASHTAG, MENTION, BRAND
+
+  monitor   SocialMonitor @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+}
+
+model TeamInvitation {
+  id             String       @id @default(cuid())
+  organizationId String
+  email          String
+  role           String       @default("MEMBER")
+  channelsAccess String       @default("ALL")
+  isApprover     Boolean      @default(false)
+  token          String       @unique
+  status         String       @default("PENDING") // PENDING, ACCEPTED, EXPIRED
+  expiresAt      DateTime
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id             String        @id @default(cuid())
+  organizationId String?
+  userId         String?
+  action         String        // LOGIN, OAUTH_CONNECTED, OAUTH_DISCONNECTED, POST_CREATED, POST_PUBLISHED, PERMISSION_CHANGED, etc.
+  resourceType   String
+  resourceId     String?
+  details        String?       // JSON details
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime      @default(now())
+
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  user           User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model WebhookEvent {
+  id             String   @id @default(cuid())
+  provider       String
+  eventId        String?  @unique
+  eventType      String
+  payload        String
+  isProcessed    Boolean  @default(false)
+  processedAt    DateTime?
+  error          String?
+  createdAt      DateTime @default(now())
+}
+
+model MediaAsset {
+  id             String       @id @default(cuid())
+  organizationId String
+  fileName       String
+  url            String
+  fileType       String       // IMAGE, VIDEO, DOCUMENT
+  mimeType       String
+  sizeBytes      Int
+  folder         String       @default("general")
+  tags           String?      // comma separated
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model Tag {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  color          String?  @default("#64748b")
+  createdAt      DateTime @default(now())
+}
+
+model Campaign {
+  id             String       @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  color          String       @default("#3b82f6")
+  startDate      DateTime?
+  endDate        DateTime?
+  status         String       @default("ACTIVE") // ACTIVE, COMPLETED, ARCHIVED
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  posts          SocialPost[]
+}
+
+model Settings {
+  id                 String       @id @default(cuid())
+  organizationId     String       @unique
+  defaultTimezone    String       @default("UTC")
+  requireApproval    Boolean      @default(false)
+  aiAutoSuggest      Boolean      @default(true)
+  notificationsEmail Boolean      @default(true)
+  brandColor         String       @default("#4f46e5")
+  updatedAt          DateTime     @updatedAt
+
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  slug        String     @unique
+  description String?
+  createdAt   DateTime   @default(now())
+
+  blogPosts   BlogPost[]
+}
+
+model BlogPost {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  excerpt     String
+  content     String
+  coverImage  String?
+  authorName  String    @default("PulseSocial Team")
+  authorAvatar String?
+  readingTime String    @default("5 min read")
+  categoryId  String
+  tags        String?   // comma-separated tags
+  isFeatured  Boolean   @default(false)
+  publishedAt DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+}
+
+model Feedback {
+  id             String    @id @default(cuid())
+  userId         String?
+  organizationId String?
+  rating         Int       @default(5)
+  message        String
+  screenshotUrl  String?
+  status         String    @default("NEW") // NEW, REVIEWED, RESOLVED
+  createdAt      DateTime  @default(now())
+}
+
+model ContactRequest {
+  id            String    @id @default(cuid())
+  name          String
+  email         String
+  subject       String
+  message       String
+  attachmentUrl String?
+  status        String    @default("PENDING") // PENDING, REPLIED, CLOSED
+  createdAt     DateTime  @default(now())
+}
+
+model PricingPlan {
+  id           String    @id @default(cuid())
+  name         String
+  slug         String    @unique
+  priceMonthly Int       @default(0)
+  priceAnnual  Int       @default(0)
+  description  String
+  featuresJson String    // JSON array of feature bullets
+  limitsJson   String?   // JSON object of limits: accounts, members, storage
+  isPopular    Boolean   @default(false)
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+}
+

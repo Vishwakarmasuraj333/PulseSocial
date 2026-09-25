@@ -36,11 +36,17 @@ export default function AnalyticsPage() {
     Promise.all([
       analyticsService.getMetrics(timeframe),
       fetch("/api/social/providers").then((r) => (r.ok ? r.json() : null)),
-    ]).then(([res, provRes]) => {
+      fetch("/api/social/accounts").then((r) => (r.ok ? r.json() : null)),
+    ]).then(([res, provRes, accRes]) => {
       setData(res);
+      let connectedList: any[] = [];
       if (provRes?.providers) {
-        setConnectedProviders(provRes.providers.filter((p: any) => p.isConnected));
+        connectedList = provRes.providers.filter((p: any) => p.isConnected);
       }
+      if (connectedList.length === 0 && accRes?.accounts) {
+        connectedList = accRes.accounts;
+      }
+      setConnectedProviders(connectedList);
       setIsLoading(false);
     });
   }, [timeframe, platform]);

@@ -27,6 +27,8 @@ import {
   ExternalLink,
   X,
   Share2,
+  Trash2,
+  RefreshCw,
 } from "lucide-react";
 
 interface PostTarget {
@@ -117,7 +119,63 @@ export default function PostsPage() {
 
   useEffect(() => {
     loadPostsAndChannels();
+
+    const handleCreated = () => {
+      loadPostsAndChannels();
+    };
+    window.addEventListener("pulsesocial_post_created", handleCreated);
+    return () => window.removeEventListener("pulsesocial_post_created", handleCreated);
   }, []);
+
+  const handleDeletePost = async (id: string) => {
+    try {
+      const res = await fetch(`/api/posts?id=${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setPosts((prev) => prev.filter((p) => p.id !== id));
+        toast({
+          title: "Post Deleted",
+          message: "The post was permanently removed.",
+          type: "success",
+        });
+      }
+    } catch {
+      toast({
+        title: "Delete Failed",
+        message: "Could not delete post.",
+        type: "error",
+      });
+    }
+  };
+
+  const handleRetryPublish = async (post: PostItem) => {
+    try {
+      const res = await fetch("/api/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: post.content,
+          targetAccountIds: post.targets?.map((t) => t.socialAccountId) || [],
+          action: "PUBLISH_NOW",
+          mediaUrls: post.media?.map((m) => m.url) || [],
+        }),
+      });
+      if (res.ok) {
+        toast({
+          title: "Broadcast Retried",
+          message: "Post broadcast updated to published.",
+          type: "success",
+        });
+        loadPostsAndChannels();
+      }
+    } catch {}
+  };
+
+  // Category counts
+  const publishedCount = posts.filter((p) => p.status === "PUBLISHED").length;
+  const scheduledCount = posts.filter((p) => p.status === "SCHEDULED").length;
+  const approvalsCount = posts.filter((p) => p.status === "PENDING_APPROVAL").length;
+  const unpublishedCount = posts.filter((p) => p.status === "FAILED").length;
+  const draftsCount = posts.filter((p) => p.status === "DRAFT").length;
 
   // Filter posts based on active sidebar tab, platform, and filter by
   const filteredPosts = posts.filter((post) => {
@@ -179,66 +237,101 @@ export default function PostsPage() {
               <button
                 type="button"
                 onClick={() => setSidebarTab("published")}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
                   sidebarTab === "published"
                     ? "bg-[#f0f2f5] dark:bg-slate-800 text-slate-900 dark:text-white"
                     : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
                 }`}
               >
-                <Send className="w-4 h-4 text-slate-500" />
-                <span>Published Posts</span>
+                <div className="flex items-center gap-3">
+                  <Send className="w-4 h-4 text-slate-500" />
+                  <span>Published Posts</span>
+                </div>
+                {publishedCount > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">
+                    {publishedCount}
+                  </span>
+                )}
               </button>
 
               <button
                 type="button"
                 onClick={() => setSidebarTab("scheduled")}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
                   sidebarTab === "scheduled"
                     ? "bg-[#f0f2f5] dark:bg-slate-800 text-slate-900 dark:text-white"
                     : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
                 }`}
               >
-                <Clock className="w-4 h-4 text-slate-500" />
-                <span>Scheduled Posts</span>
+                <div className="flex items-center gap-3">
+                  <Clock className="w-4 h-4 text-slate-500" />
+                  <span>Scheduled Posts</span>
+                </div>
+                {scheduledCount > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400">
+                    {scheduledCount}
+                  </span>
+                )}
               </button>
 
               <button
                 type="button"
                 onClick={() => setSidebarTab("approvals")}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
                   sidebarTab === "approvals"
                     ? "bg-[#f0f2f5] dark:bg-slate-800 text-slate-900 dark:text-white"
                     : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
                 }`}
               >
-                <CheckCircle2 className="w-4 h-4 text-slate-500" />
-                <span>Approvals</span>
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="w-4 h-4 text-slate-500" />
+                  <span>Approvals</span>
+                </div>
+                {approvalsCount > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400">
+                    {approvalsCount}
+                  </span>
+                )}
               </button>
 
               <button
                 type="button"
                 onClick={() => setSidebarTab("unpublished")}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
                   sidebarTab === "unpublished"
                     ? "bg-[#f0f2f5] dark:bg-slate-800 text-slate-900 dark:text-white"
                     : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
                 }`}
               >
-                <AlertTriangle className="w-4 h-4 text-slate-500" />
-                <span>Unpublished Posts</span>
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="w-4 h-4 text-slate-500" />
+                  <span>Unpublished Posts</span>
+                </div>
+                {unpublishedCount > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400">
+                    {unpublishedCount}
+                  </span>
+                )}
               </button>
 
               <button
                 type="button"
                 onClick={() => setSidebarTab("drafts")}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
                   sidebarTab === "drafts"
                     ? "bg-[#f0f2f5] dark:bg-slate-800 text-slate-900 dark:text-white"
                     : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
                 }`}
               >
-                <FileText className="w-4 h-4 text-slate-500" />
-                <span>Drafts</span>
+                <div className="flex items-center gap-3">
+                  <FileText className="w-4 h-4 text-slate-500" />
+                  <span>Drafts</span>
+                </div>
+                {draftsCount > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400">
+                    {draftsCount}
+                  </span>
+                )}
               </button>
 
               <Link
@@ -391,12 +484,13 @@ export default function PostsPage() {
                       INTERACTION <HelpCircle className="inline w-3 h-3 text-slate-350 -mt-0.5 ml-0.5" />
                     </th>
                     <th className="py-3 px-6 font-semibold text-center w-28">PUBLISHED BY</th>
+                    <th className="py-3 px-6 font-semibold text-right w-24">ACTIONS</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
                   {sortedPosts.length > 0 ? (
                     sortedPosts.map((post) => {
-                      const publishedDate = post.publishedAt || post.createdAt;
+                      const publishedDate = post.publishedAt || post.scheduledFor || post.createdAt;
                       const dateObj = new Date(publishedDate);
                       const dateFormatted = dateObj.toLocaleDateString("en-GB", {
                         day: "numeric",
@@ -426,6 +520,17 @@ export default function PostsPage() {
                               </span>
                               <span className="text-[11px] text-slate-400 font-normal">
                                 {timeFormatted}
+                              </span>
+                              <span className={`inline-block text-[9px] px-1.5 py-0.2 rounded-full font-bold uppercase ${
+                                post.status === "PUBLISHED"
+                                  ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400"
+                                  : post.status === "SCHEDULED"
+                                  ? "bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400"
+                                  : post.status === "FAILED"
+                                  ? "bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400"
+                                  : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                              }`}>
+                                {post.status}
                               </span>
                             </div>
                           </td>
@@ -483,12 +588,36 @@ export default function PostsPage() {
                               </div>
                             </div>
                           </td>
+
+                          {/* Column 5: ACTIONS (Delete, Retry) */}
+                          <td className="py-4 px-6 text-right align-top">
+                            <div className="flex items-center justify-end gap-1.5 opacity-80 group-hover:opacity-100 transition">
+                              {post.status === "FAILED" && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleRetryPublish(post)}
+                                  className="p-1 rounded-md text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40"
+                                  title="Retry Publish"
+                                >
+                                  <RefreshCw className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => handleDeletePost(post.id)}
+                                className="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition"
+                                title="Delete Post"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
                         </tr>
                       );
                     })
                   ) : (
                     <tr>
-                      <td colSpan={4} className="py-16 text-center">
+                      <td colSpan={5} className="py-16 text-center">
                         <div className="flex flex-col items-center justify-center space-y-3 max-w-sm mx-auto">
                           <div className="w-12 h-12 rounded-full bg-[#f5f3ff] dark:bg-slate-800 text-[#5846A8] flex items-center justify-center">
                             <Send className="w-6 h-6" />

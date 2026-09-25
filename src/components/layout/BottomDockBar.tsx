@@ -21,6 +21,7 @@ import {
   Clock,
   ThumbsUp,
   Smile,
+  Copy,
 } from "lucide-react";
 import { FeedbackModal } from "@/components/layout/FeedbackModal";
 import { useToast } from "@/components/ui/toast";
@@ -153,8 +154,8 @@ export function BottomDockBar() {
       }
     } catch {}
 
-    // Load real team members
-    fetch("/api/brand/members")
+    // Load real team members from /api/team
+    fetch("/api/team")
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (d?.members) setContacts(d.members);
@@ -205,16 +206,54 @@ export function BottomDockBar() {
     setSelectedNoteId(filtered[0].id);
   };
 
+  const handlePinCurrentPage = () => {
+    if (typeof window === "undefined") return;
+    const currentPath = window.location.pathname;
+    const currentTitle =
+      document.title && !document.title.includes("localhost")
+        ? document.title.split("—")[0].trim()
+        : currentPath.replace("/", "").toUpperCase() || "Dashboard";
+
+    if (pins.some((p) => p.url === currentPath)) {
+      toast({
+        title: "Already Pinned",
+        message: `"${currentTitle}" is already in your pinned dock.`,
+        type: "info",
+      });
+      return;
+    }
+
+    const newPin: PinItem = {
+      id: `pin-${Date.now()}`,
+      title: currentTitle,
+      subtitle: currentPath,
+      type: "post",
+      url: currentPath,
+    };
+
+    const updated = [newPin, ...pins];
+    setPins(updated);
+    try {
+      localStorage.setItem("pulsesocial_dock_pins", JSON.stringify(updated));
+    } catch {}
+    toast({
+      title: "Page Pinned!",
+      message: `"${currentTitle}" saved to Quick Pins.`,
+      type: "success",
+    });
+  };
+
   const handleSendChatMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!chatInputText.trim()) return;
 
+    const userText = chatInputText.trim();
     const newMsg: ChatMessage = {
       id: `chat-${Date.now()}`,
       sender: "You",
       avatarText: "ME",
       avatarBg: "bg-[#795BC2]",
-      message: chatInputText.trim(),
+      message: userText,
       time: "Just now",
       isSelf: true,
     };
@@ -234,6 +273,45 @@ export function BottomDockBar() {
       title: "Message Sent",
       message: newMsg.message,
       type: "success",
+    });
+
+    // Intelligent automated team confirmation
+    setTimeout(() => {
+      const isQuestion = userText.includes("?") || userText.toLowerCase().includes("how") || userText.toLowerCase().includes("status");
+      const teamReply: ChatMessage = {
+        id: `chat-reply-${Date.now()}`,
+        sender: "Pulse Assistant",
+        avatarText: "PA",
+        avatarBg: "bg-blue-600",
+        message: isQuestion
+          ? `Received! Checking workspace metrics and channel status for "${activeBrand.name}".`
+          : `Got it! Logged in team workspace for ${activeBrand.name}.`,
+        time: "Just now",
+      };
+
+      setChatMessages((prev) => {
+        const next = [...prev, teamReply];
+        try {
+          localStorage.setItem("pulsesocial_dock_chats", JSON.stringify(next));
+        } catch {}
+        return next;
+      });
+
+      setTimeout(() => {
+        chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 50);
+    }, 1000);
+  };
+
+  const handleClearChat = () => {
+    setChatMessages([]);
+    try {
+      localStorage.removeItem("pulsesocial_dock_chats");
+    } catch {}
+    toast({
+      title: "Chat Cleared",
+      message: "Chat history has been reset.",
+      type: "info",
     });
   };
 
@@ -379,6 +457,18 @@ export function BottomDockBar() {
             </button>
           </div>
 
+          {/* Pin Current Page Quick Button */}
+          <div className="pt-2.5 pb-2 border-b border-slate-100 dark:border-slate-800">
+            <button
+              type="button"
+              onClick={handlePinCurrentPage}
+              className="w-full py-1.5 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-semibold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer border border-blue-200/60 dark:border-blue-900/60 shadow-2xs"
+            >
+              <Pin className="w-3.5 h-3.5 rotate-45 text-blue-600" />
+              <span>Pin Current Active Page</span>
+            </button>
+          </div>
+
           {/* Quick Add Pin URL Form */}
           <form
             onSubmit={(e) => {
@@ -489,13 +579,25 @@ export function BottomDockBar() {
                 Team Workspace Chats ({chatMessages.length})
               </h3>
             </div>
-            <button
-              type="button"
-              onClick={() => setActiveDrawer(null)}
-              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-1.5">
+              {chatMessages.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleClearChat}
+                  className="text-[10px] text-slate-400 hover:text-rose-500 font-medium px-2 py-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                  title="Clear Chat History"
+                >
+                  Clear
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setActiveDrawer(null)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {/* Chat Messages Scrollable Feed */}
@@ -592,9 +694,22 @@ export function BottomDockBar() {
                       <p className="text-[10px] text-slate-400 truncate">{m.user?.email || m.email}</p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 shrink-0">
-                    {m.role || "MEMBER"}
-                  </span>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                      {m.role || "MEMBER"}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveDrawer("chats");
+                        setChatInputText(`@${m.user?.name || m.name || "Member"} `);
+                      }}
+                      className="p-1 rounded-md text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
+                      title="Send message"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               ))
             ) : (
@@ -684,14 +799,33 @@ export function BottomDockBar() {
                     placeholder="Note Title..."
                     className="text-xs font-bold text-slate-900 dark:text-white bg-transparent border-b border-transparent hover:border-slate-200 focus:border-blue-500 outline-none w-full pb-1"
                   />
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteNote(activeNote.id)}
-                    className="text-slate-400 hover:text-rose-600 p-1 rounded"
-                    title="Delete Note"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (activeNote?.content) {
+                          navigator.clipboard.writeText(activeNote.content);
+                          toast({
+                            title: "Note Copied",
+                            message: "Content copied to clipboard.",
+                            type: "success",
+                          });
+                        }
+                      }}
+                      className="text-slate-400 hover:text-blue-600 p-1 rounded"
+                      title="Copy Note Content"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteNote(activeNote.id)}
+                      className="text-slate-400 hover:text-rose-600 p-1 rounded"
+                      title="Delete Note"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
 
                 <textarea

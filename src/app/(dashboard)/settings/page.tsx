@@ -77,6 +77,8 @@ function SettingsContent() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
+  const directPhotoInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingDirectPhoto, setIsUploadingDirectPhoto] = useState(false);
 
   // Tab mapping
   const mapQueryToTab = (query: string | null): SettingsTab => {
@@ -134,6 +136,77 @@ function SettingsContent() {
     }
   }, [activeBrand]);
 
+  // Direct Brand Photo upload (Instant Sync without opening modal)
+  const handleDirectPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast({
+        title: "Invalid File",
+        message: "Please select an image file (JPG, PNG, WEBP).",
+        type: "error",
+      });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        message: "Image must be under 5MB.",
+        type: "error",
+      });
+      return;
+    }
+
+    setIsUploadingDirectPhoto(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+
+      const data = await res.json();
+      const uploadedUrl = data.url;
+
+      // Direct PATCH to backend
+      const patchRes = await fetch("/api/brand", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ logoUrl: uploadedUrl }),
+      });
+
+      if (!patchRes.ok) {
+        throw new Error("Failed to save brand logo to database");
+      }
+
+      setPhotoUrl(uploadedUrl);
+      setEditPhoto(uploadedUrl);
+      updateBrand(activeBrand.id, { avatarUrl: uploadedUrl });
+      await refreshBrands();
+
+      toast({
+        title: "Brand Photo Updated",
+        message: "Logo updated and live synced across sidebar, header, and composer.",
+        type: "success",
+      });
+    } catch (err: any) {
+      toast({
+        title: "Upload Failed",
+        message: err.message || "Unable to upload brand photo. Please try again.",
+        type: "error",
+      });
+    } finally {
+      setIsUploadingDirectPhoto(false);
+      if (directPhotoInputRef.current) directPhotoInputRef.current.value = "";
+    }
+  };
+
   // Cover photo upload
   const [isUploadingCover, setIsUploadingCover] = useState(false);
 
@@ -173,6 +246,7 @@ function SettingsContent() {
       });
 
       updateBrand(activeBrand.id, { coverUrl: uploadedUrl });
+      await refreshBrands();
 
       toast({
         title: "Cover Photo Updated",
@@ -784,8 +858,12 @@ function SettingsContent() {
                   <div className="sm:col-span-3 text-xs font-semibold text-slate-700 dark:text-slate-300 pt-2">
                     Photo
                   </div>
-                  <div className="sm:col-span-9 flex items-center gap-4">
-                    <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-slate-200 dark:border-slate-700 shadow-sm bg-slate-900 shrink-0">
+                  <div className="sm:col-span-9 flex flex-col sm:flex-row sm:items-center gap-4">
+                    <div 
+                      onClick={() => directPhotoInputRef.current?.click()}
+                      className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-slate-200 dark:border-slate-700 shadow-sm bg-slate-900 shrink-0 cursor-pointer group hover:ring-2 hover:ring-blue-500 transition"
+                      title="Click to directly upload new brand logo"
+                    >
                       {photoUrl ? (
                         <Image
                           src={photoUrl}
@@ -798,6 +876,44 @@ function SettingsContent() {
                           {(displayName || "P").charAt(0).toUpperCase()}
                         </div>
                       )}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white">
+                        <Camera className="w-5 h-5 drop-shadow" />
+                        <span className="text-[9px] font-bold mt-0.5">Upload</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2.5">
+                        <button
+                          type="button"
+                          onClick={() => directPhotoInputRef.current?.click()}
+                          disabled={isUploadingDirectPhoto}
+                          className="px-3.5 py-1.5 rounded-lg bg-[#1877F2] hover:bg-blue-700 text-white text-xs font-semibold shadow-2xs transition active:scale-95 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                        >
+                          {isUploadingDirectPhoto ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Upload className="w-3.5 h-3.5" />
+                          )}
+                          <span>{isUploadingDirectPhoto ? "Uploading Logo..." : "Upload Brand Photo"}</span>
+                        </button>
+
+                        {photoUrl && (
+                          <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-900/60">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Live Synced
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                        Direct instant update without opening modal. Syncs live across sidebar, header, and composer.
+                      </p>
+                      <input
+                        ref={directPhotoInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleDirectPhotoUpload}
+                      />
                     </div>
                   </div>
                 </div>
@@ -826,22 +942,68 @@ function SettingsContent() {
                   </div>
                 </div>
 
-                {/* 5. Change Cover Photo Button (Matching Screenshot with Sparkles) */}
-                <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
-                  <button
-                    type="button"
-                    onClick={() => coverInputRef.current?.click()}
-                    disabled={isUploadingCover}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1877F2] hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition active:scale-95 cursor-pointer disabled:opacity-50"
-                  >
-                    {isUploadingCover ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Camera className="w-4 h-4" />
-                    )}
-                    <span>{isUploadingCover ? "Uploading Cover..." : "Change cover photo for your brand"}</span>
-                    <Sparkles className="w-3.5 h-3.5 text-blue-200" />
-                  </button>
+                {/* 5. Brand Cover Photo Section (Matching Screenshot with Live Banner & Sparkles) */}
+                <div className="pt-6 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <h3 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <span>Brand Cover Banner</span>
+                        {activeBrand?.coverUrl && (
+                          <span className="text-[10px] text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full font-medium">
+                            Active
+                          </span>
+                        )}
+                      </h3>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                        Syncs live across brand workspace, client portal, and profile exports.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => coverInputRef.current?.click()}
+                      disabled={isUploadingCover}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1877F2] hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition active:scale-95 cursor-pointer disabled:opacity-50 shrink-0"
+                    >
+                      {isUploadingCover ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Camera className="w-4 h-4" />
+                      )}
+                      <span>{isUploadingCover ? "Uploading Cover..." : "Change cover photo for your brand"}</span>
+                      <Sparkles className="w-3.5 h-3.5 text-blue-200" />
+                    </button>
+                  </div>
+
+                  {activeBrand?.coverUrl ? (
+                    <div className="relative w-full h-36 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-2xs group">
+                      <Image
+                        src={activeBrand.coverUrl}
+                        alt="Brand Cover"
+                        fill
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <button
+                          type="button"
+                          onClick={() => coverInputRef.current?.click()}
+                          className="px-3.5 py-1.5 rounded-lg bg-white/95 hover:bg-white text-slate-900 text-xs font-semibold shadow-md flex items-center gap-1.5 cursor-pointer transition"
+                        >
+                          <Camera className="w-3.5 h-3.5 text-blue-600" />
+                          <span>Update Cover Photo</span>
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      onClick={() => coverInputRef.current?.click()}
+                      className="w-full h-24 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 hover:bg-blue-50/40 hover:border-blue-400 transition flex items-center justify-center gap-2 text-slate-500 text-xs cursor-pointer"
+                    >
+                      <ImageIcon className="w-4 h-4 text-slate-400" />
+                      <span>No cover photo set. Click here to upload a 1200x400 cover banner.</span>
+                    </div>
+                  )}
+
                   <input
                     ref={coverInputRef}
                     type="file"

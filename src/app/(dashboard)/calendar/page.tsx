@@ -29,8 +29,34 @@ export default function CalendarPage() {
   const [posts, setPosts] = useState<ScheduledPost[]>([]);
   const [selectedPost, setSelectedPost] = useState<ScheduledPost | null>(null);
 
+  const loadPosts = () => {
+    fetch("/api/posts")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.posts) {
+          const mapped: ScheduledPost[] = d.posts.map((p: any) => ({
+            id: p.id,
+            content: p.content,
+            mediaUrls: p.media?.map((m: any) => m.url) || [],
+            platforms: p.targets?.map((t: any) => t.socialAccount?.provider || "facebook") || ["facebook"],
+            scheduledFor: p.scheduledFor || p.publishedAt || p.createdAt,
+            status: p.status,
+            createdAt: p.createdAt,
+          }));
+          setPosts(mapped);
+        }
+      })
+      .catch(() => {});
+  };
+
   useEffect(() => {
-    postService.getPosts().then((data) => setPosts(data));
+    loadPosts();
+
+    const handleCreated = () => {
+      loadPosts();
+    };
+    window.addEventListener("pulsesocial_post_created", handleCreated);
+    return () => window.removeEventListener("pulsesocial_post_created", handleCreated);
   }, []);
 
   const year = currentDate.getFullYear();
@@ -80,7 +106,7 @@ export default function CalendarPage() {
 
   const handleDeletePost = async (id: string) => {
     try {
-      await postService.deletePost(id);
+      await fetch(`/api/posts?id=${id}`, { method: "DELETE" });
       setPosts((prev) => prev.filter((p) => p.id !== id));
       setSelectedPost(null);
       toast({

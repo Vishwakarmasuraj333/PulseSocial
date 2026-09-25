@@ -464,8 +464,16 @@ export function AppLayout({ children }: AppLayoutProps) {
                 onClick={() => setIsBrandMenuOpen(!isBrandMenuOpen)}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 hover:bg-[#F5F3FF] dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition cursor-pointer text-xs font-semibold text-slate-800 dark:text-slate-200"
               >
-                <div className="w-5 h-5 rounded-md bg-[#5846A8] text-white flex items-center justify-center text-[10px] font-bold">
-                  {(activeBrand?.name || "P").charAt(0).toUpperCase()}
+                <div className="w-5 h-5 rounded-md bg-[#5846A8] text-white flex items-center justify-center text-[10px] font-bold overflow-hidden shrink-0 shadow-2xs">
+                  {activeBrand?.avatarUrl ? (
+                    <img
+                      src={activeBrand.avatarUrl}
+                      alt={activeBrand.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    (activeBrand?.name || "P").charAt(0).toUpperCase()
+                  )}
                 </div>
                 <span className="max-w-[120px] sm:max-w-[180px] truncate">
                   {activeBrand?.name || "Pulse Workspace"}
@@ -501,8 +509,16 @@ export function AppLayout({ children }: AppLayoutProps) {
                           }}
                           className="flex items-center gap-2 truncate flex-1 text-left cursor-pointer"
                         >
-                          <div className="w-6 h-6 rounded-md bg-[#5846A8] text-white flex items-center justify-center text-[10px] font-bold shrink-0">
-                            {b.name.charAt(0).toUpperCase()}
+                          <div className="w-6 h-6 rounded-md bg-[#5846A8] text-white flex items-center justify-center text-[10px] font-bold shrink-0 overflow-hidden shadow-2xs">
+                            {b.avatarUrl ? (
+                              <img
+                                src={b.avatarUrl}
+                                alt={b.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              b.name.charAt(0).toUpperCase()
+                            )}
                           </div>
                           <span className="truncate">{b.name}</span>
                         </button>

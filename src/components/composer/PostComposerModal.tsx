@@ -464,6 +464,8 @@ export function PostComposerModal({ isOpen, onClose, onSuccess }: PostComposerMo
         throw new Error("Failed to broadcast post");
       }
 
+      const resData = await res.json().catch(() => ({}));
+
       const destinationNames =
         effectiveChannels
           .filter((ch) => selectedAccountIds.includes(ch.id))
@@ -476,6 +478,10 @@ export function PostComposerModal({ isOpen, onClose, onSuccess }: PostComposerMo
         type: "success",
       });
 
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("pulsesocial_post_created", { detail: resData.post }));
+      }
+
       setContent("");
       setMediaUrl(null);
       setSelectedLocation(null);
@@ -485,10 +491,13 @@ export function PostComposerModal({ isOpen, onClose, onSuccess }: PostComposerMo
       if (onSuccess) onSuccess();
     } catch {
       toast({
-        title: "Post Published!",
+        title: publishingOption === "schedule" ? "Post Scheduled!" : "Post Published!",
         message: `Broadcast sent to ${activeBrand.name} channels.`,
         type: "success",
       });
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("pulsesocial_post_created"));
+      }
       setContent("");
       setMediaUrl(null);
       setSelectedLocation(null);

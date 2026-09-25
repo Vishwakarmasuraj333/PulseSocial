@@ -62,8 +62,8 @@ export async function GET(req: Request) {
   }
 
   try {
-    const clientId = process.env.GOOGLE_CLIENT_ID;
-    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const clientId = process.env.GOOGLE_CLIENT_ID?.trim().replace(/^["']|["']$/g, "");
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim().replace(/^["']|["']$/g, "");
 
     if (!clientId || !clientSecret) {
       throw new Error(
@@ -71,8 +71,9 @@ export async function GET(req: Request) {
       );
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || url.origin;
-    const redirectUri = process.env.GOOGLE_REDIRECT_URI || `${appUrl}/api/auth/google/callback`;
+    const appUrl = (process.env.NEXT_PUBLIC_APP_URL || url.origin).trim().replace(/\/+$/, "");
+    const envRedirect = process.env.GOOGLE_REDIRECT_URI?.trim().replace(/^["']|["']$/g, "");
+    const redirectUri = envRedirect || `${appUrl}/api/auth/google/callback`;
 
     // 3. Exchange authorization code for tokens using PKCE verifier
     const tokenData = await exchangeGoogleAuthCode({
@@ -137,6 +138,47 @@ export async function GET(req: Request) {
           },
         },
       });
+
+      // If user had no organization, provision one now
+      if (user.memberships.length === 0) {
+        const orgSlug = `${cleanEmail.split("@")[0].replace(/[^a-z0-9]/g, "-")}-brand-${Date.now().toString().slice(-4)}`;
+        const org = await prisma.organization.create({
+          data: {
+            name: `${displayName}'s Workspace`,
+            slug: orgSlug,
+            timezone: "UTC",
+          },
+        });
+
+        await prisma.organizationMember.create({
+          data: {
+            organizationId: org.id,
+            userId: user.id,
+            role: "OWNER",
+            channelsAccess: "ALL",
+            isApprover: true,
+          },
+        });
+
+        await prisma.settings.create({
+          data: {
+            organizationId: org.id,
+            defaultTimezone: "UTC",
+            requireApproval: false,
+            aiAutoSuggest: true,
+            notificationsEmail: true,
+          },
+        });
+
+        user = await prisma.user.findUniqueOrThrow({
+          where: { id: user.id },
+          include: {
+            memberships: {
+              include: { organization: true },
+            },
+          },
+        });
+      }
     } else {
       // Create new user record
       user = await prisma.user.create({
@@ -205,7 +247,7 @@ export async function GET(req: Request) {
     const role = user.memberships[0]?.role || "OWNER";
 
     // 6. Establish secure application session with HttpOnly cookie
-    await createSession(
+    const sessionToken = await createSession(
       {
         id: user.id,
         email: user.email,
@@ -231,8 +273,23 @@ export async function GET(req: Request) {
       },
     });
 
-    // 8. Redirect to the authenticated dashboard
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+    // 8. Redirect to the authenticated dashboard and explicitly affix the session cookie
+    const redirectResponse = NextResponse.redirect(new URL("/dashboard", req.url));
+    const isProd = process.env.NODE_ENV === "production";
+    redirectResponse.cookies.set("pulsesocial_session", sessionToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+    });
+
+    // Clean up oauth cookies on redirect response as well
+    redirectResponse.cookies.delete("google_oauth_state");
+    redirectResponse.cookies.delete("google_oauth_code_verifier");
+    redirectResponse.cookies.delete("google_oauth_nonce");
+
+    return redirectResponse;
   } catch (err: unknown) {
     console.error("Google OAuth token exchange error:", err);
     const loginUrl = new URL("/login", req.url);

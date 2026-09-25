@@ -9,8 +9,8 @@ import {
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const clientId = process.env.GOOGLE_CLIENT_ID;
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  const clientId = process.env.GOOGLE_CLIENT_ID?.trim().replace(/^["']|["']$/g, "");
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim().replace(/^["']|["']$/g, "");
 
   // Strict check: if OAuth is not configured, do NOT mock or fake. Inform the developer.
   if (!clientId || !clientSecret) {
@@ -24,8 +24,9 @@ export async function GET(req: Request) {
   }
 
   // Determine authorized redirect URI
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || url.origin;
-  const redirectUri = process.env.GOOGLE_REDIRECT_URI || `${appUrl}/api/auth/google/callback`;
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || url.origin).trim().replace(/\/+$/, "");
+  const envRedirect = process.env.GOOGLE_REDIRECT_URI?.trim().replace(/^["']|["']$/g, "");
+  const redirectUri = envRedirect || `${appUrl}/api/auth/google/callback`;
 
   // Generate cryptographic PKCE, state, and nonce
   const { verifier, challenge } = generatePkcePair();
@@ -73,5 +74,32 @@ export async function GET(req: Request) {
   });
 
   // Redirect browser to Google's real authentication and account chooser page
-  return NextResponse.redirect(googleAuthUrl);
+  const response = NextResponse.redirect(googleAuthUrl);
+
+  // Set directly on the redirect response headers as well for maximum reliability across Next.js runtimes
+  response.cookies.set("google_oauth_state", state, {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 600,
+  });
+
+  response.cookies.set("google_oauth_code_verifier", verifier, {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 600,
+  });
+
+  response.cookies.set("google_oauth_nonce", nonce, {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 600,
+  });
+
+  return response;
 }

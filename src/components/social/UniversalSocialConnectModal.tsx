@@ -427,7 +427,7 @@ export function UniversalSocialConnectModal({
               {/* Security Guarantee */}
               <div className="flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-slate-400 pt-1">
                 <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Zero password sharing. Connects securely via official partner API.</span>
+                <span>Authorized securely via official OAuth 2.0 with AES-256 encryption. Your credentials remain 100% private and are never stored.</span>
               </div>
             </div>
 

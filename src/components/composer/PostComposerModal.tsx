@@ -6,6 +6,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/toast";
 import { useBrand } from "@/context/BrandContext";
 import { UniversalSocialConnectModal } from "@/components/social/UniversalSocialConnectModal";
+import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
 import {
   X,
   Plus,
@@ -593,28 +594,8 @@ export function PostComposerModal({ isOpen, onClose, onSuccess }: PostComposerMo
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <div
-                        className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full text-white flex items-center justify-center text-[8px] font-bold border border-white ${
-                          ch.provider === "facebook"
-                            ? "bg-[#1877F2]"
-                            : ch.provider === "instagram"
-                            ? "bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600"
-                            : ch.provider === "linkedin"
-                            ? "bg-[#0A66C2]"
-                            : ch.provider === "youtube"
-                            ? "bg-[#FF0000]"
-                            : "bg-slate-900"
-                        }`}
-                      >
-                        {ch.provider === "facebook"
-                          ? "f"
-                          : ch.provider === "instagram"
-                          ? "ig"
-                          : ch.provider === "linkedin"
-                          ? "in"
-                          : ch.provider === "youtube"
-                          ? "▶"
-                          : "𝕏"}
+                      <div className="absolute -bottom-0.5 -right-0.5 rounded-full ring-1 ring-white shadow-2xs overflow-hidden shrink-0">
+                        {renderPlatformIcon(ch.provider, 14)}
                       </div>
                     </button>
                   );
@@ -1049,7 +1030,7 @@ export function PostComposerModal({ isOpen, onClose, onSuccess }: PostComposerMo
                   <div className="absolute bottom-10 left-0 w-80 bg-white rounded-xl shadow-2xl border border-slate-200 p-4 z-40 text-xs animate-in fade-in zoom-in-95">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-semibold text-slate-800 flex items-center gap-1.5">
-                        Add First Comment <span className="w-4 h-4 rounded-full bg-[#1877F2] text-white flex items-center justify-center text-[9px] font-bold">f</span>
+                        Add First Comment {renderPlatformIcon(activePreviewChannel.provider, 16)}
                       </span>
                       <button onClick={() => setShowCommentPopup(false)}>
                         <X className="w-3.5 h-3.5 text-slate-400 hover:text-slate-600" />
@@ -1057,7 +1038,7 @@ export function PostComposerModal({ isOpen, onClose, onSuccess }: PostComposerMo
                     </div>
 
                     <p className="text-[11px] text-slate-400 mb-2">
-                      Automatically post the first comment under this Facebook post.
+                      Automatically post the first comment under this {activePreviewChannel.displayName || "channel"} post.
                     </p>
 
                     <textarea
@@ -1369,9 +1350,12 @@ export function PostComposerModal({ isOpen, onClose, onSuccess }: PostComposerMo
                       />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-slate-900 leading-tight">
-                        {activePreviewChannel.displayName || activeBrand.name}
-                      </h4>
+                      <div className="flex items-center gap-1.5">
+                        <h4 className="font-semibold text-slate-900 leading-tight">
+                          {activePreviewChannel.displayName || activeBrand.name}
+                        </h4>
+                        {renderPlatformIcon(activePreviewChannel.provider, 14)}
+                      </div>
                       <p className="text-[10px] text-slate-400 flex items-center gap-1">
                         <span>Just now</span> · <span>🌐</span>
                         {selectedLocation && (

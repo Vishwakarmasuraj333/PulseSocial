@@ -14,19 +14,20 @@ interface AddBrandModalProps {
 
 const BRAND_PLATFORMS = [
   { id: "facebook", name: "Facebook", desc: "Connect a Facebook account associated with the Business Page you'd like to add." },
-  { id: "x", name: "X", desc: "Connect a X account you'd like to add." },
-  { id: "linkedin", name: "LinkedIn", desc: "Connect a LinkedIn account associated with the Profile and/or Company Page you'd like to add." },
   { id: "instagram", name: "Instagram", desc: "Connect an Instagram Professional Account you'd like to add." },
-  { id: "google_business", name: "Google Business Profile", desc: "Connect a Google Business Profile account associated with the business listing you'd like to add." },
+  { id: "x", name: "X (Twitter)", desc: "Connect a X account you'd like to add." },
+  { id: "linkedin", name: "LinkedIn", desc: "Connect a LinkedIn account associated with the Profile and/or Company Page you'd like to add." },
   { id: "youtube", name: "YouTube", desc: "Connect the YouTube channel you'd like to add." },
+  { id: "tiktok", name: "TikTok", desc: "Connect a TikTok creator or business account you'd like to add." },
   { id: "pinterest", name: "Pinterest", desc: "Connect a Pinterest account you'd like to add." },
-  { id: "mastodon", name: "Mastodon", desc: "Connect a Mastodon server" },
-  { id: "threads", name: "Threads", desc: "Connect a Threads account you'd like to add." },
-  { id: "telegram", name: "Telegram", desc: "Connect a Telegram account you'd like to add." },
-  { id: "whatsapp", name: "WhatsApp", desc: "Connect a WhatsApp account you'd like to add." },
-  { id: "bluesky", name: "Bluesky", desc: "Connect a Bluesky account you'd like to add." },
   { id: "snapchat", name: "Snapchat", desc: "Connect a Snapchat Professional Account you'd like to add." },
-  { id: "arattai", name: "Arattai", desc: "Connect the Arattai account you'd like to add." },
+  { id: "threads", name: "Threads", desc: "Connect a Threads account you'd like to add." },
+  { id: "whatsapp", name: "WhatsApp Business", desc: "Connect a WhatsApp account you'd like to add." },
+  { id: "reddit", name: "Reddit", desc: "Connect a Reddit account you'd like to add." },
+  { id: "bluesky", name: "Bluesky", desc: "Connect a Bluesky account you'd like to add." },
+  { id: "telegram", name: "Telegram", desc: "Connect a Telegram account you'd like to add." },
+  { id: "google_business", name: "Google Business Profile", desc: "Connect a Google Business Profile account associated with the business listing you'd like to add." },
+  { id: "mastodon", name: "Mastodon", desc: "Connect a Mastodon server" },
 ];
 
 export function AddBrandModal({ isOpen, onClose }: AddBrandModalProps) {

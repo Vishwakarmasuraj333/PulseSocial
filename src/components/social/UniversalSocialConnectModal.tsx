@@ -317,12 +317,13 @@ export function UniversalSocialConnectModal({
     return () => window.removeEventListener("message", handleMessage);
   }, [toast]);
 
+  const [copiedRedirect, setCopiedRedirect] = useState(false);
+
   if (!isOpen) return null;
 
   const currentConfig =
     BRAND_CHANNELS.find((c) => c.id === activeTab) || BRAND_CHANNELS[0];
 
-  const [copiedRedirect, setCopiedRedirect] = useState(false);
   const liveRedirectUri = typeof window !== "undefined"
     ? `${window.location.origin}/api/social/${activeTab}/callback`
     : `http://localhost:3000/api/social/${activeTab}/callback`;

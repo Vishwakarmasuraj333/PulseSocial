@@ -6,7 +6,9 @@ import { Dialog } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/toast";
 import { useBrand } from "@/context/BrandContext";
 import { UniversalSocialConnectModal } from "@/components/social/UniversalSocialConnectModal";
-import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
+import { CanvaConnectModal } from "@/components/composer/CanvaConnectModal";
+import { GeminiAiModal } from "@/components/composer/GeminiAiModal";
+import { renderPlatformIcon, CanvaIcon, GeminiIcon } from "@/components/icons/PlatformIcons";
 import {
   X,
   Plus,
@@ -194,6 +196,9 @@ export function PostComposerModal({ isOpen, onClose, onSuccess }: PostComposerMo
   const [connectedAccounts, setConnectedAccounts] = useState<ConnectedAccountItem[]>([]);
   const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([]);
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
+  const [isCanvaModalOpen, setIsCanvaModalOpen] = useState(false);
+  const [isGeminiModalOpen, setIsGeminiModalOpen] = useState(false);
+  const [isCanvaConnected, setIsCanvaConnected] = useState(false);
 
   const fetchChannels = async () => {
     try {
@@ -231,9 +236,20 @@ export function PostComposerModal({ isOpen, onClose, onSuccess }: PostComposerMo
     } catch {}
   };
 
+  const fetchCanvaStatus = async () => {
+    try {
+      const res = await fetch("/api/integrations/canva/status");
+      if (res.ok) {
+        const data = await res.json();
+        setIsCanvaConnected(Boolean(data.isConnected));
+      }
+    } catch {}
+  };
+
   useEffect(() => {
     if (isOpen) {
       fetchChannels();
+      fetchCanvaStatus();
     }
   }, [isOpen]);
 
@@ -511,6 +527,31 @@ export function PostComposerModal({ isOpen, onClose, onSuccess }: PostComposerMo
     }
   };
 
+  const handleCanvaMediaSelected = (url: string, title?: string) => {
+    setMediaUrl(url);
+    setIsCanvaConnected(true);
+    toast({
+      title: "Canva Design Attached",
+      message: title ? `Attached "${title}" to your post.` : "Design attached successfully.",
+      type: "success",
+    });
+  };
+
+  const handleApplyGeminiContent = (data: {
+    caption: string;
+    firstComment?: string;
+    hashtags?: string[];
+    location?: string;
+  }) => {
+    setContent(data.caption);
+    if (data.firstComment) {
+      setAttachedComment(data.firstComment);
+    }
+    if (data.location && !selectedLocation) {
+      setSelectedLocation(data.location);
+    }
+  };
+
   // Filter emojis based on search
   const filteredEmojis = emojiSearch.trim()
     ? EMOJI_CATEGORIES.flatMap((c) => c.list).filter((_, idx) => idx % 2 === 0)
@@ -627,13 +668,15 @@ export function PostComposerModal({ isOpen, onClose, onSuccess }: PostComposerMo
                 )}
               </div>
 
-              {/* Create with Zia / AI */}
+              {/* Create with Gemini AI */}
               <button
                 type="button"
-                onClick={handleCreateWithZia}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-blue-400 text-blue-600 hover:bg-blue-50 text-xs font-medium mb-3 transition active:scale-95 cursor-pointer bg-blue-50/40"
+                onClick={() => setIsGeminiModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-blue-400 text-blue-600 hover:bg-blue-50 text-xs font-medium mb-3 transition active:scale-95 cursor-pointer bg-blue-50/40 group"
+                title="Generate real AI content, hooks, and hashtags with Google Gemini"
               >
-                <Sparkles className="w-3.5 h-3.5 text-blue-500" /> Create with Zia
+                <GeminiIcon size={14} className="shrink-0 group-hover:rotate-12 transition" />
+                <span>Create with Gemini AI</span>
               </button>
 
               {/* Tagged Location Badge */}
@@ -777,17 +820,31 @@ export function PostComposerModal({ isOpen, onClose, onSuccess }: PostComposerMo
                     ))}
 
                     <div className="border-t border-slate-100 my-1" />
-                    <a
-                      href="https://www.canva.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => setShowMediaMenu(false)}
-                      className="flex items-center gap-2.5 px-3.5 py-2 hover:bg-slate-50 text-slate-700 font-medium transition"
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowMediaMenu(false);
+                        setIsCanvaModalOpen(true);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3.5 py-2 hover:bg-slate-50 text-slate-700 font-medium transition text-left cursor-pointer group"
+                      title="Open Canva Connect integration"
                     >
-                      <Layers className="w-4 h-4 text-cyan-500" />
-                      <span>Design on Canva</span>
-                      <ExternalLink className="w-3 h-3 text-slate-400 ml-auto" />
-                    </a>
+                      <div className="w-5 h-5 rounded-full overflow-hidden shrink-0 flex items-center justify-center">
+                        <CanvaIcon size={20} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-semibold text-slate-800 group-hover:text-blue-600 transition">Design on Canva</span>
+                          {isCanvaConnected && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" title="Canva Connected" />
+                          )}
+                        </div>
+                        <p className="text-[10px] text-slate-400 font-normal">
+                          {isCanvaConnected ? "Canva Connected • Export or Create" : "Connect Canva • Official API"}
+                        </p>
+                      </div>
+                      <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 ml-auto shrink-0 transition" />
+                    </button>
                   </div>
                 )}
               </div>
@@ -1488,6 +1545,24 @@ export function PostComposerModal({ isOpen, onClose, onSuccess }: PostComposerMo
           fetchChannels();
           setIsConnectModalOpen(false);
         }}
+      />
+    )}
+
+    {isCanvaModalOpen && (
+      <CanvaConnectModal
+        isOpen={isCanvaModalOpen}
+        onClose={() => setIsCanvaModalOpen(false)}
+        onSelectMedia={handleCanvaMediaSelected}
+      />
+    )}
+
+    {isGeminiModalOpen && (
+      <GeminiAiModal
+        isOpen={isGeminiModalOpen}
+        onClose={() => setIsGeminiModalOpen(false)}
+        brandName={activeBrand.name || "Brand"}
+        industry={activeBrand.industry || "Digital Content"}
+        onApply={handleApplyGeminiContent}
       />
     )}
   </>

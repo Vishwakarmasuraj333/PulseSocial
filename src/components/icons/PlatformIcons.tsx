@@ -221,6 +221,20 @@ export function MastodonIcon({ className = "w-5 h-5", size }: IconProps) {
   );
 }
 
+// 15. Reddit: Official vibrant orange circle with crisp white Snoo icon
+export function RedditIcon({ className = "w-5 h-5", size }: IconProps) {
+  const s = size || 20;
+  return (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" className={className}>
+      <circle cx="12" cy="12" r="12" fill="#FF4500" />
+      <path
+        d="M17.8 11.2c-.4 0-.8.2-1 .5-1.1-.7-2.6-1.2-4.2-1.3l.8-3.7 2.6.6c0 .6.5 1 1.1 1 .6 0 1.1-.5 1.1-1.1s-.5-1.1-1.1-1.1c-.5 0-.9.3-1 .8l-2.9-.6c-.1 0-.3.1-.3.2l-.9 4.2c-1.7.1-3.2.6-4.3 1.3-.3-.3-.7-.5-1.1-.5-.8 0-1.5.7-1.5 1.5 0 .6.4 1.1.9 1.3-.1.3-.1.6-.1.9 0 2.3 2.7 4.2 6 4.2s6-1.9 6-4.2c0-.3 0-.6-.1-.9.5-.2.9-.7.9-1.3 0-.8-.7-1.4-1.5-1.4zm-8.8 1.8c.5 0 .9.4.9.9s-.4.9-.9.9-.9-.4-.9-.9.4-.9.9-.9zm5.9 3.5c-.8.8-2.2.8-2.9.8s-2.1 0-2.9-.8c-.1-.1-.1-.3 0-.4.1-.1.3-.1.4 0 .6.6 1.7.6 2.5.6s1.9 0 2.5-.6c.1-.1.3-.1.4 0 .1.1.1.3 0 .4zm-.2-2.6c-.5 0-.9-.4-.9-.9s.4-.9.9-.9.9.4.9.9-.4.9-.9.9z"
+        fill="#FFFFFF"
+      />
+    </svg>
+  );
+}
+
 // Central renderer
 export function renderPlatformIcon(
   platform: string,
@@ -264,10 +278,11 @@ export function renderPlatformIcon(
       return <BlueskyIcon size={size} className={cls} />;
     case "snapchat":
       return <SnapchatIcon size={size} className={cls} />;
+    case "reddit":
+      return <RedditIcon size={size} className={cls} />;
     case "mastodon":
     case "lemon8":
     case "golden":
-    case "reddit":
       return <MastodonIcon size={size} className={cls} />;
     default:
       return (

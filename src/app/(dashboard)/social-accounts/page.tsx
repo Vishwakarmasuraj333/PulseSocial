@@ -156,6 +156,61 @@ export const PLATFORMS: PlatformDef[] = [
       { name: "Publish toots", description: "Publish federated status updates and media" },
     ],
   },
+  {
+    id: "snapchat",
+    name: "Snapchat",
+    description: "Connect your Snapchat Public Profile to publish Stories, Spotlight videos, and track views.",
+    ctaLabel: "Continue with Snapchat",
+    buttonClass: "bg-[#FFFC00] hover:bg-[#F2EE00] text-black font-bold",
+    accountTypeLabel: "Public Profile",
+    reviewUrl: "https://accounts.snapchat.com/accounts/welcome",
+    scopes: [
+      { name: "Public profile", description: "Access display name, Bitmoji avatar, and profile handle" },
+      { name: "Publish Stories", description: "Schedule and auto-post Spotlight videos and story clips" },
+      { name: "Story analytics", description: "Track impressions, screenshot counts, and viewer reach" },
+    ],
+  },
+  {
+    id: "threads",
+    name: "Threads",
+    description: "Connect your Instagram Threads account for conversational microblogging and replies.",
+    ctaLabel: "Continue with Threads",
+    buttonClass: "bg-black hover:bg-slate-900 text-white font-semibold",
+    accountTypeLabel: "Threads Profile",
+    reviewUrl: "https://www.threads.net/settings",
+    scopes: [
+      { name: "Read profile stats", description: "Access Threads username, follower metrics, and profile bio" },
+      { name: "Publish content", description: "Post updates, images, and video threads to your feed" },
+      { name: "Read replies", description: "Track conversation threads and reader comments" },
+    ],
+  },
+  {
+    id: "whatsapp",
+    name: "WhatsApp Business",
+    description: "Connect your WhatsApp Business Cloud API to send broadcast messages and client updates.",
+    ctaLabel: "Continue with WhatsApp",
+    buttonClass: "bg-[#25D366] hover:bg-[#1EBE5D] text-white font-semibold",
+    accountTypeLabel: "Business Account",
+    reviewUrl: "https://business.facebook.com/wa/manage/",
+    scopes: [
+      { name: "Broadcast messaging", description: "Send verified announcements and customer updates" },
+      { name: "Profile management", description: "Manage verified business profile information and catalogs" },
+    ],
+  },
+  {
+    id: "reddit",
+    name: "Reddit",
+    description: "Connect your Reddit account to share articles and links to subreddits and track karma.",
+    ctaLabel: "Continue with Reddit",
+    buttonClass: "bg-[#FF4500] hover:bg-[#E03D00] text-white font-semibold",
+    accountTypeLabel: "Reddit Profile",
+    reviewUrl: "https://www.reddit.com/prefs/apps",
+    scopes: [
+      { name: "Verify identity", description: "Authenticate your Reddit username and karma score" },
+      { name: "Submit community posts", description: "Publish text, links, and media to targeted subreddits" },
+      { name: "Track engagement", description: "Monitor upvote ratios, comments, and post performance" },
+    ],
+  },
 ];
 
 export interface ConnectedAccountItem {

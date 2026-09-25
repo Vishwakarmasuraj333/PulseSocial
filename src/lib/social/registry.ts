@@ -8,6 +8,11 @@ import { PinterestProvider } from "./providers/pinterest";
 import { GoogleBusinessProvider } from "./providers/google-business";
 import { MastodonProvider } from "./providers/mastodon";
 
+import { SnapchatProvider } from "./providers/snapchat";
+import { ThreadsProvider } from "./providers/threads";
+import { WhatsAppProvider } from "./providers/whatsapp";
+import { RedditProvider } from "./providers/reddit";
+
 const providers: Record<SupportedPlatform, SocialProvider> = {
   facebook: new MetaProvider("facebook"),
   instagram: new MetaProvider("instagram"),
@@ -18,6 +23,10 @@ const providers: Record<SupportedPlatform, SocialProvider> = {
   pinterest: new PinterestProvider(),
   google_business: new GoogleBusinessProvider(),
   mastodon: new MastodonProvider(),
+  snapchat: new SnapchatProvider(),
+  threads: new ThreadsProvider(),
+  whatsapp: new WhatsAppProvider(),
+  reddit: new RedditProvider(),
 };
 
 export function getSocialProvider(platform: string): SocialProvider {

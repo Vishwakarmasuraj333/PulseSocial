@@ -7,7 +7,11 @@ export type SupportedPlatform =
   | "tiktok"
   | "pinterest"
   | "google_business"
-  | "mastodon";
+  | "mastodon"
+  | "snapchat"
+  | "threads"
+  | "whatsapp"
+  | "reddit";
 
 export interface PlatformCapabilities {
   publish: boolean;
@@ -131,6 +135,54 @@ export const PLATFORM_CAPABILITY_MATRIX: Record<SupportedPlatform, PlatformCapab
     webhooks: true,
     characterLimit: 500,
     notes: "Decentralized ActivityPub protocol with instance host configuration.",
+  },
+  snapchat: {
+    publish: true,
+    schedule: true,
+    comments: false,
+    messages: false,
+    analytics: true,
+    mediaUpload: true,
+    videoPublish: true,
+    webhooks: true,
+    characterLimit: 250,
+    notes: "Requires approved Snap Kit app with Creative Kit & Marketing API permissions.",
+  },
+  threads: {
+    publish: true,
+    schedule: true,
+    comments: true,
+    messages: false,
+    analytics: true,
+    mediaUpload: true,
+    videoPublish: true,
+    webhooks: true,
+    characterLimit: 500,
+    notes: "Meta Threads API for publishing conversational posts, images, and video.",
+  },
+  whatsapp: {
+    publish: true,
+    schedule: true,
+    comments: false,
+    messages: true,
+    analytics: true,
+    mediaUpload: true,
+    videoPublish: false,
+    webhooks: true,
+    characterLimit: 4096,
+    notes: "WhatsApp Business Cloud API for template broadcasting and interactive messages.",
+  },
+  reddit: {
+    publish: true,
+    schedule: true,
+    comments: true,
+    messages: true,
+    analytics: true,
+    mediaUpload: true,
+    videoPublish: true,
+    webhooks: true,
+    characterLimit: 40000,
+    notes: "Reddit OAuth 2.0 API for submitting to subreddits and tracking post karma.",
   },
 };
 

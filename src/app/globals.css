@@ -229,3 +229,50 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ============================================================ */
+/* SOCIAL ORBIT CONSTELLATION ANIMATION                        */
+/* ============================================================ */
+@keyframes orbitSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbitReverse {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.animate-orbit {
+  animation: orbitSpin 32s linear infinite;
+}
+
+.animate-orbit:hover {
+  animation-play-state: paused;
+}
+
+.animate-orbit-reverse {
+  animation: orbitReverse 32s linear infinite;
+}
+
+.animate-orbit-reverse:hover {
+  animation-play-state: paused;
+}
+
+.icon-glow-node {
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.8), 0 0 10px rgba(139, 107, 214, 0.5);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.icon-glow-node:hover {
+  transform: scale(1.18);
+  box-shadow: 0 0 35px rgba(255, 255, 255, 1), 0 0 20px rgba(167, 139, 223, 0.9);
+}

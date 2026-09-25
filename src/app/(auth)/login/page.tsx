@@ -13,6 +13,7 @@ import {
   RotateCw,
   CheckCircle2,
   Check,
+  Sparkles,
 } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { OtpSixBoxInput } from "@/components/auth/OtpSixBoxInput";
@@ -116,12 +117,16 @@ function LoginContent() {
   // ==========================================
   // Direct Sign In with OTP (Passwordless)
   // ==========================================
-  const handleRequestOtpLogin = async () => {
-    const trimmedEmail = email.trim().toLowerCase();
-    if (!trimmedEmail || !trimmedEmail.includes("@")) {
+  const handleRequestOtpLogin = async (explicitEmail?: string) => {
+    const targetEmail = (explicitEmail || email).trim().toLowerCase();
+    if (!targetEmail || !targetEmail.includes("@")) {
       setErrorMessage("Please enter a valid email address first.");
       triggerShake();
       return;
+    }
+
+    if (explicitEmail) {
+      setEmail(explicitEmail);
     }
 
     setErrorMessage("");
@@ -131,7 +136,7 @@ function LoginContent() {
       const res = await fetch("/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: trimmedEmail }),
+        body: JSON.stringify({ email: targetEmail }),
       });
 
       const data = await res.json();
@@ -140,7 +145,7 @@ function LoginContent() {
       }
 
       setOtpUserId(data.userId || "");
-      setOtpEmail(data.email || trimmedEmail);
+      setOtpEmail(data.email || targetEmail);
       setDigits(["", "", "", "", "", ""]);
       setCooldown(60);
       setTimeLeft(300);
@@ -148,8 +153,8 @@ function LoginContent() {
       setShowOtpBanner(true);
 
       toast({
-        title: "OTP sent successfully",
-        message: `Verification code sent to ${maskEmail(trimmedEmail)}`,
+        title: "Real OTP sent successfully",
+        message: `6-digit verification code sent to ${maskEmail(targetEmail)}`,
         type: "success",
       });
     } catch (err: unknown) {
@@ -255,7 +260,7 @@ function LoginContent() {
           userId: otpUserId || undefined,
           email: otpEmail || email.trim() || undefined,
           code,
-          redirectTo: searchParams.get("redirectTo") || "/dashboard?setup=brand",
+          redirectTo: searchParams.get("redirectTo") || "/dashboard",
         }),
       });
 
@@ -274,7 +279,7 @@ function LoginContent() {
       });
 
       setTimeout(() => {
-        window.location.href = data.redirectTo || "/dashboard?setup=brand";
+        window.location.href = searchParams.get("redirectTo") || data.redirectTo || "/dashboard";
       }, 500);
     } catch (err: unknown) {
       setErrorMessage((err as Error).message || "Invalid verification code");
@@ -383,7 +388,7 @@ function LoginContent() {
                 <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
                   Welcome back
                 </h1>
-                <p className="text-sm text-slate-500 mt-2 mb-8 font-normal">
+                <p className="text-sm text-slate-500 mt-2 mb-6 font-normal">
                   Please enter your details
                 </p>
 
@@ -603,8 +608,8 @@ function LoginContent() {
           </div>
 
           {/* Simple Bottom Copyright */}
-          <div className="text-center text-[11px] text-slate-400">
-            © 777% PulseSocial Corporation. All rights reserved.
+          <div className="text-center text-xs text-slate-500">
+            © {new Date().getFullYear()} PulseSocial Corporation. All rights reserved.
           </div>
         </div>
 

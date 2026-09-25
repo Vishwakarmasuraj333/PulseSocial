@@ -276,7 +276,7 @@ export async function GET(req: Request) {
     // 8. Redirect to the authenticated dashboard and explicitly affix the session cookie
     const redirectResponse = NextResponse.redirect(new URL("/dashboard", req.url));
     const isProd = process.env.NODE_ENV === "production";
-    redirectResponse.cookies.set("pulsesocial_session", sessionToken, {
+    redirectResponse.cookies.set("pulsesocial_auth_session", sessionToken, {
       httpOnly: true,
       secure: isProd,
       sameSite: "lax",

@@ -2,7 +2,7 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
-const COOKIE_NAME = "pulsesocial_session";
+const COOKIE_NAME = "pulsesocial_auth_session";
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "pulsesocial_super_secure_jwt_secret_token_change_in_production_32chars"
 );
@@ -111,11 +111,13 @@ export async function getCurrentUser() {
 
 export async function destroySession(): Promise<void> {
   const cookieStore = await cookies();
-  cookieStore.set(COOKIE_NAME, "", {
+  const opts = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: "lax" as const,
     path: "/",
     maxAge: 0,
-  });
+  };
+  cookieStore.set(COOKIE_NAME, "", opts);
+  cookieStore.set("pulsesocial_session", "", opts);
 }

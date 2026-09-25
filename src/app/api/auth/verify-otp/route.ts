@@ -108,7 +108,8 @@ export async function POST(req: Request) {
       resourceId: user.id,
     });
 
-    const targetDestination = requestedRedirect || "/dashboard?setup=brand";
+    const hasExistingOrg = (user.memberships?.length || 0) > 0;
+    const targetDestination = requestedRedirect || (hasExistingOrg ? "/dashboard" : "/dashboard?setup=brand");
 
     return NextResponse.json({
       success: true,

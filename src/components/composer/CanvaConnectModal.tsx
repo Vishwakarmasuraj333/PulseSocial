@@ -379,17 +379,6 @@ export function CanvaConnectModal({
                     </a>{" "}
                     and set your Client ID and Client Secret in <code className="bg-amber-100 px-1 py-0.5 rounded">.env</code>.
                   </p>
-                  <div className="flex items-center gap-2 bg-white/90 p-2 rounded border border-amber-200 text-[11px]">
-                    <span className="text-slate-400 font-mono truncate flex-1">{redirectUri}</span>
-                    <button
-                      type="button"
-                      onClick={copyRedirectUri}
-                      className="px-2 py-1 bg-amber-200/60 hover:bg-amber-200 text-amber-900 font-semibold rounded flex items-center gap-1 transition"
-                    >
-                      {copiedRedirect ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                      <span>{copiedRedirect ? "Copied" : "Copy URI"}</span>
-                    </button>
-                  </div>
                 </div>
               )}
 

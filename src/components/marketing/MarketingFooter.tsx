@@ -59,8 +59,8 @@ export function MarketingFooter() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12 pb-12 border-b border-slate-800/80">
           {/* Brand Col */}
           <div className="col-span-2 space-y-4">
-            <PulseSocialLogo size="md" theme="light" variant="full" href="/" />
-            <p className="text-xs text-slate-400 max-w-sm leading-relaxed">
+            <PulseSocialLogo size="md" theme="dark" variant="full" href="/" />
+            <p className="text-xs text-slate-300 max-w-sm leading-relaxed">
               PulseSocial is the unified social media management SaaS platform for modern teams, creators, and enterprises. Publish, schedule, collaborate, and analyze from one powerful workspace.
             </p>
             <div className="flex items-center gap-3 pt-2">
@@ -105,9 +105,9 @@ export function MarketingFooter() {
         </div>
 
         {/* Bottom copyright bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} PulseSocial Inc. All rights reserved. Manage Every Social. From One Place.</p>
-          <div className="flex items-center gap-4">
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+          <p className="text-slate-300">© {new Date().getFullYear()} PulseSocial Inc. All rights reserved. Manage Every Social. From One Place.</p>
+          <div className="flex items-center gap-4 text-slate-400">
             <span>English (US)</span>
             <span>·</span>
             <span>SOC2 Type II Compliant</span>

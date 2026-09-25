@@ -41,6 +41,13 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
+  Home,
+  FileEdit,
+  AtSign,
+  TrendingUp,
+  Wand2,
+  Palette,
+  CreditCard,
 } from "lucide-react";
 import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
 import { PostComposerModal } from "@/components/composer/PostComposerModal";
@@ -213,80 +220,194 @@ export function AppLayout({ children }: AppLayoutProps) {
     }
   };
 
-  // Requested 12 Primary Sidebar Navigation Sections
-  const SIDEBAR_ITEMS = [
+  // Categorized Sidebar Navigation Sections
+  const SIDEBAR_SECTIONS = [
     {
-      label: "Dashboard",
-      href: "/dashboard",
-      icon: LayoutDashboard,
-      match: (p: string) => p === "/" || p === "/dashboard",
+      title: "Overview",
+      items: [
+        {
+          label: "Dashboard",
+          href: "/dashboard",
+          icon: LayoutDashboard,
+          match: (p: string) => p === "/dashboard",
+        },
+        {
+          label: "Home",
+          href: "/",
+          icon: Home,
+          match: (p: string) => p === "/",
+        },
+      ],
     },
     {
-      label: "Social Accounts",
-      href: "/social-accounts",
-      icon: Share2,
-      match: (p: string) => p.startsWith("/social-accounts"),
-      badge: connectedAccounts.length > 0 ? connectedAccounts.length.toString() : undefined,
+      title: "Publishing",
+      items: [
+        {
+          label: "Posts",
+          href: "/posts",
+          icon: FileText,
+          match: (p: string) => p === "/posts" && !p.includes("filter="),
+        },
+        {
+          label: "New Post",
+          href: "/posts/new",
+          icon: PlusCircle,
+          match: (p: string) => p.startsWith("/posts/new") || p.startsWith("/compose"),
+        },
+        {
+          label: "Content Calendar",
+          href: "/calendar",
+          icon: Calendar,
+          match: (p: string) => p.startsWith("/calendar"),
+        },
+        {
+          label: "Drafts",
+          href: "/drafts",
+          icon: FileEdit,
+          match: (p: string) => p.startsWith("/drafts") || p.includes("filter=DRAFT"),
+        },
+        {
+          label: "Scheduled",
+          href: "/posts?filter=SCHEDULED",
+          icon: Clock,
+          match: (p: string) => p.includes("filter=SCHEDULED"),
+        },
+        {
+          label: "Published",
+          href: "/posts?filter=PUBLISHED",
+          icon: CheckCircle2,
+          match: (p: string) => p.includes("filter=PUBLISHED"),
+        },
+      ],
     },
     {
-      label: "Posts",
-      href: "/posts",
-      icon: FileText,
-      match: (p: string) => p === "/posts" || (p.startsWith("/posts") && !p.startsWith("/posts/new")),
+      title: "Engagement",
+      items: [
+        {
+          label: "Inbox",
+          href: "/inbox",
+          icon: MessageSquare,
+          match: (p: string) => p === "/inbox" || (p.startsWith("/inbox") && !p.includes("tab=")),
+          badge: unreadNotificationsCount > 0 ? unreadNotificationsCount.toString() : undefined,
+        },
+        {
+          label: "Comments",
+          href: "/inbox?tab=comments",
+          icon: MessageCircle,
+          match: (p: string) => p.includes("tab=comments"),
+        },
+        {
+          label: "Mentions",
+          href: "/inbox?tab=mentions",
+          icon: AtSign,
+          match: (p: string) => p.includes("tab=mentions"),
+        },
+        {
+          label: "Notifications",
+          href: "/inbox?tab=all",
+          icon: Bell,
+          match: (p: string) => p.includes("tab=all"),
+        },
+      ],
     },
     {
-      label: "New Post",
-      href: "/posts/new",
-      icon: PlusCircle,
-      match: (p: string) => p.startsWith("/posts/new") || p.startsWith("/compose"),
+      title: "Analytics",
+      items: [
+        {
+          label: "Overview",
+          href: "/analytics",
+          icon: BarChart3,
+          match: (p: string) => p === "/analytics" && !p.includes("tab="),
+        },
+        {
+          label: "Post Analytics",
+          href: "/analytics?tab=posts",
+          icon: TrendingUp,
+          match: (p: string) => p.includes("tab=posts"),
+        },
+        {
+          label: "Audience",
+          href: "/connections",
+          icon: Users,
+          match: (p: string) => p.startsWith("/connections"),
+        },
+        {
+          label: "Engagement",
+          href: "/analytics?tab=engagement",
+          icon: Activity,
+          match: (p: string) => p.includes("tab=engagement"),
+        },
+        {
+          label: "Reports",
+          href: "/reports",
+          icon: PieChart,
+          match: (p: string) => p.startsWith("/reports"),
+        },
+      ],
     },
     {
-      label: "Content Calendar",
-      href: "/calendar",
-      icon: Calendar,
-      match: (p: string) => p.startsWith("/calendar"),
+      title: "Social",
+      items: [
+        {
+          label: "Connected Accounts",
+          href: "/social-accounts",
+          icon: Share2,
+          match: (p: string) => p === "/social-accounts" && !p.includes("action="),
+          badge: connectedAccounts.length > 0 ? connectedAccounts.length.toString() : undefined,
+        },
+        {
+          label: "Add New Social",
+          href: "/social-accounts?action=connect",
+          icon: Plus,
+          match: (p: string) => p.includes("action=connect"),
+        },
+      ],
     },
     {
-      label: "Schedule",
-      href: "/posts?filter=SCHEDULED",
-      icon: Clock,
-      match: (p: string) => p.includes("SCHEDULED"),
+      title: "AI / Creation",
+      items: [
+        {
+          label: "AI Studio",
+          href: "/ai",
+          icon: Sparkles,
+          match: (p: string) => p.startsWith("/ai") && !p.startsWith("/ai-assistant"),
+        },
+        {
+          label: "Gemini AI",
+          href: "/ai-assistant",
+          icon: Wand2,
+          match: (p: string) => p.startsWith("/ai-assistant"),
+        },
+        {
+          label: "Canva",
+          href: "/media?action=canva",
+          icon: Palette,
+          match: (p: string) => p.includes("action=canva"),
+        },
+      ],
     },
     {
-      label: "Inbox",
-      href: "/inbox",
-      icon: MessageSquare,
-      match: (p: string) => p.startsWith("/inbox") || p.startsWith("/messages"),
-    },
-    {
-      label: "Analytics",
-      href: "/analytics",
-      icon: BarChart3,
-      match: (p: string) => p.startsWith("/analytics"),
-    },
-    {
-      label: "Reports",
-      href: "/reports",
-      icon: PieChart,
-      match: (p: string) => p.startsWith("/reports"),
-    },
-    {
-      label: "Audience",
-      href: "/connections",
-      icon: Users,
-      match: (p: string) => p.startsWith("/connections"),
-    },
-    {
-      label: "Media Library",
-      href: "/media",
-      icon: ImageIcon,
-      match: (p: string) => p.startsWith("/media"),
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-      icon: Settings,
-      match: (p: string) => p.startsWith("/settings"),
+      title: "Workspace",
+      items: [
+        {
+          label: "Team",
+          href: "/team",
+          icon: Users,
+          match: (p: string) => p.startsWith("/team"),
+        },
+        {
+          label: "Settings",
+          href: "/settings",
+          icon: Settings,
+          match: (p: string) => p === "/settings" && !p.includes("tab="),
+        },
+        {
+          label: "Billing",
+          href: "/settings?tab=portal_settings",
+          icon: CreditCard,
+          match: (p: string) => p.includes("portal_settings") || p.includes("billing"),
+        },
+      ],
     },
   ];
 
@@ -366,40 +487,52 @@ export function AppLayout({ children }: AppLayoutProps) {
         )}
 
         {/* Navigation Items */}
-        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-          {SIDEBAR_ITEMS.map((item) => {
-            const Icon = item.icon;
-            const isActive = item.match(pathname);
+        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
+          {SIDEBAR_SECTIONS.map((section, sIdx) => (
+            <div key={section.title} className="space-y-1">
+              {isSidebarOpen ? (
+                <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-3 pt-1 pb-0.5">
+                  {section.title}
+                </div>
+              ) : sIdx > 0 ? (
+                <div className="my-2 border-t border-slate-100 dark:border-slate-800" />
+              ) : null}
 
-            return (
-              <Link
-                key={item.label}
-                href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 ${
-                  isActive
-                    ? "bg-[#F0EAFB] text-[#6F52B5] font-bold shadow-2xs"
-                    : "text-[#68627A] hover:text-[#6F52B5] hover:bg-[#F0EBF9]"
-                }`}
-                title={!isSidebarOpen ? item.label : undefined}
-              >
-                <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-[#6F52B5]" : "text-[#9690A5] group-hover:text-[#6F52B5]"}`} />
-                {isSidebarOpen && (
-                  <span className="truncate flex-1">{item.label}</span>
-                )}
-                {isSidebarOpen && item.badge && (
-                  <span
-                    className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+              {section.items.map((item) => {
+                const Icon = item.icon;
+                const isActive = item.match(pathname);
+
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 ${
                       isActive
-                        ? "bg-[#6F52B5] text-white"
-                        : "bg-[#DDD3F4] text-[#6F52B5]"
+                        ? "bg-[#F0EAFB] text-[#6F52B5] font-bold shadow-2xs"
+                        : "text-[#68627A] hover:text-[#6F52B5] hover:bg-[#F0EBF9]"
                     }`}
+                    title={!isSidebarOpen ? item.label : undefined}
                   >
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-[#6F52B5]" : "text-[#9690A5] group-hover:text-[#6F52B5]"}`} />
+                    {isSidebarOpen && (
+                      <span className="truncate flex-1">{item.label}</span>
+                    )}
+                    {isSidebarOpen && item.badge && (
+                      <span
+                        className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                          isActive
+                            ? "bg-[#6F52B5] text-white"
+                            : "bg-[#DDD3F4] text-[#6F52B5]"
+                        }`}
+                      >
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </div>
 
         {/* Sidebar Footer: Quick Action & Profile preview */}

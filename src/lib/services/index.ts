@@ -313,7 +313,9 @@ export const aiService = {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to generate caption");
-      return data.content as string;
+      const caption = data.result?.caption || data.content || data.result?.variations?.[0]?.caption;
+      if (!caption) throw new Error("No caption in response");
+      return caption as string;
     } catch {
       // High-quality deterministic AI fallback
       return `Transforming the way you scale on ${platform}! 🚀 Discover how smart automation and deep insights can drive 3x more engagement. What's your biggest challenge right now? Drop your thoughts below! 👇✨`;
@@ -329,7 +331,7 @@ export const aiService = {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to generate hashtags");
-      return data.hashtags as string[];
+      return (data.result?.hashtags || data.hashtags || []) as string[];
     } catch {
       return [
         "#SocialGrowth",

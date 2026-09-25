@@ -512,31 +512,6 @@ export function UniversalSocialConnectModal({
                     )}
                   </div>
                 )}
-                {/* Dynamic Live Callback URL with 1-click Copy */}
-                <div className="pt-2 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 bg-white/70 dark:bg-slate-900/70 px-3 py-2 rounded-xl border border-slate-200/80 dark:border-slate-800">
-                  <div className="flex items-center gap-1.5 truncate">
-                    <span className="font-semibold text-slate-700 dark:text-slate-300 shrink-0">Redirect URI:</span>
-                    <span className="font-mono text-[10px] text-slate-600 dark:text-slate-400 truncate">{liveRedirectUri}</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      navigator.clipboard.writeText(liveRedirectUri);
-                      setCopiedRedirect(true);
-                      setTimeout(() => setCopiedRedirect(false), 2000);
-                      toast({
-                        title: "Copied to clipboard",
-                        message: `${currentConfig.name} Authorized redirect URI copied.`,
-                        type: "success",
-                      });
-                    }}
-                    className="shrink-0 text-[#5846a8] dark:text-[#a79cf0] font-semibold hover:underline cursor-pointer flex items-center gap-1 ml-2 select-none"
-                    title="Copy Authorized Redirect URI"
-                  >
-                    {copiedRedirect ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedRedirect ? "Copied" : "Copy"}</span>
-                  </button>
-                </div>
               </div>
 
               {/* Security Guarantee */}

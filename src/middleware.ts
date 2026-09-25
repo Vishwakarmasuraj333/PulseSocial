@@ -34,7 +34,7 @@ const AUTH_ROUTES = ["/login", "/signup"];
 export async function middleware(req: any) {
   const { pathname } = req.nextUrl;
 
-  const sessionCookie = req.cookies.get("pulsesocial_session")?.value;
+  const sessionCookie = req.cookies.get("pulsesocial_auth_session")?.value;
   let isAuthenticated = false;
 
   if (sessionCookie) {
@@ -48,9 +48,14 @@ export async function middleware(req: any) {
     }
   }
 
-  // If visiting the root of the app, send to /login
+  // If visiting the root of the app (/), ALWAYS show the frontend marketing landing page!
   if (pathname === "/") {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.next();
+  }
+
+  // If already authenticated and visiting auth routes (/login, /signup), redirect to dashboard
+  if (isAuthenticated && AUTH_ROUTES.includes(pathname)) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   // Check if requested route requires authentication
@@ -69,27 +74,6 @@ export async function middleware(req: any) {
 
 export const config = {
   matcher: [
-    "/dashboard/:path*",
-    "/compose/:path*",
-    "/inbox/:path*",
-    "/posts/:path*",
-    "/calendar/:path*",
-    "/messages/:path*",
-    "/monitor/:path*",
-    "/analytics/:path*",
-    "/team/:path*",
-    "/settings/:path*",
-    "/media/:path*",
-    "/connections/:path*",
-    "/reports/:path*",
-    "/automation/:path*",
-    "/collaborate/:path*",
-    "/approvals/:path*",
-    "/drafts/:path*",
-    "/social-accounts/:path*",
-    "/ai-assistant/:path*",
-    "/login",
-    "/signup",
-    "/",
+    "/((?!api|_next/static|_next/image|favicon.ico|icon.svg|sitemap.xml|robots.txt).*)",
   ],
 };

@@ -11,7 +11,9 @@ export type SupportedPlatform =
   | "snapchat"
   | "threads"
   | "whatsapp"
-  | "reddit";
+  | "reddit"
+  | "bluesky"
+  | "telegram";
 
 export interface PlatformCapabilities {
   publish: boolean;
@@ -183,6 +185,30 @@ export const PLATFORM_CAPABILITY_MATRIX: Record<SupportedPlatform, PlatformCapab
     webhooks: true,
     characterLimit: 40000,
     notes: "Reddit OAuth 2.0 API for submitting to subreddits and tracking post karma.",
+  },
+  bluesky: {
+    publish: true,
+    schedule: true,
+    comments: true,
+    messages: false,
+    analytics: false,
+    mediaUpload: true,
+    videoPublish: true,
+    webhooks: true,
+    characterLimit: 300,
+    notes: "AT Protocol federated social network for open microblogging.",
+  },
+  telegram: {
+    publish: true,
+    schedule: true,
+    comments: true,
+    messages: true,
+    analytics: true,
+    mediaUpload: true,
+    videoPublish: true,
+    webhooks: true,
+    characterLimit: 4096,
+    notes: "Telegram Bot API & Channel publishing for broadcasts and media.",
   },
 };
 

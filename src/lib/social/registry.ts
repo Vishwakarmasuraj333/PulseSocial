@@ -12,6 +12,8 @@ import { SnapchatProvider } from "./providers/snapchat";
 import { ThreadsProvider } from "./providers/threads";
 import { WhatsAppProvider } from "./providers/whatsapp";
 import { RedditProvider } from "./providers/reddit";
+import { BlueskyProvider } from "./providers/bluesky";
+import { TelegramProvider } from "./providers/telegram";
 
 const providers: Record<SupportedPlatform, SocialProvider> = {
   facebook: new MetaProvider("facebook"),
@@ -27,6 +29,8 @@ const providers: Record<SupportedPlatform, SocialProvider> = {
   threads: new ThreadsProvider(),
   whatsapp: new WhatsAppProvider(),
   reddit: new RedditProvider(),
+  bluesky: new BlueskyProvider(),
+  telegram: new TelegramProvider(),
 };
 
 export function getSocialProvider(platform: string): SocialProvider {

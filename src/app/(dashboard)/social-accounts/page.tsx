@@ -211,6 +211,32 @@ export const PLATFORMS: PlatformDef[] = [
       { name: "Track engagement", description: "Monitor upvote ratios, comments, and post performance" },
     ],
   },
+  {
+    id: "bluesky",
+    name: "Bluesky",
+    description: "Connect your Bluesky profile to publish posts to the AT Protocol decentralized network.",
+    ctaLabel: "Continue with Bluesky",
+    buttonClass: "bg-[#1185FE] hover:bg-[#0D70D8] text-white font-semibold",
+    accountTypeLabel: "Bluesky Account",
+    reviewUrl: "https://bsky.app",
+    scopes: [
+      { name: "Read feed", description: "Access public posts, profile details, and replies" },
+      { name: "Publish updates", description: "Post toots, images, and links to your feed" },
+    ],
+  },
+  {
+    id: "telegram",
+    name: "Telegram",
+    description: "Connect your Telegram Channel to broadcast announcements, articles, and rich media.",
+    ctaLabel: "Continue with Telegram",
+    buttonClass: "bg-[#24A1DE] hover:bg-[#208DC3] text-white font-semibold",
+    accountTypeLabel: "Broadcast Channel",
+    reviewUrl: "https://t.me",
+    scopes: [
+      { name: "Channel broadcast", description: "Send announcements, formatted text, and media" },
+      { name: "Subscriber metrics", description: "Read audience statistics and channel views" },
+    ],
+  },
 ];
 
 export interface ConnectedAccountItem {

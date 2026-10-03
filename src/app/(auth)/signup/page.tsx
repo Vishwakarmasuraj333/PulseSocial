@@ -570,14 +570,12 @@ export default function SignupPage() {
         {/* ============================================================ */}
         {/* RIGHT COLUMN: Iconic Purple Specialist Showcase              */}
         {/* ============================================================ */}
-        <div className="hidden md:flex w-1/2 bg-[#9371D0] min-h-screen items-center justify-center p-6 lg:p-12 relative overflow-hidden select-none">
-          <div className="w-full max-w-[540px] flex flex-col items-center justify-center relative z-10">
-            <img
-              src="/images/auth_specialist_hero.png"
-              alt="Customer Support Specialist"
-              className="w-full h-auto object-contain drop-shadow-2xl transition-transform hover:scale-[1.02] duration-300"
-            />
-          </div>
+        <div className="hidden md:flex w-1/2 bg-[#9371D0] min-h-screen items-center justify-center relative overflow-hidden select-none">
+          <img
+            src="/images/auth_specialist_hero.png"
+            alt="Customer Support Specialist"
+            className="w-full h-full max-h-[92vh] max-w-[640px] object-contain select-none pointer-events-none"
+          />
         </div>
       </div>
     </>

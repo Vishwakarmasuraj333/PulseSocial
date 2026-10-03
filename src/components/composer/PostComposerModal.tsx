@@ -264,22 +264,82 @@ export function PostComposerModal({
       if (initialMediaUrl !== undefined) {
         setMediaUrl(initialMediaUrl);
       }
+      setSelectedAccountIds((prev) =>
+        prev.length > 0
+          ? prev
+          : ["channel-facebook", "channel-instagram", "channel-x", "channel-linkedin"]
+      );
     }
   }, [isOpen, initialContent, initialMediaUrl]);
 
+  const DEFAULT_COMPOSER_CHANNELS: ConnectedAccountItem[] = [
+    {
+      id: "channel-facebook",
+      provider: "facebook",
+      displayName: activeBrand.name ? `${activeBrand.name} (Facebook)` : "Facebook Page",
+      username: activeBrand.slug || "brand_page",
+      profileImageUrl: activeBrand.avatarUrl || "/icons/pulse-logo.svg",
+      status: "CONNECTED",
+    },
+    {
+      id: "channel-instagram",
+      provider: "instagram",
+      displayName: activeBrand.name ? `${activeBrand.name} (Instagram)` : "Instagram",
+      username: activeBrand.slug || "brand_instagram",
+      profileImageUrl: activeBrand.avatarUrl || "/icons/pulse-logo.svg",
+      status: "CONNECTED",
+    },
+    {
+      id: "channel-x",
+      provider: "x",
+      displayName: activeBrand.name ? `${activeBrand.name} (X)` : "X (Twitter)",
+      username: activeBrand.slug || "brand_x",
+      profileImageUrl: activeBrand.avatarUrl || "/icons/pulse-logo.svg",
+      status: "CONNECTED",
+    },
+    {
+      id: "channel-linkedin",
+      provider: "linkedin",
+      displayName: activeBrand.name ? `${activeBrand.name} (LinkedIn)` : "LinkedIn",
+      username: activeBrand.slug || "brand_linkedin",
+      profileImageUrl: activeBrand.avatarUrl || "/icons/pulse-logo.svg",
+      status: "CONNECTED",
+    },
+    {
+      id: "channel-pinterest",
+      provider: "pinterest",
+      displayName: activeBrand.name ? `${activeBrand.name} (Pinterest)` : "Pinterest",
+      username: activeBrand.slug || "brand_pins",
+      profileImageUrl: activeBrand.avatarUrl || "/icons/pulse-logo.svg",
+      status: "CONNECTED",
+    },
+    {
+      id: "channel-youtube",
+      provider: "youtube",
+      displayName: activeBrand.name ? `${activeBrand.name} (YouTube)` : "YouTube",
+      username: activeBrand.slug || "brand_youtube",
+      profileImageUrl: activeBrand.avatarUrl || "/icons/pulse-logo.svg",
+      status: "CONNECTED",
+    },
+    {
+      id: "channel-tiktok",
+      provider: "tiktok",
+      displayName: activeBrand.name ? `${activeBrand.name} (TikTok)` : "TikTok",
+      username: activeBrand.slug || "brand_tiktok",
+      profileImageUrl: activeBrand.avatarUrl || "/icons/pulse-logo.svg",
+      status: "CONNECTED",
+    },
+  ];
+
   const effectiveChannels: ConnectedAccountItem[] =
     connectedAccounts.length > 0
-      ? connectedAccounts
-      : [
-          {
-            id: "default-channel",
-            provider: "facebook",
-            displayName: activeBrand.name || "Brand Page",
-            username: activeBrand.slug || "brand",
-            profileImageUrl: activeBrand.avatarUrl || "/icons/pulse-logo.svg",
-            status: "CONNECTED",
-          },
-        ];
+      ? [
+          ...connectedAccounts,
+          ...DEFAULT_COMPOSER_CHANNELS.filter(
+            (def) => !connectedAccounts.some((c) => c.provider === def.provider)
+          ),
+        ]
+      : DEFAULT_COMPOSER_CHANNELS;
 
   const activePreviewChannel =
     effectiveChannels.find((ch) => selectedAccountIds.includes(ch.id)) ||

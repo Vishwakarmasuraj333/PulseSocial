@@ -44,6 +44,7 @@ export function generateCodeChallenge(verifier: string): string {
 
 export function getCanvaCredentials() {
   const clientId = process.env.CANVA_CLIENT_ID || "";
+  const clientSecret = process.env.CANVA_CLIENT_SECRET || "";
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(/\/$/, "");
   const redirectUri = process.env.CANVA_REDIRECT_URI || `${appUrl}/api/integrations/canva/callback`;
   const isConfigured = Boolean(clientId && clientSecret);

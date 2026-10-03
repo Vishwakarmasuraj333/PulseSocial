@@ -1,15 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   Heart,
   MessageCircle,
-  ArrowRight,
   Sparkles,
   Share2,
-  Bookmark,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Play,
+  Pause,
 } from "lucide-react";
 import {
   InstagramIcon,
@@ -18,7 +20,6 @@ import {
   XIcon,
   PinterestIcon,
   FacebookIcon,
-  renderPlatformIcon,
 } from "@/components/icons/PlatformIcons";
 
 interface ShowcaseCard {
@@ -58,31 +59,31 @@ const PLATFORMS_DATA: PlatformShowcase[] = [
       {
         id: 0,
         image:
-          "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&auto=format&fit=crop&q=80",
-        caption: "Fresh morning brew with desk essentials",
+          "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=700&auto=format&fit=crop&q=85",
+        caption: "Fresh morning brew with desk essentials and productive vibes ☕️✨",
         author: "@cafepulse",
-        likes: "2.4K",
-        comments: "148",
+        likes: "4.2K",
+        comments: "184",
         tilt: "-rotate-2",
       },
       {
         id: 1,
         image:
-          "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=600&auto=format&fit=crop&q=80",
-        caption: "Summer treat vibes & strawberry glaze",
+          "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=700&auto=format&fit=crop&q=85",
+        caption: "Summer treat aesthetics & strawberry glaze artisan collection 🍓🍰",
         author: "@sweetcreatives",
-        likes: "5.8K",
-        comments: "392",
+        likes: "8.9K",
+        comments: "512",
         tilt: "rotate-0",
       },
       {
         id: 2,
         image:
-          "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=600&auto=format&fit=crop&q=80",
-        caption: "Vintage bike rides through seaside streets",
+          "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=700&auto=format&fit=crop&q=85",
+        caption: "Vintage seaside bike rides through golden hour sunlit streets 🚲🌊",
         author: "@wanderlust_visuals",
-        likes: "3.9K",
-        comments: "215",
+        likes: "6.3K",
+        comments: "328",
         tilt: "rotate-2",
       },
     ],
@@ -101,31 +102,31 @@ const PLATFORMS_DATA: PlatformShowcase[] = [
       {
         id: 0,
         image:
-          "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80",
-        caption: "Behind the scenes recording that viral synth hook 🎧🔥",
+          "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=700&auto=format&fit=crop&q=85",
+        caption: "Behind the scenes recording that viral synth hook in studio 🎧🔥",
         author: "@beatmakers_studio",
-        likes: "84.2K",
-        comments: "1.2K",
+        likes: "94.2K",
+        comments: "1.8K",
         tilt: "-rotate-2",
       },
       {
         id: 1,
         image:
-          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80",
-        caption: "Top 3 lighting hacks every creator should know",
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=700&auto=format&fit=crop&q=85",
+        caption: "Top 3 lighting hacks every content creator needs to know 💡⚡",
         author: "@creatoracademy",
-        likes: "42.1K",
-        comments: "856",
+        likes: "68.4K",
+        comments: "1.1K",
         tilt: "rotate-0",
       },
       {
         id: 2,
         image:
-          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&auto=format&fit=crop&q=80",
-        caption: "Golden hour sunset time-lapse from the highest summit",
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=700&auto=format&fit=crop&q=85",
+        caption: "Golden hour sunset time-lapse from the highest mountain summit 🏔️🌅",
         author: "@urbanexplorers",
-        likes: "61.9K",
-        comments: "940",
+        likes: "112K",
+        comments: "2.4K",
         tilt: "rotate-2",
       },
     ],
@@ -144,31 +145,31 @@ const PLATFORMS_DATA: PlatformShowcase[] = [
       {
         id: 0,
         image:
-          "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&auto=format&fit=crop&q=80",
-        caption: "How we scaled to $10M ARR without venture debt: Lessons learned",
+          "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=700&auto=format&fit=crop&q=85",
+        caption: "How our team scaled to $10M ARR with zero venture debt: The 5 core principles 🚀📈",
         author: "@saasfounders",
-        likes: "8.4K",
-        comments: "642",
+        likes: "12.4K",
+        comments: "842",
         tilt: "-rotate-2",
       },
       {
         id: 1,
         image:
-          "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&auto=format&fit=crop&q=80",
-        caption: "The 2026 playbook for organic B2B audience distribution",
+          "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=700&auto=format&fit=crop&q=85",
+        caption: "The 2026 playbook for organic B2B audience distribution and retention 📊🎯",
         author: "@growthmatrix",
-        likes: "4.7K",
-        comments: "318",
+        likes: "7.8K",
+        comments: "492",
         tilt: "rotate-0",
       },
       {
         id: 2,
         image:
-          "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&auto=format&fit=crop&q=80",
-        caption: "Announcing our new automated generative AI workflow for teams",
+          "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=700&auto=format&fit=crop&q=85",
+        caption: "Announcing our automated AI workflow studio for marketing agencies worldwide 🤖💼",
         author: "@techpioneers",
-        likes: "12.1K",
-        comments: "789",
+        likes: "16.5K",
+        comments: "1.1K",
         tilt: "rotate-2",
       },
     ],
@@ -187,31 +188,31 @@ const PLATFORMS_DATA: PlatformShowcase[] = [
       {
         id: 0,
         image:
-          "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=600&auto=format&fit=crop&q=80",
-        caption: "10 design heuristics every senior UI engineer must master 🧵👇",
+          "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=700&auto=format&fit=crop&q=85",
+        caption: "10 design heuristics every senior product engineer must master in 2026 🧵👇",
         author: "@productpulse",
-        likes: "18.5K",
-        comments: "1.4K",
+        likes: "24.6K",
+        comments: "1.9K",
         tilt: "-rotate-2",
       },
       {
         id: 1,
         image:
-          "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&auto=format&fit=crop&q=80",
-        caption: "Deploying to production on Friday? How we guarantee zero downtime",
+          "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=700&auto=format&fit=crop&q=85",
+        caption: "Deploying to production on Friday? How we achieve 99.999% uptime with automated CI/CD 💻⚡",
         author: "@devinsights",
-        likes: "9.2K",
-        comments: "612",
+        likes: "14.2K",
+        comments: "820",
         tilt: "rotate-0",
       },
       {
         id: 2,
         image:
-          "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80",
-        caption: "Q3 global digital ad spend trends & emerging multichannel shifts",
+          "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=700&auto=format&fit=crop&q=85",
+        caption: "Global digital marketing spend breakdown: The multi-platform omnichannel shift 📈🌐",
         author: "@marketsignals",
-        likes: "14.3K",
-        comments: "920",
+        likes: "19.8K",
+        comments: "1.3K",
         tilt: "rotate-2",
       },
     ],
@@ -230,31 +231,31 @@ const PLATFORMS_DATA: PlatformShowcase[] = [
       {
         id: 0,
         image:
-          "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=600&auto=format&fit=crop&q=80",
-        caption: "Cozy scandinavian living room inspiration & lighting aesthetics",
+          "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=700&auto=format&fit=crop&q=85",
+        caption: "Cozy scandinavian living room inspiration & warm lighting aesthetics 🛋️🕯️",
         author: "@minimalistliving",
-        likes: "15.2K",
-        comments: "480",
+        likes: "28.4K",
+        comments: "640",
         tilt: "-rotate-2",
       },
       {
         id: 1,
         image:
-          "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=600&auto=format&fit=crop&q=80",
-        caption: "Handcrafted ceramic mug collection launch preview",
+          "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=700&auto=format&fit=crop&q=85",
+        caption: "Handcrafted artisan ceramic collection launch & studio process 🏺🎨",
         author: "@artisanatelier",
-        likes: "22.8K",
-        comments: "710",
+        likes: "36.2K",
+        comments: "980",
         tilt: "rotate-0",
       },
       {
         id: 2,
         image:
-          "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600&auto=format&fit=crop&q=80",
-        caption: "Urban terrace garden design & indoor plant propagation",
+          "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=700&auto=format&fit=crop&q=85",
+        caption: "Urban terrace garden design & indoor botanical styling guide 🌿🪴",
         author: "@greenhabitats",
-        likes: "31.4K",
-        comments: "950",
+        likes: "44.9K",
+        comments: "1.2K",
         tilt: "rotate-2",
       },
     ],
@@ -264,40 +265,40 @@ const PLATFORMS_DATA: PlatformShowcase[] = [
     name: "Facebook",
     tag: "FACEBOOK",
     tagColor: "text-blue-600 bg-blue-50 border-blue-200 dark:bg-blue-950/40 dark:border-blue-800",
-    title: "Manage brand pages & interactive communities with ease.",
+    title: "Engage local communities & convert high-intent buyers.",
     description:
-      "Broadcast multi-photo albums, interactive polls, video reels, and respond to community messages from a single unified workspace.",
+      "Manage Facebook Pages and Groups, automate customer responses, schedule link previews, and maximize organic algorithmic reach.",
     link: "/platforms#facebook",
     iconRenderer: () => <FacebookIcon size={18} />,
     cards: [
       {
         id: 0,
         image:
-          "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&auto=format&fit=crop&q=80",
-        caption: "Announcing our worldwide community summit 2026",
+          "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=700&auto=format&fit=crop&q=85",
+        caption: "Announcing our worldwide community summit 2026: Connect with top digital creators 🤝🌍",
         author: "@globalbrand",
-        likes: "11.2K",
-        comments: "530",
+        likes: "18.6K",
+        comments: "820",
         tilt: "-rotate-2",
       },
       {
         id: 1,
         image:
-          "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&auto=format&fit=crop&q=80",
-        caption: "Weekly creator spotlight: Meet our top community builders",
+          "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=700&auto=format&fit=crop&q=85",
+        caption: "Weekly creator spotlight: Meet the creative teams revolutionizing social storytelling 🌟🎬",
         author: "@creatorcollective",
-        likes: "7.6K",
-        comments: "290",
+        likes: "12.3K",
+        comments: "490",
         tilt: "rotate-0",
       },
       {
         id: 2,
         image:
-          "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80",
-        caption: "Full body HIIT routine you can do anywhere in 20 mins",
+          "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=700&auto=format&fit=crop&q=85",
+        caption: "Full body HIIT routine you can do anywhere in 20 minutes without equipment ⚡️🏋️‍♂️",
         author: "@fitnessfirst",
-        likes: "19.4K",
-        comments: "1.1K",
+        likes: "31.2K",
+        comments: "1.7K",
         tilt: "rotate-2",
       },
     ],
@@ -307,16 +308,42 @@ const PLATFORMS_DATA: PlatformShowcase[] = [
 export function PulseInstagramShowcase() {
   const [activePlatformIndex, setActivePlatformIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [hoveredCardId, setHoveredCardId] = useState<number | null>(null);
+  const [progress, setProgress] = useState(0);
 
-  // Auto-advance platforms every 4.5 seconds unless user hovers
+  const DURATION_MS = 3800;
+  const STEP_MS = 50;
+
+  // Smooth continuous auto-switch timer with live progress bar
   useEffect(() => {
     if (isPaused) return;
+
     const interval = setInterval(() => {
-      setActivePlatformIndex((prev) => (prev + 1) % PLATFORMS_DATA.length);
-    }, 4500);
+      setProgress((prev) => {
+        if (prev >= 100) {
+          setActivePlatformIndex((curr) => (curr + 1) % PLATFORMS_DATA.length);
+          return 0;
+        }
+        return prev + (STEP_MS / DURATION_MS) * 100;
+      });
+    }, STEP_MS);
+
     return () => clearInterval(interval);
   }, [isPaused]);
+
+  const selectPlatform = (index: number) => {
+    setActivePlatformIndex(index);
+    setProgress(0);
+  };
+
+  const handlePrev = () => {
+    setActivePlatformIndex((curr) => (curr - 1 + PLATFORMS_DATA.length) % PLATFORMS_DATA.length);
+    setProgress(0);
+  };
+
+  const handleNext = () => {
+    setActivePlatformIndex((curr) => (curr + 1) % PLATFORMS_DATA.length);
+    setProgress(0);
+  };
 
   const activePlatform = PLATFORMS_DATA[activePlatformIndex];
 
@@ -328,7 +355,7 @@ export function PulseInstagramShowcase() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-10">
         
-        {/* Interactive Platform Tabs */}
+        {/* Interactive Platform Tabs with Animated Progress Fill */}
         <div className="flex flex-wrap items-center justify-center gap-2 max-w-4xl mx-auto">
           {PLATFORMS_DATA.map((p, idx) => {
             const isSelected = idx === activePlatformIndex;
@@ -336,31 +363,61 @@ export function PulseInstagramShowcase() {
               <button
                 key={p.id}
                 type="button"
-                onClick={() => setActivePlatformIndex(idx)}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                onClick={() => selectPlatform(idx)}
+                className={`relative overflow-hidden flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all duration-300 cursor-pointer ${
                   isSelected
-                    ? "bg-[#5846A8] text-white shadow-md shadow-indigo-500/25 scale-105"
-                    : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
+                    ? "bg-[#5846A8] text-white shadow-lg shadow-indigo-500/25 scale-105"
+                    : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:scale-102"
                 }`}
               >
-                <span>{p.iconRenderer()}</span>
-                <span>{p.name}</span>
+                {/* Progress bar inside active tab */}
                 {isSelected && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse ml-0.5" />
+                  <span
+                    className="absolute left-0 bottom-0 top-0 bg-white/20 transition-all duration-75 pointer-events-none"
+                    style={{ width: `${progress}%` }}
+                  />
+                )}
+                <span className="relative z-10">{p.iconRenderer()}</span>
+                <span className="relative z-10">{p.name}</span>
+                {isSelected && (
+                  <span className="relative z-10 w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-0.5" />
                 )}
               </button>
             );
           })}
         </div>
 
-        {/* Dynamic Header Copy */}
-        <div className="max-w-3xl mx-auto space-y-3.5 transition-all duration-300 animate-in fade-in">
-          <div className="flex items-center justify-center">
+        {/* Dynamic Animated Header Copy */}
+        <div
+          key={`header-${activePlatform.id}`}
+          className="max-w-3xl mx-auto space-y-3.5 animate-in fade-in zoom-in-95 duration-300"
+        >
+          <div className="flex items-center justify-center gap-3">
             <span
               className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border ${activePlatform.tagColor}`}
             >
               <span>{activePlatform.tag}</span>
             </span>
+
+            {/* Play/Pause state pill */}
+            <button
+              type="button"
+              onClick={() => setIsPaused(!isPaused)}
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
+              title={isPaused ? "Resume auto-rotation" : "Pause auto-rotation"}
+            >
+              {isPaused ? (
+                <>
+                  <Play className="w-2.5 h-2.5 text-emerald-500 fill-emerald-500" />
+                  <span>Resume Auto-Play</span>
+                </>
+              ) : (
+                <>
+                  <Pause className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                  <span>Auto-Switching</span>
+                </>
+              )}
+            </button>
           </div>
 
           <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
@@ -384,80 +441,105 @@ export function PulseInstagramShowcase() {
           </div>
         </div>
 
-        {/* 3 Polaroid / Visual Cards for the Active Platform */}
-        <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 pt-4">
-          {activePlatform.cards.map((card, idx) => (
-            <div
-              key={`${activePlatform.id}-${card.id}`}
-              onMouseEnter={() => setHoveredCardId(idx)}
-              onMouseLeave={() => setHoveredCardId(null)}
-              className={`w-72 sm:w-80 bg-white dark:bg-slate-900 p-4 pb-5 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xl transition-all duration-400 transform ${card.tilt} hover:rotate-0 hover:scale-105 hover:z-20 cursor-pointer animate-in fade-in zoom-in-95`}
-            >
-              {/* Card top author badge */}
-              <div className="flex items-center justify-between pb-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-xs">
-                    <div className="w-full h-full bg-white dark:bg-slate-900 rounded-full flex items-center justify-center">
-                      <span className="text-[10px] font-black text-indigo-700 dark:text-indigo-300">
-                        PS
+        {/* 3 Staggered Polaroid Cards for Active Platform with Navigation Arrows */}
+        <div className="relative flex items-center justify-center">
+          {/* Left Arrow Button */}
+          <button
+            type="button"
+            onClick={handlePrev}
+            className="hidden lg:flex absolute -left-4 z-30 w-11 h-11 rounded-full bg-white dark:bg-slate-900 shadow-xl border border-slate-200 dark:border-slate-800 items-center justify-center text-slate-700 dark:text-slate-300 hover:scale-110 active:scale-95 transition cursor-pointer"
+            aria-label="Previous platform"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+
+          {/* Cards Row */}
+          <div
+            key={`cards-${activePlatform.id}`}
+            className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 pt-4 w-full"
+          >
+            {activePlatform.cards.map((card, idx) => (
+              <div
+                key={`${activePlatform.id}-${card.id}`}
+                style={{ animationDelay: `${idx * 120}ms` }}
+                className={`w-72 sm:w-80 bg-white dark:bg-slate-900 p-4 pb-5 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xl transition-all duration-300 transform ${card.tilt} hover:rotate-0 hover:scale-105 hover:z-20 cursor-pointer animate-in fade-in slide-in-from-bottom-4`}
+              >
+                {/* Card top author badge */}
+                <div className="flex items-center justify-between pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-sm">
+                      <div className="w-full h-full bg-white dark:bg-slate-900 rounded-full flex items-center justify-center">
+                        <span className="text-[10px] font-black text-indigo-700 dark:text-indigo-300">
+                          PS
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-left">
+                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block leading-tight">
+                        {card.author}
+                      </span>
+                      <span className="text-[10px] text-slate-400 flex items-center gap-0.5">
+                        <CheckCircle2 className="w-2.5 h-2.5 text-blue-500 inline" /> Verified Pulse Partner
                       </span>
                     </div>
                   </div>
-                  <div className="text-left">
-                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block leading-tight">
-                      {card.author}
-                    </span>
-                    <span className="text-[10px] text-slate-400 flex items-center gap-0.5">
-                      <CheckCircle2 className="w-2.5 h-2.5 text-blue-500 inline" /> Verified Pulse Partner
-                    </span>
-                  </div>
-                </div>
-                <div className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                  {activePlatform.iconRenderer()}
-                </div>
-              </div>
-
-              {/* Photo Media */}
-              <div className="w-full h-64 sm:h-72 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 relative group">
-                <img
-                  src={card.image}
-                  alt={card.caption}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors" />
-
-                {/* Floating pill badge */}
-                <div className="absolute top-2.5 right-2.5 bg-black/60 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-amber-300" />
-                  <span>Scheduled with PulseSocial</span>
-                </div>
-              </div>
-
-              {/* Caption text */}
-              <p className="mt-3 text-xs text-slate-800 dark:text-slate-200 font-medium text-left line-clamp-2 leading-relaxed">
-                {card.caption}
-              </p>
-
-              {/* Interaction metrics row */}
-              <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1 font-semibold text-rose-600 dark:text-rose-400">
-                    <Heart className="w-3.5 h-3.5 fill-rose-500 text-rose-500" />
-                    <span>{card.likes}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <MessageCircle className="w-3.5 h-3.5 text-indigo-500" />
-                    <span>{card.comments}</span>
+                  <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-xs">
+                    {activePlatform.iconRenderer()}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1 text-[11px] text-slate-400">
-                  <Share2 className="w-3.5 h-3.5 hover:text-slate-700 dark:hover:text-white transition" />
+                {/* Photo Media */}
+                <div className="w-full h-64 sm:h-72 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 relative group">
+                  <img
+                    src={card.image}
+                    alt={card.caption}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors" />
+
+                  {/* Floating badge */}
+                  <div className="absolute top-2.5 right-2.5 bg-black/70 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md">
+                    <Sparkles className="w-3 h-3 text-amber-300" />
+                    <span>Scheduled with PulseSocial</span>
+                  </div>
+                </div>
+
+                {/* Caption text */}
+                <p className="mt-3 text-xs text-slate-800 dark:text-slate-200 font-medium text-left line-clamp-2 leading-relaxed">
+                  {card.caption}
+                </p>
+
+                {/* Interaction metrics row */}
+                <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1 font-semibold text-rose-600 dark:text-rose-400">
+                      <Heart className="w-3.5 h-3.5 fill-rose-500 text-rose-500" />
+                      <span>{card.likes}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <MessageCircle className="w-3.5 h-3.5 text-indigo-500" />
+                      <span>{card.comments}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1 text-[11px] text-slate-400">
+                    <Share2 className="w-3.5 h-3.5 hover:text-slate-700 dark:hover:text-white transition" />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* Right Arrow Button */}
+          <button
+            type="button"
+            onClick={handleNext}
+            className="hidden lg:flex absolute -right-4 z-30 w-11 h-11 rounded-full bg-white dark:bg-slate-900 shadow-xl border border-slate-200 dark:border-slate-800 items-center justify-center text-slate-700 dark:text-slate-300 hover:scale-110 active:scale-95 transition cursor-pointer"
+            aria-label="Next platform"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Dynamic cycling indicator dots */}
@@ -466,13 +548,13 @@ export function PulseInstagramShowcase() {
             <button
               key={i}
               type="button"
-              onClick={() => setActivePlatformIndex(i)}
+              onClick={() => selectPlatform(i)}
               className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
                 i === activePlatformIndex
-                  ? "w-8 bg-indigo-600"
+                  ? "w-8 bg-indigo-600 shadow-xs"
                   : "w-2 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400"
               }`}
-              aria-label={`Go to slide ${i + 1}`}
+              aria-label={`Go to platform ${i + 1}`}
             />
           ))}
         </div>

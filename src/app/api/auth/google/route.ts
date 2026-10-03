@@ -24,9 +24,18 @@ export async function GET(req: Request) {
   }
 
   // Determine authorized redirect URI
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || url.origin).trim().replace(/\/+$/, "");
-  const envRedirect = process.env.GOOGLE_REDIRECT_URI?.trim().replace(/^["']|["']$/g, "");
-  const redirectUri = envRedirect || `${appUrl}/api/auth/google/callback`;
+  const isLocal = url.hostname === "localhost" || url.hostname === "127.0.0.1";
+  let redirectUri: string;
+  if (isLocal) {
+    redirectUri = process.env.GOOGLE_REDIRECT_URI?.trim().replace(/^["']|["']$/g, "") || `${url.origin}/api/auth/google/callback`;
+  } else {
+    const configuredProd = process.env.GOOGLE_REDIRECT_URI?.trim().replace(/^["']|["']$/g, "");
+    if (configuredProd && !configuredProd.includes("localhost") && !configuredProd.includes("127.0.0.1")) {
+      redirectUri = configuredProd;
+    } else {
+      redirectUri = `${url.origin}/api/auth/google/callback`;
+    }
+  }
 
   // Generate cryptographic PKCE, state, and nonce
   const { verifier, challenge } = generatePkcePair();

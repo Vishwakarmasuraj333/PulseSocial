@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { PulseAnnouncementBar } from "@/components/marketing/PulseAnnouncementBar";
-import { PulseSuiteTopNav } from "@/components/marketing/PulseSuiteTopNav";
 import { MarketingHeader } from "@/components/marketing/MarketingHeader";
 import { PulseHeroStage } from "@/components/marketing/PulseHeroStage";
 import { PulseAwardsGrid } from "@/components/marketing/PulseAwardsGrid";
@@ -27,10 +26,7 @@ export default function HomePage() {
       {/* 1. Top Announcement Bar (Linkthread) */}
       <PulseAnnouncementBar />
 
-      {/* 2. Top Suite Bar */}
-      <PulseSuiteTopNav />
-
-      {/* 3. Main Navigation Header */}
+      {/* 2. Main Navigation Header */}
       <MarketingHeader />
 
       {/* Main Content Sections (Matching PDF) */}

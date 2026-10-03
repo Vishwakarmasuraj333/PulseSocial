@@ -568,145 +568,15 @@ export default function SignupPage() {
         </div>
 
         {/* ============================================================ */}
-        {/* RIGHT COLUMN: Purple Customer Support Specialist (Matching)   */}
+        {/* RIGHT COLUMN: Iconic Purple Showcase with Social Icons       */}
         {/* ============================================================ */}
-        <div className="hidden md:flex w-1/2 bg-[#9674D4] min-h-screen items-center justify-center p-8 lg:p-14 relative overflow-hidden select-none">
-          <div className="w-full max-w-[540px] aspect-[4/3.8] relative flex items-center justify-center">
-            <svg
-              viewBox="0 0 540 500"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-full h-full drop-shadow-2xl"
-            >
-              <defs>
-                <linearGradient id="suScreenGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#1E1B2E" />
-                  <stop offset="100%" stopColor="#2E284A" />
-                </linearGradient>
-                <linearGradient id="suShirtGrad" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#6C4EA8" />
-                  <stop offset="100%" stopColor="#553A8C" />
-                </linearGradient>
-                <filter id="suSoftGlow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="3" result="blur" />
-                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                </filter>
-              </defs>
-
-              <g stroke="#E8DCFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.65">
-                <path d="M70 120 C70 105 85 95 105 95 L145 95 C165 95 180 105 180 120 L180 155 C180 165 170 170 155 170 L115 170 L85 190 L90 170 L80 170 C70 170 70 160 70 155 Z" />
-                <line x1="125" y1="125" x2="125" y2="155" strokeWidth="2.5" />
-                <circle cx="125" cy="115" r="1.5" fill="#E8DCFF" />
-
-                <path d="M250 145 C250 115 270 95 300 95 C330 95 350 115 350 145" />
-                <rect x="240" y="140" width="14" height="24" rx="7" />
-                <rect x="346" y="140" width="14" height="24" rx="7" />
-
-                <rect x="420" y="130" width="45" height="30" rx="15" />
-                <circle cx="432" cy="145" r="2" fill="#E8DCFF" />
-                <circle cx="442" cy="145" r="2" fill="#E8DCFF" />
-                <circle cx="452" cy="145" r="2" fill="#E8DCFF" />
-
-                <circle cx="95" cy="280" r="32" />
-                <ellipse cx="95" cy="280" rx="16" ry="32" />
-                <line x1="63" y1="280" x2="127" y2="280" />
-                <rect x="80" y="270" width="30" height="20" rx="6" fill="#9674D4" />
-                <text x="95" y="284" textAnchor="middle" fill="#FFFFFF" fontSize="11" fontWeight="bold">24</text>
-
-                <rect x="380" y="220" width="55" height="36" rx="4" />
-                <path d="M370 256 L445 256" strokeWidth="2" />
-
-                <rect x="80" y="380" width="46" height="32" rx="4" />
-                <path d="M80 380 L103 400 L126 380" />
-
-                <path d="M430 290 C430 280 445 280 445 290 C445 300 435 305 435 315" />
-                <circle cx="435" cy="325" r="1.5" fill="#E8DCFF" />
-
-                <path d="M420 365 L445 365 C450 365 455 355 450 350 L435 340 L420 340" />
-
-                <path d="M190 80 L190 90 M185 85 L195 85" />
-                <path d="M410 80 L410 90 M405 85 L415 85" />
-                <path d="M210 200 L210 210 M205 205 L215 205" />
-                <path d="M360 380 L360 390 M355 385 L365 385" />
-                <circle cx="390" cy="85" r="4" />
-                <circle cx="160" cy="220" r="3" />
-                <circle cx="450" cy="410" r="3" />
-              </g>
-
-              <ellipse cx="270" cy="460" rx="90" ry="12" fill="#EADFFF" opacity="0.8" />
-              <path d="M255 410 L250 455 L290 455 L285 410 Z" fill="#EADFFF" />
-              <rect
-                x="145"
-                y="190"
-                width="290"
-                height="225"
-                rx="24"
-                fill="url(#suScreenGrad)"
-                stroke="#EADFFF"
-                strokeWidth="5"
-              />
-
-              <g transform="translate(115, 250)">
-                <circle cx="28" cy="28" r="28" fill="#FFFFFF" filter="url(#suSoftGlow)" />
-                <path
-                  d="M20 28 L26 34 L36 21"
-                  stroke="#5846A8"
-                  strokeWidth="3.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </g>
-
-              <path
-                d="M205 410 C205 320 240 300 270 300 C300 300 335 320 335 410 Z"
-                fill="url(#suShirtGrad)"
-              />
-              <path
-                d="M240 230 C220 220 200 240 205 275 C210 310 225 330 245 335 C235 300 240 260 250 245 Z"
-                fill="#111119"
-              />
-              <path
-                d="M295 230 C315 220 335 240 330 275 C325 310 310 330 290 335 C300 300 295 260 285 245 Z"
-                fill="#111119"
-              />
-              <rect x="260" y="275" width="20" height="30" fill="#FFFFFF" rx="4" />
-              <ellipse cx="270" cy="260" rx="20" ry="26" fill="#FFFFFF" />
-              <path
-                d="M245 250 C245 220 260 215 270 215 C285 215 300 220 295 250 C285 235 265 235 245 250 Z"
-                fill="#111119"
-              />
-              <path d="M255 245 C255 230 265 225 275 225 C285 225 292 232 292 245" stroke="#2D283E" strokeWidth="2.5" />
-              <rect x="286" y="245" width="6" height="12" rx="3" fill="#2D283E" />
-              <path d="M290 255 L275 268" stroke="#2D283E" strokeWidth="2" strokeLinecap="round" />
-              <circle cx="273" cy="269" r="2.5" fill="#2D283E" />
-
-              <path
-                d="M205 410 C195 385 190 355 190 320 C190 290 195 260 198 240"
-                stroke="#FFFFFF"
-                strokeWidth="18"
-                strokeLinecap="round"
-                fill="none"
-              />
-              <circle cx="204" cy="235" r="9" fill="#FFFFFF" stroke="#6C4EA8" strokeWidth="3" />
-              <line x1="192" y1="230" x2="188" y2="205" stroke="#FFFFFF" strokeWidth="5" strokeLinecap="round" />
-              <line x1="200" y1="228" x2="200" y2="200" stroke="#FFFFFF" strokeWidth="5" strokeLinecap="round" />
-              <line x1="208" y1="230" x2="212" y2="205" stroke="#FFFFFF" strokeWidth="5" strokeLinecap="round" />
-
-              <path
-                d="M125 390 C135 380 145 400 155 390 C165 380 175 400 185 390"
-                stroke="#FFFFFF"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                fill="none"
-              />
-              <path
-                d="M400 395 C410 385 420 405 430 395 C440 385 450 405 460 395"
-                stroke="#FFFFFF"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                fill="none"
-              />
-            </svg>
+        <div className="hidden md:flex w-1/2 bg-[#9674D4] min-h-screen items-center justify-center p-6 lg:p-10 relative overflow-hidden select-none">
+          <div className="w-full max-w-[620px] flex flex-col items-center justify-center relative z-10">
+            <img
+              src="/images/purple_auth_showcase.jpg"
+              alt="All Social App Link Social Management"
+              className="w-full h-auto rounded-3xl shadow-2xl border-2 border-white/40 drop-shadow-2xl transition-transform hover:scale-[1.01] duration-300"
+            />
           </div>
         </div>
       </div>

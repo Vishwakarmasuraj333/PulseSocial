@@ -804,14 +804,14 @@ export default function LoginPage() {
         </div>
 
         {/* ============================================================ */}
-        {/* RIGHT COLUMN: Iconic Purple Showcase with Social Icons       */}
+        {/* RIGHT COLUMN: Iconic Purple Specialist Showcase              */}
         {/* ============================================================ */}
-        <div className="hidden md:flex w-1/2 bg-[#9674D4] min-h-screen items-center justify-center p-6 lg:p-10 relative overflow-hidden select-none">
-          <div className="w-full max-w-[620px] flex flex-col items-center justify-center relative z-10">
+        <div className="hidden md:flex w-1/2 bg-[#9674D4] min-h-screen items-center justify-center p-6 lg:p-12 relative overflow-hidden select-none">
+          <div className="w-full max-w-[540px] flex flex-col items-center justify-center relative z-10">
             <img
-              src="/images/purple_auth_showcase.jpg"
-              alt="All Social App Link Social Management"
-              className="w-full h-auto rounded-3xl shadow-2xl border-2 border-white/40 drop-shadow-2xl transition-transform hover:scale-[1.01] duration-300"
+              src="/images/auth_specialist_hero.png"
+              alt="Customer Support Specialist"
+              className="w-full h-auto object-contain drop-shadow-2xl transition-transform hover:scale-[1.02] duration-300"
             />
           </div>
         </div>

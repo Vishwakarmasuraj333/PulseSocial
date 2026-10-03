@@ -34,9 +34,30 @@ export async function POST(req: Request) {
     });
 
     if (existingUser) {
+      if (existingUser.emailVerified) {
+        return NextResponse.json(
+          { error: "An account with this email address already exists. Please sign in." },
+          { status: 409 }
+        );
+      }
+
+      // If user signed up previously but hasn't verified OTP yet, refresh credentials & re-dispatch OTP
+      const passwordHash = await hashPassword(password);
+      await prisma.user.update({
+        where: { id: existingUser.id },
+        data: { name, passwordHash },
+      });
+
+      await createAndSendOTP(existingUser.id, existingUser.email);
+
       return NextResponse.json(
-        { error: "An account with this email address already exists." },
-        { status: 409 }
+        {
+          success: true,
+          message: "Verification code sent to your email. Please verify to continue.",
+          userId: existingUser.id,
+          email: existingUser.email,
+        },
+        { status: 200 }
       );
     }
 

@@ -15,8 +15,13 @@ const nextConfig = {
   },
   webpack: (config, { dev }) => {
     if (dev) {
-      // Disable disk pack file caching in dev to prevent Webpack RangeError: Array buffer allocation failed on Windows
-      config.cache = false;
+      // Use memory caching in dev on Windows to prevent disk pack buffer errors while keeping recompilation fast
+      config.cache = {
+        type: "memory",
+      };
+      if (config.output) {
+        config.output.chunkLoadTimeout = 300000;
+      }
     }
     return config;
   },

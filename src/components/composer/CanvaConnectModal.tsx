@@ -288,6 +288,7 @@ export function CanvaConnectModal({
     <Dialog
       isOpen={isOpen}
       onClose={onClose}
+      showCloseButton={false}
       maxWidth="max-w-3xl"
       className="p-0 overflow-hidden rounded-2xl border border-slate-200 shadow-2xl bg-white text-slate-800"
     >
@@ -318,10 +319,12 @@ export function CanvaConnectModal({
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+            className="group p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+            title="Close (Esc)"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
           </button>
         </div>
 

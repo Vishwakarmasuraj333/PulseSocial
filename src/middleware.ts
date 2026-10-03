@@ -8,6 +8,8 @@ const JWT_SECRET = new TextEncoder().encode(
 // Routes that strictly require active session
 const PROTECTED_PREFIXES = [
   "/dashboard",
+  "/onboarding",
+  "/ai",
   "/compose",
   "/inbox",
   "/posts",
@@ -28,11 +30,11 @@ const PROTECTED_PREFIXES = [
   "/ai-assistant",
 ];
 
-// Auth routes where authenticated users should be redirected to dashboard
+// Auth routes where authenticated users should be redirected to dashboard unless they ask to log out/switch
 const AUTH_ROUTES = ["/login", "/signup"];
 
 export async function middleware(req: any) {
-  const { pathname } = req.nextUrl;
+  const { pathname, searchParams } = req.nextUrl;
 
   const sessionCookie = req.cookies.get("pulsesocial_auth_session")?.value;
   let isAuthenticated = false;
@@ -53,6 +55,14 @@ export async function middleware(req: any) {
     return NextResponse.next();
   }
 
+  // If visiting /login or /signup with ?logout=true or ?force=true, clear session and show login page
+  if (AUTH_ROUTES.includes(pathname) && (searchParams.get("logout") === "true" || searchParams.has("force") || searchParams.get("switch") === "true")) {
+    const res = NextResponse.next();
+    res.cookies.delete("pulsesocial_auth_session");
+    res.cookies.delete("pulsesocial_session");
+    return res;
+  }
+
   // If already authenticated and visiting auth routes (/login, /signup), redirect to dashboard
   if (isAuthenticated && AUTH_ROUTES.includes(pathname)) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
@@ -66,7 +76,12 @@ export async function middleware(req: any) {
   if (isProtected && !isAuthenticated) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("redirectTo", pathname);
-    return NextResponse.redirect(loginUrl);
+    const res = NextResponse.redirect(loginUrl);
+    if (sessionCookie) {
+      res.cookies.delete("pulsesocial_auth_session");
+      res.cookies.delete("pulsesocial_session");
+    }
+    return res;
   }
 
   return NextResponse.next();

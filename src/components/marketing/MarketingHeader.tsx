@@ -82,10 +82,10 @@ export function MarketingHeader() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`sticky top-0 left-0 right-0 z-40 transition-all duration-200 ${
         isScrolled
-          ? "bg-white/90 dark:bg-slate-950/90 backdrop-blur-md shadow-xs border-b border-slate-200/80 dark:border-slate-800/80 py-3"
-          : "bg-transparent py-4 sm:py-5"
+          ? "bg-white/95 dark:bg-slate-950/95 backdrop-blur-md shadow-md border-b border-slate-200/90 dark:border-slate-800/90 py-2.5 sm:py-3"
+          : "bg-white/90 dark:bg-slate-950/90 backdrop-blur-md shadow-xs border-b border-slate-200/60 dark:border-slate-800/60 py-3 sm:py-3.5"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">

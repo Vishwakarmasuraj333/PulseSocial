@@ -60,7 +60,10 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
         }
       } catch {}
 
-      // 2. Fetch authenticated session
+      // 2. Fetch authenticated session only if session cookie exists
+      const hasAuthCookie = typeof document !== "undefined" && document.cookie.includes("pulsesocial_auth_session");
+      if (!hasAuthCookie) return;
+
       const res = await fetch("/api/auth/me");
       if (res.ok) {
         const data = await res.json();

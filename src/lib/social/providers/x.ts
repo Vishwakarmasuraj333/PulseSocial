@@ -11,6 +11,8 @@ import {
   MessageResult,
 } from "../types";
 
+import crypto from "crypto";
+
 export class XProvider implements SocialProvider {
   platform: SupportedPlatform = "x";
   displayName = "X (Twitter)";
@@ -27,6 +29,12 @@ export class XProvider implements SocialProvider {
   getAuthorizationUrl(state: string, redirectUri: string, codeVerifier?: string): string {
     if (!this.isConfigured()) throw new Error(this.getMissingConfigMessage());
 
+    const verifier = codeVerifier || state;
+    const challenge = crypto
+      .createHash("sha256")
+      .update(verifier)
+      .digest("base64url");
+
     const scopes = ["tweet.read", "tweet.write", "users.read", "offline.access"].join(" ");
     const params = new URLSearchParams({
       response_type: "code",
@@ -34,11 +42,11 @@ export class XProvider implements SocialProvider {
       redirect_uri: redirectUri,
       scope: scopes,
       state,
-      code_challenge: codeVerifier || state,
-      code_challenge_method: "plain",
+      code_challenge: challenge,
+      code_challenge_method: "S256",
     });
 
-    return `https://twitter.com/i/oauth2/authorize?${params.toString()}`;
+    return `https://x.com/i/oauth2/authorize?${params.toString()}`;
   }
 
   async exchangeCode(code: string, redirectUri: string, codeVerifier?: string): Promise<OAuthTokenResult> {
@@ -49,6 +57,7 @@ export class XProvider implements SocialProvider {
     ).toString("base64");
 
     const body = new URLSearchParams({
+      client_id: process.env.X_CLIENT_ID!,
       code,
       grant_type: "authorization_code",
       redirect_uri: redirectUri,

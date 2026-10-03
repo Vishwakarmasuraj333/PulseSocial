@@ -42,6 +42,8 @@ interface PostComposerModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  initialContent?: string;
+  initialMediaUrl?: string;
 }
 
 // Categorized comprehensive real emoji library
@@ -188,7 +190,13 @@ interface ConnectedAccountItem {
   status: string;
 }
 
-export function PostComposerModal({ isOpen, onClose, onSuccess }: PostComposerModalProps) {
+export function PostComposerModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  initialContent,
+  initialMediaUrl,
+}: PostComposerModalProps) {
   const { toast } = useToast();
   const { activeBrand } = useBrand();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -250,8 +258,14 @@ export function PostComposerModal({ isOpen, onClose, onSuccess }: PostComposerMo
     if (isOpen) {
       fetchChannels();
       fetchCanvaStatus();
+      if (initialContent !== undefined) {
+        setContent(initialContent);
+      }
+      if (initialMediaUrl !== undefined) {
+        setMediaUrl(initialMediaUrl);
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, initialContent, initialMediaUrl]);
 
   const effectiveChannels: ConnectedAccountItem[] =
     connectedAccounts.length > 0
@@ -542,13 +556,22 @@ export function PostComposerModal({ isOpen, onClose, onSuccess }: PostComposerMo
     firstComment?: string;
     hashtags?: string[];
     location?: string;
+    imageUrl?: string;
   }) => {
-    setContent(data.caption);
+    if (data.caption) setContent(data.caption);
     if (data.firstComment) {
       setAttachedComment(data.firstComment);
     }
     if (data.location && !selectedLocation) {
       setSelectedLocation(data.location);
+    }
+    if (data.imageUrl) {
+      setMediaUrl(data.imageUrl);
+      toast({
+        title: "AI Media Attached!",
+        message: "High-resolution AI image added to post preview.",
+        type: "success",
+      });
     }
   };
 
@@ -566,17 +589,23 @@ export function PostComposerModal({ isOpen, onClose, onSuccess }: PostComposerMo
     <Dialog
       isOpen={isOpen}
       onClose={onClose}
+      showCloseButton={false}
       maxWidth="max-w-6xl"
       className="p-0 overflow-hidden rounded-2xl border border-slate-200/90 shadow-2xl bg-white text-slate-800"
     >
       <div className="relative min-h-[620px] flex flex-col justify-between">
-        {/* Modal Close Button */}
+        {/* Single Premium Animated Modal Close Button */}
         <button
+          type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 z-20 text-slate-400 hover:text-slate-700 p-1.5 rounded-full hover:bg-slate-100 transition"
-          title="Close Composer"
+          className="group absolute top-4 right-4 z-30 flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100/90 hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 hover:border-rose-200 transition-all duration-200 hover:scale-105 active:scale-95 shadow-xs cursor-pointer"
+          title="Close Composer (Esc)"
+          aria-label="Close composer"
         >
-          <X className="w-5 h-5" />
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-rose-500 transition-colors hidden sm:inline">
+            ESC
+          </span>
+          <X className="w-4 h-4 transition-transform duration-300 group-hover:rotate-90 group-hover:scale-110" />
         </button>
 
         {/* 3-Column Body matching User Screenshot */}

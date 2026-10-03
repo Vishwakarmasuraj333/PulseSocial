@@ -6,13 +6,22 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
+    let targetUserId = userId;
+    const email = searchParams.get("email");
 
-    if (!userId) {
-      return NextResponse.json({ error: "userId is required" }, { status: 400 });
+    if (!targetUserId && email) {
+      const user = await prisma.user.findUnique({
+        where: { email: email.toLowerCase().trim() },
+      });
+      if (user) targetUserId = user.id;
+    }
+
+    if (!targetUserId) {
+      return NextResponse.json({ error: "userId or email is required" }, { status: 400 });
     }
 
     const otpRecord = await prisma.emailVerificationOTP.findFirst({
-      where: { userId },
+      where: { userId: targetUserId },
       orderBy: { createdAt: "desc" },
     });
 

@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth/session";
+import { getSession, destroySession } from "@/lib/auth/session";
+import { prisma } from "@/lib/prisma";
 
 export default async function DashboardRootLayout({
   children,
@@ -12,5 +13,22 @@ export default async function DashboardRootLayout({
     redirect("/login");
   }
 
+  // Double check user exists and is active in database
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: session.id },
+      select: { id: true, status: true },
+    });
+
+    if (!user || user.status !== "ACTIVE") {
+      await destroySession();
+      redirect("/login");
+    }
+  } catch (err) {
+    // If DB check fails, redirect to login
+    redirect("/login");
+  }
+
   return <>{children}</>;
 }
+

@@ -55,20 +55,29 @@ export default function AIPage() {
     <AppLayout>
       <div className="p-6 max-w-5xl mx-auto space-y-6">
         {/* Header Title */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                 PulseAI Studio
               </h1>
-              <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200">
-                GPT-4o Enhanced
+              <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
+                Google Gemini 3.8 Flash
               </span>
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              Generate viral captions, multi-platform threads, hashtags, and schedule recommendations in seconds.
+              Generate viral captions, multi-platform threads, hashtags, and schedule recommendations complying with official platform regulations.
             </p>
           </div>
+
+          <a
+            href="/ai-assistant"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-sm transition self-start sm:self-auto"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Launch Full Gemini AI Studio</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </a>
         </div>
 
         {/* Studio Grid */}

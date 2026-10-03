@@ -11,4 +11,17 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .agents
-node_modules
+
+# SQLite databases & journals
+*.db
+*.db-journal
+prisma/*.db
+prisma/*.db-journal
+
+# TypeScript build info & editor settings
+*.tsbuildinfo
+.vscode/
+
+# Local scratch files
+scratch_*.js
+crop_*.js

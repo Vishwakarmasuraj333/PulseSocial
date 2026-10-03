@@ -53,6 +53,9 @@ export const authService = {
 
   async getSession(): Promise<UserSession | null> {
     try {
+      if (typeof document !== "undefined" && !document.cookie.includes("pulsesocial_auth_session")) {
+        return null;
+      }
       const res = await fetch("/api/auth/me");
       if (!res.ok) return null;
       const data = await res.json();

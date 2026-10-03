@@ -403,6 +403,9 @@ export function renderPlatformIcon(
     case "lemon8":
     case "golden":
       return <MastodonIcon size={size} className={cls} />;
+    case "google":
+    case "google_business":
+      return <GoogleBusinessIcon size={size} className={cls} />;
     default:
       return (
         <div
@@ -414,5 +417,19 @@ export function renderPlatformIcon(
       );
   }
 }
+
+export function GoogleBusinessIcon({ className = "w-5 h-5", size }: IconProps) {
+  const s = size || 20;
+  return (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" className={className}>
+      <circle cx="12" cy="12" r="11.5" fill="#4285F4" stroke="#3367D6" strokeWidth="1" />
+      <path
+        d="M12 5C8.13 5 5 8.13 5 12c0 3.87 3.13 7 7 7 3.87 0 7-3.13 7-7 0-.54-.06-1.07-.18-1.57H12v3.14h4.05c-.35 1.15-1.28 2.01-2.45 2.29-.44.1-.9.14-1.6.14-2.21 0-4-1.79-4-4s1.79-4 4-4c1.08 0 2.06.43 2.77 1.13l2.22-2.22C16.5 7.42 14.39 6.5 12 6.5V5z"
+        fill="#FFFFFF"
+      />
+    </svg>
+  );
+}
+
 
 

@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
 import { authService } from "@/lib/services";
 import { useToast } from "@/components/ui/toast";
@@ -23,11 +23,10 @@ import {
 import { OtpSixBoxInput } from "@/components/auth/OtpSixBoxInput";
 import { OtpTopBanner, maskEmail } from "@/components/auth/OtpTopBanner";
 
-function SignupContent() {
+export default function SignupPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const searchParams = useSearchParams();
   const [step, setStep] = useState<"form" | "otp">("form");
 
   // Form fields
@@ -53,8 +52,10 @@ function SignupContent() {
   const [shake, setShake] = useState(false);
 
   useEffect(() => {
-    const error = searchParams.get("error");
-    const message = searchParams.get("message");
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get("error");
+    const message = params.get("message");
     if (error === "google_not_configured") {
       setErrorMessage(
         message ||
@@ -63,7 +64,7 @@ function SignupContent() {
     } else if (error) {
       setErrorMessage(message || "Authentication could not be completed. Please try again.");
     }
-  }, [searchParams]);
+  }, []);
 
   // 60-second Resend cooldown
   useEffect(() => {
@@ -710,13 +711,5 @@ function SignupContent() {
         </div>
       </div>
     </>
-  );
-}
-
-export default function SignupPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-white" />}>
-      <SignupContent />
-    </Suspense>
   );
 }

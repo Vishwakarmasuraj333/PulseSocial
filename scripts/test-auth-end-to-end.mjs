@@ -1,8 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import crypto from "crypto";
-
 const prisma = new PrismaClient();
-const BASE_URL = "http://localhost:3001";
+const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 
 function findOtpCode(targetHash) {
   for (let i = 100000; i <= 999999; i++) {
@@ -128,32 +127,32 @@ async function runTests() {
   console.log("✓ Wrong password correctly rejected with 401 Unauthorized!");
 
   // Test 6: Google Sign-In with Suraj Vishwakarma
-  console.log("\n[TEST 6] Testing /api/auth/google-signin (Suraj Vishwakarma)...");
-  const googleRes = await fetch(`${BASE_URL}/api/auth/google-signin`, {
+  // Test 6: Real Password Login with Suraj Vishwakarma
+  console.log("\n[TEST 6] Testing /api/auth/login (itsurya9930@gmail.com)...");
+  const loginRes = await fetch(`${BASE_URL}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       email: "itsurya9930@gmail.com",
-      name: "Suraj Vishwakarma",
-      avatarUrl: null,
-      googleId: "goog_suraj_test_123",
+      password: "Password123!",
+      rememberMe: true,
     }),
   });
-  const googleData = await googleRes.json();
-  const googleCookie = googleRes.headers.get("set-cookie");
-  console.log(`Google sign-in status: ${googleRes.status}`);
-  console.log("Google sign-in response:", googleData);
-  console.log("Google session cookie generated:", !!googleCookie);
-  if (googleRes.status !== 200 || !googleData.success) {
-    throw new Error(`Google sign-in failed: ${JSON.stringify(googleData)}`);
+  const loginData = await loginRes.json();
+  const sessionCookie = loginRes.headers.get("set-cookie");
+  console.log(`Login status: ${loginRes.status}`);
+  console.log("Login response:", loginData);
+  console.log("Session cookie generated:", !!sessionCookie);
+  if (loginRes.status !== 200 || !loginData.success) {
+    throw new Error(`Login failed: ${JSON.stringify(loginData)}`);
   }
-  console.log("✓ Google sign-in works seamlessly and issues auth session cookie!");
+  console.log("✓ Login works seamlessly and issues auth session cookie!");
 
   // Test 7: Verify Authenticated Session with /api/auth/me
   console.log("\n[TEST 7] Testing session verification via /api/auth/me...");
   const meRes = await fetch(`${BASE_URL}/api/auth/me`, {
     headers: {
-      Cookie: googleCookie || "",
+      Cookie: sessionCookie || "",
     },
   });
   const meData = await meRes.json();
@@ -169,7 +168,7 @@ async function runTests() {
   const socialConnectRes = await fetch(`${BASE_URL}/api/social/google/connect`, {
     redirect: "manual",
     headers: {
-      Cookie: googleCookie || "",
+      Cookie: sessionCookie || "",
     },
   });
   console.log(`Social google connect status: ${socialConnectRes.status}`);

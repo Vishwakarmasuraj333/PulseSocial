@@ -96,7 +96,7 @@ export async function sendVerificationEmail(toEmail: string, otp: string) {
   const from = process.env.EMAIL_FROM || "PulseSocial <noreply@pulsesocial.io>";
 
   if (process.env.NODE_ENV !== "production") {
-    console.log(`[PULSESOCIAL OTP DISPATCH] To: ${toEmail} | Code dispatched`);
+    console.log(`[PULSESOCIAL OTP DISPATCH] To: ${toEmail} | Code: ${otp}`);
   }
 
   if (!host || !user || !pass) {

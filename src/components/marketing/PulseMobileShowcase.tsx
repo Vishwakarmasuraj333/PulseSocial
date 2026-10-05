@@ -23,7 +23,10 @@ export function PulseMobileShowcase() {
                     <span className="text-emerald-400">● Live</span>
                   </div>
                   <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
-                    <div className="text-[10px] font-bold text-white">Zylker Travels</div>
+                    <div className="text-[10px] font-bold text-white flex items-center gap-1">
+  <span className="w-2.5 h-2.5 rounded-full bg-[#1E3A8A] flex items-center justify-center text-[5px] text-white font-black">P</span>
+  <span>PulseSocial Global</span>
+</div>
                     <div className="text-[9px] text-slate-400">What to Do in Switzerland 🇨🇭</div>
                     <div className="h-20 rounded-lg overflow-hidden bg-slate-800">
                       <img
@@ -49,7 +52,7 @@ export function PulseMobileShowcase() {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-xs font-black text-white">Home</div>
-                      <div className="text-[10px] text-slate-400">Zylker Travels</div>
+                      <div className="text-[10px] text-slate-400">PulseSocial Global</div>
                     </div>
                     <div className="flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />

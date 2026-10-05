@@ -221,13 +221,14 @@ export async function POST(req: NextRequest) {
     const platformRule = getPlatformRule(platform);
 
     // List of active models supported in 2026 Google Generative AI API
-    const modelCandidates = [
+    const modelCandidates = Array.from(new Set([
       model,
+      "gemini-3.5-flash",
+      "gemini-3-flash-preview",
+      "gemini-3.1-flash-lite",
       "gemini-3.8-flash",
       "gemini-flash-latest",
-      "gemini-3.5-flash",
-      "gemini-3.1-pro-preview",
-    ].filter(Boolean);
+    ])).filter(Boolean);
 
     // If an API key is available, attempt real live call to Google Gemini
     if (apiKey && apiKey.length > 8) {
@@ -351,6 +352,7 @@ Return valid JSON ONLY with this exact structure:
 
                 return NextResponse.json({
                   success: true,
+                  content: enrichedVars[0].caption,
                   result: {
                     hook: enrichedVars[0].hook,
                     caption: enrichedVars[0].caption,
@@ -382,6 +384,7 @@ Return valid JSON ONLY with this exact structure:
     return NextResponse.json({
       success: true,
       requiresKey: false,
+      content: enrichedVars[0].caption,
       result: {
         hook: enrichedVars[0].hook,
         caption: enrichedVars[0].caption,

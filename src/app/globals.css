@@ -276,3 +276,147 @@ body {
   transform: scale(1.18);
   box-shadow: 0 0 35px rgba(255, 255, 255, 1), 0 0 20px rgba(167, 139, 223, 0.9);
 }
+
+/* Floating animation utilities for Hero Banner */
+@keyframes floatUpSlow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes floatDownSlow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+}
+
+.animate-float-up {
+  animation: floatUpSlow 5s ease-in-out infinite;
+}
+
+.animate-float-down {
+  animation: floatDownSlow 5.6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: floatUpSlow 6.2s ease-in-out 1.2s infinite;
+}
+
+.animate-float-reverse {
+  animation: floatDownSlow 6.5s ease-in-out 0.8s infinite;
+}
+
+/* Infinite Marquee Slider Animations */
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marqueeScrollReverse {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 32s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+.animate-marquee-reverse {
+  display: flex;
+  width: max-content;
+  animation: marqueeScrollReverse 34s linear infinite;
+}
+
+.animate-marquee-reverse:hover {
+  animation-play-state: paused;
+}
+
+.animate-marquee-slow {
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 45s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-slow:hover {
+  animation-play-state: paused;
+}
+
+/* Feature Showcase Custom Animations */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+}
+
+@keyframes floatReverseSlow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(8px) rotate(-1.5deg);
+  }
+}
+
+@keyframes sandTrickle {
+  0% {
+    stroke-dashoffset: 0;
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: -20;
+    opacity: 0.6;
+  }
+}
+
+@keyframes wavePulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.8));
+  }
+}
+
+.animate-float-slow {
+  animation: floatSlow 4s ease-in-out infinite;
+}
+
+.animate-float-reverse {
+  animation: floatReverseSlow 4.5s ease-in-out infinite;
+}
+
+.animate-sand {
+  animation: sandTrickle 1.2s linear infinite;
+}
+
+.animate-wave-pulse {
+  animation: wavePulse 3s ease-in-out infinite;
+}
+

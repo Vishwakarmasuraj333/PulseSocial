@@ -22,10 +22,16 @@ export async function POST(req: NextRequest) {
     const cleanPrompt = prompt.trim();
     let finalPrompt = cleanPrompt;
 
-    // 1. Google Gemini 3.8 Flash Prompt Enhancement for cinema-grade realism
+    // 1. Google Gemini Prompt Enhancement for cinema-grade realism
     const apiKey = (customApiKey || process.env.GEMINI_API_KEY || "").trim();
     if (enhance && apiKey) {
-      const enhanceModels = ["gemini-3.8-flash", "gemini-flash-latest", "gemini-3.5-flash"];
+      const enhanceModels = [
+        "gemini-3.5-flash",
+        "gemini-3-flash-preview",
+        "gemini-3.1-flash-lite",
+        "gemini-3.8-flash",
+        "gemini-flash-latest",
+      ];
       for (const m of enhanceModels) {
         try {
           const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`;
@@ -38,9 +44,9 @@ DO NOT include markdown, quotes, or preamble. Return ONLY the raw enhanced promp
           const geminiRes = await fetch(geminiEndpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            signal: AbortSignal.timeout(4000),
+            signal: AbortSignal.timeout(6000),
             body: JSON.stringify({
-              contents: [{ parts: [{ text: enhanceInstruction }] }],
+              contents: [{ role: "user", parts: [{ text: enhanceInstruction }] }],
             }),
           });
 

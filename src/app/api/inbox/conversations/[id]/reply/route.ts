@@ -19,14 +19,15 @@ export async function POST(
     try {
       const session = await getSession();
       if (session?.activeOrgId) {
+        const cleanId = id.replace(/^(cmt-|msg-)/, "");
         // Attempt database updates if matching comment/message exists
         await prisma.socialComment.updateMany({
-          where: { id },
+          where: { id: { in: [id, cleanId] } },
           data: { isReplied: true, isRead: true },
         });
 
         await prisma.socialMessage.updateMany({
-          where: { id },
+          where: { id: { in: [id, cleanId] } },
           data: { isRead: true },
         });
 

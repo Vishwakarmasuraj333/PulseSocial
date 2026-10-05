@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { PulseAnnouncementBar } from "@/components/marketing/PulseAnnouncementBar";
 import { MarketingHeader } from "@/components/marketing/MarketingHeader";
 import { PulseHeroStage } from "@/components/marketing/PulseHeroStage";
-import { PulseAwardsGrid } from "@/components/marketing/PulseAwardsGrid";
 import { PulseFeaturesShowcase } from "@/components/marketing/PulseFeaturesShowcase";
 import { PulseTestimonialVideo } from "@/components/marketing/PulseTestimonialVideo";
 import { PulseInstagramShowcase } from "@/components/marketing/PulseInstagramShowcase";
@@ -16,20 +15,25 @@ import { PulseWebinarBanner } from "@/components/marketing/PulseWebinarBanner";
 import { PulseMegaFooter } from "@/components/marketing/PulseMegaFooter";
 import { PulseConciergeModal, PulseStickyConcierge } from "@/components/marketing/PulseConciergeModal";
 import { PulseVideoModal } from "@/components/marketing/PulseVideoModal";
+import { PulseSocialSidebar } from "@/components/marketing/PulseSocialSidebar";
+import { PulseBackToTop } from "@/components/marketing/PulseBackToTop";
 
 export default function HomePage() {
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isConciergeModalOpen, setIsConciergeModalOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white relative">
       {/* 1. Top Announcement Bar (Linkthread) */}
       <PulseAnnouncementBar />
 
       {/* 2. Main Navigation Header */}
       <MarketingHeader />
 
-      {/* Main Content Sections (Matching PDF) */}
+      {/* Floating Animated Social Media Sidebar Dock */}
+      <PulseSocialSidebar />
+
+      {/* Main Content Sections */}
       <main className="flex-1">
         {/* 4. Hero Section with Rotating Card Switcher & Orbiting Floating Social Icons */}
         <PulseHeroStage
@@ -37,10 +41,7 @@ export default function HomePage() {
           onBookDemo={() => setIsConciergeModalOpen(true)}
         />
 
-        {/* 5. Industry Awards & Verified Trust Ratings Row */}
-        <PulseAwardsGrid />
-
-        {/* 6. Core Features: Schedule, Calendar, Monitor, Analytics */}
+        {/* 5. Core Features Showcase: Schedule, Calendar, Monitor, Analytics */}
         <PulseFeaturesShowcase />
 
         {/* 7. Video Testimonial Carousel (Jon Tromans) */}
@@ -70,7 +71,10 @@ export default function HomePage() {
       {/* 14. Comprehensive Mega Footer */}
       <PulseMegaFooter />
 
-      {/* 15. Sticky Floating Concierge & Modal (Page 7 & 15) */}
+      {/* Floating Back to Top Button */}
+      <PulseBackToTop />
+
+      {/* 15. Sticky Floating Concierge & Modal */}
       <PulseStickyConcierge onOpen={() => setIsConciergeModalOpen(true)} />
 
       <PulseConciergeModal

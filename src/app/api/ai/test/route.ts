@@ -13,7 +13,13 @@ export async function POST(req: NextRequest) {
       }, { status: 400 });
     }
 
-    const testModels = ["gemini-3.8-flash", "gemini-flash-latest", "gemini-3.5-flash"];
+    const testModels = [
+      "gemini-3.8-flash",
+      "gemini-3.5-flash",
+      "gemini-3-flash-preview",
+      "gemini-3.1-flash-lite",
+      "gemini-flash-latest",
+    ];
     const startTime = Date.now();
 
     for (const model of testModels) {
@@ -24,23 +30,26 @@ export async function POST(req: NextRequest) {
           headers: { "Content-Type": "application/json" },
           signal: AbortSignal.timeout(6000),
           body: JSON.stringify({
-            contents: [{ parts: [{ text: "ping" }] }]
-          })
+            contents: [{ role: "user", parts: [{ text: "ping" }] }],
+          }),
         });
 
         if (res.ok) {
-          const latencyMs = Date.now() - startTime;
-          return NextResponse.json({
-            ok: true,
-            activeModel: model,
-            latencyMs,
-            status: "Connected & Verified",
-            message: `Successfully connected to Google Gemini (${model}) in ${latencyMs}ms.`,
-            keyMasked: `${apiKey.substring(0, 6)}...${apiKey.slice(-4)}`,
-          });
+          const geminiData = await res.json();
+          if (geminiData.candidates?.[0]?.content?.parts?.[0]?.text) {
+            const latencyMs = Date.now() - startTime;
+            return NextResponse.json({
+              ok: true,
+              activeModel: model,
+              latencyMs,
+              status: "Connected & Verified",
+              message: `Successfully connected to Google Gemini (${model}) in ${latencyMs}ms.`,
+              keyMasked: `${apiKey.substring(0, 6)}...${apiKey.slice(-4)}`,
+            });
+          }
         }
       } catch (err: any) {
-        // try next model
+        // try next model fallback
       }
     }
 

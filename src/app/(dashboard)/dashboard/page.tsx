@@ -454,28 +454,32 @@ export default function DashboardPage() {
                             </span>
                           </div>
                         </div>
-                        <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full">
-                          Live
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/80 px-2 py-0.5 rounded-full border border-purple-200 dark:border-purple-800">
+                            <Sparkles className="w-3 h-3 text-purple-600 animate-pulse" />
+                            <span>✨ Gemini AI</span>
+                          </span>
+                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                            livePosts[0]?.status === "PUBLISHED"
+                              ? "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800"
+                              : "text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800"
+                          }`}>
+                            {livePosts[0]?.status || "READY"}
+                          </span>
+                        </div>
                       </div>
 
                       {/* Post Media / Preview */}
-                      {livePosts[0]?.mediaUrls && livePosts[0].mediaUrls.length > 0 ? (
+                      {(livePosts[0]?.mediaUrls?.[0] || livePosts[0]?.media?.[0]?.url) ? (
                         <div
                           onClick={() => setSelectedMediaPost(livePosts[0])}
                           className="mt-3 relative aspect-video w-full rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 cursor-pointer group/media"
                         >
-                          <Image
-                            src={livePosts[0].mediaUrls[0]}
-                            alt="Post media"
-                            fill
-                            className="object-cover group-hover/media:scale-105 transition duration-300"
+                          <img
+                            src={livePosts[0]?.mediaUrls?.[0] || livePosts[0]?.media?.[0]?.url}
+                            alt="Post visual"
+                            className="w-full h-full object-cover group-hover/media:scale-105 transition duration-300"
                           />
-                          <div className="absolute inset-0 bg-black/25 flex items-center justify-center opacity-0 group-hover/media:opacity-100 transition backdrop-blur-2xs">
-                            <div className="w-11 h-11 rounded-full bg-white/95 text-slate-900 flex items-center justify-center shadow-lg">
-                              <Play className="w-5 h-5 fill-slate-900 pl-0.5" />
-                            </div>
-                          </div>
                         </div>
                       ) : (
                         <div className="mt-3 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-700 dark:text-slate-300 border border-slate-100 dark:border-slate-800">
@@ -486,7 +490,7 @@ export default function DashboardPage() {
                       )}
 
                       {/* Caption text */}
-                      {livePosts[0]?.content && livePosts[0]?.mediaUrls?.length > 0 && (
+                      {livePosts[0]?.content && (livePosts[0]?.mediaUrls?.[0] || livePosts[0]?.media?.[0]?.url) && (
                         <p className="mt-2.5 text-xs text-slate-800 dark:text-slate-200 font-medium line-clamp-2">
                           {livePosts[0].content}
                         </p>
@@ -498,12 +502,12 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-1.5">
                         <ThumbsUp className="w-3.5 h-3.5 text-blue-600" />
                         <span className="font-semibold text-slate-700 dark:text-slate-300">
-                          {livePosts[0]?.likes || 0}
+                          {livePosts[0]?.likes != null ? livePosts[0].likes : "No likes yet"}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <MessageCircle className="w-3.5 h-3.5 text-indigo-500" />
-                        <span>{livePosts[0]?.comments || 0} comments</span>
+                        <span>{livePosts[0]?.comments != null ? `${livePosts[0].comments} comments` : "No comments yet"}</span>
                       </div>
                     </div>
                   </div>

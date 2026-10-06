@@ -35,17 +35,24 @@ export class MetaProvider implements SocialProvider {
       process.env.META_APP_ID ||
       (this.platform === "instagram" ? "1740017983566986" : "191062257579887");
 
-    const scopes = [
-      "public_profile",
-      "pages_show_list",
-      "pages_read_engagement",
-      "pages_manage_posts",
-      "instagram_basic",
-      "instagram_content_publish",
-      "instagram_manage_comments",
-      "instagram_manage_insights",
-      "business_management",
-    ].join(",");
+    const scopes =
+      this.platform === "instagram"
+        ? [
+            "public_profile",
+            "instagram_basic",
+            "instagram_content_publish",
+            "instagram_manage_comments",
+            "instagram_manage_insights",
+            "pages_show_list",
+            "pages_read_engagement",
+          ].join(",")
+        : [
+            "public_profile",
+            "email",
+            "pages_show_list",
+            "pages_read_engagement",
+            "pages_manage_posts",
+          ].join(",");
 
     const params = new URLSearchParams({
       client_id: appId,

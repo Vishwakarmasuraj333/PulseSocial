@@ -28,7 +28,9 @@ export async function GET(
       url.searchParams.get("format") === "json" ||
       req.headers.get("accept")?.includes("application/json");
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || url.origin;
+    const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
+    const proto = req.headers.get("x-forwarded-proto") || (host?.includes("localhost") ? "http" : "https");
+    const appUrl = host ? `${proto}://${host}` : (process.env.NEXT_PUBLIC_APP_URL || url.origin);
     const redirectUri = `${appUrl}/api/social/${platformKey}/callback`;
 
     // If real provider credentials are not configured in environment

@@ -235,62 +235,90 @@ export async function POST(req: Request) {
     if (action === "PUBLISH_NOW") {
       let publishedCount = 0;
       let failureCount = 0;
+      let notConfiguredCount = 0;
 
       for (const target of post.targets) {
         const account = target.socialAccount;
         try {
-          let platformPostId = `pulse-live-${account.provider}-${Date.now()}-${target.id.slice(-4)}`;
-
-          if (account.token) {
-            try {
-              const decryptedAccess = decryptToken(
-                account.token.encryptedAccessToken,
-                account.token.iv,
-                account.token.tag
-              );
-
-              const provider = getSocialProvider(account.provider as any);
-              const result = await provider.publishPost(decryptedAccess, {
-                content,
-                targetAccountId: account.providerAccountId,
-                mediaUrls: post.media.map((m) => ({ url: m.url, type: m.mediaType as "IMAGE" | "VIDEO" })),
-              });
-
-              if (result.success && result.platformPostId) {
-                platformPostId = result.platformPostId;
-              }
-            } catch (provErr: any) {
-              // Gracefully proceed with live simulated broadcast ID
-            }
+          if (!account.token) {
+            notConfiguredCount++;
+            await prisma.socialPostTarget.update({
+              where: { id: target.id },
+              data: {
+                status: "READY",
+                errorMessage: `${account.provider} account is not connected with live OAuth tokens.`,
+              },
+            });
+            continue;
           }
 
-          publishedCount++;
-          await prisma.socialPostTarget.update({
-            where: { id: target.id },
-            data: {
-              status: "PUBLISHED",
-              platformPostId,
-              publishedAt: new Date(),
-            },
+          const decryptedAccess = decryptToken(
+            account.token.encryptedAccessToken,
+            account.token.iv,
+            account.token.tag
+          );
+
+          if (!decryptedAccess || decryptedAccess.startsWith("token_")) {
+            notConfiguredCount++;
+            await prisma.socialPostTarget.update({
+              where: { id: target.id },
+              data: {
+                status: "READY",
+                errorMessage: `Live publishing integration is not configured for ${account.provider}. Saved as READY.`,
+              },
+            });
+            continue;
+          }
+
+          const provider = getSocialProvider(account.provider as any);
+          const result = await provider.publishPost(decryptedAccess, {
+            content,
+            targetAccountId: account.providerAccountId,
+            mediaUrls: post.media.map((m) => ({ url: m.url, type: m.mediaType as "IMAGE" | "VIDEO" })),
           });
-        } catch (targetErr: unknown) {
+
+          if (result.success && result.platformPostId) {
+            publishedCount++;
+            await prisma.socialPostTarget.update({
+              where: { id: target.id },
+              data: {
+                status: "PUBLISHED",
+                platformPostId: result.platformPostId,
+                publishedAt: new Date(),
+              },
+            });
+          } else {
+            failureCount++;
+            await prisma.socialPostTarget.update({
+              where: { id: target.id },
+              data: {
+                status: "FAILED",
+                errorMessage: result.error || "Remote platform API rejected publication.",
+              },
+            });
+          }
+        } catch (targetErr: any) {
           failureCount++;
           await prisma.socialPostTarget.update({
             where: { id: target.id },
             data: {
               status: "FAILED",
-              errorMessage: (targetErr as Error).message,
+              errorMessage: targetErr?.message || "Platform API error.",
             },
           });
         }
       }
 
-      const finalStatus =
-        publishedCount > 0 && failureCount === 0
-          ? "PUBLISHED"
-          : publishedCount > 0 && failureCount > 0
-          ? "PARTIALLY_PUBLISHED"
-          : "FAILED";
+      let finalStatus = "DRAFT";
+      if (publishedCount > 0 && failureCount === 0 && notConfiguredCount === 0) {
+        finalStatus = "PUBLISHED";
+      } else if (publishedCount > 0) {
+        finalStatus = "PARTIALLY_PUBLISHED";
+      } else if (notConfiguredCount > 0 && failureCount === 0) {
+        finalStatus = "READY";
+      } else if (failureCount > 0) {
+        finalStatus = "FAILED";
+      }
 
       await prisma.socialPost.update({
         where: { id: post.id },

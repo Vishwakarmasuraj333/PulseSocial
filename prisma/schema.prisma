@@ -32,6 +32,7 @@ model User {
   auditLogs             AuditLog[]
   assignedComments      SocialComment[]
   assignedMessages      SocialMessage[]
+  aiGenerations         AiGeneration[]
 }
 
 model Organization {
@@ -56,6 +57,7 @@ model Organization {
   teamInvitations       TeamInvitation[]
   auditLogs             AuditLog[]
   settings              Settings?
+  aiGenerations         AiGeneration[]
 }
 
 model OrganizationMember {
@@ -551,5 +553,33 @@ model PricingPlan {
   isPopular    Boolean   @default(false)
   isActive     Boolean   @default(true)
   createdAt    DateTime  @default(now())
+}
+
+model AiGeneration {
+  id              String        @id @default(cuid())
+  userId          String?
+  workspaceId     String?
+  provider        String        @default("gemini")
+  taskType        String        // social-copy, image, suggestions, prompt-enhance, image-to-caption, caption-to-image
+  model           String
+  prompt          String
+  enhancedPrompt  String?
+  inputData       String?       // JSON string
+  outputText      String?       // JSON string or caption text
+  imageUrl        String?
+  platform        String?
+  tone            String?
+  status          String        @default("SUCCESS") // SUCCESS, FAILED
+  errorMessage    String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user            User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  organization    Organization? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([workspaceId])
+  @@index([taskType])
+  @@index([createdAt])
 }
 

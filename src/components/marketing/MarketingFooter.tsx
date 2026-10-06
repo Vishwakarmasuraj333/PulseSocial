@@ -106,7 +106,10 @@ export function MarketingFooter() {
 
         {/* Bottom copyright bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <p className="text-slate-300">© {new Date().getFullYear()} PulseSocial Inc. All rights reserved. Manage Every Social. From One Place.</p>
+          <p className="text-slate-300">
+            © {new Date().getFullYear()} PulseSocial Inc. All rights reserved. &bull;{" "}
+            <span className="font-semibold text-purple-400">Developed by Suraj Vishwakarma</span>
+          </p>
           <div className="flex items-center gap-4 text-slate-400">
             <span>English (US)</span>
             <span>·</span>

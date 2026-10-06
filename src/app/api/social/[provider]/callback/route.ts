@@ -72,7 +72,9 @@ export async function GET(
       );
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || url.origin;
+    const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
+    const proto = req.headers.get("x-forwarded-proto") || (host?.includes("localhost") ? "http" : "https");
+    const appUrl = host ? `${proto}://${host}` : (process.env.NEXT_PUBLIC_APP_URL || url.origin);
     const redirectUri = `${appUrl}/api/social/${platformKey}/callback`;
 
     // 1. Exchange code for access & refresh tokens

@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Star, Quote, CheckCircle2, TrendingUp } from "lucide-react";
 
+import { SURAJ_VISHWAKARMA_AVATAR } from "@/lib/assets/founder-image";
+
 interface Testimonial {
   id: number;
   name: string;
@@ -26,6 +28,17 @@ export function PulseTestimonialVideo({ onWatchVideo }: PulseTestimonialVideoPro
   const testimonials: Testimonial[] = [
     {
       id: 0,
+      name: "Suraj Vishwakarma",
+      role: "Creator & Lead Developer",
+      company: "Developed PulseSocial",
+      avatarUrl: SURAJ_VISHWAKARMA_AVATAR,
+      quote:
+        "I engineered PulseSocial from the ground up to empower businesses, creators, and marketers with a next-gen AI social media command center. From predictive scheduling to autonomous multi-channel publishing, everything is built for peak speed and performance.",
+      metric: "100% Custom Built",
+      metricLabel: "Developed by Suraj Vishwakarma",
+    },
+    {
+      id: 1,
       name: "Jon Tromans",
       role: "Digital Marketing Trainer",
       company: "The Marketing Training Hub",
@@ -36,7 +49,7 @@ export function PulseTestimonialVideo({ onWatchVideo }: PulseTestimonialVideoPro
       metricLabel: "Time Saved",
     },
     {
-      id: 1,
+      id: 2,
       name: "Sarah Jenkins",
       role: "VP of Marketing",
       company: "Bloom Digital Agency",
@@ -45,17 +58,6 @@ export function PulseTestimonialVideo({ onWatchVideo }: PulseTestimonialVideoPro
         "Managing 24 client accounts without missing a single comment used to require 4 coordinators. With PulseSocial's unified inbox and automated queues, our team productivity tripled in 30 days.",
       metric: "3.2x",
       metricLabel: "Team Output",
-    },
-    {
-      id: 2,
-      name: "Marco Silva",
-      role: "Head of Growth",
-      company: "TechFlow Media",
-      avatarUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=320&auto=format&fit=crop&q=80",
-      quote:
-        "The best-time predictive scheduling is shockingly accurate. Our organic LinkedIn impressions rose by 140% in just two weeks without spending a single dollar on boosted ads.",
-      metric: "+140%",
-      metricLabel: "Organic Reach",
     },
     {
       id: 3,
@@ -113,7 +115,9 @@ export function PulseTestimonialVideo({ onWatchVideo }: PulseTestimonialVideoPro
               <img
                 src={item.avatarUrl}
                 alt={item.name}
-                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                loading="eager"
+                decoding="async"
+                className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-110"
               />
             </div>
 
@@ -139,9 +143,16 @@ export function PulseTestimonialVideo({ onWatchVideo }: PulseTestimonialVideoPro
           </p>
 
           <div className="space-y-0.5 pt-2">
-            <h4 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
-              {item.name}
-            </h4>
+            <div className="flex items-center justify-center gap-2">
+              <h4 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                {item.name}
+              </h4>
+              {item.name === "Suraj Vishwakarma" && (
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-600 text-white shadow-xs">
+                  Creator & Developer
+                </span>
+              )}
+            </div>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
               {item.role} &bull; <span className="text-slate-800 dark:text-slate-200 font-semibold">{item.company}</span>
             </p>

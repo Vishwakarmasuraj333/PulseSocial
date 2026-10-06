@@ -46,6 +46,18 @@ export default function SignupPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [showOtpBanner, setShowOtpBanner] = useState(false);
 
+  // Flip animation state when navigating to /login or toggling 3D preview
+  const [isFlipping, setIsFlipping] = useState(false);
+  const [isCardFlipped, setIsCardFlipped] = useState(false);
+
+  const handleNavigateToLogin = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    setIsFlipping(true);
+    setTimeout(() => {
+      router.push("/login");
+    }, 320);
+  };
+
   // UI state
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -275,6 +287,7 @@ export default function SignupPage() {
             ) : (
               <Link
                 href="/login"
+                onClick={handleNavigateToLogin}
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#5846a8] transition"
               >
                 <span>Already have an account? Sign in</span>
@@ -300,6 +313,21 @@ export default function SignupPage() {
             {/* STEP 1: Registration Form */}
             {step === "form" && (
               <div className="animate-in fade-in duration-200">
+                {/* Switcher Pills between Sign In and Sign Up */}
+                <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl mb-5 w-fit border border-slate-200/60">
+                  <Link
+                    href="/login"
+                    onClick={handleNavigateToLogin}
+                    className="px-3.5 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 font-semibold text-xs transition inline-flex items-center gap-1"
+                  >
+                    <ArrowLeft className="w-3 h-3 text-slate-400" />
+                    <span>Sign In</span>
+                  </Link>
+                  <span className="px-3.5 py-1.5 rounded-lg bg-white text-slate-900 font-bold text-xs shadow-xs">
+                    Sign Up
+                  </span>
+                </div>
+
                 <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
                   Get started with PulseSocial
                 </h1>
@@ -474,7 +502,11 @@ export default function SignupPage() {
 
                 <div className="mt-6 text-center text-xs text-slate-500">
                   <span>Already have an account? </span>
-                  <Link href="/login" className="text-[#5846a8] font-semibold hover:underline">
+                  <Link
+                    href="/login"
+                    onClick={handleNavigateToLogin}
+                    className="text-[#5846a8] font-semibold hover:underline"
+                  >
                     Sign in
                   </Link>
                 </div>
@@ -568,14 +600,44 @@ export default function SignupPage() {
         </div>
 
         {/* ============================================================ */}
-        {/* RIGHT COLUMN: Iconic Purple Specialist Showcase              */}
+        {/* RIGHT COLUMN: Iconic Purple Specialist with 3D Flip (Palti) */}
         {/* ============================================================ */}
-        <div className="hidden md:flex w-1/2 bg-[#9371D0] min-h-screen items-center justify-center relative overflow-hidden select-none">
-          <img
-            src="/images/auth_specialist_hero.png"
-            alt="Customer Support Specialist"
-            className="w-full h-full max-h-[92vh] max-w-[640px] object-contain select-none pointer-events-none"
-          />
+        <div className="hidden md:flex w-1/2 bg-[#9371D0] min-h-screen items-center justify-center relative overflow-hidden select-none [perspective:1400px]">
+          {/* Interactive 3D Flip Container */}
+          <div
+            className={`relative w-full h-full max-h-[92vh] max-w-[640px] flex items-center justify-center transition-transform duration-700 [transform-style:preserve-3d] ${
+              isFlipping ? "animate-palti-rev-exit" : "animate-palti-rev-enter"
+            } ${isCardFlipped ? "[transform:rotateY(180deg)]" : ""}`}
+          >
+            {/* FRONT FACE: PulseSocial Support Specialist (Signup Hero) */}
+            <div className="absolute inset-0 w-full h-full flex items-center justify-center [backface-visibility:hidden]">
+              <img
+                src="/images/auth_specialist_hero.png"
+                alt="PulseSocial Support Specialist"
+                className="w-full h-full max-h-[92vh] max-w-[640px] object-contain select-none pointer-events-none"
+              />
+            </div>
+
+            {/* BACK FACE: PulseSocial Multi-Channel Purple Hero */}
+            <div className="absolute inset-0 w-full h-full flex items-center justify-center [backface-visibility:hidden] [transform:rotateY(180deg)]">
+              <img
+                src="/images/auth_login_purple_hero.png"
+                alt="PulseSocial Secure Multi-Channel Authentication"
+                className="w-full h-full max-h-[92vh] max-w-[640px] object-contain select-none pointer-events-none"
+              />
+            </div>
+          </div>
+
+          {/* Interactive Flip Preview Trigger Button */}
+          <button
+            type="button"
+            onClick={() => setIsCardFlipped((prev) => !prev)}
+            title="Palat kar dekhein (3D Flip Animation)"
+            className="absolute bottom-6 right-6 z-20 flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/20 hover:bg-white/30 text-white backdrop-blur-md border border-white/25 text-xs font-semibold shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer active:scale-95 group"
+          >
+            <RotateCw className="w-3.5 h-3.5 group-hover:rotate-180 transition-transform duration-500" />
+            <span>{isCardFlipped ? "Flip to Specialist" : "Flip to Login Hero"}</span>
+          </button>
         </div>
       </div>
     </>

@@ -420,3 +420,82 @@ body {
   animation: wavePulse 3s ease-in-out infinite;
 }
 
+/* ============================================================ */
+/* AUTH 3D "PALTI" (FLIP) ANIMATIONS                           */
+/* ============================================================ */
+@keyframes paltiEnter {
+  0% {
+    transform: perspective(1400px) rotateY(-90deg) scale(0.92);
+    opacity: 0;
+  }
+  60% {
+    transform: perspective(1400px) rotateY(8deg) scale(1.02);
+    opacity: 1;
+  }
+  100% {
+    transform: perspective(1400px) rotateY(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes paltiExit {
+  0% {
+    transform: perspective(1400px) rotateY(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: perspective(1400px) rotateY(90deg) scale(0.92);
+    opacity: 0;
+  }
+}
+
+@keyframes paltiReverseEnter {
+  0% {
+    transform: perspective(1400px) rotateY(90deg) scale(0.92);
+    opacity: 0;
+  }
+  60% {
+    transform: perspective(1400px) rotateY(-8deg) scale(1.02);
+    opacity: 1;
+  }
+  100% {
+    transform: perspective(1400px) rotateY(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes paltiReverseExit {
+  0% {
+    transform: perspective(1400px) rotateY(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: perspective(1400px) rotateY(-90deg) scale(0.92);
+    opacity: 0;
+  }
+}
+
+.animate-palti-enter {
+  animation: paltiEnter 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+}
+
+.animate-palti-exit {
+  animation: paltiExit 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+}
+
+.animate-palti-rev-enter {
+  animation: paltiReverseEnter 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+}
+
+.animate-palti-rev-exit {
+  animation: paltiReverseExit 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+}
+

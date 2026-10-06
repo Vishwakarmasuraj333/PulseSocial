@@ -1268,7 +1268,7 @@ function SettingsContent() {
                   { id: "slack", name: "Slack Notifications", desc: "Send publishing confirmations and approval alerts to your Slack channels.", connected: false },
                   { id: "zapier", name: "Zapier", desc: "Automate cross-platform ingestion and RSS webhook workflows.", connected: false },
                   { id: "bitly", name: "Custom Link Shortener (zurl.co)", desc: "Automatic click tracking and UTM campaign tagging.", connected: true },
-                  { id: "openai", name: "PulseAI / Zia Assistant", desc: "Generate witty captions, content ideas, and viral hashtags.", connected: true },
+                  { id: "gemini", name: "Google Gemini AI Studio", desc: "Official Google Gemini 3.8 Flash & Nano Banana models for viral copy & photorealistic media.", connected: true },
                 ].map((integ) => (
                   <div
                     key={integ.id}

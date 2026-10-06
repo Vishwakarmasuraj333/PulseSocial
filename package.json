@@ -12,6 +12,7 @@
     "db:seed": "npx tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@google/genai": "^2.27.0",
     "@hookform/resolvers": "^3.9.1",
     "@prisma/client": "^6.4.1",
     "bcryptjs": "^2.4.3",
@@ -36,6 +37,8 @@
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
     "autoprefixer": "^10.6.1",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.1.7",
     "postcss": "^8.4.49",
     "prisma": "^6.4.1",
     "sharp": "^0.35.4",

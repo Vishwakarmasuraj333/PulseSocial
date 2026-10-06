@@ -10,6 +10,7 @@ import {
   AlertCircle,
   XCircle,
   ArrowLeft,
+  ArrowRight,
   RotateCw,
   CheckCircle2,
   Check,
@@ -40,6 +41,18 @@ export default function LoginPage() {
       return new URLSearchParams(window.location.search).get("redirectTo") || "/dashboard";
     }
     return "/dashboard";
+  };
+
+  // Flip animation state when navigating to /signup or toggling 3D preview
+  const [isFlipping, setIsFlipping] = useState(false);
+  const [isCardFlipped, setIsCardFlipped] = useState(false);
+
+  const handleNavigateToSignup = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    setIsFlipping(true);
+    setTimeout(() => {
+      router.push("/signup");
+    }, 320);
   };
 
   // Auth step: "credentials" (Email + Password or Direct OTP) or "otp" (6-box OTP verification)
@@ -426,7 +439,7 @@ export default function LoginPage() {
           <div className="flex items-center justify-between">
             <PulseSocialLogo size="md" variant="full" href="/" />
 
-            {authStep === "otp" && (
+            {authStep === "otp" ? (
               <button
                 type="button"
                 onClick={() => {
@@ -438,6 +451,15 @@ export default function LoginPage() {
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Back to sign in</span>
               </button>
+            ) : (
+              <Link
+                href="/signup"
+                onClick={handleNavigateToSignup}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#5846a8] transition group"
+              >
+                <span>Don&apos;t have an account? <strong className="text-[#5846a8] group-hover:underline">Sign up</strong></span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
             )}
           </div>
 
@@ -460,6 +482,21 @@ export default function LoginPage() {
             {/* -------------------------------------------------------- */}
             {authStep === "credentials" && (
               <div className="animate-in fade-in duration-200">
+                {/* Switcher Pills between Sign In and Sign Up */}
+                <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl mb-5 w-fit border border-slate-200/60">
+                  <span className="px-3.5 py-1.5 rounded-lg bg-white text-slate-900 font-bold text-xs shadow-xs">
+                    Sign In
+                  </span>
+                  <Link
+                    href="/signup"
+                    onClick={handleNavigateToSignup}
+                    className="px-3.5 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 font-semibold text-xs transition inline-flex items-center gap-1"
+                  >
+                    <span>Sign Up</span>
+                    <ArrowRight className="w-3 h-3 text-slate-400" />
+                  </Link>
+                </div>
+
                 <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
                   Welcome back
                 </h1>
@@ -710,7 +747,11 @@ export default function LoginPage() {
                 {/* Footer sign up link */}
                 <div className="mt-8 text-center text-xs text-slate-500">
                   <span>Don&apos;t have an account? </span>
-                  <Link href="/signup" className="text-[#5846A8] font-bold hover:underline">
+                  <Link
+                    href="/signup"
+                    onClick={handleNavigateToSignup}
+                    className="text-[#5846A8] font-bold hover:underline"
+                  >
                     Sign up
                   </Link>
                 </div>
@@ -821,14 +862,44 @@ export default function LoginPage() {
         </div>
 
         {/* ============================================================ */}
-        {/* RIGHT COLUMN: Iconic Purple Specialist Showcase              */}
+        {/* RIGHT COLUMN: Purple Hero with 3D Flip ("Palti") Animation   */}
         {/* ============================================================ */}
-        <div className="hidden md:flex w-1/2 bg-[#9371D0] min-h-screen items-center justify-center relative overflow-hidden select-none">
-          <img
-            src="/images/auth_specialist_hero.png"
-            alt="Customer Support Specialist"
-            className="w-full h-full max-h-[92vh] max-w-[640px] object-contain select-none pointer-events-none"
-          />
+        <div className="hidden md:flex w-1/2 bg-[#9371D0] min-h-screen items-center justify-center relative overflow-hidden select-none [perspective:1400px]">
+          {/* Interactive 3D Flip Container */}
+          <div
+            className={`relative w-full h-full max-h-[92vh] max-w-[640px] flex items-center justify-center transition-transform duration-700 [transform-style:preserve-3d] ${
+              isFlipping ? "animate-palti-exit" : "animate-palti-enter"
+            } ${isCardFlipped ? "[transform:rotateY(180deg)]" : ""}`}
+          >
+            {/* FRONT FACE: PulseSocial Multi-Channel Purple Hero */}
+            <div className="absolute inset-0 w-full h-full flex items-center justify-center [backface-visibility:hidden]">
+              <img
+                src="/images/auth_login_purple_hero.png"
+                alt="PulseSocial Secure Multi-Channel Authentication"
+                className="w-full h-full max-h-[92vh] max-w-[640px] object-contain select-none pointer-events-none"
+              />
+            </div>
+
+            {/* BACK FACE: PulseSocial Support Specialist (Signup Hero) */}
+            <div className="absolute inset-0 w-full h-full flex items-center justify-center [backface-visibility:hidden] [transform:rotateY(180deg)]">
+              <img
+                src="/images/auth_specialist_hero.png"
+                alt="PulseSocial Specialist"
+                className="w-full h-full max-h-[92vh] max-w-[640px] object-contain select-none pointer-events-none"
+              />
+            </div>
+          </div>
+
+          {/* Interactive Flip Preview Trigger Button */}
+          <button
+            type="button"
+            onClick={() => setIsCardFlipped((prev) => !prev)}
+            title="Palat kar dekhein (3D Flip Animation)"
+            className="absolute bottom-6 right-6 z-20 flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/20 hover:bg-white/30 text-white backdrop-blur-md border border-white/25 text-xs font-semibold shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer active:scale-95 group"
+          >
+            <RotateCw className="w-3.5 h-3.5 group-hover:rotate-180 transition-transform duration-500" />
+            <span>{isCardFlipped ? "Flip to Login Hero" : "Flip to Specialist"}</span>
+          </button>
         </div>
       </div>
     </>

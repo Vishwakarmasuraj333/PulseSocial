@@ -22,6 +22,9 @@ import {
   ThumbsUp,
   Smile,
   Copy,
+  Play,
+  Pause,
+  Square,
 } from "lucide-react";
 import { FeedbackModal } from "@/components/layout/FeedbackModal";
 import { PulseHelpGuidesModal } from "@/components/layout/PulseHelpGuidesModal";
@@ -136,6 +139,59 @@ export function BottomDockBar() {
 
   // Dynamic Contacts
   const [contacts, setContacts] = useState<any[]>([]);
+  const [contactSearchQuery, setContactSearchQuery] = useState("");
+  const [contactFilter, setContactFilter] = useState("all");
+
+  // Live Zoho Social Style Working Session Tracker matching screenshot
+  const [timerSeconds, setTimerSeconds] = useState<number>(19374); // 05:22:54 initial default
+  const [isTimerRunning, setIsTimerRunning] = useState<boolean>(true);
+
+  useEffect(() => {
+    try {
+      const savedTimer = localStorage.getItem("pulsesocial_session_timer");
+      if (savedTimer) {
+        setTimerSeconds(Number(savedTimer) || 19374);
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    let interval: any = null;
+    if (isTimerRunning) {
+      interval = setInterval(() => {
+        setTimerSeconds((prev) => {
+          const next = prev + 1;
+          try {
+            localStorage.setItem("pulsesocial_session_timer", String(next));
+          } catch {}
+          return next;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isTimerRunning]);
+
+  const formatTimerTime = (totalSecs: number) => {
+    const hours = Math.floor(totalSecs / 3600);
+    const minutes = Math.floor((totalSecs % 3600) / 60);
+    const seconds = totalSecs % 60;
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  };
+
+  const handleResetTimer = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setTimerSeconds(0);
+    try {
+      localStorage.setItem("pulsesocial_session_timer", "0");
+    } catch {}
+    toast({
+      title: "Session Timer Reset",
+      message: "Working session tracker reset to 00:00:00",
+      type: "info",
+    });
+  };
 
   // Load saved pins & notes from localStorage
   useEffect(() => {
@@ -162,6 +218,16 @@ export function BottomDockBar() {
         if (d?.members) setContacts(d.members);
       })
       .catch(() => {});
+
+    // Ctrl+Space shortcut to open contacts
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.code === "Space") {
+        e.preventDefault();
+        setActiveDrawer((prev) => (prev === "contacts" ? null : "contacts"));
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   const saveNotes = (updated: NoteItem[]) => {
@@ -323,8 +389,38 @@ export function BottomDockBar() {
       {/* ============================================================ */}
       <footer className="fixed bottom-0 lg:left-64 left-0 right-0 z-40 h-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/90 dark:border-slate-800 flex items-center justify-between px-4 text-xs select-none shadow-[0_-2px_12px_rgba(0,0,0,0.04)] font-sans transition-all duration-300">
         
-        {/* Left Action Items: Pins, Chats, Contacts */}
+        {/* Left Action Items: Session Tracker, Pins, Chats, Contacts */}
         <div className="flex items-center gap-1.5 sm:gap-2.5">
+          {/* Live Zoho Social Style Working Session Tracker */}
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900 text-white dark:bg-slate-800 text-[11px] font-mono shadow-xs border border-slate-700/60">
+            <button
+              type="button"
+              onClick={() => setIsTimerRunning(!isTimerRunning)}
+              className="flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 transition cursor-pointer"
+              title={isTimerRunning ? "Pause session timer" : "Resume session timer"}
+            >
+              {isTimerRunning ? (
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block" />
+              ) : (
+                <Play className="w-3 h-3 text-emerald-400" />
+              )}
+              <span className="font-semibold text-slate-100">{formatTimerTime(timerSeconds)}</span>
+              <span className="text-[10px] text-slate-400 font-sans hidden sm:inline">
+                {isTimerRunning ? "Working" : "Paused"}
+              </span>
+            </button>
+            <div className="flex items-center gap-1 border-l border-slate-700 pl-1.5 text-slate-400">
+              <button
+                type="button"
+                onClick={handleResetTimer}
+                title="Reset session timer"
+                className="hover:text-rose-400 transition cursor-pointer p-0.5"
+              >
+                <Square className="w-2.5 h-2.5 fill-current" />
+              </button>
+            </div>
+          </div>
+
           {/* 1. My Pins */}
           <button
             type="button"
@@ -427,11 +523,15 @@ export function BottomDockBar() {
           {/* 7. Feedback */}
           <button
             type="button"
-            onClick={() => setIsFeedbackOpen(true)}
+            onClick={() => setIsFeedbackOpen(!isFeedbackOpen)}
             title="Send Real Feedback to Product Team"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100/80 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 transition text-xs font-semibold cursor-pointer border border-blue-200/60 dark:border-blue-800/50"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all text-xs font-semibold cursor-pointer border ${
+              isFeedbackOpen
+                ? "bg-[#1e70eb] text-white border-[#1e70eb] shadow-xs"
+                : "bg-blue-50 hover:bg-blue-100/80 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-200/60 dark:border-blue-800/50"
+            }`}
           >
-            <MessageSquare className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <MessageSquare className={`w-4 h-4 ${isFeedbackOpen ? "text-white" : "text-blue-600 dark:text-blue-400"}`} />
             <span>Feedback</span>
           </button>
         </div>
@@ -657,89 +757,166 @@ export function BottomDockBar() {
       )}
 
       {/* ============================================================ */}
-      {/* 3. CONTACTS DIRECTORY                                        */}
+      {/* 3. CONTACTS DIRECTORY (Zoho Social Professional Style)        */}
       {/* ============================================================ */}
       {activeDrawer === "contacts" && (
-        <div className="fixed bottom-12 lg:left-96 left-4 z-50 w-92 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-4 animate-in slide-in-from-bottom-2 duration-150">
-          <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
-            <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-blue-600" />
-              <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                Workspace Contacts ({contacts.length || 1})
-              </h3>
+        <div className="fixed bottom-12 lg:left-96 left-4 z-50 w-96 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-4 animate-in slide-in-from-bottom-2 duration-150 flex flex-col relative">
+          {/* Header: User Profile Status */}
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="flex items-center gap-2.5">
+              <div className="relative">
+                <div className="w-8 h-8 rounded-full bg-[#795BC2] text-white font-bold flex items-center justify-center text-xs shadow-xs">
+                  S
+                </div>
+                <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900" />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-xs font-bold text-slate-900 dark:text-white">
+                    Suraj Vishwakarma
+                  </h3>
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                    Available
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-400">Workspace Primary Owner</p>
+              </div>
             </div>
             <button
               type="button"
               onClick={() => setActiveDrawer(null)}
-              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
+              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
-          <div className="py-2.5 max-h-64 overflow-y-auto space-y-2 text-xs">
-            {contacts.length > 0 ? (
-              contacts.map((m: any) => (
-                <div
-                  key={m.id}
-                  className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+          {/* Search Box: Ctrl + Space */}
+          <div className="pt-2.5 pb-2">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={contactSearchQuery}
+                onChange={(e) => setContactSearchQuery(e.target.value)}
+                placeholder="Search (Ctrl + Space)"
+                className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder:text-slate-400 outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 transition"
+              />
+            </div>
+          </div>
+
+          {/* Filter Pills */}
+          <div className="flex items-center gap-1 pb-2 overflow-x-auto no-scrollbar text-[11px]">
+            {["Frequents", "Unread", "All", "People", "Messages", "Chats", "Pins"].map((pill) => {
+              const pillKey = pill.toLowerCase();
+              const isSelected = contactFilter === pillKey || (contactFilter === "all" && pill === "All");
+              return (
+                <button
+                  key={pill}
+                  type="button"
+                  onClick={() => setContactFilter(pillKey)}
+                  className={`px-2.5 py-0.5 rounded-full font-medium whitespace-nowrap transition cursor-pointer ${
+                    isSelected
+                      ? "bg-blue-600 text-white font-semibold shadow-2xs"
+                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                  }`}
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0">
-                      {(m.user?.name || m.name || "U").charAt(0).toUpperCase()}
+                  {pill}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Contacts List */}
+          <div className="py-2 max-h-56 overflow-y-auto space-y-1.5 text-xs">
+            {contacts.length > 0 ? (
+              contacts
+                .filter((m: any) => {
+                  if (!contactSearchQuery) return true;
+                  const q = contactSearchQuery.toLowerCase();
+                  return (
+                    (m.user?.name || m.name || "").toLowerCase().includes(q) ||
+                    (m.user?.email || m.email || "").toLowerCase().includes(q)
+                  );
+                })
+                .map((m: any) => (
+                  <div
+                    key={m.id}
+                    className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0">
+                        {(m.user?.name || m.name || "U").charAt(0).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-slate-800 dark:text-slate-200 truncate">
+                          {m.user?.name || m.name}
+                        </p>
+                        <p className="text-[10px] text-slate-400 truncate">{m.user?.email || m.email}</p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <p className="font-semibold text-slate-800 dark:text-slate-200 truncate">
-                        {m.user?.name || m.name}
-                      </p>
-                      <p className="text-[10px] text-slate-400 truncate">{m.user?.email || m.email}</p>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                        {m.role || "MEMBER"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveDrawer("chats");
+                          setChatInputText(`@${m.user?.name || m.name || "Member"} `);
+                        }}
+                        className="p-1 rounded-md text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
+                        title="Send message"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
-                      {m.role || "MEMBER"}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveDrawer("chats");
-                        setChatInputText(`@${m.user?.name || m.name || "Member"} `);
-                      }}
-                      className="p-1 rounded-md text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
-                      title="Send message"
-                    >
-                      <MessageCircle className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              ))
+                ))
             ) : (
-              <div className="p-3 text-center text-slate-400 space-y-1">
+              <div className="p-3 text-center text-slate-400 space-y-1.5">
                 <p className="font-semibold text-slate-600 dark:text-slate-300">
-                  {activeBrand?.name || "Active Workspace"}
+                  {activeBrand?.name || "PulseSocial Workspace"}
                 </p>
-                <p className="text-[11px]">Primary Owner active.</p>
+                <p className="text-[11px]">Primary Owner active. Invite team members to collaborate.</p>
               </div>
             )}
           </div>
 
-          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-right">
+          {/* Footer + Floating Blue Add Button */}
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
             <a
               href="/settings?tab=brand_members"
               className="text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 inline-flex items-center gap-1"
             >
-              <span>Manage Brand Members</span>
-              <ExternalLink className="w-3.5 h-3.5" />
+              <span>Manage Members</span>
+              <ExternalLink className="w-3 h-3" />
             </a>
+
+            <button
+              type="button"
+              onClick={() => {
+                toast({
+                  title: "Invite Member",
+                  message: "Opening brand member invite form in settings.",
+                  type: "info",
+                });
+                window.location.href = "/settings?tab=brand_members";
+              }}
+              className="w-8 h-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-md transition active:scale-95 cursor-pointer"
+              title="Add / Invite New Member"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}
 
       {/* ============================================================ */}
-      {/* 4. NOTEBOOK POPUP (Auto-saving text notes)                   */}
+      {/* 4. NOTEBOOK POPUP (Auto-saving text notes with Zoho Actions)  */}
       {/* ============================================================ */}
       {isNotebookOpen && (
-        <div className="fixed bottom-12 right-6 z-50 w-[480px] max-w-[92vw] h-[400px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden animate-in slide-in-from-bottom-2 duration-150">
+        <div className="fixed bottom-12 right-6 z-50 w-[500px] max-w-[92vw] h-[420px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden animate-in slide-in-from-bottom-2 duration-150">
           {/* Header */}
           <div className="p-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/80 dark:bg-slate-950/80">
             <div className="flex items-center gap-2">
@@ -763,6 +940,104 @@ export function BottomDockBar() {
                 <X className="w-4 h-4" />
               </button>
             </div>
+          </div>
+
+          {/* Quick Action Toolbar matching Zoho Social Notebook */}
+          <div className="px-3 py-1.5 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center gap-1.5 text-[11px]">
+            <button
+              type="button"
+              onClick={handleAddNote}
+              className="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950/40 text-slate-700 dark:text-slate-300 hover:text-blue-600 font-medium flex items-center gap-1 transition"
+            >
+              <span>✍️</span>
+              <span>Write</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const newNote: NoteItem = {
+                  id: `note-${Date.now()}`,
+                  title: "Task Checklist",
+                  content: "[ ] Review Instagram reel metrics\n[ ] Approve scheduled LinkedIn post\n[ ] Reply to brand DMs\n[ ] Generate weekend campaign copy",
+                  updatedAt: "Just now",
+                  pinned: false,
+                };
+                const updated = [newNote, ...notes];
+                saveNotes(updated);
+                setSelectedNoteId(newNote.id);
+                toast({
+                  title: "To Do List Created",
+                  message: "Checklist note added to your notebook.",
+                  type: "success",
+                });
+              }}
+              className="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-slate-700 dark:text-slate-300 hover:text-emerald-600 font-medium flex items-center gap-1 transition"
+            >
+              <span>✅</span>
+              <span>To Do</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const input = document.createElement("input");
+                input.type = "file";
+                input.onchange = (e: any) => {
+                  const f = e.target.files?.[0];
+                  if (f) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      const updated = notes.map((n) =>
+                        n.id === selectedNoteId
+                          ? {
+                              ...n,
+                              content: `${n.content}\n\n[Uploaded File: ${f.name} (${(f.size / 1024).toFixed(1)} KB)]`,
+                              updatedAt: "Just now",
+                            }
+                          : n
+                      );
+                      saveNotes(updated);
+                      toast({
+                        title: "File Attached",
+                        message: `${f.name} added to note.`,
+                        type: "success",
+                      });
+                    };
+                    reader.readAsText(f);
+                  }
+                };
+                input.click();
+              }}
+              className="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950/40 text-slate-700 dark:text-slate-300 hover:text-blue-600 font-medium flex items-center gap-1 transition"
+            >
+              <span>📁</span>
+              <span>Upload</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (activeNote) {
+                  const updated = notes.map((n) =>
+                    n.id === selectedNoteId
+                      ? {
+                          ...n,
+                          content: `${n.content}\n\n📎 Attachment Link: ${window.location.href}`,
+                          updatedAt: "Just now",
+                        }
+                      : n
+                  );
+                  saveNotes(updated);
+                  toast({
+                    title: "URL Attached",
+                    message: "Current page link attached to note.",
+                    type: "success",
+                  });
+                }
+              }}
+              className="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-purple-950/40 text-slate-700 dark:text-slate-300 hover:text-purple-600 font-medium flex items-center gap-1 transition"
+            >
+              <span>📎</span>
+              <span>Attach</span>
+            </button>
           </div>
 
           {/* Notebook Body: Left Tabs + Main Text Editor */}

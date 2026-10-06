@@ -67,10 +67,6 @@ export function PulseBackToTop() {
           Back to Top
         </span>
 
-        {/* Scroll Progress percentage chip */}
-        <span className="hidden sm:inline-flex items-center text-[10px] font-bold font-mono text-purple-100 bg-white/20 px-1.5 py-0.5 rounded-md border border-white/25">
-          {Math.round(scrollProgress)}%
-        </span>
       </button>
     </div>
   );

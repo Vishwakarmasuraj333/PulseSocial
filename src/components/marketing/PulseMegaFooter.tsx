@@ -260,8 +260,9 @@ export function PulseMegaFooter() {
             <Link href="/cookies" className="hover:text-slate-300">Cookie Policy</Link>
           </div>
 
-          <div>
-            © {new Date().getFullYear()}, PulseSocial Corporation Pvt. Ltd. All Rights Reserved.
+          <div className="flex items-center gap-1.5">
+            © {new Date().getFullYear()}, PulseSocial Corporation. All Rights Reserved. &bull;{" "}
+            <span className="text-slate-300 font-semibold">Developed by Suraj Vishwakarma</span>
           </div>
         </div>
       </div>

@@ -55,22 +55,34 @@ interface Variation {
 
 const TEXT_MODELS = [
   {
+    id: "gemini-3.5-flash",
+    name: "Gemini 3.5 Flash",
+    badge: "Ultra Fast",
+    desc: "Instant real-time responses & high consistency (Fastest)",
+  },
+  {
+    id: "gemini-3.7-flash",
+    name: "Gemini 3.7 Flash",
+    badge: "Next-Gen",
+    desc: "Advanced multimodal reasoning & creative copy",
+  },
+  {
     id: "gemini-3.8-flash",
     name: "Gemini 3.8 Flash",
     badge: "Flagship",
-    desc: "Next-gen multimodal, ultra-fast & viral hooks",
+    desc: "Next-gen multimodal & deep reasoning",
   },
   {
     id: "gemini-flash-latest",
     name: "Gemini Flash Latest",
-    badge: "Smart & Fast",
-    desc: "Real-time production social copy",
+    badge: "Production",
+    desc: "Real-time production social copy & viral hooks",
   },
   {
-    id: "gemini-3.5-flash",
-    name: "Gemini 3.5 Flash",
-    badge: "Balanced",
-    desc: "High consistency & structured output",
+    id: "gemini-3.1-flash-lite",
+    name: "Gemini 3.1 Flash Lite",
+    badge: "Lite",
+    desc: "Instant micro-copy, hashtags & quick ideas",
   },
   {
     id: "gemini-3.1-pro-preview",
@@ -127,10 +139,10 @@ export default function GeminiAiStudioPage() {
   const [prompt, setPrompt] = useState("");
   const [platform, setPlatform] = useState("Instagram");
   const [tone, setTone] = useState("Engaging & Viral");
-  const [selectedTextModel, setSelectedTextModel] = useState("gemini-3.8-flash");
+  const [selectedTextModel, setSelectedTextModel] = useState("gemini-3.5-flash");
   const [isGeneratingText, setIsGeneratingText] = useState(false);
   const [variations, setVariations] = useState<Variation[]>([]);
-  const [activeProvider, setActiveProvider] = useState<string>("Google Gemini 3.8 Flash");
+  const [activeProvider, setActiveProvider] = useState<string>("Google Gemini 3.5 Flash");
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editedText, setEditedText] = useState("");
@@ -281,18 +293,26 @@ export default function GeminiAiStudioPage() {
         throw new Error(data.message || data.error || "Generation failed");
       }
 
-      if (data.result?.variations && Array.isArray(data.result.variations)) {
-        setVariations(data.result.variations);
-      } else if (data.result?.caption) {
+      const allVariations = data.variations || data.result?.variations;
+      if (allVariations && Array.isArray(allVariations) && allVariations.length > 0) {
+        setVariations(
+          allVariations.map((v: any) => ({
+            ...v,
+            validation: validateContentRules(v.caption || "", platform, v.hashtags || []),
+          }))
+        );
+      } else if (data.result?.caption || data.primaryCaption) {
+        const caption = data.result?.caption || data.primaryCaption || "";
+        const hashtags = data.result?.hashtags || data.hashtags || [];
         setVariations([
           {
             id: 1,
             label: "Generated Output",
-            hook: data.result.hook,
-            caption: data.result.caption,
-            hashtags: data.result.hashtags,
-            firstComment: data.result.firstComment,
-            validation: validateContentRules(data.result.caption, platform, data.result.hashtags),
+            hook: data.result?.hook || caption.split("\n")[0],
+            caption,
+            hashtags,
+            firstComment: data.result?.firstComment || data.firstComment,
+            validation: validateContentRules(caption, platform, hashtags),
           },
         ]);
       }

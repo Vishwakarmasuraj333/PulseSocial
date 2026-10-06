@@ -4,8 +4,9 @@ import React from "react";
 import Link from "next/link";
 import { MarketingHeader } from "@/components/marketing/MarketingHeader";
 import { MarketingFooter } from "@/components/marketing/MarketingFooter";
-import { Shield, Sparkles, Globe, Users, Zap, CheckCircle2, ArrowRight, Lock } from "lucide-react";
 import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
+import { SURAJ_VISHWAKARMA_AVATAR } from "@/lib/assets/founder-image";
+import { Shield, Sparkles, Globe, Users, Zap, CheckCircle2, ArrowRight, Lock } from "lucide-react";
 
 export default function AboutPage() {
   const values = [
@@ -75,6 +76,35 @@ export default function AboutPage() {
               </div>
             );
           })}
+        </div>
+
+        {/* Creator / Founder Spotlight */}
+        <div className="mb-20 p-8 sm:p-12 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl">
+          <div className="flex flex-col md:flex-row items-center gap-8 max-w-4xl mx-auto">
+            <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-2xl overflow-hidden ring-4 ring-indigo-500/20 shadow-2xl shrink-0">
+              <img
+                src={SURAJ_VISHWAKARMA_AVATAR}
+                alt="Suraj Vishwakarma - Creator & Lead Developer of PulseSocial"
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
+            <div className="space-y-3 text-center md:text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-bold uppercase tracking-wider">
+                <span>Founder & Lead Developer</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950 dark:text-white">
+                Suraj Vishwakarma
+              </h2>
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                Suraj architected and engineered PulseSocial from the ground up as a modern, unified social media command center. Built with Next.js, Google Gemini AI, and hardware-grade token encryption, PulseSocial reflects his passion for high-performance software engineering and seamless developer experiences.
+              </p>
+              <div className="pt-1 flex flex-wrap items-center justify-center md:justify-start gap-3 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800">🚀 Full-Stack Engineering</span>
+                <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800">🧠 AI Architecture</span>
+                <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800">🛡️ Hardware-Grade Security</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Architecture Guarantee */}

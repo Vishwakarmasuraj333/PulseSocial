@@ -63,11 +63,6 @@ export async function middleware(req: any) {
     return res;
   }
 
-  // If already authenticated and visiting auth routes (/login, /signup), redirect to dashboard
-  if (isAuthenticated && AUTH_ROUTES.includes(pathname)) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
-  }
-
   // Check if requested route requires authentication
   const isProtected = PROTECTED_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)

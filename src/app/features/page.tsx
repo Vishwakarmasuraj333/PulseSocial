@@ -24,36 +24,42 @@ import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 export default function FeaturesPage() {
   const featureList = [
     {
+      id: "publishing",
       title: "Universal Multi-Platform Composer",
       desc: "Write once, preview everywhere. Automatic aspect-ratio verification, video duration checks, and per-platform character counts for Meta, LinkedIn, X, TikTok, and YouTube.",
       icon: Send,
       points: ["Character counter with native truncation rules", "Media drag & drop with automated format conversion", "Drafts, immediate publishing, and recurring queues"],
     },
     {
+      id: "calendar",
       title: "Visual Content Calendar",
       desc: "A responsive birds-eye timeline of every piece of scheduled content. Switch between Month, Week, Day, and List views with full drag-and-drop rescheduling.",
       icon: Calendar,
       points: ["Color-coded channel badges", "Immediate rescheduling and time-slot locking", "Detailed inspection drawer for team approvals"],
     },
     {
+      id: "inbox",
       title: "Unified Social Inbox",
       desc: "Never miss a customer inquiry, high-intent lead, or comment. Consolidate interactions across Facebook, Instagram, LinkedIn, and X into a single two-pane thread stream.",
       icon: MessageSquare,
       points: ["Real interaction threads with author avatars", "One-click inline replies dispatched directly through official APIs", "Conversation status flags and team member assignment"],
     },
     {
+      id: "analytics",
       title: "Real-Time Telemetry & Analytics",
       desc: "True official metrics without fabricated guesswork. Monitor organic impressions, engagement curves, profile clicks, and follower growth with exportable PDF and CSV reports.",
       icon: BarChart3,
       points: ["Cross-channel performance comparison", "Aggregated reach and impression curves", "Zero fake numbers: transparent API data only"],
     },
     {
+      id: "security",
       title: "Hardware-Grade AES-256 Vault",
       desc: "All OAuth 2.0 access tokens and refresh tokens are encrypted at rest with AES-256-GCM hardware encryption. We never collect or store third-party user passwords.",
       icon: Shield,
       points: ["Zero password collection", "Cryptographic state and PKCE validation", "Automated token refresh before expiration"],
     },
     {
+      id: "team",
       title: "Role-Based Team Collaboration",
       desc: "Safely scale your social team. Assign members granular roles (Owner, Admin, Editor, Analyst, Viewer) with optional mandatory post approvals before publishing.",
       icon: Users,
@@ -84,7 +90,8 @@ export default function FeaturesPage() {
             return (
               <div
                 key={f.title}
-                className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-xl hover:border-indigo-500/40 transition-all duration-200 flex flex-col justify-between"
+                id={f.id}
+                className="scroll-mt-32 p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-xl hover:border-indigo-500/40 transition-all duration-200 flex flex-col justify-between"
               >
                 <div>
                   <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-6 shadow-xs">

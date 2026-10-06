@@ -18,6 +18,7 @@ import {
   Calendar,
   MessageSquare,
   LayoutDashboard,
+  LogOut,
 } from "lucide-react";
 import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
 
@@ -27,11 +28,47 @@ export function MarketingHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isResourcesOpen, setIsResourcesOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ id: string; email: string; name?: string } | null>(null);
   const resourcesRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setIsLoggedIn(typeof document !== "undefined" && document.cookie.includes("pulsesocial_auth_session"));
-  }, []);
+    let isMounted = true;
+    fetch("/api/auth/me")
+      .then((res) => {
+        if (res.ok) return res.json();
+        return null;
+      })
+      .then((data) => {
+        if (isMounted) {
+          if (data?.user) {
+            setIsLoggedIn(true);
+            setCurrentUser(data.user);
+          } else {
+            setIsLoggedIn(false);
+            setCurrentUser(null);
+          }
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setIsLoggedIn(false);
+          setCurrentUser(null);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [pathname]);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {}
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+    window.location.href = "/login?logout=true";
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -161,16 +198,27 @@ export function MarketingHeader() {
         </div>
 
         {/* Right: Auth Action Buttons */}
-        <div className="hidden sm:flex items-center gap-3">
+        <div className="hidden sm:flex items-center gap-2.5">
           {isLoggedIn ? (
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:opacity-95 text-white text-xs font-bold shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/35 transition active:scale-[0.98] group"
-            >
-              <LayoutDashboard className="w-3.5 h-3.5" />
-              <span>Go to Dashboard</span>
-              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-            </Link>
+            <>
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:opacity-95 text-white text-xs font-bold shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/35 transition active:scale-[0.98] group"
+              >
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                <span>Go to Dashboard</span>
+                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition cursor-pointer"
+                title="Log out from PulseSocial"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Log out</span>
+              </button>
+            </>
           ) : (
             <>
               <Link
@@ -234,14 +282,27 @@ export function MarketingHeader() {
 
           <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2.5">
             {isLoggedIn ? (
-              <Link
-                href="/dashboard"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full py-2.5 text-center text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20 transition flex items-center justify-center gap-1.5"
-              >
-                <LayoutDashboard className="w-3.5 h-3.5" />
-                <span>Go to Dashboard</span>
-              </Link>
+              <>
+                <Link
+                  href="/dashboard"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full py-2.5 text-center text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20 transition flex items-center justify-center gap-1.5"
+                >
+                  <LayoutDashboard className="w-3.5 h-3.5" />
+                  <span>Go to Dashboard</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="w-full py-2.5 text-center text-xs font-bold rounded-xl border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Log Out of Account</span>
+                </button>
+              </>
             ) : (
               <>
                 <Link

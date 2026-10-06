@@ -67,6 +67,28 @@ export default function LoginPage() {
   // UI state
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [existingUser, setExistingUser] = useState<{ id: string; email: string } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.user) setExistingUser(data.user);
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleSignOutCurrent = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {}
+    setExistingUser(null);
+    toast({
+      title: "Signed Out",
+      message: "You have been signed out. Please sign in with your credentials.",
+      type: "info",
+    });
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -444,6 +466,32 @@ export default function LoginPage() {
                 <p className="text-sm text-slate-500 mt-1 mb-5 font-normal">
                   Sign in to access your PulseSocial workspace
                 </p>
+                {/* Active Session Notification (if already logged in) */}
+                {existingUser && (
+                  <div className="mb-5 p-3 rounded-2xl bg-indigo-50/90 dark:bg-indigo-950/40 border border-indigo-200/90 dark:border-indigo-900/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-indigo-950 dark:text-indigo-200 animate-in fade-in duration-200">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span className="truncate">
+                        Signed in as <strong>{existingUser.email}</strong>
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Link
+                        href="/dashboard"
+                        className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] transition shadow-xs"
+                      >
+                        Enter Workspace →
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={handleSignOutCurrent}
+                        className="px-2.5 py-1 rounded-lg border border-indigo-300 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 font-semibold text-[11px] transition cursor-pointer"
+                      >
+                        Switch Account
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Professional Auth Method Switcher Tabs */}
                 <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-6 border border-slate-200/80">

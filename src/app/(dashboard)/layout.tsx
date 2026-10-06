@@ -14,21 +14,25 @@ export default async function DashboardRootLayout({
   }
 
   // Double check user exists and is active in database
+  let isAuthorized = false;
   try {
     const user = await prisma.user.findUnique({
       where: { id: session.id },
       select: { id: true, status: true },
     });
 
-    if (!user || user.status !== "ACTIVE") {
-      await destroySession();
-      redirect("/login");
+    if (user && user.status === "ACTIVE") {
+      isAuthorized = true;
     }
   } catch (err) {
-    // If DB check fails, redirect to login
+    console.warn("[AUTH_DASHBOARD_CHECK_FAILED]", err);
+    isAuthorized = false;
+  }
+
+  if (!isAuthorized) {
+    await destroySession().catch(() => {});
     redirect("/login");
   }
 
   return <>{children}</>;
 }
-

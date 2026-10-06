@@ -150,7 +150,7 @@ export function PulseFeaturesShowcase() {
             </p>
             <div className="pt-2">
               <Link
-                href="/compose"
+                href="/features#publishing"
                 className="inline-flex items-center gap-2.5 text-[15px] font-bold text-[#1668e3] hover:text-[#0f52b8] dark:text-[#38bdf8] dark:hover:text-[#7dd3fc] underline underline-offset-4 group transition-colors"
               >
                 <span>Learn more about publishing</span>
@@ -225,7 +225,7 @@ export function PulseFeaturesShowcase() {
             </p>
             <div className="pt-2">
               <Link
-                href="/calendar"
+                href="/features#calendar"
                 className="inline-flex items-center gap-2.5 text-[15px] font-bold text-[#1668e3] hover:text-[#0f52b8] dark:text-[#38bdf8] dark:hover:text-[#7dd3fc] underline underline-offset-4 group transition-colors"
               >
                 <span>Learn more about content calendar</span>
@@ -265,7 +265,7 @@ export function PulseFeaturesShowcase() {
             </p>
             <div className="pt-2">
               <Link
-                href="/inbox"
+                href="/features#inbox"
                 className="inline-flex items-center gap-2.5 text-[15px] font-bold text-[#1668e3] hover:text-[#0f52b8] dark:text-[#38bdf8] dark:hover:text-[#7dd3fc] underline underline-offset-4 group transition-colors"
               >
                 <span>Learn more about monitoring</span>
@@ -349,7 +349,7 @@ export function PulseFeaturesShowcase() {
             </p>
             <div className="pt-2">
               <Link
-                href="/analytics"
+                href="/features#analytics"
                 className="inline-flex items-center gap-2.5 text-[15px] font-bold text-[#1668e3] hover:text-[#0f52b8] dark:text-[#38bdf8] dark:hover:text-[#7dd3fc] underline underline-offset-4 group transition-colors"
               >
                 <span>Learn more about reports</span>

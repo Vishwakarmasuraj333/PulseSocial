@@ -35,11 +35,11 @@ export const authService = {
     };
   },
 
-  async signup(payload: { name: string; email: string; password: string }) {
+  async signup(payload: { name: string; email: string; password: string; terms?: boolean }) {
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ ...payload, terms: true }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Signup failed");

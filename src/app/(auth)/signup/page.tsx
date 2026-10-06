@@ -191,6 +191,12 @@ export default function SignupPage() {
         throw new Error(data.error || "Invalid verification code");
       }
 
+      if (data.user) {
+        try {
+          localStorage.setItem("pulsesocial_active_user", JSON.stringify(data.user));
+        } catch {}
+      }
+
       setIsSuccess(true);
       setShowOtpBanner(false);
       toast({

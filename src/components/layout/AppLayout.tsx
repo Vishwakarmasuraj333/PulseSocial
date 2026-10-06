@@ -85,6 +85,22 @@ export function AppLayout({ children }: AppLayoutProps) {
   // User session
   const [user, setUser] = useState<UserSession | null>(null);
 
+  // User profile computed attributes (strictly real and dynamic)
+  const realName =
+    user?.name ||
+    (user?.email
+      ? user.email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+      : "Active Member");
+  const realEmail = user?.email || "";
+  const initial = (realName || "U").charAt(0).toUpperCase();
+  const realRole = user?.role
+    ? user.role.toUpperCase() === "OWNER"
+      ? "WORKSPACE OWNER"
+      : user.role.toUpperCase() === "ADMIN"
+      ? "WORKSPACE ADMIN"
+      : `${user.role.toUpperCase()} MEMBER`
+    : "ORGANIZATION OWNER";
+
   // Connected accounts
   const [connectedAccounts, setConnectedAccounts] = useState<any[]>([]);
 
@@ -114,11 +130,28 @@ export function AppLayout({ children }: AppLayoutProps) {
   const userMenuRef = useRef<HTMLDivElement>(null);
   const notifMenuRef = useRef<HTMLDivElement>(null);
 
-  // Load user session
+  // Load real user session with immediate cache retrieval
   useEffect(() => {
+    try {
+      const cached = localStorage.getItem("pulsesocial_active_user");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && (parsed.email || parsed.name)) {
+          setUser(parsed);
+        }
+      }
+    } catch {}
+
     async function loadUser() {
-      const session = await authService.getSession();
-      setUser(session);
+      try {
+        const session = await authService.getSession();
+        if (session) {
+          setUser(session);
+          try {
+            localStorage.setItem("pulsesocial_active_user", JSON.stringify(session));
+          } catch {}
+        }
+      } catch {}
     }
     loadUser();
   }, []);
@@ -778,24 +811,41 @@ export function AppLayout({ children }: AppLayoutProps) {
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                 className="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
               >
-                <div className="w-8 h-8 rounded-full bg-[#5846A8] text-white flex items-center justify-center font-bold text-xs ring-2 ring-purple-100 dark:ring-purple-900">
-                  {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+                <div className="w-8 h-8 rounded-full bg-[#5846A8] text-white flex items-center justify-center font-bold text-xs ring-2 ring-purple-100 dark:ring-purple-900 shadow-xs">
+                  {initial}
+                </div>
+                <div className="hidden xl:flex flex-col text-left">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 leading-tight truncate max-w-[120px]">
+                    {realName}
+                  </span>
+                  <span className="text-[10px] text-slate-400 leading-tight truncate max-w-[120px]">
+                    {realRole}
+                  </span>
                 </div>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block" />
               </button>
 
               {isUserMenuOpen && (
-                <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150 text-xs">
-                  <div className="p-3 bg-[#F5F3FF] dark:bg-slate-800/80 rounded-xl mb-1.5">
-                    <p className="font-bold text-slate-900 dark:text-white truncate">
-                      {user?.name || "PulseSocial User"}
+                <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-2.5 z-50 animate-in fade-in zoom-in-95 duration-150 text-xs">
+                  <div className="p-3 bg-[#F5F3FF] dark:bg-slate-800/80 rounded-xl mb-1.5 border border-purple-100/80 dark:border-purple-900/40">
+                    <p className="font-bold text-slate-900 dark:text-white truncate text-sm">
+                      {realName}
                     </p>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
-                      {user?.email || "user@pulsesocial.io"}
-                    </p>
-                    <span className="inline-block mt-1 text-[9px] font-bold px-2 py-0.5 rounded bg-purple-100 text-[#5846A8] dark:bg-purple-900 dark:text-purple-300">
-                      {user?.role || "ORGANIZATION MEMBER"}
-                    </span>
+                    {realEmail && (
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5 font-mono">
+                        {realEmail}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                      <span className="inline-block text-[9px] font-bold px-2 py-0.5 rounded bg-[#5846A8] text-white shadow-2xs">
+                        {realRole}
+                      </span>
+                      {user?.activeOrganization?.name && (
+                        <span className="inline-block text-[9px] font-semibold px-2 py-0.5 rounded bg-purple-100 text-[#5846A8] dark:bg-purple-900/60 dark:text-purple-300 truncate max-w-[140px]">
+                          🏢 {user.activeOrganization.name}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <div className="space-y-0.5">

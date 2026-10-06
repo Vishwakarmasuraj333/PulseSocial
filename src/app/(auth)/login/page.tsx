@@ -340,6 +340,12 @@ export default function LoginPage() {
         throw new Error(data.error || "Invalid verification code");
       }
 
+      if (data.user) {
+        try {
+          localStorage.setItem("pulsesocial_active_user", JSON.stringify(data.user));
+        } catch {}
+      }
+
       setIsOtpSuccess(true);
       setShowOtpBanner(false);
       toast({

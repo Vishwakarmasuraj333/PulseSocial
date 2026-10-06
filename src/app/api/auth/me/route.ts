@@ -12,15 +12,17 @@ export async function GET() {
     user.memberships.find((m) => m.organizationId === session?.activeOrgId) ||
     user.memberships[0];
 
+  const fallbackName = user.name || (user.email ? user.email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) : "User");
+
   return NextResponse.json({
     user: {
       id: user.id,
       email: user.email,
-      name: user.name,
+      name: fallbackName,
       avatarUrl: user.avatarUrl,
       emailVerified: user.emailVerified,
       activeOrganization: membership?.organization || null,
-      role: membership?.role || "MEMBER",
+      role: membership?.role || session?.role || "OWNER",
     },
   });
 }

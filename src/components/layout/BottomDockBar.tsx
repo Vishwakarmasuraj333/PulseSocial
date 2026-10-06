@@ -80,6 +80,39 @@ export function BottomDockBar() {
   const { toast } = useToast();
   const { activeBrand } = useBrand();
 
+  // Dynamic Logged-in User Session State
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem("pulsesocial_active_user");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && (parsed.name || parsed.email)) setCurrentUser(parsed);
+      }
+    } catch {}
+
+    fetch("/api/auth/me", { headers: { "Cache-Control": "no-cache" } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d?.user) {
+          setCurrentUser(d.user);
+          try {
+            localStorage.setItem("pulsesocial_active_user", JSON.stringify(d.user));
+          } catch {}
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const currentUserName =
+    currentUser?.name ||
+    (currentUser?.email
+      ? currentUser.email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase())
+      : "Active Member");
+  const currentUserInitial = (currentUserName || "U").charAt(0).toUpperCase();
+  const currentUserRole = currentUser?.role === "OWNER" ? "Workspace Primary Owner" : (currentUser?.role || "Team Member");
+
   const [isNotebookOpen, setIsNotebookOpen] = useState(false);
   const [activeDrawer, setActiveDrawer] = useState<"pins" | "chats" | "contacts" | null>(null);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
@@ -317,8 +350,8 @@ export function BottomDockBar() {
     const userText = chatInputText.trim();
     const newMsg: ChatMessage = {
       id: `chat-${Date.now()}`,
-      sender: "You",
-      avatarText: "ME",
+      sender: currentUserName,
+      avatarText: currentUserInitial,
       avatarBg: "bg-[#795BC2]",
       message: userText,
       time: "Just now",
@@ -766,20 +799,22 @@ export function BottomDockBar() {
             <div className="flex items-center gap-2.5">
               <div className="relative">
                 <div className="w-8 h-8 rounded-full bg-[#795BC2] text-white font-bold flex items-center justify-center text-xs shadow-xs">
-                  S
+                  {currentUserInitial}
                 </div>
                 <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900" />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
                   <h3 className="text-xs font-bold text-slate-900 dark:text-white">
-                    Suraj Vishwakarma
+                    {currentUserName}
                   </h3>
                   <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
                     Available
                   </span>
                 </div>
-                <p className="text-[10px] text-slate-400">Workspace Primary Owner</p>
+                <p className="text-[10px] text-slate-400 truncate max-w-[200px]">
+                  {currentUser?.email || currentUserRole}
+                </p>
               </div>
             </div>
             <button

@@ -14,6 +14,11 @@ export interface UserSession {
   emailVerified: boolean;
   activeOrgId?: string;
   role?: string;
+  activeOrganization?: {
+    id: string;
+    name: string;
+    slug?: string;
+  } | null;
 }
 
 export const authService = {
@@ -53,12 +58,16 @@ export const authService = {
 
   async getSession(): Promise<UserSession | null> {
     try {
-      if (typeof document !== "undefined" && !document.cookie.includes("pulsesocial_auth_session")) {
-        return null;
-      }
-      const res = await fetch("/api/auth/me");
+      const res = await fetch("/api/auth/me", {
+        headers: { "Cache-Control": "no-cache" },
+      });
       if (!res.ok) return null;
       const data = await res.json();
+      if (data?.user && typeof window !== "undefined") {
+        try {
+          localStorage.setItem("pulsesocial_active_user", JSON.stringify(data.user));
+        } catch {}
+      }
       return data.user || null;
     } catch {
       return null;
@@ -66,7 +75,12 @@ export const authService = {
   },
 
   async logout() {
-    await fetch("/api/auth/logout", { method: "POST" });
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("pulsesocial_active_user");
+      }
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {}
     window.location.href = "/login";
   },
 };

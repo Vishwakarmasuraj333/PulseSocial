@@ -477,23 +477,6 @@ export default function LoginPage() {
                   </button>
                 </div>
 
-                {/* Quick Account Chips for Testing */}
-                <div className="mb-5 p-2.5 rounded-xl bg-purple-50/70 border border-purple-100 flex items-center justify-between text-xs">
-                  <span className="text-[11px] font-semibold text-purple-900">
-                    Quick test account:
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEmail("itsurya9930@gmail.com");
-                      setPassword("Suraj@12345");
-                    }}
-                    className="px-2 py-1 rounded bg-white text-purple-700 font-bold hover:bg-purple-100 border border-purple-200 transition text-[11px] cursor-pointer"
-                  >
-                    itsurya9930@gmail.com
-                  </button>
-                </div>
-
                 {/* FORM: PASSWORD LOGIN */}
                 {loginMethod === "password" ? (
                   <form onSubmit={handleLoginSubmit} className="space-y-4">
@@ -725,20 +708,6 @@ export default function LoginPage() {
                   <span>Code expires in:</span>
                   <span className="font-bold text-[#5846A8]">{formatTimer(timeLeft)}</span>
                 </div>
-
-                {/* Dev Code Auto-Fill Pill */}
-                {devCode && (
-                  <div className="mb-4">
-                    <button
-                      type="button"
-                      onClick={handleAutoFillDevCode}
-                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-semibold shadow-xs transition cursor-pointer"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Code: <strong className="font-mono">{devCode}</strong> (Click to Auto-fill)</span>
-                    </button>
-                  </div>
-                )}
 
                 {/* The 6-Box OTP Input */}
                 <form

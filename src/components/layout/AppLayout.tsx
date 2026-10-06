@@ -231,12 +231,6 @@ export function AppLayout({ children }: AppLayoutProps) {
           icon: LayoutDashboard,
           match: (p: string) => p === "/dashboard",
         },
-        {
-          label: "Home",
-          href: "/",
-          icon: Home,
-          match: (p: string) => p === "/",
-        },
       ],
     },
     {

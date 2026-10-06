@@ -258,22 +258,27 @@ export interface ConnectedAccountData {
 
 interface UniversalSocialConnectModalProps {
   platformId?: string;
+  defaultChannelId?: string;
   title?: string;
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: (channel?: any) => void;
+  onAccountConnected?: (channel?: any) => void;
 }
 
 export function UniversalSocialConnectModal({
-  platformId = "youtube",
+  platformId,
+  defaultChannelId,
   isOpen,
   onClose,
   onSuccess,
+  onAccountConnected,
 }: UniversalSocialConnectModalProps) {
   const { toast } = useToast();
   const { activeBrand } = useBrand();
 
-  const [activeTab, setActiveTab] = useState<string>(platformId || "youtube");
+  const selectedPlatform = defaultChannelId || platformId || "youtube";
+  const [activeTab, setActiveTab] = useState<string>(selectedPlatform);
   const [step, setStep] = useState<"connect" | "permissions" | "success">("connect");
 
   // OAuth states
@@ -285,15 +290,16 @@ export function UniversalSocialConnectModal({
   // Real connected account data
   const [connectedAccount, setConnectedAccount] = useState<ConnectedAccountData | null>(null);
 
-  // Sync active tab with platformId when opened
+  // Sync active tab with platformId/defaultChannelId when opened
   useEffect(() => {
-    if (platformId) {
-      setActiveTab(platformId);
+    const target = defaultChannelId || platformId;
+    if (target) {
+      setActiveTab(target);
     }
     setStep("connect");
     setOauthError(null);
     setIsOAuthWaiting(false);
-  }, [platformId, isOpen]);
+  }, [platformId, defaultChannelId, isOpen]);
 
   // Listen for real OAuth completion from child popup window
   useEffect(() => {
@@ -378,10 +384,12 @@ export function UniversalSocialConnectModal({
       type: "success",
     });
     if (onSuccess) onSuccess(connectedAccount);
+    if (onAccountConnected) onAccountConnected(connectedAccount);
   };
 
   const handleFinish = () => {
     if (onSuccess) onSuccess(connectedAccount);
+    if (onAccountConnected) onAccountConnected(connectedAccount);
     onClose();
   };
 
@@ -514,11 +522,6 @@ export function UniversalSocialConnectModal({
                 )}
               </div>
 
-              {/* Security Guarantee */}
-              <div className="flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-slate-400 pt-1">
-                <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Authorized securely via official OAuth 2.0 with AES-256 encryption. Your credentials remain 100% private and are never stored.</span>
-              </div>
             </div>
 
             {/* Bottom Actions Row */}

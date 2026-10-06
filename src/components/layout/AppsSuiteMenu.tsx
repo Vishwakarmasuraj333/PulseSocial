@@ -29,7 +29,7 @@ const SUITE_APPS = [
     name: "Pulse Social",
     description: "Multi-channel publishing & queue",
     icon: Share2,
-    href: "/",
+    href: "/dashboard",
     color: "bg-sky-500/10 text-sky-600 group-hover:bg-sky-500 group-hover:text-white",
   },
   {

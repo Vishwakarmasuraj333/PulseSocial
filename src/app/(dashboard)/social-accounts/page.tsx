@@ -21,6 +21,7 @@ import {
   Check,
   Zap,
 } from "lucide-react";
+import { UniversalSocialConnectModal } from "@/components/social/UniversalSocialConnectModal";
 
 export interface PlatformDef {
   id: string;
@@ -324,119 +325,16 @@ export default function SocialConnectionsPage() {
     return () => window.removeEventListener("message", handleMessage);
   }, [toast, loadConnections]);
 
-  const [isConnectingAll, setIsConnectingAll] = useState(false);
+  const [connectModalPlatform, setConnectModalPlatform] = useState<string | null>(null);
 
-  // Instant 1-Click Workspace Channel Connect
-  const handleInstantConnect = async (platform: PlatformDef) => {
-    setConnectingPlatform(platform.id);
-    try {
-      const res = await fetch("/api/social/accounts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          provider: platform.id,
-          displayName: `${platform.name} Channel`,
-          username: `${platform.id}_official`,
-          accountType: platform.accountTypeLabel || "PROFILE",
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to connect channel");
-
-      toast({
-        title: "Channel Connected!",
-        message: `${platform.name} is now connected and active in your workspace.`,
-        type: "success",
-      });
-      loadConnections();
-    } catch (err: unknown) {
-      toast({
-        title: "Connection Failed",
-        message: (err as Error).message || "Could not connect account.",
-        type: "error",
-      });
-    } finally {
-      setConnectingPlatform(null);
-    }
-  };
-
-  // Connect all primary platforms at once
-  const handleConnectAllChannels = async () => {
-    setIsConnectingAll(true);
-    const targetPlatforms = PLATFORMS.slice(0, 6);
-    let count = 0;
-
-    for (const p of targetPlatforms) {
-      try {
-        await fetch("/api/social/accounts", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            provider: p.id,
-            displayName: `${p.name} Channel`,
-            username: `${p.id}_official`,
-            accountType: p.accountTypeLabel || "PROFILE",
-          }),
-        });
-        count++;
-      } catch {}
-    }
-
-    setIsConnectingAll(false);
-    toast({
-      title: "All Channels Connected!",
-      message: `Successfully connected ${count} social channels to your workspace.`,
-      type: "success",
-    });
-    loadConnections();
-  };
-
-  // Initiate real OAuth authorization with smart instant fallback
-  const handleConnect = async (platform: PlatformDef) => {
-    setConnectingPlatform(platform.id);
-    try {
-      const res = await fetch(`/api/social/${platform.id}/connect?format=json`);
-      const data = await res.json();
-
-      if (!res.ok || !data.success || !data.authUrl) {
-        toast({
-          title: `${platform.name} Config Pending`,
-          message: data.missingConfigMessage || "OAuth keys pending in .env. Connecting via instant workspace mode...",
-          type: "info",
-        });
-        await handleInstantConnect(platform);
-        return;
-      }
-
-      const popup = window.open(data.authUrl, "_blank", "noopener,noreferrer,width=650,height=750");
-      if (!popup) {
-        toast({
-          title: "Popup Blocked",
-          message: "Please allow popups in your browser to authorize your account.",
-          type: "info",
-        });
-      } else {
-        toast({
-          title: `Connecting to ${platform.name}`,
-          message: `Please complete authorization in the official ${platform.name} window.`,
-          type: "info",
-        });
-      }
-    } catch (err: unknown) {
-      toast({
-        title: "OAuth Notice",
-        message: "OAuth authorization could not complete. Activating channel in workspace mode...",
-        type: "info",
-      });
-      await handleInstantConnect(platform);
-    } finally {
-      setConnectingPlatform(null);
-    }
+  // Initiate real OAuth authorization through authentic Enterprise Modal
+  const handleConnect = (platform: PlatformDef) => {
+    setConnectModalPlatform(platform.id);
   };
 
   // Reconnect flow
   const handleReconnect = (platform: PlatformDef) => {
-    handleConnect(platform);
+    setConnectModalPlatform(platform.id);
   };
 
   // Sync / Refresh flow
@@ -533,12 +431,11 @@ export default function SocialConnectionsPage() {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={handleConnectAllChannels}
-              disabled={isConnectingAll}
-              className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-sm active:scale-95 disabled:opacity-50"
+              onClick={() => setConnectModalPlatform("youtube")}
+              className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-sm active:scale-95"
             >
-              <Zap className="w-3.5 h-3.5 fill-current" />
-              <span>{isConnectingAll ? "Connecting Channels..." : "⚡ Connect All Channels (1-Click)"}</span>
+              <Plus className="w-3.5 h-3.5" />
+              <span>Connect Channel</span>
             </button>
 
             <button
@@ -595,34 +492,14 @@ export default function SocialConnectionsPage() {
                     </div>
 
                     {/* Primary Button: Continue with [Platform] */}
-                    <div className="pt-2 space-y-2">
+                    <div className="pt-2">
                       <button
                         type="button"
                         onClick={() => handleConnect(platform)}
-                        disabled={isConnecting}
-                        className={`w-full py-2.5 px-4 rounded-xl ${platform.buttonClass} font-semibold text-xs sm:text-sm shadow-xs transition active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50`}
+                        className={`w-full py-2.5 px-4 rounded-xl ${platform.buttonClass} font-semibold text-xs sm:text-sm shadow-xs transition active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer`}
                       >
-                        {isConnecting ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>Connecting…</span>
-                          </>
-                        ) : (
-                          <>
-                            <ExternalLink className="w-4 h-4" />
-                            <span>{platform.ctaLabel}</span>
-                          </>
-                        )}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handleInstantConnect(platform)}
-                        disabled={isConnecting}
-                        className="w-full py-2 px-3 rounded-xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/70 dark:bg-indigo-950/30 hover:bg-indigo-100/80 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-medium text-xs transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
-                      >
-                        <Zap className="w-3.5 h-3.5 text-indigo-500 fill-indigo-500" />
-                        <span>⚡ Instant 1-Click Connect</span>
+                        <ExternalLink className="w-4 h-4" />
+                        <span>{platform.ctaLabel}</span>
                       </button>
                     </div>
                   </div>
@@ -880,6 +757,17 @@ export default function SocialConnectionsPage() {
             </div>
           </div>
         )}
+
+        {/* Real Enterprise Multi-Platform Connect Modal */}
+        <UniversalSocialConnectModal
+          isOpen={!!connectModalPlatform}
+          defaultChannelId={connectModalPlatform || undefined}
+          onClose={() => setConnectModalPlatform(null)}
+          onAccountConnected={() => {
+            loadConnections();
+            setConnectModalPlatform(null);
+          }}
+        />
 
       </div>
     </AppLayout>

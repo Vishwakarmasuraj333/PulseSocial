@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
+import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { getSession } from "@/lib/auth/session";
 
@@ -17,20 +17,44 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Validate mime type
-    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"];
-    if (!validTypes.includes(file.type)) {
+    // Support all modern image and video formats
+    const validImageTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/gif",
+      "image/svg+xml",
+      "image/avif",
+      "image/heic",
+      "image/heif",
+    ];
+
+    const validVideoTypes = [
+      "video/mp4",
+      "video/webm",
+      "video/quicktime",
+      "video/x-matroska",
+      "video/mpeg",
+      "video/ogg",
+      "video/mp2t",
+      "video/3gpp",
+    ];
+
+    const isImage = validImageTypes.includes(file.type) || file.type.startsWith("image/");
+    const isVideo = validVideoTypes.includes(file.type) || file.type.startsWith("video/");
+
+    if (!isImage && !isVideo) {
       return NextResponse.json(
-        { error: "Invalid file type. Please upload JPG, PNG, WEBP, or GIF." },
+        { error: `Unsupported media format (${file.type || "unknown"}). Please upload JPG, PNG, WEBP, GIF, MP4, or WebM.` },
         { status: 400 }
       );
     }
 
-    // Validate size (max 5MB)
-    const MAX_SIZE = 5 * 1024 * 1024;
+    // Validate size (max 60MB for rich videos and high-res media)
+    const MAX_SIZE = 60 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
       return NextResponse.json(
-        { error: "File too large. Maximum size is 5MB." },
+        { error: "File too large. Maximum size allowed is 60MB." },
         { status: 400 }
       );
     }
@@ -39,7 +63,7 @@ export async function POST(req: Request) {
     const buffer = Buffer.from(bytes);
 
     // Sanitize filename
-    const ext = path.extname(file.name) || ".png";
+    const ext = path.extname(file.name) || (isVideo ? ".mp4" : ".png");
     const cleanName = file.name
       .replace(ext, "")
       .replace(/[^a-zA-Z0-9_-]/g, "_")
@@ -47,7 +71,6 @@ export async function POST(req: Request) {
     const fileName = `${Date.now()}_${cleanName}${ext}`;
 
     const uploadDir = path.join(process.cwd(), "public", "uploads");
-    const { mkdir } = await import("fs/promises");
     await mkdir(uploadDir, { recursive: true });
     const filePath = path.join(uploadDir, fileName);
 
@@ -61,6 +84,7 @@ export async function POST(req: Request) {
       fileName,
       size: file.size,
       mimeType: file.type,
+      mediaType: isVideo ? "video" : "image",
     });
   } catch (error: unknown) {
     console.error("Upload failed:", error);

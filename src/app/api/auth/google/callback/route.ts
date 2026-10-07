@@ -6,6 +6,7 @@ import { logAudit } from "@/lib/audit/logger";
 import {
   exchangeGoogleAuthCode,
   fetchGoogleUserInfo,
+  getGoogleRedirectUri,
 } from "@/lib/auth/google-oauth";
 
 export async function GET(req: Request) {
@@ -18,11 +19,13 @@ export async function GET(req: Request) {
   const cookieStore = await cookies();
   const savedState = cookieStore.get("google_oauth_state")?.value;
   const savedVerifier = cookieStore.get("google_oauth_code_verifier")?.value;
+  const savedRedirectUri = cookieStore.get("google_oauth_redirect_uri")?.value;
 
   // Clean up single-use OAuth cookies
   cookieStore.delete("google_oauth_state");
   cookieStore.delete("google_oauth_code_verifier");
   cookieStore.delete("google_oauth_nonce");
+  cookieStore.delete("google_oauth_redirect_uri");
 
   // 1. Handle user cancellation or provider rejection from Google
   if (error) {
@@ -71,18 +74,7 @@ export async function GET(req: Request) {
       );
     }
 
-    const isLocal = url.hostname === "localhost" || url.hostname === "127.0.0.1";
-    let redirectUri: string;
-    if (isLocal) {
-      redirectUri = process.env.GOOGLE_REDIRECT_URI?.trim().replace(/^["']|["']$/g, "") || `${url.origin}/api/auth/google/callback`;
-    } else {
-      const configuredProd = process.env.GOOGLE_REDIRECT_URI?.trim().replace(/^["']|["']$/g, "");
-      if (configuredProd && !configuredProd.includes("localhost") && !configuredProd.includes("127.0.0.1")) {
-        redirectUri = configuredProd;
-      } else {
-        redirectUri = `${url.origin}/api/auth/google/callback`;
-      }
-    }
+    const redirectUri = savedRedirectUri || getGoogleRedirectUri(req);
 
     // 3. Exchange authorization code for tokens using PKCE verifier
     const tokenData = await exchangeGoogleAuthCode({

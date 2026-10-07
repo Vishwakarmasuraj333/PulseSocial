@@ -150,3 +150,30 @@ export async function fetchGoogleUserInfo(accessToken: string): Promise<GoogleUs
 
   return data as GoogleUserInfo;
 }
+
+/**
+ * Calculates the exact canonical Google redirect URI for the request
+ */
+export function getGoogleRedirectUri(req: Request): string {
+  const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
+  const isLocal = !host || host.includes("localhost") || host.includes("127.0.0.1");
+
+  if (isLocal) {
+    const configured = process.env.GOOGLE_REDIRECT_URI?.trim().replace(/^["']|["']$/g, "");
+    if (configured && (configured.includes("localhost") || configured.includes("127.0.0.1"))) {
+      return configured;
+    }
+    const origin = host ? `http://${host}` : "http://localhost:3000";
+    return `${origin}/api/auth/google/callback`;
+  }
+
+  // Production environment (Vercel or custom domain)
+  // Check if an explicit production redirect URI is configured in environment
+  const configured = process.env.GOOGLE_REDIRECT_URI?.trim().replace(/^["']|["']$/g, "");
+  if (configured && !configured.includes("localhost") && !configured.includes("127.0.0.1")) {
+    return configured;
+  }
+
+  // Fallback to https://<host>/api/auth/google/callback
+  return `https://${host}/api/auth/google/callback`;
+}

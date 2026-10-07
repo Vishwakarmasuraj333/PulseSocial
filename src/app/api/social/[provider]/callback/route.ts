@@ -62,6 +62,11 @@ export async function GET(
     const cookieStore = await cookies();
     const storedState = cookieStore.get(`oauth_state_${platformKey}`)?.value;
     const storedVerifier = cookieStore.get(`oauth_verifier_${platformKey}`)?.value;
+    const storedRedirectUri = cookieStore.get(`oauth_redirect_uri_${platformKey}`)?.value;
+
+    cookieStore.delete(`oauth_state_${platformKey}`);
+    cookieStore.delete(`oauth_verifier_${platformKey}`);
+    cookieStore.delete(`oauth_redirect_uri_${platformKey}`);
 
     if (!storedState || storedState !== state) {
       return NextResponse.redirect(
@@ -75,7 +80,7 @@ export async function GET(
     const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
     const proto = req.headers.get("x-forwarded-proto") || (host?.includes("localhost") ? "http" : "https");
     const appUrl = host ? `${proto}://${host}` : (process.env.NEXT_PUBLIC_APP_URL || url.origin);
-    const redirectUri = `${appUrl}/api/social/${platformKey}/callback`;
+    const redirectUri = storedRedirectUri || `${appUrl}/api/social/${platformKey}/callback`;
 
     // 1. Exchange authorization code for access & refresh tokens
     const tokenResult = await socialProvider.exchangeCode(code, redirectUri, storedVerifier);

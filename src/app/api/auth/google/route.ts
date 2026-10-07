@@ -5,10 +5,10 @@ import {
   generateOAuthState,
   generateOAuthNonce,
   buildGoogleAuthUrl,
+  getGoogleRedirectUri,
 } from "@/lib/auth/google-oauth";
 
 export async function GET(req: Request) {
-  const url = new URL(req.url);
   const clientId = process.env.GOOGLE_CLIENT_ID?.trim().replace(/^["']|["']$/g, "");
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim().replace(/^["']|["']$/g, "");
 
@@ -23,19 +23,8 @@ export async function GET(req: Request) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Determine authorized redirect URI
-  const isLocal = url.hostname === "localhost" || url.hostname === "127.0.0.1";
-  let redirectUri: string;
-  if (isLocal) {
-    redirectUri = process.env.GOOGLE_REDIRECT_URI?.trim().replace(/^["']|["']$/g, "") || `${url.origin}/api/auth/google/callback`;
-  } else {
-    const configuredProd = process.env.GOOGLE_REDIRECT_URI?.trim().replace(/^["']|["']$/g, "");
-    if (configuredProd && !configuredProd.includes("localhost") && !configuredProd.includes("127.0.0.1")) {
-      redirectUri = configuredProd;
-    } else {
-      redirectUri = `${url.origin}/api/auth/google/callback`;
-    }
-  }
+  // Determine authorized redirect URI (ensures https scheme on production/Vercel)
+  const redirectUri = getGoogleRedirectUri(req);
 
   // Generate cryptographic PKCE, state, and nonce
   const { verifier, challenge } = generatePkcePair();
@@ -63,6 +52,14 @@ export async function GET(req: Request) {
   });
 
   cookieStore.set("google_oauth_nonce", nonce, {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 600,
+  });
+
+  cookieStore.set("google_oauth_redirect_uri", redirectUri, {
     httpOnly: true,
     secure: isProd,
     sameSite: "lax",
@@ -103,6 +100,14 @@ export async function GET(req: Request) {
   });
 
   response.cookies.set("google_oauth_nonce", nonce, {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 600,
+  });
+
+  response.cookies.set("google_oauth_redirect_uri", redirectUri, {
     httpOnly: true,
     secure: isProd,
     sameSite: "lax",

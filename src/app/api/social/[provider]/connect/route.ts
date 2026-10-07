@@ -160,6 +160,14 @@ export async function GET(
       maxAge: 600,
     });
 
+    cookieStore.set(`oauth_redirect_uri_${platformKey}`, redirectUri, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 600,
+    });
+
     // Direct redirection to official third-party authorization consent screen
     const authUrl = socialProvider.getAuthorizationUrl(state, redirectUri, codeVerifier);
 

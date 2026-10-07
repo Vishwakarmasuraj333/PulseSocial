@@ -58,8 +58,17 @@ export async function middleware(req: any) {
   // If visiting /login or /signup with ?logout=true or ?force=true, clear session and show login page
   if (AUTH_ROUTES.includes(pathname) && (searchParams.get("logout") === "true" || searchParams.has("force") || searchParams.get("switch") === "true")) {
     const res = NextResponse.next();
-    res.cookies.delete("pulsesocial_auth_session");
-    res.cookies.delete("pulsesocial_session");
+    const isProd = process.env.NODE_ENV === "production" || req.url.startsWith("https:");
+    const cookieOpts = {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: "lax" as const,
+      path: "/",
+      maxAge: 0,
+      expires: new Date(0),
+    };
+    res.cookies.set("pulsesocial_auth_session", "", cookieOpts);
+    res.cookies.set("pulsesocial_session", "", cookieOpts);
     return res;
   }
 
@@ -73,8 +82,17 @@ export async function middleware(req: any) {
     loginUrl.searchParams.set("redirectTo", pathname);
     const res = NextResponse.redirect(loginUrl);
     if (sessionCookie) {
-      res.cookies.delete("pulsesocial_auth_session");
-      res.cookies.delete("pulsesocial_session");
+      const isProd = process.env.NODE_ENV === "production" || req.url.startsWith("https:");
+      const cookieOpts = {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: "lax" as const,
+        path: "/",
+        maxAge: 0,
+        expires: new Date(0),
+      };
+      res.cookies.set("pulsesocial_auth_session", "", cookieOpts);
+      res.cookies.set("pulsesocial_session", "", cookieOpts);
     }
     return res;
   }

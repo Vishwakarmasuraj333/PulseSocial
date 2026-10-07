@@ -82,13 +82,15 @@ export function MarketingHeader() {
       try {
         localStorage.removeItem("pulsesocial_active_user");
         localStorage.removeItem("pulsesocial_active_brand");
+        sessionStorage.clear();
       } catch {}
-      document.cookie = "pulsesocial_auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      document.cookie = "pulsesocial_auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0";
+      document.cookie = "pulsesocial_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0";
       window.dispatchEvent(new Event("pulsesocial_auth_changed"));
     }
     setIsLoggedIn(false);
     setCurrentUser(null);
-    window.location.replace("/login?logout=true");
+    window.location.href = "/login?logout=true";
   };
 
   useEffect(() => {

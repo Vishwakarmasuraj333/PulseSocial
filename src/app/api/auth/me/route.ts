@@ -1,11 +1,23 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser, getSession } from "@/lib/auth/session";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ user: null }, { status: 401 });
+      return NextResponse.json(
+        { user: null },
+        {
+          status: 401,
+          headers: {
+            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        }
+      );
     }
 
   const session = await getSession();

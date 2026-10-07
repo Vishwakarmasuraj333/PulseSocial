@@ -117,7 +117,12 @@ export async function destroySession(): Promise<void> {
     sameSite: "lax" as const,
     path: "/",
     maxAge: 0,
+    expires: new Date(0),
   };
   cookieStore.set(COOKIE_NAME, "", opts);
   cookieStore.set("pulsesocial_session", "", opts);
+  try {
+    cookieStore.delete(COOKIE_NAME);
+    cookieStore.delete("pulsesocial_session");
+  } catch {}
 }

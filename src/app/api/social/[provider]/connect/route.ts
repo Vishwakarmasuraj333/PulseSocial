@@ -4,6 +4,8 @@ import { cookies } from "next/headers";
 import { getSession } from "@/lib/auth/session";
 import { getSocialProvider } from "@/lib/social/registry";
 import { SupportedPlatform } from "@/lib/social/types";
+import { prisma } from "@/lib/prisma";
+import { encryptToken } from "@/lib/security/encryption";
 
 export async function GET(
   req: Request,
@@ -32,6 +34,85 @@ export async function GET(
     const proto = req.headers.get("x-forwarded-proto") || (host?.includes("localhost") ? "http" : "https");
     const appUrl = host ? `${proto}://${host}` : (process.env.NEXT_PUBLIC_APP_URL || url.origin);
     const redirectUri = `${appUrl}/api/social/${platformKey}/callback`;
+
+    // Resolve tenant organization
+    let orgId = session.activeOrgId;
+    if (!orgId) {
+      const user = await prisma.user.findUnique({
+        where: { id: session.id },
+        include: { memberships: true },
+      });
+      orgId = user?.memberships[0]?.organizationId;
+    }
+
+    // Direct WhatsApp Cloud API verification & connection
+    if (
+      platformKey === "whatsapp" &&
+      process.env.WHATSAPP_PHONE_NUMBER_ID &&
+      process.env.WHATSAPP_ACCESS_TOKEN &&
+      orgId
+    ) {
+      const accounts = await socialProvider.getAccounts(process.env.WHATSAPP_ACCESS_TOKEN);
+      if (accounts && accounts.length > 0) {
+        const primary = accounts[0];
+        const encAccess = encryptToken(process.env.WHATSAPP_ACCESS_TOKEN);
+
+        const account = await prisma.socialAccount.upsert({
+          where: {
+            organizationId_provider_providerAccountId: {
+              organizationId: orgId,
+              provider: "whatsapp",
+              providerAccountId: primary.providerAccountId,
+            },
+          },
+          update: {
+            displayName: primary.displayName,
+            username: primary.username,
+            accountType: "WHATSAPP_BUSINESS",
+            status: "CONNECTED",
+            scopes: JSON.stringify(["whatsapp_business_messaging", "whatsapp_business_management"]),
+            tokenExpiresAt: null,
+          },
+          create: {
+            organizationId: orgId,
+            provider: "whatsapp",
+            providerAccountId: primary.providerAccountId,
+            displayName: primary.displayName,
+            username: primary.username,
+            profileImageUrl: primary.profileImageUrl,
+            accountType: "WHATSAPP_BUSINESS",
+            status: "CONNECTED",
+            scopes: JSON.stringify(["whatsapp_business_messaging", "whatsapp_business_management"]),
+            tokenExpiresAt: null,
+          },
+        });
+
+        await prisma.socialToken.upsert({
+          where: { socialAccountId: account.id },
+          update: {
+            encryptedAccessToken: encAccess.encrypted,
+            iv: encAccess.iv,
+            tag: encAccess.tag,
+          },
+          create: {
+            socialAccountId: account.id,
+            encryptedAccessToken: encAccess.encrypted,
+            iv: encAccess.iv,
+            tag: encAccess.tag,
+          },
+        });
+
+        if (wantsJson) {
+          return NextResponse.json({
+            success: true,
+            connected: true,
+            platform: "whatsapp",
+            account: primary,
+          });
+        }
+        return NextResponse.redirect(new URL("/social-accounts?connected=whatsapp", req.url));
+      }
+    }
 
     // If provider credentials are not configured in environment, return clear unconfigured status
     if (!socialProvider.isConfigured()) {

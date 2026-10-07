@@ -83,6 +83,20 @@ export default function LoginPage() {
   const [existingUser, setExistingUser] = useState<{ id: string; email: string } | null>(null);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("logout") === "true") {
+        setExistingUser(null);
+        try {
+          localStorage.removeItem("pulsesocial_active_user");
+          localStorage.removeItem("pulsesocial_active_brand");
+          sessionStorage.clear();
+        } catch {}
+        fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+        return;
+      }
+    }
+
     fetch("/api/auth/me")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
@@ -96,6 +110,13 @@ export default function LoginPage() {
       await fetch("/api/auth/logout", { method: "POST" });
     } catch {}
     setExistingUser(null);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("pulsesocial_active_user");
+        localStorage.removeItem("pulsesocial_active_brand");
+        sessionStorage.clear();
+      } catch {}
+    }
     toast({
       title: "Signed Out",
       message: "You have been signed out. Please sign in with your credentials.",

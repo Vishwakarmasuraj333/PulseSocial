@@ -14,10 +14,9 @@ export async function POST(req: NextRequest) {
     }
 
     const testModels = [
-      "gemini-3.5-flash",
-      "gemini-3.7-flash",
       "gemini-flash-latest",
       "gemini-3.8-flash",
+      "gemini-3.7-flash",
       "gemini-3.1-flash-lite",
     ];
     const startTime = Date.now();

@@ -3,7 +3,7 @@ import { GeminiTextModelId, GeminiImageModelId } from "./gemini-types";
 // Official Google Gemini Active Models (2026 Production)
 export const GEMINI_MODELS = {
   // Text Models
-  TEXT_FAST: "gemini-3.5-flash" as GeminiTextModelId,
+  TEXT_FAST: "gemini-flash-latest" as GeminiTextModelId,
   TEXT_BALANCED: "gemini-3.7-flash" as GeminiTextModelId,
   TEXT_PRO: "gemini-3.8-flash" as GeminiTextModelId,
   TEXT_LATEST: "gemini-flash-latest" as GeminiTextModelId,
@@ -27,19 +27,12 @@ export interface ModelDescriptor {
 
 export const TEXT_MODEL_CONFIGS: ModelDescriptor[] = [
   {
-    id: "gemini-3.5-flash",
-    apiModelId: "gemini-3.5-flash",
-    name: "Gemini 3.5 Flash",
-    badge: "Ultra Fast",
-    desc: "Lightning fast, high consistency & structured output",
+    id: "gemini-flash-latest",
+    apiModelId: "gemini-flash-latest",
+    name: "Gemini Flash Latest",
+    badge: "Production",
+    desc: "Real-time production copy, viral hooks & fastest response",
     isDefault: true,
-  },
-  {
-    id: "gemini-3.7-flash",
-    apiModelId: "gemini-3.7-flash",
-    name: "Gemini 3.7 Flash",
-    badge: "Next-Gen",
-    desc: "Advanced multimodal reasoning & creative copy",
   },
   {
     id: "gemini-3.8-flash",
@@ -49,11 +42,11 @@ export const TEXT_MODEL_CONFIGS: ModelDescriptor[] = [
     desc: "Next-gen multimodal, high intelligence & reasoning",
   },
   {
-    id: "gemini-flash-latest",
-    apiModelId: "gemini-flash-latest",
-    name: "Gemini Flash Latest",
-    badge: "Production",
-    desc: "Real-time production copy & viral hooks",
+    id: "gemini-3.7-flash",
+    apiModelId: "gemini-3.7-flash",
+    name: "Gemini 3.7 Flash",
+    badge: "Next-Gen",
+    desc: "Advanced multimodal reasoning & creative copy",
   },
   {
     id: "gemini-3.1-flash-lite",
@@ -106,20 +99,17 @@ export const SUPPORTED_ASPECT_RATIOS = [
 ];
 
 export function resolveGeminiTextModel(rawInput?: string): string {
-  if (!rawInput) return GEMINI_MODELS.TEXT_FAST;
+  if (!rawInput) return "gemini-flash-latest";
   const normalized = rawInput.trim().toLowerCase();
 
-  if (normalized.includes("3.5") || normalized === "gemini-3.5-flash") {
-    return "gemini-3.5-flash";
-  }
-  if (normalized.includes("3.7") || normalized === "gemini-3.7-flash") {
-    return "gemini-3.7-flash";
+  if (normalized.includes("latest") || normalized === "gemini-flash-latest") {
+    return "gemini-flash-latest";
   }
   if (normalized.includes("3.8") || normalized === "gemini-3.8-flash") {
     return "gemini-3.8-flash";
   }
-  if (normalized.includes("latest") || normalized === "gemini-flash-latest") {
-    return "gemini-flash-latest";
+  if (normalized.includes("3.7") || normalized === "gemini-3.7-flash") {
+    return "gemini-3.7-flash";
   }
   if (normalized.includes("lite") || normalized.includes("3.1-flash-lite")) {
     return "gemini-3.1-flash-lite";
@@ -128,7 +118,7 @@ export function resolveGeminiTextModel(rawInput?: string): string {
     return "gemini-3.1-pro-preview";
   }
 
-  return GEMINI_MODELS.TEXT_FAST;
+  return "gemini-flash-latest";
 }
 
 export function resolveGeminiImageModel(rawInput?: string): string {

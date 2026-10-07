@@ -272,86 +272,21 @@ export function PostComposerModal({
       if (initialMediaUrl !== undefined) {
         setMediaUrl(initialMediaUrl);
       }
-      setSelectedAccountIds((prev) =>
-        prev.length > 0
-          ? prev
-          : ["channel-facebook", "channel-instagram", "channel-x", "channel-linkedin"]
-      );
     }
   }, [isOpen, initialContent, initialMediaUrl]);
 
-  const DEFAULT_COMPOSER_CHANNELS: ConnectedAccountItem[] = [
-    {
-      id: "channel-facebook",
-      provider: "facebook",
-      displayName: activeBrand.name ? `${activeBrand.name} (Facebook)` : "Facebook Page",
-      username: activeBrand.slug || "brand_page",
-      profileImageUrl: activeBrand.avatarUrl || "/icons/pulse-logo.svg",
-      status: "CONNECTED",
-    },
-    {
-      id: "channel-instagram",
-      provider: "instagram",
-      displayName: activeBrand.name ? `${activeBrand.name} (Instagram)` : "Instagram",
-      username: activeBrand.slug || "brand_instagram",
-      profileImageUrl: activeBrand.avatarUrl || "/icons/pulse-logo.svg",
-      status: "CONNECTED",
-    },
-    {
-      id: "channel-x",
-      provider: "x",
-      displayName: activeBrand.name ? `${activeBrand.name} (X)` : "X (Twitter)",
-      username: activeBrand.slug || "brand_x",
-      profileImageUrl: activeBrand.avatarUrl || "/icons/pulse-logo.svg",
-      status: "CONNECTED",
-    },
-    {
-      id: "channel-linkedin",
-      provider: "linkedin",
-      displayName: activeBrand.name ? `${activeBrand.name} (LinkedIn)` : "LinkedIn",
-      username: activeBrand.slug || "brand_linkedin",
-      profileImageUrl: activeBrand.avatarUrl || "/icons/pulse-logo.svg",
-      status: "CONNECTED",
-    },
-    {
-      id: "channel-pinterest",
-      provider: "pinterest",
-      displayName: activeBrand.name ? `${activeBrand.name} (Pinterest)` : "Pinterest",
-      username: activeBrand.slug || "brand_pins",
-      profileImageUrl: activeBrand.avatarUrl || "/icons/pulse-logo.svg",
-      status: "CONNECTED",
-    },
-    {
-      id: "channel-youtube",
-      provider: "youtube",
-      displayName: activeBrand.name ? `${activeBrand.name} (YouTube)` : "YouTube",
-      username: activeBrand.slug || "brand_youtube",
-      profileImageUrl: activeBrand.avatarUrl || "/icons/pulse-logo.svg",
-      status: "CONNECTED",
-    },
-    {
-      id: "channel-tiktok",
-      provider: "tiktok",
-      displayName: activeBrand.name ? `${activeBrand.name} (TikTok)` : "TikTok",
-      username: activeBrand.slug || "brand_tiktok",
-      profileImageUrl: activeBrand.avatarUrl || "/icons/pulse-logo.svg",
-      status: "CONNECTED",
-    },
-  ];
+  const effectiveChannels: ConnectedAccountItem[] = connectedAccounts;
 
-  const effectiveChannels: ConnectedAccountItem[] =
-    connectedAccounts.length > 0
-      ? [
-          ...connectedAccounts,
-          ...DEFAULT_COMPOSER_CHANNELS.filter(
-            (def) => !connectedAccounts.some((c) => c.provider === def.provider)
-          ),
-        ]
-      : DEFAULT_COMPOSER_CHANNELS;
-
-  const activePreviewChannel =
+  const activePreviewChannel: ConnectedAccountItem =
     effectiveChannels.find((ch) => selectedAccountIds.includes(ch.id)) ||
-    effectiveChannels[0];
+    effectiveChannels[0] || {
+      id: "preview-channel",
+      provider: "facebook",
+      displayName: activeBrand.name || "PulseSocial",
+      username: activeBrand.slug || "pulsesocial",
+      profileImageUrl: activeBrand.avatarUrl || "/icons/pulse-logo.svg",
+      status: "DISCONNECTED",
+    };
 
   const [content, setContent] = useState("");
   const [mediaUrl, setMediaUrl] = useState<string | null>(null);
@@ -626,16 +561,28 @@ export function PostComposerModal({
       return;
     }
 
+    const validTargetIds = selectedAccountIds.filter(
+      (id) => !id.startsWith("channel-") && id !== "default-channel" && id !== "preview-channel"
+    );
+
+    if (validTargetIds.length === 0) {
+      toast({
+        title: "No Account Selected",
+        message: "Please connect and select at least one official social account before publishing.",
+        type: "warning",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      const validTargetIds = selectedAccountIds.filter((id) => id !== "default-channel");
       const res = await fetch("/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           content,
           mediaUrls: mediaUrl ? [mediaUrl] : [],
-          targetAccountIds: validTargetIds.length > 0 ? validTargetIds : [activeBrand.id || "auto"],
+          targetAccountIds: validTargetIds,
           action: publishingOption === "schedule" ? "SCHEDULE" : "PUBLISH_NOW",
           scheduledFor: publishingOption === "schedule" ? `${scheduledDate}T${scheduledTime}:00Z` : undefined,
           location: selectedLocation || undefined,
@@ -645,11 +592,11 @@ export function PostComposerModal({
         }),
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to broadcast post");
-      }
-
       const resData = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(resData.error || "Failed to broadcast post");
+      }
 
       const destinationNames =
         effectiveChannels
@@ -674,22 +621,12 @@ export function PostComposerModal({
       setAttachedComment(null);
       onClose();
       if (onSuccess) onSuccess();
-    } catch {
+    } catch (err: unknown) {
       toast({
-        title: publishingOption === "schedule" ? "Post Scheduled!" : "Post Published!",
-        message: `Broadcast sent to ${activeBrand.name} channels.`,
-        type: "success",
+        title: "Publishing Failed",
+        message: (err as Error).message || "Could not publish post. Check your connected account credentials.",
+        type: "error",
       });
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new CustomEvent("pulsesocial_post_created"));
-      }
-      setContent("");
-      setMediaUrl(null);
-      setSelectedLocation(null);
-      setAttachedUrlData(null);
-      setAttachedComment(null);
-      onClose();
-      if (onSuccess) onSuccess();
     } finally {
       setIsSubmitting(false);
     }
@@ -786,6 +723,12 @@ export function PostComposerModal({
                 >
                   <Plus className="w-4 h-4" />
                 </button>
+
+                {effectiveChannels.length === 0 && (
+                  <span className="text-xs text-slate-500 italic">
+                    No social accounts connected yet. Click (+) to connect.
+                  </span>
+                )}
 
                 {effectiveChannels.map((ch) => {
                   const isSelected = selectedAccountIds.includes(ch.id);

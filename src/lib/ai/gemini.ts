@@ -127,10 +127,11 @@ export async function generateSocialCopy(req: SocialCopyRequest): Promise<Social
   // Fallback models in case primary model hits temporary 503 or 429
   const candidateModels = [
     modelId,
-    GEMINI_MODELS.TEXT_FAST,
-    "gemini-3.7-flash",
     "gemini-flash-latest",
     "gemini-3.1-flash-lite",
+    GEMINI_MODELS.TEXT_FAST,
+    "gemini-3.8-flash",
+    "gemini-3.7-flash",
   ].filter((v, i, a) => a.indexOf(v) === i);
 
   let lastError: any = null;
@@ -265,10 +266,11 @@ export async function generateGeminiSuggestions(
   const prompt = buildSuggestionsPrompt(topic, platform, brandName);
 
   const candidateModels = [
-    GEMINI_MODELS.TEXT_FAST,
-    "gemini-3.7-flash",
     "gemini-flash-latest",
     "gemini-3.1-flash-lite",
+    GEMINI_MODELS.TEXT_FAST,
+    "gemini-3.8-flash",
+    "gemini-3.7-flash",
   ];
 
   let lastError: any = null;
@@ -316,9 +318,10 @@ export async function enhancePrompt(req: PromptEnhanceRequest): Promise<PromptEn
   const prompt = buildPromptEnhancerPrompt(req);
 
   const candidateModels = [
-    GEMINI_MODELS.TEXT_FAST,
-    "gemini-3.7-flash",
     "gemini-flash-latest",
+    "gemini-3.1-flash-lite",
+    GEMINI_MODELS.TEXT_FAST,
+    "gemini-3.8-flash",
   ];
 
   for (const modelId of candidateModels) {

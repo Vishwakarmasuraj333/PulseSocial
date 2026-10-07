@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
       industry = "Social Media Marketing",
       tone = "Engaging & Viral",
       platform = "Instagram",
-      model = "gemini-3.5-flash",
+      model = "gemini-flash-latest",
       includeHashtags = true,
       includeCta = true,
       includeFirstComment = true,

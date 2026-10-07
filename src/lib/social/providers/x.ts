@@ -164,17 +164,44 @@ export class XProvider implements SocialProvider {
     return res.ok;
   }
 
-  async getAnalytics(): Promise<AnalyticsResult> {
+  async getAnalytics(accessToken?: string): Promise<AnalyticsResult> {
+    if (accessToken) {
+      try {
+        const res = await fetch("https://api.twitter.com/2/users/me?user.fields=public_metrics", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const metrics = data.data?.public_metrics;
+          if (metrics) {
+            return {
+              followers: metrics.followers_count || 0,
+              impressions: 0,
+              reach: metrics.followers_count || 0,
+              engagementCount: 0,
+              engagementRate: 0,
+              clicks: 0,
+              shares: 0,
+              saves: 0,
+              isCalculated: false,
+              rawJson: JSON.stringify(metrics),
+            };
+          }
+        }
+      } catch (e) {
+        console.error("X analytics fetch failed:", e);
+      }
+    }
     return {
-      followers: 3200,
-      impressions: 21500,
-      reach: 16200,
-      engagementCount: 1420,
-      engagementRate: 6.6,
-      clicks: 390,
-      shares: 180, // retweets
-      saves: 95, // bookmarks
-      isCalculated: false,
+      followers: 0,
+      impressions: 0,
+      reach: 0,
+      engagementCount: 0,
+      engagementRate: 0,
+      clicks: 0,
+      shares: 0,
+      saves: 0,
+      isCalculated: true,
     };
   }
 

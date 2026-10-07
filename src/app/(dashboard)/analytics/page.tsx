@@ -87,9 +87,24 @@ export default function AnalyticsPage() {
         {/* Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Social Analytics & Insights
-            </h1>
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                Social Analytics & Insights
+              </h1>
+              {(data as any)?.dataSource === "API_SYNCED" ? (
+                <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold">
+                  ● Real API Data
+                </span>
+              ) : (data as any)?.dataSource === "DATABASE_CALCULATED" ? (
+                <span className="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 text-[10px] font-bold">
+                  ● Database Calculated
+                </span>
+              ) : (
+                <span className="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 text-[10px] font-bold">
+                  ○ Awaiting live platform data
+                </span>
+              )}
+            </div>
             <p className="text-xs text-slate-500 mt-1">
               Cross-network growth intelligence, follower reach, engagement rate, and campaign ROI.
             </p>
@@ -122,14 +137,14 @@ export default function AnalyticsPage() {
           <div className="p-5 rounded-2xl bg-[#f5f3ff] dark:bg-purple-950/20 border border-[#ede9fe] dark:border-purple-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
             <div className="space-y-1">
               <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                No analytics data available yet.
+                Awaiting live platform data
               </h3>
               <p className="text-xs text-slate-500">
                 Connect your social accounts to view live metrics, authentic reach, and cross-channel performance.
               </p>
             </div>
             <Link
-              href="/connections"
+              href="/social-accounts"
               className="px-4 py-2 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white text-xs font-semibold shadow-xs shadow-purple-900/15 transition w-fit shrink-0 cursor-pointer"
             >
               Connect a social account

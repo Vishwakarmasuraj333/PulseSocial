@@ -258,6 +258,7 @@ export interface ConnectedAccountData {
 
 interface UniversalSocialConnectModalProps {
   platformId?: string;
+  initialPlatformId?: string;
   defaultChannelId?: string;
   title?: string;
   isOpen: boolean;
@@ -268,6 +269,7 @@ interface UniversalSocialConnectModalProps {
 
 export function UniversalSocialConnectModal({
   platformId,
+  initialPlatformId,
   defaultChannelId,
   isOpen,
   onClose,
@@ -277,8 +279,15 @@ export function UniversalSocialConnectModal({
   const { toast } = useToast();
   const { activeBrand } = useBrand();
 
-  const selectedPlatform = defaultChannelId || platformId || "youtube";
+  const selectedPlatform = initialPlatformId || defaultChannelId || platformId || "youtube";
   const [activeTab, setActiveTab] = useState<string>(selectedPlatform);
+
+  useEffect(() => {
+    if (initialPlatformId || platformId || defaultChannelId) {
+      setActiveTab(initialPlatformId || platformId || defaultChannelId || "youtube");
+    }
+  }, [initialPlatformId, platformId, defaultChannelId]);
+
   const [step, setStep] = useState<"connect" | "permissions" | "success">("connect");
 
   // OAuth states
@@ -344,30 +353,22 @@ export function UniversalSocialConnectModal({
       const data = await res.json();
 
       if (!res.ok || !data.success || !data.authUrl) {
-        throw new Error(data.missingConfigMessage || "OAuth service unavailable. Please configure API credentials in .env.");
+        setOauthError(
+          data.error ||
+          `OAuth credentials for ${currentConfig.name} are not configured in environment variables (.env). Configure CLIENT_ID and CLIENT_SECRET to authenticate.`
+        );
+        return;
       }
 
       setPendingAuthUrl(data.authUrl);
       setIsOAuthWaiting(true);
 
-      // Open official provider popup (without noopener so window.opener postMessage works smoothly)
-      const popup = window.open(
-        data.authUrl,
-        "pulse_oauth_popup",
-        "width=680,height=800,menubar=no,toolbar=no,status=no,resizable=yes"
-      );
-
-      if (!popup || popup.closed || typeof popup.closed === "undefined") {
-        // Fallback: If popup is blocked by browser policy, navigate top-level directly
+      // Open official provider full page in new tab
+      const newTab = window.open(data.authUrl, "_blank");
+      if (!newTab || newTab.closed || typeof newTab.closed === "undefined") {
         window.location.href = data.authUrl;
         return;
       }
-
-      toast({
-        title: `Connecting to ${currentConfig.name}`,
-        message: `Please complete authorization in the official ${currentConfig.name} window.`,
-        type: "info",
-      });
     } catch (err: unknown) {
       setOauthError((err as Error).message || "Unable to initiate authorization.");
     } finally {
@@ -458,11 +459,30 @@ export function UniversalSocialConnectModal({
 
             {/* Content Body */}
             <div className="p-6 space-y-5">
-              {/* OAuth Error Alert */}
+              {/* OAuth Status Alert */}
               {oauthError && (
-                <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-300 text-xs flex items-start gap-2.5 animate-in fade-in">
-                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-                  <span className="flex-1">{oauthError}</span>
+                <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-300 text-xs space-y-2 animate-in fade-in">
+                  <div className="flex items-start gap-2.5">
+                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <span className="flex-1 font-medium">{oauthError}</span>
+                  </div>
+                  <div className="pt-2 border-t border-amber-200/60 dark:border-amber-800/60 flex items-center justify-between text-[11px]">
+                    <span className="text-amber-700 dark:text-amber-400 font-mono truncate mr-2">
+                      Callback: {liveRedirectUri}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(liveRedirectUri);
+                        setCopiedRedirect(true);
+                        setTimeout(() => setCopiedRedirect(false), 2000);
+                      }}
+                      className="px-2 py-0.5 rounded bg-amber-200/70 dark:bg-amber-800/60 hover:bg-amber-300 dark:hover:bg-amber-700 text-amber-900 dark:text-amber-200 font-semibold flex items-center gap-1 cursor-pointer shrink-0"
+                    >
+                      {copiedRedirect ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                      <span>{copiedRedirect ? "Copied" : "Copy URI"}</span>
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -500,26 +520,6 @@ export function UniversalSocialConnectModal({
                     </>
                   )}
                 </button>
-
-                {/* Live Waiting Status when popup is open */}
-                {isOAuthWaiting && (
-                  <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
-                    <span className="flex items-center gap-1.5 font-medium text-emerald-600 dark:text-emerald-400">
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      Verifying your account in official window…
-                    </span>
-                    {pendingAuthUrl && (
-                      <a
-                        href={pendingAuthUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline hover:text-slate-900 dark:hover:text-white font-semibold"
-                      >
-                        Re-open
-                      </a>
-                    )}
-                  </div>
-                )}
               </div>
 
             </div>

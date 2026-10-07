@@ -107,14 +107,14 @@ export class ThreadsProvider implements SocialProvider {
 
   async getAnalytics(accessToken: string, accountId: string, since: Date, until: Date): Promise<AnalyticsResult> {
     return {
-      followers: 28400,
-      impressions: 74200,
-      reach: 58900,
-      engagementCount: 9400,
-      engagementRate: 12.6,
-      clicks: 1890,
-      shares: 1450,
-      saves: 620,
+      followers: 0,
+      impressions: 0,
+      reach: 0,
+      engagementCount: 0,
+      engagementRate: 0,
+      clicks: 0,
+      shares: 0,
+      saves: 0,
       isCalculated: true,
     };
   }

@@ -25,22 +25,51 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
 
-    const mapped = accounts.map((a) => ({
-      id: a.id,
-      provider: a.provider,
-      providerAccountId: a.providerAccountId,
-      displayName: a.displayName,
-      username: a.username,
-      profileImageUrl: a.profileImageUrl,
-      accountType: a.accountType,
-      status: a.status,
-      followersCount: a.profile?.followersCount || 0,
-      followingCount: a.profile?.followingCount || 0,
-      postsCount: a.profile?.postsCount || 0,
-      lastSyncedAt: a.lastSyncedAt ? a.lastSyncedAt.toISOString() : null,
-      tokenExpiresAt: a.token?.expiresAt ? a.token.expiresAt.toISOString() : null,
-      createdAt: a.createdAt.toISOString(),
-    }));
+    const mapped = accounts.map((a) => {
+      let meta: Record<string, unknown> = {};
+      try {
+        meta = a.metadata ? JSON.parse(a.metadata) : {};
+      } catch {}
+
+      // Calculate real remaining validity in days
+      let validityDays = 60; // Default standard validity
+      if (a.token?.expiresAt) {
+        const diff = Math.ceil(
+          (new Date(a.token.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+        );
+        validityDays = Math.max(0, diff);
+      } else if (a.tokenExpiresAt) {
+        const diff = Math.ceil(
+          (new Date(a.tokenExpiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+        );
+        validityDays = Math.max(0, diff);
+      } else if (
+        a.provider === "telegram" ||
+        a.provider === "mastodon" ||
+        a.provider === "bluesky"
+      ) {
+        validityDays = 365; // Permanent bot/app credentials
+      }
+
+      return {
+        id: a.id,
+        provider: a.provider,
+        providerAccountId: a.providerAccountId,
+        displayName: a.displayName,
+        username: a.username,
+        profileImageUrl: a.profileImageUrl,
+        accountType: a.accountType || "Page",
+        status: a.status,
+        syncPosts: meta.syncPosts !== false,
+        validityDays,
+        followersCount: a.profile?.followersCount || 0,
+        followingCount: a.profile?.followingCount || 0,
+        postsCount: a.profile?.postsCount || 0,
+        lastSyncedAt: a.lastSyncedAt ? a.lastSyncedAt.toISOString() : null,
+        tokenExpiresAt: a.token?.expiresAt ? a.token.expiresAt.toISOString() : null,
+        createdAt: a.createdAt.toISOString(),
+      };
+    });
 
     return NextResponse.json({ success: true, accounts: mapped });
   } catch (err: unknown) {
@@ -51,95 +80,14 @@ export async function GET() {
   }
 }
 
-export async function POST(req: Request) {
-  try {
-    const session = await getSession();
-    if (!session?.activeOrgId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const body = await req.json();
-    const { provider, displayName, username, accountType, profileImageUrl } = body;
-
-    if (!provider) {
-      return NextResponse.json({ error: "Platform provider is required" }, { status: 400 });
-    }
-
-    const providerKey = provider.toLowerCase().trim();
-    const safeDisplayName = displayName || `${providerKey.charAt(0).toUpperCase() + providerKey.slice(1)} Channel`;
-    const safeUsername = username || `${providerKey}_official`;
-    const providerAccountId = `acc_${providerKey}_${Date.now()}`;
-
-    const { encrypted, iv, tag } = encryptToken(`token_${providerKey}_${Date.now()}`);
-
-    const account = await prisma.socialAccount.create({
-      data: {
-        organizationId: session.activeOrgId,
-        provider: providerKey,
-        providerAccountId,
-        displayName: safeDisplayName,
-        username: safeUsername,
-        profileImageUrl: profileImageUrl || null,
-        accountType: accountType || "PROFILE",
-        status: "CONNECTED",
-        scopes: JSON.stringify(["publish", "read", "analytics", "messages"]),
-        connectedAt: new Date(),
-        lastSyncedAt: new Date(),
-        token: {
-          create: {
-            encryptedAccessToken: encrypted,
-            iv,
-            tag,
-            expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
-          },
-        },
-        profile: {
-          create: {
-            bio: `Official ${safeDisplayName} account connected to PulseSocial`,
-            followersCount: Math.floor(Math.random() * 8000) + 1200,
-            followingCount: Math.floor(Math.random() * 500) + 80,
-            postsCount: Math.floor(Math.random() * 150) + 25,
-          },
-        },
-      },
-      include: {
-        profile: true,
-      },
-    });
-
-    await logAudit({
-      organizationId: session.activeOrgId,
-      userId: session.id,
-      action: "SOCIAL_ACCOUNT_CONNECTED",
-      resourceType: "SocialAccount",
-      resourceId: account.id,
-      details: {
-        provider: providerKey,
-        displayName: safeDisplayName,
-        mode: "INSTANT_CONNECT",
-      },
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: `${safeDisplayName} successfully connected!`,
-      account: {
-        id: account.id,
-        provider: account.provider,
-        displayName: account.displayName,
-        username: account.username,
-        profileImageUrl: account.profileImageUrl,
-        accountType: account.accountType,
-        status: account.status,
-        followersCount: account.profile?.followersCount || 0,
-      },
-    });
-  } catch (err: unknown) {
-    return NextResponse.json(
-      { error: (err as Error).message || "Failed to connect account" },
-      { status: 500 }
-    );
-  }
+export async function POST() {
+  return NextResponse.json(
+    {
+      error:
+        "Direct account creation is disabled. Please connect your social channels securely using the official OAuth flow via /api/social/[provider]/connect.",
+    },
+    { status: 400 }
+  );
 }
 
 export async function DELETE(req: Request) {
@@ -171,6 +119,15 @@ export async function DELETE(req: Request) {
       where: { id: account.id },
     });
 
+    await logAudit({
+      organizationId: session.activeOrgId,
+      userId: session.id,
+      action: "SOCIAL_ACCOUNT_DISCONNECTED",
+      resourceType: "SocialAccount",
+      resourceId: account.id,
+      details: { provider: account.provider, displayName: account.displayName },
+    });
+
     return NextResponse.json({
       success: true,
       message: `${account.displayName} has been disconnected.`,
@@ -178,6 +135,55 @@ export async function DELETE(req: Request) {
   } catch (err: unknown) {
     return NextResponse.json(
       { error: (err as Error).message || "Failed to disconnect account" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(req: Request) {
+  try {
+    const session = await getSession();
+    if (!session?.activeOrgId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const { id, status, syncPosts } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "Account ID is required" }, { status: 400 });
+    }
+
+    const account = await prisma.socialAccount.findFirst({
+      where: { id, organizationId: session.activeOrgId },
+    });
+
+    if (!account) {
+      return NextResponse.json({ error: "Social account not found" }, { status: 404 });
+    }
+
+    let meta: Record<string, unknown> = {};
+    try {
+      meta = account.metadata ? JSON.parse(account.metadata) : {};
+    } catch {}
+
+    if (typeof syncPosts === "boolean") {
+      meta.syncPosts = syncPosts;
+    }
+
+    const updated = await prisma.socialAccount.update({
+      where: { id: account.id },
+      data: {
+        ...(status ? { status } : {}),
+        metadata: JSON.stringify(meta),
+        lastSyncedAt: new Date(),
+      },
+    });
+
+    return NextResponse.json({ success: true, account: updated });
+  } catch (err: unknown) {
+    return NextResponse.json(
+      { error: (err as Error).message || "Failed to update account" },
       { status: 500 }
     );
   }

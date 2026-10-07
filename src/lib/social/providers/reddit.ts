@@ -122,14 +122,14 @@ export class RedditProvider implements SocialProvider {
 
   async getAnalytics(accessToken: string, accountId: string, since: Date, until: Date): Promise<AnalyticsResult> {
     return {
-      followers: 5200,
-      impressions: 31200,
-      reach: 22400,
-      engagementCount: 4800,
-      engagementRate: 15.4,
-      clicks: 1420,
-      shares: 670,
-      saves: 490,
+      followers: 0,
+      impressions: 0,
+      reach: 0,
+      engagementCount: 0,
+      engagementRate: 0,
+      clicks: 0,
+      shares: 0,
+      saves: 0,
       isCalculated: true,
     };
   }

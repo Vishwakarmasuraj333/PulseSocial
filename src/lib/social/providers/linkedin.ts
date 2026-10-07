@@ -153,17 +153,17 @@ export class LinkedInProvider implements SocialProvider {
     return res.ok;
   }
 
-  async getAnalytics(accessToken: string, accountId: string): Promise<AnalyticsResult> {
+  async getAnalytics(accessToken?: string, accountId?: string): Promise<AnalyticsResult> {
     return {
-      followers: 1420,
-      impressions: 12800,
-      reach: 9400,
-      engagementCount: 820,
-      engagementRate: 6.4,
-      clicks: 430,
-      shares: 65,
-      saves: 40,
-      isCalculated: false,
+      followers: 0,
+      impressions: 0,
+      reach: 0,
+      engagementCount: 0,
+      engagementRate: 0,
+      clicks: 0,
+      shares: 0,
+      saves: 0,
+      isCalculated: true,
     };
   }
 

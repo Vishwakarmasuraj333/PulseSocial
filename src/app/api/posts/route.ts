@@ -95,16 +95,14 @@ export async function POST(req: Request) {
     const orgName = org?.name || "Official Brand";
     const orgSlug = org?.slug || "brand_official";
 
-    // 1. Resolve or establish valid SocialAccount IDs for every selected platform
-    let validAccountIds: string[] = [];
-    const requestedTargets = (targetAccountIds && targetAccountIds.length > 0)
-      ? targetAccountIds
-      : ["facebook", "instagram", "x", "linkedin"];
+    // 1. Resolve valid connected SocialAccount IDs strictly belonging to this organization
+    const validAccountIds: string[] = [];
+    const requestedTargets = targetAccountIds || [];
 
     for (const targetId of requestedTargets) {
       if (!targetId || targetId === "default-channel" || targetId === "auto") continue;
 
-      // Check if targetId is an existing SocialAccount ID
+      // Check if targetId is an existing SocialAccount ID in this workspace
       const byId = await prisma.socialAccount.findFirst({
         where: { id: targetId, organizationId: session.activeOrgId },
       });
@@ -113,66 +111,25 @@ export async function POST(req: Request) {
         continue;
       }
 
-      // If targetId is a provider format like "channel-facebook", "channel-x", "instagram", etc.
+      // Check if targetId is a provider identifier (e.g. "facebook", "channel-facebook")
       const cleanProvider = targetId.toLowerCase().replace(/^channel-/, "").trim();
-
-      // Check if an account for this provider exists in this org
-      let existingByProvider = await prisma.socialAccount.findFirst({
+      const existingByProvider = await prisma.socialAccount.findFirst({
         where: { organizationId: session.activeOrgId, provider: cleanProvider },
       });
-
-      if (!existingByProvider) {
-        // Auto-provision brand social account for this provider
-        const { encrypted, iv, tag } = encryptToken(`token_${cleanProvider}_${Date.now()}`);
-        const providerName = cleanProvider.charAt(0).toUpperCase() + cleanProvider.slice(1);
-        existingByProvider = await prisma.socialAccount.create({
-          data: {
-            organizationId: session.activeOrgId,
-            provider: cleanProvider,
-            providerAccountId: `brand_${cleanProvider}_${Date.now()}`,
-            displayName: `${orgName} (${providerName})`,
-            username: `${orgSlug}_${cleanProvider}`,
-            profileImageUrl: "/icons/pulse-logo.svg",
-            status: "CONNECTED",
-            scopes: JSON.stringify(["publish", "read", "analytics", "messages"]),
-            accountType: cleanProvider === "youtube" ? "Channel" : cleanProvider === "facebook" ? "Business Page" : "Professional Account",
-            connectedAt: new Date(),
-            lastSyncedAt: new Date(),
-            token: {
-              create: {
-                encryptedAccessToken: encrypted,
-                iv,
-                tag,
-                expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
-              },
-            },
-            profile: {
-              create: {
-                bio: `Official ${orgName} on ${cleanProvider}`,
-                followersCount: Math.floor(Math.random() * 8500) + 1500,
-                followingCount: Math.floor(Math.random() * 450) + 50,
-                postsCount: 1,
-              },
-            },
-          },
-        });
-      }
 
       if (existingByProvider && !validAccountIds.includes(existingByProvider.id)) {
         validAccountIds.push(existingByProvider.id);
       }
     }
 
-    // Safety fallback: if somehow still empty, ensure at least one primary account exists
     if (validAccountIds.length === 0) {
-      const fallbackAccounts = await prisma.socialAccount.findMany({
-        where: { organizationId: session.activeOrgId },
-        take: 4,
-        select: { id: true },
-      });
-      if (fallbackAccounts.length > 0) {
-        validAccountIds = fallbackAccounts.map((a) => a.id);
-      }
+      return NextResponse.json(
+        {
+          error:
+            "No connected social accounts found for the selected platforms. Please connect your official social accounts before publishing.",
+        },
+        { status: 400 }
+      );
     }
 
     // Resolve creator ID reliably
@@ -235,18 +192,25 @@ export async function POST(req: Request) {
     if (action === "PUBLISH_NOW") {
       let publishedCount = 0;
       let failureCount = 0;
-      let notConfiguredCount = 0;
-
       for (const target of post.targets) {
         const account = target.socialAccount;
         try {
           if (!account.token) {
-            notConfiguredCount++;
+            failureCount++;
+            const errMsg = `${account.provider} account is not connected with live OAuth tokens.`;
             await prisma.socialPostTarget.update({
               where: { id: target.id },
               data: {
-                status: "READY",
-                errorMessage: `${account.provider} account is not connected with live OAuth tokens.`,
+                status: "FAILED",
+                errorMessage: errMsg,
+              },
+            });
+            await prisma.publishingAttempt.create({
+              data: {
+                postId: post.id,
+                provider: account.provider,
+                status: "FAILED",
+                errorMessage: errMsg,
               },
             });
             continue;
@@ -258,13 +222,22 @@ export async function POST(req: Request) {
             account.token.tag
           );
 
-          if (!decryptedAccess || decryptedAccess.startsWith("token_")) {
-            notConfiguredCount++;
+          if (!decryptedAccess || decryptedAccess.startsWith("token_") || decryptedAccess.startsWith("direct_token_")) {
+            failureCount++;
+            const errMsg = `Live OAuth credentials are not connected for ${account.provider}. Reconnect via official OAuth.`;
             await prisma.socialPostTarget.update({
               where: { id: target.id },
               data: {
-                status: "READY",
-                errorMessage: `Live publishing integration is not configured for ${account.provider}. Saved as READY.`,
+                status: "FAILED",
+                errorMessage: errMsg,
+              },
+            });
+            await prisma.publishingAttempt.create({
+              data: {
+                postId: post.id,
+                provider: account.provider,
+                status: "FAILED",
+                errorMessage: errMsg,
               },
             });
             continue;
@@ -287,36 +260,60 @@ export async function POST(req: Request) {
                 publishedAt: new Date(),
               },
             });
+            await prisma.publishingAttempt.create({
+              data: {
+                postId: post.id,
+                provider: account.provider,
+                status: "SUCCESS",
+                responsePayload: JSON.stringify(result),
+              },
+            });
           } else {
             failureCount++;
+            const errMsg = result.error || "Remote platform API rejected publication.";
             await prisma.socialPostTarget.update({
               where: { id: target.id },
               data: {
                 status: "FAILED",
-                errorMessage: result.error || "Remote platform API rejected publication.",
+                errorMessage: errMsg,
+              },
+            });
+            await prisma.publishingAttempt.create({
+              data: {
+                postId: post.id,
+                provider: account.provider,
+                status: "FAILED",
+                errorMessage: errMsg,
               },
             });
           }
         } catch (targetErr: any) {
           failureCount++;
+          const errMsg = targetErr?.message || "Platform API error.";
           await prisma.socialPostTarget.update({
             where: { id: target.id },
             data: {
               status: "FAILED",
-              errorMessage: targetErr?.message || "Platform API error.",
+              errorMessage: errMsg,
+            },
+          });
+          await prisma.publishingAttempt.create({
+            data: {
+              postId: post.id,
+              provider: account.provider,
+              status: "FAILED",
+              errorMessage: errMsg,
             },
           });
         }
       }
 
-      let finalStatus = "DRAFT";
-      if (publishedCount > 0 && failureCount === 0 && notConfiguredCount === 0) {
+      let finalStatus = "FAILED";
+      if (publishedCount > 0 && failureCount === 0) {
         finalStatus = "PUBLISHED";
-      } else if (publishedCount > 0) {
+      } else if (publishedCount > 0 && failureCount > 0) {
         finalStatus = "PARTIALLY_PUBLISHED";
-      } else if (notConfiguredCount > 0 && failureCount === 0) {
-        finalStatus = "READY";
-      } else if (failureCount > 0) {
+      } else {
         finalStatus = "FAILED";
       }
 

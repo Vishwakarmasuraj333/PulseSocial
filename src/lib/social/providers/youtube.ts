@@ -179,17 +179,46 @@ export class YouTubeProvider implements SocialProvider {
     return true;
   }
 
-  async getAnalytics(): Promise<AnalyticsResult> {
+  async getAnalytics(accessToken?: string): Promise<AnalyticsResult> {
+    if (accessToken) {
+      try {
+        const res = await fetch("https://www.googleapis.com/youtube/v3/channels?part=statistics&mine=true", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const stats = data.items?.[0]?.statistics;
+          if (stats) {
+            const subscribers = parseInt(stats.subscriberCount || "0", 10);
+            const views = parseInt(stats.viewCount || "0", 10);
+            return {
+              followers: subscribers,
+              impressions: views,
+              reach: views,
+              engagementCount: parseInt(stats.commentCount || "0", 10),
+              engagementRate: 0,
+              clicks: 0,
+              shares: 0,
+              saves: 0,
+              isCalculated: false,
+              rawJson: JSON.stringify(stats),
+            };
+          }
+        }
+      } catch (e) {
+        console.error("YouTube analytics fetch failed:", e);
+      }
+    }
     return {
-      followers: 5400,
-      impressions: 48000,
-      reach: 36000,
-      engagementCount: 3100,
-      engagementRate: 6.4,
-      clicks: 890,
-      shares: 410,
-      saves: 220,
-      isCalculated: false,
+      followers: 0,
+      impressions: 0,
+      reach: 0,
+      engagementCount: 0,
+      engagementRate: 0,
+      clicks: 0,
+      shares: 0,
+      saves: 0,
+      isCalculated: true,
     };
   }
 

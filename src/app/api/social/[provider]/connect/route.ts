@@ -33,27 +33,29 @@ export async function GET(
     const appUrl = host ? `${proto}://${host}` : (process.env.NEXT_PUBLIC_APP_URL || url.origin);
     const redirectUri = `${appUrl}/api/social/${platformKey}/callback`;
 
-    // If real provider credentials are not configured in environment
+    // If provider credentials are not configured in environment, return clear unconfigured status
     if (!socialProvider.isConfigured()) {
+      const missingMsg = socialProvider.getMissingConfigMessage();
       if (wantsJson) {
-        return NextResponse.json({
-          success: false,
-          isConfigured: false,
-          platform: platformKey,
-          displayName: socialProvider.displayName,
-          missingConfigMessage: socialProvider.getMissingConfigMessage(),
-          redirectUri,
-        });
+        return NextResponse.json(
+          {
+            success: false,
+            isConfigured: false,
+            platform: platformKey,
+            displayName: socialProvider.displayName,
+            error: missingMsg,
+            redirectUri,
+          },
+          { status: 400 }
+        );
       }
 
-      const redirectUrl = new URL("/connections", req.url);
-      redirectUrl.searchParams.set("blocked", "true");
-      redirectUrl.searchParams.set("provider", platformKey);
-      redirectUrl.searchParams.set(
-        "message",
-        `Configuration Required: ${socialProvider.getMissingConfigMessage()}`
+      return NextResponse.redirect(
+        new URL(
+          `/settings?tab=channels&error=${encodeURIComponent(missingMsg)}`,
+          req.url
+        )
       );
-      return NextResponse.redirect(redirectUrl);
     }
 
     // Generate secure cryptographic state & PKCE codeVerifier

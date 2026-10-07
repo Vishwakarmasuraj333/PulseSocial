@@ -74,14 +74,14 @@ export class BlueskyProvider implements SocialProvider {
 
   async getAnalytics(accessToken: string, accountId: string, since: Date, until: Date): Promise<AnalyticsResult> {
     return {
-      followers: 19800,
-      impressions: 48900,
-      reach: 36200,
-      engagementCount: 7400,
-      engagementRate: 15.1,
-      clicks: 1200,
-      shares: 2100,
-      saves: 540,
+      followers: 0,
+      impressions: 0,
+      reach: 0,
+      engagementCount: 0,
+      engagementRate: 0,
+      clicks: 0,
+      shares: 0,
+      saves: 0,
       isCalculated: true,
     };
   }

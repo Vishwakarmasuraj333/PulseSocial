@@ -633,17 +633,6 @@ export default function SignupPage() {
               />
             </div>
           </div>
-
-          {/* Interactive Flip Preview Trigger Button */}
-          <button
-            type="button"
-            onClick={() => setIsCardFlipped((prev) => !prev)}
-            title="Palat kar dekhein (3D Flip Animation)"
-            className="absolute bottom-6 right-6 z-20 flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/20 hover:bg-white/30 text-white backdrop-blur-md border border-white/25 text-xs font-semibold shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer active:scale-95 group"
-          >
-            <RotateCw className="w-3.5 h-3.5 group-hover:rotate-180 transition-transform duration-500" />
-            <span>{isCardFlipped ? "Flip to Specialist" : "Flip to Login Hero"}</span>
-          </button>
         </div>
       </div>
     </>

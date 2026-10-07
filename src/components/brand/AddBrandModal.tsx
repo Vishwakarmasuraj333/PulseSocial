@@ -49,7 +49,7 @@ export function AddBrandModal({ isOpen, onClose }: AddBrandModalProps) {
     setStep("name_brand");
   };
 
-  const handleCreateBrandFinal = (e: React.FormEvent) => {
+  const handleCreateBrandFinal = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!brandName.trim()) {
       toast({
@@ -61,9 +61,8 @@ export function AddBrandModal({ isOpen, onClose }: AddBrandModalProps) {
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      const newBrand = addBrand({
+    try {
+      const newBrand = await addBrand({
         name: brandName.trim(),
         industry: "Digital Media",
         color: "#1877F2",
@@ -78,7 +77,15 @@ export function AddBrandModal({ isOpen, onClose }: AddBrandModalProps) {
       setBrandName("");
       setStep("trial_notice");
       onClose();
-    }, 1000);
+    } catch {
+      toast({
+        title: "Brand Creation Failed",
+        message: "Could not create workspace.",
+        type: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

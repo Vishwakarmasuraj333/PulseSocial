@@ -8,84 +8,76 @@ import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 
 export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("annual");
+  const [dynamicPlans, setDynamicPlans] = useState<any[]>([]);
+
+  React.useEffect(() => {
+    fetch("/api/pricing")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && Array.isArray(d.plans) && d.plans.length > 0) {
+          setDynamicPlans(d.plans);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const plans = [
     {
-      name: "Free Starter",
-      desc: "Perfect for testing multi-channel scheduling on your core brand channels.",
-      priceMonthly: "$0",
-      priceAnnual: "$0",
+      name: "Starter",
+      slug: "starter",
+      desc: "Ideal for independent creators and emerging influencers building audience momentum.",
+      priceMonthly: "$19",
+      priceAnnual: "$15",
       badge: null,
       highlight: false,
-      ctaLabel: "Start Free",
+      ctaLabel: "Start with Starter",
       ctaHref: "/signup",
       features: [
-        "3 Connected Social Channels",
-        "Up to 30 Scheduled Posts per Month",
-        "Basic Analytics (7-day history)",
-        "Single User Workspace",
-        "Community Support",
+        "Up to 5 Social Accounts",
+        "Unlimited Scheduled Posts",
+        "Standard AI Copy Generator",
+        "Basic Analytics & Reach Metrics",
+        "Unified Comment Inbox",
       ],
     },
     {
       name: "Professional",
-      desc: "Ideal for active creators and solo entrepreneurs scaling brand growth.",
-      priceMonthly: "$24",
-      priceAnnual: "$19",
+      slug: "professional",
+      desc: "Engineered for scaling creators, fast-growing brands, and dynamic marketing teams.",
+      priceMonthly: "$49",
+      priceAnnual: "$39",
       period: "per month, billed annually",
       badge: "Most Popular",
       highlight: true,
-      ctaLabel: "Start 14-Day Free Trial",
+      ctaLabel: "Start Professional",
       ctaHref: "/signup",
       features: [
-        "10 Connected Social Channels",
-        "Unlimited Scheduled Posts",
-        "30-day Analytics & CSV Export",
-        "Unified Social Inbox (Comments & DMs)",
-        "PulseAI Assistant (200 generations/mo)",
-        "2 Team Members",
-        "Priority Email Support",
+        "Up to 15 Connected Accounts",
+        "Gemini 2.5 Flash AI Assistant",
+        "Multi-Channel Simultaneous Broadcast",
+        "Advanced Analytics & PDF Reports",
+        "Team Approvals & Roles",
+        "Unified Direct Messages & Chat",
       ],
     },
     {
-      name: "Business",
-      desc: "Built for marketing agencies and fast-growing businesses managing multiple channels.",
-      priceMonthly: "$69",
-      priceAnnual: "$55",
+      name: "Agency & Enterprise",
+      slug: "agency",
+      desc: "For digital agencies and multi-brand corporate teams managing enterprise scale.",
+      priceMonthly: "$99",
+      priceAnnual: "$79",
       period: "per month, billed annually",
-      badge: "Team Choice",
+      badge: "Agency Choice",
       highlight: false,
-      ctaLabel: "Start 14-Day Free Trial",
+      ctaLabel: "Start Agency Plan",
       ctaHref: "/signup",
       features: [
-        "25 Connected Social Channels",
-        "Unlimited Scheduled Posts",
-        "90-day Analytics & Custom PDF Reports",
-        "Multi-Agent Unified Inbox & Assignments",
-        "Post Approvals & Workflow Governance",
-        "PulseAI Assistant (Unlimited generations)",
-        "5 Team Members",
-        "Dedicated Chat & Email Support",
-      ],
-    },
-    {
-      name: "Enterprise",
-      desc: "Complete governance, custom channel quotas, and dedicated engineering assistance.",
-      priceMonthly: "Custom",
-      priceAnnual: "Custom",
-      period: "tailored contract",
-      badge: null,
-      highlight: false,
-      ctaLabel: "Contact Sales",
-      ctaHref: "/contact",
-      features: [
-        "Unlimited Connected Social Channels",
-        "Unlimited Scheduled Posts & Queue Rules",
-        "Multi-Year Historical Analytics Telemetry",
-        "Custom Roles & Granular Channel Permissions",
-        "Hardware-Grade AES-256 Dedicated Key",
-        "Single Sign-On (SAML, Okta, Azure AD)",
-        "Dedicated Account Executive & SLA",
+        "Unlimited Social Channels & Brands",
+        "Dedicated IP & Custom Webhooks",
+        "Audit Logging & SSO Security",
+        "AI Prompt Enhancer & Auto-Publish",
+        "White-label Reports & Client Portals",
+        "24/7 Priority Support & SLA",
       ],
     },
   ];
@@ -159,7 +151,7 @@ export default function PricingPage() {
 
         {/* Pricing Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-          {plans.map((p) => {
+          {(dynamicPlans.length > 0 ? dynamicPlans : plans).map((p) => {
             const price = billingCycle === "annual" ? p.priceAnnual : p.priceMonthly;
             return (
               <div
@@ -199,7 +191,7 @@ export default function PricingPage() {
                   </div>
 
                   <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 mb-6">
-                    {p.features.map((f) => (
+                    {p.features.map((f: string) => (
                       <li key={f} className="flex items-start gap-2">
                         <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
                         <span className="leading-snug">{f}</span>
@@ -209,7 +201,7 @@ export default function PricingPage() {
                 </div>
 
                 <Link
-                  href={p.ctaHref}
+                  href={p.ctaHref || "/signup"}
                   className={`w-full py-2.5 text-center rounded-xl text-xs font-semibold transition active:scale-[0.98] ${
                     p.highlight
                       ? "bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20"

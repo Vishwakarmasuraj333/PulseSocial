@@ -170,6 +170,20 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   useEffect(() => {
     loadAccounts();
+
+    const handleUpdate = () => {
+      loadAccounts();
+    };
+
+    window.addEventListener("pulsesocial_active_brand_changed", handleUpdate);
+    window.addEventListener("message", (e) => {
+      if (e.data?.type === "PULSESOCIAL_CHANNEL_CONNECTED") {
+        loadAccounts();
+      }
+    });
+    return () => {
+      window.removeEventListener("pulsesocial_active_brand_changed", handleUpdate);
+    };
   }, []);
 
   // Load real activity notifications

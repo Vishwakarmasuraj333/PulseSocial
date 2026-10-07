@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { ensureBlogSeeded } from "@/lib/blog/seed";
 
 export async function GET(
   req: Request,
@@ -7,12 +8,27 @@ export async function GET(
 ) {
   try {
     const { slug } = await params;
+    const decodedSlug = decodeURIComponent(slug).toLowerCase().trim();
+
+    await ensureBlogSeeded(prisma);
 
     const p = prisma as any;
-    const post = await p.blogPost.findUnique({
-      where: { slug },
+    let post = await p.blogPost.findUnique({
+      where: { slug: decodedSlug },
       include: { category: true },
     });
+
+    if (!post) {
+      post = await p.blogPost.findFirst({
+        where: {
+          OR: [
+            { slug: { contains: decodedSlug, mode: "insensitive" } },
+            { title: { contains: decodedSlug.replace(/-/g, " "), mode: "insensitive" } },
+          ],
+        },
+        include: { category: true },
+      });
+    }
 
     if (!post) {
       return NextResponse.json({ error: "Article not found" }, { status: 404 });

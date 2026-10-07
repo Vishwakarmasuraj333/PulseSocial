@@ -128,14 +128,14 @@ export class SnapchatProvider implements SocialProvider {
 
   async getAnalytics(accessToken: string, accountId: string, since: Date, until: Date): Promise<AnalyticsResult> {
     return {
-      followers: 14500,
-      impressions: 48900,
-      reach: 34100,
-      engagementCount: 6800,
-      engagementRate: 13.9,
-      clicks: 1240,
-      shares: 3100,
-      saves: 890,
+      followers: 0,
+      impressions: 0,
+      reach: 0,
+      engagementCount: 0,
+      engagementRate: 0,
+      clicks: 0,
+      shares: 0,
+      saves: 0,
       isCalculated: true,
     };
   }

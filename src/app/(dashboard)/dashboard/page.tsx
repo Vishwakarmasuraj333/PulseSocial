@@ -111,12 +111,12 @@ export default function DashboardPage() {
         if (aData.accounts && aData.accounts.length > 0) {
           const mappedAccounts = aData.accounts.map((a: any) => {
             const matchedAnalytics = analyticsAccounts.find((acc) => acc.id === a.id);
-            const followers = a.followersCount || matchedAnalytics?.followersCount || 1280;
+            const followers = a.followersCount || matchedAnalytics?.followersCount || 0;
             const channelPostsCount = fetchedPosts.filter((p) =>
               p.targets?.some((t: any) => t.socialAccountId === a.id || t.socialAccount?.provider === a.provider)
-            ).length || a.postsCount || fetchedPosts.length;
-            const reach = matchedAnalytics?.reach || Math.round(followers * 0.48 + channelPostsCount * 340);
-            const engagements = matchedAnalytics?.engagements || Math.round(reach * 0.054 + 16);
+            ).length || a.postsCount || 0;
+            const reach = matchedAnalytics?.reach || 0;
+            const engagements = matchedAnalytics?.engagements || 0;
 
             return {
               id: a.id,
@@ -126,7 +126,7 @@ export default function DashboardPage() {
               postsCount: channelPostsCount,
               reach,
               engagements,
-              growth: "+4.8%",
+              growth: matchedAnalytics?.growthRate ? `+${matchedAnalytics.growthRate}%` : null,
               connectedAccount: {
                 id: a.id,
                 displayName: a.displayName,
@@ -346,15 +346,14 @@ export default function DashboardPage() {
                           </td>
                           <td className="py-3.5 text-right font-medium text-slate-800 dark:text-slate-200">
                             <span>{(channel.connectedAccount?.followerCount || 0).toLocaleString()}</span>
-                            <span className="text-[11px] text-emerald-600 font-semibold ml-1.5">
-                              ↑ 4.8%
-                            </span>
+                            {channel.growth && (
+                              <span className="text-[11px] text-emerald-600 font-semibold ml-1.5">
+                                ↑ {channel.growth}
+                              </span>
+                            )}
                           </td>
                           <td className="py-3.5 text-right font-medium text-slate-800 dark:text-slate-200">
-                            <span>{Math.max(12, Math.round((channel.connectedAccount?.followerCount || 1000) * 0.048))}</span>
-                            <span className="text-[11px] text-emerald-600 font-semibold ml-1.5">
-                              ↑ 5.2%
-                            </span>
+                            <span>{channel.newFollowers ?? "—"}</span>
                           </td>
                           <td className="py-3.5 text-right font-medium text-slate-800 dark:text-slate-200">
                             <span className="font-bold">{channel.postsCount || 0}</span>
@@ -363,16 +362,10 @@ export default function DashboardPage() {
                             </span>
                           </td>
                           <td className="py-3.5 text-right font-medium text-slate-800 dark:text-slate-200">
-                            <span>{(channel.reach || 0).toLocaleString()}</span>
-                            <span className="text-[11px] text-emerald-600 font-semibold ml-1.5">
-                              ↑ 8.4%
-                            </span>
+                            <span>{channel.reach > 0 ? channel.reach.toLocaleString() : "Awaiting sync"}</span>
                           </td>
                           <td className="py-3.5 text-right font-medium text-slate-800 dark:text-slate-200">
-                            <span>{(channel.engagements || 0).toLocaleString()}</span>
-                            <span className="text-[11px] text-[#6F52B5] dark:text-purple-400 font-semibold ml-1.5">
-                              ↑ 6.1%
-                            </span>
+                            <span>{channel.engagements > 0 ? channel.engagements.toLocaleString() : "Awaiting sync"}</span>
                           </td>
                         </tr>
                       ))
@@ -381,10 +374,10 @@ export default function DashboardPage() {
                         <td colSpan={6} className="py-6 text-center text-slate-500 dark:text-slate-400">
                           <div className="flex flex-col items-center justify-center gap-1.5">
                             <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                              No social channels connected yet.
+                              Awaiting live platform data
                             </span>
                             <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                              Click any network icon below to connect your real social media account.
+                              No social channels connected. Click any network icon below to authorize your account.
                             </span>
                           </div>
                         </td>

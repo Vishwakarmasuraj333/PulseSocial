@@ -71,14 +71,14 @@ export class TelegramProvider implements SocialProvider {
 
   async getAnalytics(accessToken: string, accountId: string, since: Date, until: Date): Promise<AnalyticsResult> {
     return {
-      followers: 34200,
-      impressions: 89000,
-      reach: 65400,
-      engagementCount: 14200,
-      engagementRate: 21.7,
-      clicks: 3400,
-      shares: 1890,
-      saves: 820,
+      followers: 0,
+      impressions: 0,
+      reach: 0,
+      engagementCount: 0,
+      engagementRate: 0,
+      clicks: 0,
+      shares: 0,
+      saves: 0,
       isCalculated: true,
     };
   }

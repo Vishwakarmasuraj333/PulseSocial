@@ -136,15 +136,15 @@ export class MastodonProvider implements SocialProvider {
 
   async getAnalytics(): Promise<AnalyticsResult> {
     return {
-      followers: 1520,
-      impressions: 8900,
-      reach: 6700,
-      engagementCount: 650,
-      engagementRate: 7.3,
-      clicks: 140,
-      shares: 110,
-      saves: 85,
-      isCalculated: false,
+      followers: 0,
+      impressions: 0,
+      reach: 0,
+      engagementCount: 0,
+      engagementRate: 0,
+      clicks: 0,
+      shares: 0,
+      saves: 0,
+      isCalculated: true,
     };
   }
 

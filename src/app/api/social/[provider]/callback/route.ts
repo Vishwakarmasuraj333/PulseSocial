@@ -58,7 +58,7 @@ export async function GET(
       );
     }
 
-    // REAL OAUTH FLOW:
+    // REAL OAUTH FLOW: Verify state and verifier
     const cookieStore = await cookies();
     const storedState = cookieStore.get(`oauth_state_${platformKey}`)?.value;
     const storedVerifier = cookieStore.get(`oauth_verifier_${platformKey}`)?.value;
@@ -77,20 +77,20 @@ export async function GET(
     const appUrl = host ? `${proto}://${host}` : (process.env.NEXT_PUBLIC_APP_URL || url.origin);
     const redirectUri = `${appUrl}/api/social/${platformKey}/callback`;
 
-    // 1. Exchange code for access & refresh tokens
+    // 1. Exchange authorization code for access & refresh tokens
     const tokenResult = await socialProvider.exchangeCode(code, redirectUri, storedVerifier);
 
-    // 2. Encrypt tokens at rest using hardware-grade AES-256-GCM
-    const encAccess = encryptToken(tokenResult.accessToken);
-    const encRefresh = tokenResult.refreshToken ? encryptToken(tokenResult.refreshToken) : null;
-
-    // 3. Fetch remote accounts info
+    // 2. Fetch authenticated remote accounts info
     const accounts = await socialProvider.getAccounts(tokenResult.accessToken);
     if (!accounts || accounts.length === 0) {
       throw new Error(`No accessible ${socialProvider.displayName} accounts or pages were found.`);
     }
 
     const primaryAccount = accounts[0];
+
+    // 2. Encrypt tokens at rest using AES-256-GCM
+    const encAccess = encryptToken(tokenResult.accessToken);
+    const encRefresh = tokenResult.refreshToken ? encryptToken(tokenResult.refreshToken) : null;
 
     // 4. Save SocialAccount record
     const socialAccount = await prisma.socialAccount.upsert({

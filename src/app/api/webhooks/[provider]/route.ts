@@ -79,6 +79,74 @@ export async function POST(
       },
     });
 
+    // Ingest authentic webhook events into SocialComment and SocialMessage
+    if (Array.isArray(payload.entry)) {
+      for (const entry of payload.entry) {
+        const targetAccountId = entry.id;
+        const account = await prisma.socialAccount.findFirst({
+          where: {
+            provider,
+            providerAccountId: targetAccountId,
+          },
+        });
+
+        if (account) {
+          // 1. Ingest Comments
+          if (Array.isArray(entry.changes)) {
+            for (const change of entry.changes) {
+              if (change.field === "feed" && change.value?.item === "comment") {
+                const commentId = change.value.comment_id;
+                const authorName = change.value.from?.name || "Social Follower";
+                const content = change.value.message || "";
+                if (commentId && content) {
+                  const existing = await prisma.socialComment.findFirst({
+                    where: { platformCommentId: commentId },
+                  });
+                  if (!existing) {
+                    await prisma.socialComment.create({
+                      data: {
+                        socialAccountId: account.id,
+                        platformCommentId: commentId,
+                        platformPostId: change.value.post_id || null,
+                        authorName,
+                        authorUsername: change.value.from?.id || null,
+                        content,
+                        postedAt: change.value.created_time ? new Date(change.value.created_time * 1000) : new Date(),
+                      },
+                    });
+                  }
+                }
+              }
+            }
+          }
+
+          // 2. Ingest Inbound Direct Messages
+          if (Array.isArray(entry.messaging)) {
+            for (const msg of entry.messaging) {
+              if (msg.message && msg.message.text) {
+                const mid = msg.message.mid || `${msg.sender?.id}_${msg.timestamp}`;
+                const existing = await prisma.socialMessage.findFirst({
+                  where: { platformMessageId: mid },
+                });
+                if (!existing) {
+                  await prisma.socialMessage.create({
+                    data: {
+                      socialAccountId: account.id,
+                      platformMessageId: mid,
+                      senderName: msg.sender?.name || `Customer ${msg.sender?.id?.substring(0, 6) || ""}`,
+                      senderUsername: msg.sender?.id || null,
+                      content: msg.message.text,
+                      sentAt: msg.timestamp ? new Date(msg.timestamp) : new Date(),
+                    },
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
     return NextResponse.json({ success: true, eventId });
   } catch (error: unknown) {
     console.error("Webhook processing error:", error);

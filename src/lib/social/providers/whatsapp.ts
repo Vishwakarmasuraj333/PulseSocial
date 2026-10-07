@@ -100,14 +100,14 @@ export class WhatsAppProvider implements SocialProvider {
 
   async getAnalytics(accessToken: string, accountId: string, since: Date, until: Date): Promise<AnalyticsResult> {
     return {
-      followers: 8900,
-      impressions: 42100,
-      reach: 38200,
-      engagementCount: 18400,
-      engagementRate: 48.2,
-      clicks: 4120,
-      shares: 980,
-      saves: 340,
+      followers: 0,
+      impressions: 0,
+      reach: 0,
+      engagementCount: 0,
+      engagementRate: 0,
+      clicks: 0,
+      shares: 0,
+      saves: 0,
       isCalculated: true,
     };
   }

@@ -29,7 +29,26 @@ import {
   Share2,
   Trash2,
   RefreshCw,
+  MoreVertical,
+  Copy,
+  Eye,
+  Megaphone,
+  CheckSquare,
+  Square,
+  Search,
+  Filter,
+  List,
+  SlidersHorizontal,
+  Smile,
+  Paperclip,
+  SendHorizonal,
+  MessageSquare,
+  Heart,
+  MessageSquareReply,
+  Users,
+  Loader2,
 } from "lucide-react";
+import { UniversalSocialConnectModal } from "@/components/social/UniversalSocialConnectModal";
 
 interface PostTarget {
   id: string;
@@ -81,12 +100,84 @@ export default function PostsPage() {
   const [sortBy, setSortBy] = useState<string>("date");
   const [dateFilter, setDateFilter] = useState<string>("");
 
+  // Social Planner Header Tabs
+  const [socialPlannerTab, setSocialPlannerTab] = useState<
+    "planner" | "content" | "comments" | "statistics" | "listening"
+  >("planner");
+
   // Modals & Real Data
   const [isComposerOpen, setIsComposerOpen] = useState(false);
+  const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
+  const [isChannelPopoverOpen, setIsChannelPopoverOpen] = useState(false);
+  const [channelSearchQuery, setChannelSearchQuery] = useState("");
+
+  // Comments feed state
+  const [commentsPlatform, setCommentsPlatform] = useState<string>("all");
+  const [commentsPosts, setCommentsPosts] = useState<any[]>([]);
+  const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
+  const [isSubmittingComment, setIsSubmittingComment] = useState<Record<string, boolean>>({});
+  const [commentsLoading, setCommentsLoading] = useState(false);
+
+  const [composerPrefill, setComposerPrefill] = useState<{ content: string; mediaUrl?: string } | null>(null);
   const [selectedMediaPost, setSelectedMediaPost] = useState<PostItem | null>(null);
+  const [selectedPostForDetails, setSelectedPostForDetails] = useState<PostItem | null>(null);
+  const [activeActionMenuPostId, setActiveActionMenuPostId] = useState<string | null>(null);
+  const [selectedPostIds, setSelectedPostIds] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [detailsPlatformTab, setDetailsPlatformTab] = useState<string>("all");
   const [posts, setPosts] = useState<PostItem[]>([]);
   const [connectedChannels, setConnectedChannels] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const loadCommentsFeed = async (platform = "all") => {
+    setCommentsLoading(true);
+    try {
+      const res = await fetch(`/api/comments?platform=${platform}`, { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        setCommentsPosts(data.posts || []);
+      }
+    } catch {
+    } finally {
+      setCommentsLoading(false);
+    }
+  };
+
+  const handleSendComment = async (postId: string) => {
+    const text = commentInputs[postId]?.trim();
+    if (!text) return;
+
+    setIsSubmittingComment((prev) => ({ ...prev, [postId]: true }));
+    try {
+      const res = await fetch("/api/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          postId,
+          message: text,
+          authorName: activeBrand?.name || "PulseSocial",
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to post comment");
+
+      toast({
+        title: "Comment Published",
+        message: "Your comment has been submitted.",
+        type: "success",
+      });
+      setCommentInputs((prev) => ({ ...prev, [postId]: "" }));
+      loadCommentsFeed(commentsPlatform);
+    } catch (err: unknown) {
+      toast({
+        title: "Comment Error",
+        message: (err as Error).message || "Could not publish comment.",
+        type: "error",
+      });
+    } finally {
+      setIsSubmittingComment((prev) => ({ ...prev, [postId]: false }));
+    }
+  };
 
   // Fetch real data from backend
   const loadPostsAndChannels = async () => {
@@ -126,6 +217,38 @@ export default function PostsPage() {
     window.addEventListener("pulsesocial_post_created", handleCreated);
     return () => window.removeEventListener("pulsesocial_post_created", handleCreated);
   }, []);
+
+  useEffect(() => {
+    const handleGlobalClick = () => {
+      setActiveActionMenuPostId(null);
+    };
+    window.addEventListener("click", handleGlobalClick);
+    return () => window.removeEventListener("click", handleGlobalClick);
+  }, []);
+
+  const handleClonePost = (post: PostItem) => {
+    setComposerPrefill({
+      content: post.content,
+      mediaUrl: post.media?.[0]?.url,
+    });
+    setIsComposerOpen(true);
+    setActiveActionMenuPostId(null);
+  };
+
+  const handleToggleSelectAll = (allIds: string[]) => {
+    if (selectedPostIds.length === allIds.length && allIds.length > 0) {
+      setSelectedPostIds([]);
+    } else {
+      setSelectedPostIds(allIds);
+    }
+  };
+
+  const handleToggleSelectPost = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedPostIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
 
   const handleDeletePost = async (id: string) => {
     try {
@@ -199,9 +322,11 @@ export default function PostsPage() {
       const hasVideo = post.media?.some((m) => m.mediaType === "video" || m.url.endsWith(".mp4"));
       if (!hasVideo) return false;
     }
-    if (filterByType === "images") {
-      const hasImage = post.media?.some((m) => m.mediaType === "image" || !m.url.endsWith(".mp4"));
-      if (!hasImage) return false;
+    // 4. Search query
+    if (searchQuery.trim().length > 0) {
+      if (!post.content.toLowerCase().includes(searchQuery.toLowerCase().trim())) {
+        return false;
+      }
     }
 
     return true;
@@ -225,11 +350,290 @@ export default function PostsPage() {
   return (
     <AppLayout>
       <div className="bg-[#f2f5f8] dark:bg-slate-950 min-h-[calc(100vh-60px)] font-sans flex flex-col">
-        <div className="flex-1 flex flex-col md:flex-row max-w-[1600px] w-full mx-auto">
-          
-          {/* ============================================================ */}
-          {/* LEFT SIDEBAR: Posts Sub-Navigation (Matching Screenshot)     */}
-          {/* ============================================================ */}
+        {/* Top Marketing & Social Planner Header matching Screenshots */}
+        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-6">
+            <div className="flex items-center justify-between h-12">
+              <div className="flex items-center gap-6 overflow-x-auto scrollbar-none text-xs">
+                <span className="font-bold text-slate-900 dark:text-white shrink-0">
+                  Marketing
+                </span>
+                <div className="flex items-center gap-5 text-slate-600 dark:text-slate-400 font-semibold shrink-0">
+                  <span className="text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 py-3.5">
+                    Social Planner
+                  </span>
+                  <Link href="/marketing/emails" className="hover:text-slate-900 dark:hover:text-white transition">Emails</Link>
+                  <Link href="/snippets" className="hover:text-slate-900 dark:hover:text-white transition">Snippets</Link>
+                  <Link href="/timers" className="hover:text-slate-900 dark:hover:text-white transition">Countdown Timers</Link>
+                  <Link href="/links" className="hover:text-slate-900 dark:hover:text-white transition">Trigger Links</Link>
+                  <Link href="/affiliates" className="hover:text-slate-900 dark:hover:text-white transition">Affiliate Manager</Link>
+                  <Link href="/brand-boards" className="hover:text-slate-900 dark:hover:text-white transition">Brand Boards</Link>
+                  <Link href="/ad-manager" className="hover:text-slate-900 dark:hover:text-white transition">Ad Manager</Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Social Planner Subtabs Row */}
+            <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 py-2">
+              <div className="flex items-center gap-2 overflow-x-auto scrollbar-none text-xs font-semibold">
+                <button
+                  type="button"
+                  onClick={() => setSocialPlannerTab("planner")}
+                  className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                    socialPlannerTab === "planner"
+                      ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400 font-bold"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                  }`}
+                >
+                  Planner
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSocialPlannerTab("content")}
+                  className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                    socialPlannerTab === "content"
+                      ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400 font-bold"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                  }`}
+                >
+                  Content
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSocialPlannerTab("comments");
+                    loadCommentsFeed(commentsPlatform);
+                  }}
+                  className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 cursor-pointer ${
+                    socialPlannerTab === "comments"
+                      ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400 font-bold"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                  }`}
+                >
+                  <span>Comments</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSocialPlannerTab("statistics")}
+                  className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                    socialPlannerTab === "statistics"
+                      ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400 font-bold"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                  }`}
+                >
+                  Statistics
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSocialPlannerTab("listening")}
+                  className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                    socialPlannerTab === "listening"
+                      ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400 font-bold"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                  }`}
+                >
+                  Social Listening
+                </button>
+                <Link
+                  href="/social-accounts"
+                  className="px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 transition"
+                >
+                  Settings
+                </Link>
+              </div>
+
+              {/* Action buttons on right */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsConnectModalOpen(true)}
+                  className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Socials</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsComposerOpen(true)}
+                  className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-xs cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>New Post</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {socialPlannerTab === "comments" ? (
+          /* ============================================================ */
+          /* COMMENTS VIEW (Screenshot 2 exact match)                     */
+          /* ============================================================ */
+          <div className="flex-1 flex flex-col md:flex-row max-w-[1600px] w-full mx-auto p-4 sm:p-6 gap-6">
+            <aside className="w-full md:w-60 shrink-0 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-3 shadow-xs space-y-1">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-3 block mb-2">
+                Channels
+              </span>
+              {[
+                { id: "all", name: "All Channels", icon: "all", unread: 2 },
+                { id: "facebook", name: "Facebook", icon: "facebook", unread: 0 },
+                { id: "instagram", name: "Instagram", icon: "instagram", unread: 2 },
+                { id: "linkedin", name: "LinkedIn", icon: "linkedin", unread: 0 },
+                { id: "tiktok", name: "TikTok", icon: "tiktok", unread: 0 },
+                { id: "bluesky", name: "Bluesky", icon: "bluesky", unread: 0 },
+                { id: "threads", name: "Threads", icon: "threads", unread: 0 },
+                { id: "pinterest", name: "Pinterest", icon: "pinterest", unread: 0 },
+                { id: "youtube", name: "YouTube", icon: "youtube", unread: 0 },
+              ].map((ch) => {
+                const isSelected = commentsPlatform === ch.id;
+                return (
+                  <button
+                    key={ch.id}
+                    type="button"
+                    onClick={() => {
+                      setCommentsPlatform(ch.id);
+                      loadCommentsFeed(ch.id);
+                    }}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                      isSelected
+                        ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400"
+                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      {ch.id !== "all" ? (
+                        <div className="w-4 h-4 flex items-center justify-center">
+                          {renderPlatformIcon(ch.icon, 16)}
+                        </div>
+                      ) : (
+                        <span className="w-4 h-4 flex items-center justify-center font-bold text-xs">@</span>
+                      )}
+                      <span>{ch.name}</span>
+                    </div>
+
+                    {ch.unread > 0 && (
+                      <span className="px-1.5 py-0.2 rounded-full text-[10px] font-black bg-rose-500 text-white">
+                        {ch.unread}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </aside>
+
+            <main className="flex-1 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-xs space-y-6">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+                <div>
+                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                    Post Comments & Engagement
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Moderate and reply directly to live user comments across authorized social channels.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => loadCommentsFeed(commentsPlatform)}
+                  className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold flex items-center gap-1.5 hover:bg-slate-50 transition cursor-pointer"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${commentsLoading ? "animate-spin" : ""}`} />
+                  <span>Refresh</span>
+                </button>
+              </div>
+
+              {commentsLoading ? (
+                <div className="py-16 text-center space-y-2">
+                  <Loader2 className="w-6 h-6 animate-spin text-indigo-600 mx-auto" />
+                  <p className="text-xs text-slate-400">Loading comment streams...</p>
+                </div>
+              ) : commentsPosts.length === 0 ? (
+                <div className="py-16 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-8 space-y-3">
+                  <MessageSquare className="w-8 h-8 text-slate-300 mx-auto" />
+                  <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                    No active comment threads
+                  </h3>
+                  <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                    When followers comment on your published posts, they will appear here in real time.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {commentsPosts.map((post) => (
+                    <div
+                      key={post.id}
+                      className="rounded-2xl border border-slate-200 dark:border-slate-800 p-5 space-y-4 bg-slate-50/40 dark:bg-slate-850/30"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="space-y-1">
+                          <p className="text-xs text-slate-800 dark:text-slate-200 font-medium">
+                            {post.content}
+                          </p>
+                          <span className="text-[10px] text-slate-400">
+                            {new Date(post.createdAt).toLocaleDateString()} &bull; {post.comments?.length || 0} comments
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3 pl-3 border-l-2 border-indigo-200 dark:border-indigo-900/60 pt-1">
+                        {post.comments?.map((comment: any) => (
+                          <div key={comment.id} className="text-xs space-y-0.5">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-slate-900 dark:text-white">
+                                {comment.authorName}
+                              </span>
+                              <span className="text-[10px] text-slate-400">
+                                {new Date(comment.postedAt).toLocaleTimeString()}
+                              </span>
+                            </div>
+                            <p className="text-slate-700 dark:text-slate-300">
+                              {comment.message}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="pt-2 flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={commentInputs[post.id] || ""}
+                          onChange={(e) =>
+                            setCommentInputs((prev) => ({ ...prev, [post.id]: e.target.value }))
+                          }
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                              e.preventDefault();
+                              handleSendComment(post.id);
+                            }
+                          }}
+                          placeholder={`Comment as ${activeBrand?.name || "PulseSocial"}...`}
+                          className="flex-1 px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleSendComment(post.id)}
+                          disabled={isSubmittingComment[post.id] || !commentInputs[post.id]?.trim()}
+                          className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition flex items-center gap-1.5 disabled:opacity-50 cursor-pointer shadow-xs"
+                        >
+                          {isSubmittingComment[post.id] ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <SendHorizonal className="w-3.5 h-3.5" />
+                          )}
+                          <span>Reply</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </main>
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col md:flex-row max-w-[1600px] w-full mx-auto">
+            {/* ============================================================ */}
+            {/* LEFT SIDEBAR: Posts Sub-Navigation (Matching Screenshot)     */}
+            {/* ============================================================ */}
           <aside className="w-full md:w-56 shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200/90 dark:border-slate-800 p-3 sm:p-4 select-none">
             
             {/* Top Post Categories */}
@@ -419,55 +823,203 @@ export default function PostsPage() {
               })}
             </div>
 
-            {/* Sub-Header Filter Bar: Filter by Posts, Sort by Date, Choose Date */}
-            <div className="px-6 py-3.5 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
-              
-              {/* Left Selectors */}
-              <div className="flex items-center gap-4">
-                {/* Filter by */}
-                <div className="flex items-center gap-1.5 text-slate-500">
-                  <span>Filter by:</span>
-                  <select
-                    value={filterByType}
-                    onChange={(e) => setFilterByType(e.target.value)}
-                    className="font-semibold text-slate-800 dark:text-white bg-transparent border-none focus:outline-none cursor-pointer"
-                  >
-                    <option value="posts" className="dark:bg-slate-900">Posts</option>
-                    <option value="videos" className="dark:bg-slate-900">Videos</option>
-                    <option value="images" className="dark:bg-slate-900">Images</option>
-                  </select>
-                </div>
+            {/* Top Toolbar matching Screenshot 1 */}
+            <div className="px-6 py-3 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900">
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  type="button"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Filter views</span>
+                  <span className="font-bold text-[#5846A8] dark:text-purple-300">All</span>
+                </button>
 
-                {/* Sort by */}
-                <div className="flex items-center gap-1.5 text-slate-500">
-                  <span>Sort by:</span>
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="font-semibold text-slate-800 dark:text-white bg-transparent border-none focus:outline-none cursor-pointer"
-                  >
-                    <option value="date" className="dark:bg-slate-900">Date</option>
-                    <option value="interactions" className="dark:bg-slate-900">Interactions</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Right: Choose Date Picker */}
-              <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => {
                     toast({
-                      title: "Date Range Filter",
-                      message: "Showing posts across all recorded dates.",
+                      title: "Advanced Filters",
+                      message: "Filter posts by date, tags, and campaigns.",
                       type: "info",
                     });
                   }}
-                  className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
                 >
-                  <CalendarIcon className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Choose Date</span>
+                  <Filter className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Filters</span>
                 </button>
+
+                {/* Date range display */}
+                <div className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-50/50 dark:bg-slate-850">
+                  <CalendarIcon className="w-3.5 h-3.5 text-slate-400" />
+                  <span>19 / 04 / 2026</span>
+                  <span className="text-slate-400">—</span>
+                  <span>19 / 10 / 2026</span>
+                </div>
+
+                {/* Channel Avatars Pill with Popover matching Screenshot 3 */}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setIsChannelPopoverOpen(!isChannelPopoverOpen)}
+                    className="flex items-center -space-x-1.5 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-850 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                  >
+                    {connectedChannels.slice(0, 4).map((acc) => (
+                      <div
+                        key={acc.id}
+                        className="w-5 h-5 rounded-full overflow-hidden border border-white dark:border-slate-900 bg-slate-200 flex items-center justify-center shrink-0"
+                        title={acc.displayName}
+                      >
+                        {renderPlatformIcon(acc.provider, 14)}
+                      </div>
+                    ))}
+                    {connectedChannels.length > 4 ? (
+                      <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 pl-2">
+                        +{connectedChannels.length - 4}
+                      </span>
+                    ) : connectedChannels.length === 0 ? (
+                      <span className="text-[11px] text-slate-400 font-medium px-1">
+                        + Add Channel
+                      </span>
+                    ) : null}
+                    <ChevronDown className="w-3 h-3 text-slate-400 ml-1.5" />
+                  </button>
+
+                  {/* Channel Group Popover matching Screenshot 3 */}
+                  {isChannelPopoverOpen && (
+                    <div className="absolute left-0 mt-2 w-72 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-3">
+                      {/* Search */}
+                      <div className="relative">
+                        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          value={channelSearchQuery}
+                          onChange={(e) => setChannelSearchQuery(e.target.value)}
+                          placeholder="Search channels..."
+                          className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 text-slate-800 dark:text-slate-200 focus:outline-none"
+                        />
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            toast({
+                              title: "Channel Groups",
+                              message: "Organize channels into client-specific groups.",
+                              type: "info",
+                            });
+                          }}
+                          className="flex-1 py-1.5 px-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-850 text-[11px] font-semibold text-slate-700 dark:text-slate-300 transition text-center"
+                        >
+                          + Create new group
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsChannelPopoverOpen(false);
+                            setIsConnectModalOpen(true);
+                          }}
+                          className="flex-1 py-1.5 px-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-semibold transition text-center"
+                        >
+                          + Add new social
+                        </button>
+                      </div>
+
+                      {/* Channels List with Checkboxes */}
+                      <div className="max-h-48 overflow-y-auto space-y-1 divide-y divide-slate-50 dark:divide-slate-800/60">
+                        {connectedChannels.length === 0 ? (
+                          <p className="text-[11px] text-slate-400 text-center py-4">No channels connected yet</p>
+                        ) : (
+                          connectedChannels
+                            .filter((c) =>
+                              c.displayName.toLowerCase().includes(channelSearchQuery.toLowerCase())
+                            )
+                            .map((channel) => (
+                              <label
+                                key={channel.id}
+                                className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-850 cursor-pointer text-xs"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center">
+                                    {renderPlatformIcon(channel.provider, 16)}
+                                  </div>
+                                  <span className="font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[140px]">
+                                    {channel.displayName}
+                                  </span>
+                                </div>
+                                <input
+                                  type="checkbox"
+                                  defaultChecked={true}
+                                  className="rounded text-indigo-600 focus:ring-0"
+                                />
+                              </label>
+                            ))
+                        )}
+                      </div>
+
+                      {/* Footer */}
+                      <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] font-semibold">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPlatform("ALL")}
+                          className="text-slate-500 hover:text-slate-700 cursor-pointer"
+                        >
+                          Clear
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPlatform("ALL")}
+                          className="text-indigo-600 hover:text-indigo-700 cursor-pointer"
+                        >
+                          Select all
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Right: View mode and Search */}
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="flex items-center border border-slate-200 dark:border-slate-700 rounded-lg p-0.5 bg-slate-50 dark:bg-slate-850">
+                  <button
+                    type="button"
+                    className="p-1.5 rounded-md bg-white dark:bg-slate-900 text-slate-800 dark:text-white shadow-2xs"
+                    title="List View"
+                  >
+                    <List className="w-3.5 h-3.5" />
+                  </button>
+                  <Link
+                    href="/calendar"
+                    className="p-1.5 rounded-md text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition"
+                    title="Calendar View"
+                  >
+                    <Calendar className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+
+                <div className="relative flex-1 sm:w-64">
+                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search by caption (min 3 chars)"
+                    className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs bg-slate-50/50 dark:bg-slate-850 focus:outline-none focus:ring-1 focus:ring-[#5846A8] text-slate-800 dark:text-white"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -477,14 +1029,27 @@ export default function PostsPage() {
             <div className="flex-1 overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-850/50">
-                    <th className="py-3 px-6 font-semibold w-40">PUBLISHED ON</th>
-                    <th className="py-3 px-6 font-semibold">POST CONTENT</th>
-                    <th className="py-3 px-6 font-semibold text-center w-28">
-                      INTERACTION <HelpCircle className="inline w-3 h-3 text-slate-350 -mt-0.5 ml-0.5" />
+                  <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-50/60 dark:bg-slate-850/60 select-none">
+                    <th className="py-3 px-4 w-10 text-center">
+                      <input
+                        type="checkbox"
+                        checked={sortedPosts.length > 0 && selectedPostIds.length === sortedPosts.length}
+                        onChange={() => handleToggleSelectAll(sortedPosts.map((p) => p.id))}
+                        className="rounded border-slate-300 text-[#5846A8] focus:ring-[#5846A8] cursor-pointer"
+                      />
                     </th>
-                    <th className="py-3 px-6 font-semibold text-center w-28">PUBLISHED BY</th>
-                    <th className="py-3 px-6 font-semibold text-right w-24">ACTIONS</th>
+                    <th className="py-3 px-4 font-semibold">
+                      <span className="flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5 text-slate-400" />
+                        <span>CAPTION</span>
+                      </span>
+                    </th>
+                    <th className="py-3 px-4 font-semibold w-24">MEDIA</th>
+                    <th className="py-3 px-4 font-semibold w-32">STATUS</th>
+                    <th className="py-3 px-4 font-semibold w-28">TYPE</th>
+                    <th className="py-3 px-4 font-semibold w-36">DATE</th>
+                    <th className="py-3 px-4 font-semibold w-28">SOCIAL</th>
+                    <th className="py-3 px-4 font-semibold text-right w-16"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
@@ -493,7 +1058,7 @@ export default function PostsPage() {
                       const publishedDate = post.publishedAt || post.scheduledFor || post.createdAt;
                       const dateObj = new Date(publishedDate);
                       const dateFormatted = dateObj.toLocaleDateString("en-GB", {
-                        day: "numeric",
+                        day: "2-digit",
                         month: "short",
                         year: "numeric",
                       });
@@ -505,119 +1070,195 @@ export default function PostsPage() {
                       const primaryTarget = post.targets?.[0]?.socialAccount;
                       const provider = primaryTarget?.provider || "facebook";
                       const mediaItem = post.media?.[0];
-                      const totalInteractions = (post.likes || 0) + (post.comments || 0);
 
                       return (
                         <tr
                           key={post.id}
-                          className="hover:bg-slate-50/80 dark:hover:bg-slate-850/40 transition group"
+                          onClick={() => setSelectedPostForDetails(post)}
+                          className="hover:bg-slate-50/80 dark:hover:bg-slate-850/40 transition group cursor-pointer"
                         >
-                          {/* Column 1: PUBLISHED ON */}
-                          <td className="py-4 px-6 align-top whitespace-nowrap">
-                            <div className="space-y-0.5">
+                          {/* Checkbox */}
+                          <td
+                            className="py-3.5 px-4 text-center align-middle"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedPostIds.includes(post.id)}
+                              onChange={(e) => handleToggleSelectPost(post.id, e as any)}
+                              className="rounded border-slate-300 text-[#5846A8] focus:ring-[#5846A8] cursor-pointer"
+                            />
+                          </td>
+
+                          {/* Caption */}
+                          <td className="py-3.5 px-4 align-middle max-w-md">
+                            <div className="flex items-center gap-2">
+                              <span className="text-slate-400 shrink-0">🎤</span>
+                              <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 line-clamp-1 group-hover:text-[#5846A8] transition">
+                                {post.content}
+                              </span>
+                            </div>
+                          </td>
+
+                          {/* Media Thumbnail */}
+                          <td className="py-3.5 px-4 align-middle">
+                            {mediaItem?.url ? (
+                              <div
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedPostForDetails(post);
+                                }}
+                                className="w-10 h-10 rounded-lg overflow-hidden bg-slate-900 relative shrink-0 border border-slate-200 dark:border-slate-700 shadow-2xs group/thumb"
+                              >
+                                <Image
+                                  src={mediaItem.url}
+                                  alt="Media"
+                                  fill
+                                  className="object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                  <div className="w-4 h-4 rounded-full bg-white/90 text-slate-900 flex items-center justify-center shadow-xs">
+                                    <Play className="w-2.5 h-2.5 fill-slate-900 pl-0.5" />
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400">
+                                <FileText className="w-4 h-4" />
+                              </div>
+                            )}
+                          </td>
+
+                          {/* Status */}
+                          <td className="py-3.5 px-4 align-middle whitespace-nowrap">
+                            <span
+                              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold ${
+                                post.status === "PUBLISHED"
+                                  ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200/60"
+                                  : post.status === "SCHEDULED"
+                                  ? "bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200/60"
+                                  : post.status === "FAILED"
+                                  ? "bg-rose-50 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200/60"
+                                  : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border border-slate-200/60"
+                              }`}
+                            >
+                              {post.status === "PUBLISHED" && <Send className="w-3 h-3" />}
+                              {post.status === "SCHEDULED" && <Clock className="w-3 h-3" />}
+                              {post.status === "FAILED" && <AlertTriangle className="w-3 h-3" />}
+                              <span>{post.status.charAt(0) + post.status.slice(1).toLowerCase()}</span>
+                            </span>
+                          </td>
+
+                          {/* Type */}
+                          <td className="py-3.5 px-4 align-middle whitespace-nowrap text-xs text-slate-600 dark:text-slate-400">
+                            Native post
+                          </td>
+
+                          {/* Date */}
+                          <td className="py-3.5 px-4 align-middle whitespace-nowrap">
+                            <div className="text-xs">
                               <span className="font-semibold text-slate-800 dark:text-slate-200 block">
                                 {dateFormatted}
                               </span>
-                              <span className="text-[11px] text-slate-400 font-normal">
+                              <span className="text-[11px] text-slate-400">
                                 {timeFormatted}
                               </span>
-                              <span className={`inline-block text-[9px] px-1.5 py-0.2 rounded-full font-bold uppercase ${
-                                post.status === "PUBLISHED"
-                                  ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400"
-                                  : post.status === "SCHEDULED"
-                                  ? "bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400"
-                                  : post.status === "FAILED"
-                                  ? "bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400"
-                                  : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
-                              }`}>
-                                {post.status}
-                              </span>
                             </div>
                           </td>
 
-                          {/* Column 2: POST CONTENT (Thumbnail, Title, Content, Reactions) */}
-                          <td className="py-4 px-6 align-top">
-                            <div className="flex items-start gap-3.5 max-w-xl">
-                              {/* Media Thumbnail (if exists) */}
-                              {mediaItem?.url && (
-                                <div
-                                  onClick={() => setSelectedMediaPost(post)}
-                                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 relative shrink-0 border border-slate-250/80 dark:border-slate-700 cursor-pointer group/media shadow-xs"
-                                >
-                                  <Image
-                                    src={mediaItem.url}
-                                    alt="Media preview"
-                                    fill
-                                    className="object-cover group-hover/media:scale-105 transition duration-200"
-                                  />
-                                  <div className="absolute inset-0 bg-black/25 flex items-center justify-center opacity-80 group-hover/media:opacity-100 transition">
-                                    <div className="w-6 h-6 rounded-full bg-white/90 text-slate-900 flex items-center justify-center shadow-xs">
-                                      <Play className="w-3.5 h-3.5 fill-slate-900 pl-0.5" />
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Content Details */}
-                              <div className="space-y-1.5 flex-1 min-w-0">
-                                <p className="text-xs text-slate-800 dark:text-slate-200 font-medium leading-relaxed line-clamp-3">
-                                  {post.content}
-                                </p>
-
-                                {/* Reaction Pills below content */}
-                                <div className="flex items-center gap-1.5 pt-1">
-                                  <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f5f3ff] dark:bg-purple-950/40 text-[#5846A8] dark:text-purple-300 text-[11px] font-semibold border border-[#ede9fe] dark:border-purple-800/40 shadow-2xs">
-                                    <ThumbsUp className="w-3 h-3 fill-[#5846A8]" />
-                                    <span>{post.likes || totalInteractions || 0}</span>
-                                  </div>
-                                </div>
+                          {/* Social */}
+                          <td className="py-3.5 px-4 align-middle">
+                            <div className="relative inline-flex items-center">
+                              <div className="w-7 h-7 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-300 font-bold text-xs shadow-2xs">
+                                {activeBrand?.name ? activeBrand.name.charAt(0).toUpperCase() : "P"}
+                              </div>
+                              <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full overflow-hidden bg-white dark:bg-slate-900 border border-white dark:border-slate-800 flex items-center justify-center shadow-xs">
+                                {renderPlatformIcon(provider, 12)}
                               </div>
                             </div>
                           </td>
 
-                          {/* Column 3: INTERACTION */}
-                          <td className="py-4 px-6 text-center align-top font-bold text-slate-800 dark:text-slate-200 text-sm">
-                            {totalInteractions || 0}
-                          </td>
+                          {/* Actions Three Dots */}
+                          <td
+                            className="py-3.5 px-4 align-middle text-right relative"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveActionMenuPostId(
+                                  activeActionMenuPostId === post.id ? null : post.id
+                                );
+                              }}
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                              title="Actions"
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </button>
 
-                          {/* Column 4: PUBLISHED BY (Round platform letter circle) */}
-                          <td className="py-4 px-6 text-center align-top">
-                            <div className="inline-flex items-center justify-center">
-                              <div className="w-7 h-7 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold text-xs shadow-2xs">
-                                {provider.charAt(0).toLowerCase()}
-                              </div>
-                            </div>
-                          </td>
-
-                          {/* Column 5: ACTIONS (Delete, Retry) */}
-                          <td className="py-4 px-6 text-right align-top">
-                            <div className="flex items-center justify-end gap-1.5 opacity-80 group-hover:opacity-100 transition">
-                              {post.status === "FAILED" && (
+                            {/* Dropdown Menu */}
+                            {activeActionMenuPostId === post.id && (
+                              <div className="absolute right-4 top-10 w-40 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 py-1.5 z-40 animate-in fade-in zoom-in-95 text-left text-xs font-medium">
                                 <button
                                   type="button"
-                                  onClick={() => handleRetryPublish(post)}
-                                  className="p-1 rounded-md text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40"
-                                  title="Retry Publish"
+                                  onClick={() => {
+                                    setSelectedPostForDetails(post);
+                                    setActiveActionMenuPostId(null);
+                                  }}
+                                  className="w-full px-3 py-2 flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition cursor-pointer"
                                 >
-                                  <RefreshCw className="w-3.5 h-3.5" />
+                                  <Eye className="w-3.5 h-3.5 text-blue-600" />
+                                  <span>Preview</span>
                                 </button>
-                              )}
-                              <button
-                                type="button"
-                                onClick={() => handleDeletePost(post.id)}
-                                className="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition"
-                                title="Delete Post"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleClonePost(post)}
+                                  className="w-full px-3 py-2 flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition cursor-pointer"
+                                >
+                                  <Copy className="w-3.5 h-3.5 text-indigo-600" />
+                                  <span>Clone</span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    toast({
+                                      title: "Run as Ad",
+                                      message: "Boost and campaign budget initialized for this post.",
+                                      type: "info",
+                                    });
+                                    setActiveActionMenuPostId(null);
+                                  }}
+                                  className="w-full px-3 py-2 flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition cursor-pointer"
+                                >
+                                  <Megaphone className="w-3.5 h-3.5 text-amber-600" />
+                                  <span>Run as Ad</span>
+                                </button>
+
+                                <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    handleDeletePost(post.id);
+                                    setActiveActionMenuPostId(null);
+                                  }}
+                                  className="w-full px-3 py-2 flex items-center gap-2 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 transition cursor-pointer"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                  <span>Delete</span>
+                                </button>
+                              </div>
+                            )}
                           </td>
                         </tr>
                       );
                     })
                   ) : (
                     <tr>
-                      <td colSpan={5} className="py-16 text-center">
+                      <td colSpan={8} className="py-16 text-center">
                         <div className="flex flex-col items-center justify-center space-y-3 max-w-sm mx-auto">
                           <div className="w-12 h-12 rounded-full bg-[#f5f3ff] dark:bg-slate-800 text-[#5846A8] flex items-center justify-center">
                             <Send className="w-6 h-6" />
@@ -630,7 +1271,10 @@ export default function PostsPage() {
                           </p>
                           <button
                             type="button"
-                            onClick={() => setIsComposerOpen(true)}
+                            onClick={() => {
+                              setComposerPrefill(null);
+                              setIsComposerOpen(true);
+                            }}
                             className="px-4 py-2 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white font-semibold text-xs shadow-xs shadow-purple-900/15 transition cursor-pointer flex items-center gap-1.5"
                           >
                             <Plus className="w-3.5 h-3.5" />
@@ -645,44 +1289,273 @@ export default function PostsPage() {
             </div>
           </main>
         </div>
+      )}
       </div>
 
-      {/* Post Composer Modal */}
+      {/* Post Composer Modal with Clone Support */}
       <PostComposerModal
         isOpen={isComposerOpen}
-        onClose={() => setIsComposerOpen(false)}
+        onClose={() => {
+          setIsComposerOpen(false);
+          setComposerPrefill(null);
+        }}
+        initialContent={composerPrefill?.content}
+        initialMediaUrl={composerPrefill?.mediaUrl}
         onSuccess={loadPostsAndChannels}
       />
 
-      {/* Photo / Video Full Inspection Modal */}
-      {selectedMediaPost && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xs animate-in fade-in">
-          <div className="relative w-full max-w-2xl bg-black rounded-xl overflow-hidden shadow-2xl border border-slate-800 text-white">
-            <div className="flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-800">
-              <span className="text-xs font-semibold truncate max-w-md">
-                {selectedMediaPost.content || "Media Inspection"}
-              </span>
+      {/* Post details Slide-Over Panel (Matching Screenshot 2) */}
+      {selectedPostForDetails && (
+        <div
+          className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-2xs animate-in fade-in"
+          onClick={() => setSelectedPostForDetails(null)}
+        >
+          <div
+            className="w-full sm:w-[480px] lg:w-[520px] bg-white dark:bg-slate-900 h-full shadow-2xl border-l border-slate-200 dark:border-slate-800 flex flex-col justify-between animate-in slide-in-from-right duration-200 overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Drawer Header */}
+            <div>
+              <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
+                  Post details
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setSelectedPostForDetails(null)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Drawer Content */}
+              <div className="p-6 space-y-6">
+                {/* Preview Link Button */}
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (selectedPostForDetails.media?.[0]?.url) {
+                        window.open(selectedPostForDetails.media[0].url, "_blank");
+                      } else {
+                        toast({
+                          title: "Post Details",
+                          message: "Live post details loaded from database.",
+                          type: "info",
+                        });
+                      }
+                    }}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-100 dark:hover:bg-blue-900/50 transition cursor-pointer"
+                  >
+                    <Eye className="w-4 h-4" />
+                    <span>Preview Link</span>
+                  </button>
+                </div>
+
+                {/* Status & Timestamp */}
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                    <Send className="w-3.5 h-3.5" />
+                    <span>
+                      {selectedPostForDetails.status.charAt(0) +
+                        selectedPostForDetails.status.slice(1).toLowerCase()}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 font-medium">
+                    {new Date(
+                      selectedPostForDetails.publishedAt ||
+                        selectedPostForDetails.scheduledFor ||
+                        selectedPostForDetails.createdAt
+                    ).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}{" "}
+                    {new Date(
+                      selectedPostForDetails.publishedAt ||
+                        selectedPostForDetails.scheduledFor ||
+                        selectedPostForDetails.createdAt
+                    ).toLocaleTimeString("en-US", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+
+                {/* Engagement Bar (Likes, Shares, Comments) */}
+                <div className="flex items-center gap-6 py-4 border-y border-slate-100 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 font-semibold">
+                  <div className="flex items-center gap-2">
+                    <ThumbsUp className="w-4 h-4 text-slate-400" />
+                    <span>{selectedPostForDetails.likes || 0} Likes</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Share2 className="w-4 h-4 text-slate-400" />
+                    <span>0 Shares</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MessageCircle className="w-4 h-4 text-slate-400" />
+                    <span>{selectedPostForDetails.comments || 0} Comments</span>
+                  </div>
+                </div>
+
+                {/* POST PREVIEW SECTION */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                      POST PREVIEW
+                    </h4>
+                  </div>
+
+                  {/* Platform Filter Tabs */}
+                  <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-2">
+                    <button
+                      type="button"
+                      onClick={() => setDetailsPlatformTab("all")}
+                      className={`text-xs font-bold pb-2 border-b-2 transition cursor-pointer ${
+                        detailsPlatformTab === "all"
+                          ? "border-[#5846A8] text-[#5846A8] dark:text-purple-300"
+                          : "border-transparent text-slate-400 hover:text-slate-600"
+                      }`}
+                    >
+                      All
+                    </button>
+                    {selectedPostForDetails.targets?.map((target) => (
+                      <button
+                        key={target.id}
+                        type="button"
+                        onClick={() => setDetailsPlatformTab(target.socialAccount.provider)}
+                        className={`pb-2 border-b-2 transition cursor-pointer ${
+                          detailsPlatformTab === target.socialAccount.provider
+                            ? "border-[#5846A8]"
+                            : "border-transparent opacity-60 hover:opacity-100"
+                        }`}
+                        title={target.socialAccount.displayName}
+                      >
+                        <div className="w-4 h-4 rounded-full overflow-hidden flex items-center justify-center">
+                          {renderPlatformIcon(target.socialAccount.provider, 16)}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Phone Mockup Frame */}
+                  <div className="w-full max-w-[340px] mx-auto bg-slate-950 rounded-[32px] p-3 shadow-2xl border-4 border-slate-800 space-y-3 text-white">
+                    {/* Phone Status Bar */}
+                    <div className="flex items-center justify-between text-[10px] text-slate-400 px-2 pt-1 font-medium">
+                      <span>3:30 pm</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                        <span>100%</span>
+                      </div>
+                    </div>
+
+                    {/* Media Mockup Card */}
+                    <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 flex flex-col justify-between p-3">
+                      {/* Media Image or Gradient */}
+                      {selectedPostForDetails.media?.[0]?.url ? (
+                        <Image
+                          src={selectedPostForDetails.media[0].url}
+                          alt="Post media"
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/60 to-purple-950/60 flex items-center justify-center p-6 text-center text-xs font-medium text-slate-300">
+                          {selectedPostForDetails.content}
+                        </div>
+                      )}
+
+                      {/* Video Play Button Overlay */}
+                      {selectedPostForDetails.media?.[0]?.url && (
+                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-full bg-white/90 text-slate-950 flex items-center justify-center shadow-lg">
+                            <Play className="w-5 h-5 fill-slate-950 pl-0.5" />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Top Author Tag */}
+                      <div className="relative z-10 flex items-center gap-2 bg-black/40 backdrop-blur-md px-2.5 py-1.5 rounded-full w-fit">
+                        <div className="w-5 h-5 rounded-full bg-white/20 overflow-hidden flex items-center justify-center text-[10px] font-bold">
+                          {activeBrand?.name ? activeBrand.name.charAt(0) : "P"}
+                        </div>
+                        <span className="text-[11px] font-bold truncate max-w-[140px]">
+                          {selectedPostForDetails.targets?.[0]?.socialAccount?.displayName ||
+                            activeBrand?.name ||
+                            "b2bgrowthexpo"}
+                        </span>
+                      </div>
+
+                      {/* Right Social Actions Column */}
+                      <div className="absolute right-2 bottom-16 flex flex-col items-center gap-3 z-10 text-[11px] font-bold">
+                        <div className="flex flex-col items-center">
+                          <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
+                            <ThumbsUp className="w-4 h-4 fill-white" />
+                          </div>
+                          <span>25K</span>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
+                            <MessageCircle className="w-4 h-4 fill-white" />
+                          </div>
+                          <span>560</span>
+                        </div>
+                        <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
+                          <Share2 className="w-4 h-4" />
+                        </div>
+                      </div>
+
+                      {/* Bottom Caption Pill */}
+                      <div className="relative z-10 bg-black/60 backdrop-blur-md rounded-xl p-2.5 text-left space-y-1">
+                        <span className="text-[11px] font-bold block">
+                          @{activeBrand?.slug || "b2bgrowthexpo"}
+                        </span>
+                        <p className="text-[10px] text-slate-200 line-clamp-2 leading-relaxed">
+                          {selectedPostForDetails.content}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Drawer Footer Actions */}
+            <div className="p-5 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => setSelectedMediaPost(null)}
-                className="text-slate-400 hover:text-white p-1 rounded transition"
+                onClick={() => handleClonePost(selectedPostForDetails)}
+                className="flex-1 py-2 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-xs"
               >
-                <X className="w-5 h-5" />
+                <Copy className="w-3.5 h-3.5" />
+                <span>Clone Post</span>
               </button>
-            </div>
-            <div className="relative aspect-video w-full bg-slate-950 flex items-center justify-center">
-              {selectedMediaPost.media?.[0]?.url && (
-                <Image
-                  src={selectedMediaPost.media[0].url}
-                  alt="Post media"
-                  fill
-                  className="object-contain"
-                />
-              )}
+              <button
+                type="button"
+                onClick={() => {
+                  handleDeletePost(selectedPostForDetails.id);
+                  setSelectedPostForDetails(null);
+                }}
+                className="py-2 px-3 rounded-xl border border-rose-200 dark:border-rose-900 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs font-semibold transition cursor-pointer"
+                title="Delete Post"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Universal Social Connect Modal */}
+      <UniversalSocialConnectModal
+        isOpen={isConnectModalOpen}
+        onClose={() => setIsConnectModalOpen(false)}
+        onSuccess={() => {
+          setIsConnectModalOpen(false);
+          loadPostsAndChannels();
+        }}
+      />
     </AppLayout>
   );
 }

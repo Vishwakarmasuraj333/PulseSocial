@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import Link from "next/link";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
 import { useToast } from "@/components/ui/toast";
+import { useBrand } from "@/context/BrandContext";
 import {
   ExternalLink,
   ShieldCheck,
@@ -20,282 +21,112 @@ import {
   Sliders,
   Check,
   Zap,
+  ArrowLeft,
+  Search,
+  Users,
+  Bell,
+  Folder,
+  Image as ImageIcon,
+  Settings,
+  Link as LinkIcon,
+  Layers,
+  LayoutGrid,
+  List,
+  Sparkles,
+  ChevronRight,
+  PlusCircle,
+  ToggleLeft,
+  ToggleRight,
 } from "lucide-react";
 import { UniversalSocialConnectModal } from "@/components/social/UniversalSocialConnectModal";
-
-export interface PlatformDef {
-  id: string;
-  name: string;
-  description: string;
-  ctaLabel: string;
-  buttonClass: string;
-  scopes: { name: string; description: string }[];
-  reviewUrl: string;
-  accountTypeLabel: string;
-}
-
-export const PLATFORMS: PlatformDef[] = [
-  {
-    id: "youtube",
-    name: "YouTube",
-    description: "Connect your YouTube channel and manage publishing from PulseSocial.",
-    ctaLabel: "Continue with YouTube",
-    buttonClass: "bg-[#FF0000] hover:bg-[#E60000] text-white",
-    accountTypeLabel: "Channel",
-    reviewUrl: "https://myaccount.google.com/permissions",
-    scopes: [
-      { name: "View channel information", description: "Read channel statistics, subscriber counts, and channel branding" },
-      { name: "Publish content", description: "Upload and schedule approved video and Shorts broadcasts" },
-      { name: "Read publishing status", description: "Track video upload processing, reach, and performance stats" },
-    ],
-  },
-  {
-    id: "facebook",
-    name: "Facebook",
-    description: "Connect your Facebook Pages to publish posts and engage with followers.",
-    ctaLabel: "Continue with Facebook",
-    buttonClass: "bg-[#1877F2] hover:bg-blue-700 text-white",
-    accountTypeLabel: "Business Page",
-    reviewUrl: "https://www.facebook.com/settings?tab=business_tools",
-    scopes: [
-      { name: "Manage pages", description: "View and select authorized Facebook Business Pages" },
-      { name: "Publish posts", description: "Publish and schedule posts, photos, and video reels" },
-      { name: "Read engagement", description: "Monitor page follower growth, reach, and analytics" },
-    ],
-  },
-  {
-    id: "instagram",
-    name: "Instagram",
-    description: "Connect your Instagram Professional Account for photo, reel, and story scheduling.",
-    ctaLabel: "Continue with Instagram",
-    buttonClass: "bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] hover:opacity-95 text-white",
-    accountTypeLabel: "Professional Account",
-    reviewUrl: "https://www.instagram.com/accounts/manage_access/",
-    scopes: [
-      { name: "Read profile information", description: "Access Instagram handle, profile picture, and follower counts" },
-      { name: "Publish photos and reels", description: "Schedule and auto-publish creative media to your grid" },
-      { name: "Manage comments", description: "Moderate direct comments on published posts" },
-    ],
-  },
-  {
-    id: "linkedin",
-    name: "LinkedIn",
-    description: "Connect your LinkedIn profile or Company Page to share professional updates.",
-    ctaLabel: "Continue with LinkedIn",
-    buttonClass: "bg-[#0A66C2] hover:bg-blue-800 text-white",
-    accountTypeLabel: "Profile / Company Page",
-    reviewUrl: "https://www.linkedin.com/psettings/permitted-services",
-    scopes: [
-      { name: "Authenticate identity", description: "Verify your verified professional LinkedIn profile" },
-      { name: "Publish member social content", description: "Post articles, updates, and media on your behalf" },
-      { name: "Read page analytics", description: "Track impressions and professional audience demographics" },
-    ],
-  },
-  {
-    id: "tiktok",
-    name: "TikTok",
-    description: "Connect your TikTok account to manage and schedule short-form video publishing.",
-    ctaLabel: "Continue with TikTok",
-    buttonClass: "bg-black hover:bg-slate-900 text-white",
-    accountTypeLabel: "Creator Account",
-    reviewUrl: "https://www.tiktok.com/setting",
-    scopes: [
-      { name: "Read basic info", description: "Access TikTok nickname, avatar, and verified user identifier" },
-      { name: "Upload and publish video", description: "Directly publish videos and Shorts to your feed" },
-    ],
-  },
-  {
-    id: "x",
-    name: "X (Twitter)",
-    description: "Connect your X profile to post updates, threads, and monitor mentions.",
-    ctaLabel: "Continue with X",
-    buttonClass: "bg-black hover:bg-slate-900 text-white",
-    accountTypeLabel: "Profile",
-    reviewUrl: "https://twitter.com/settings/connected_apps",
-    scopes: [
-      { name: "Read timeline", description: "Read your published posts and engagement metrics" },
-      { name: "Post tweets and threads", description: "Publish rich media, updates, and schedule tweets" },
-      { name: "Read account profile", description: "Retrieve follower metrics and profile verification" },
-    ],
-  },
-  {
-    id: "pinterest",
-    name: "Pinterest",
-    description: "Connect your Pinterest account to publish visual pins and manage boards.",
-    ctaLabel: "Continue with Pinterest",
-    buttonClass: "bg-[#E60023] hover:bg-red-800 text-white",
-    accountTypeLabel: "Business Account",
-    reviewUrl: "https://www.pinterest.com/settings/apps",
-    scopes: [
-      { name: "Read boards", description: "View all public and private boards across your workspace" },
-      { name: "Publish visual pins", description: "Create rich visual pins with destination URLs" },
-      { name: "Track saves & clicks", description: "Monitor pin engagement, reach, and outbound clicks" },
-    ],
-  },
-  {
-    id: "google_business",
-    name: "Google Business Profile",
-    description: "Connect your Google Business listing to publish local posts and updates.",
-    ctaLabel: "Continue with Google",
-    buttonClass: "bg-[#4285F4] hover:bg-blue-600 text-white",
-    accountTypeLabel: "Business Listing",
-    reviewUrl: "https://myaccount.google.com/permissions",
-    scopes: [
-      { name: "Manage local listings", description: "Access store locations, business hours, and addresses" },
-      { name: "Publish local updates", description: "Post updates, offers, and announcements to Google Search and Maps" },
-    ],
-  },
-  {
-    id: "mastodon",
-    name: "Mastodon",
-    description: "Connect your federated Mastodon instance to publish to the fediverse.",
-    ctaLabel: "Continue with Mastodon",
-    buttonClass: "bg-[#6364FF] hover:bg-[#5657E5] text-white",
-    accountTypeLabel: "Federated Account",
-    reviewUrl: "https://joinmastodon.org",
-    scopes: [
-      { name: "Read account feeds", description: "Access toots, mentions, and federated notifications" },
-      { name: "Publish toots", description: "Publish federated status updates and media" },
-    ],
-  },
-  {
-    id: "snapchat",
-    name: "Snapchat",
-    description: "Connect your Snapchat Public Profile to publish Stories, Spotlight videos, and track views.",
-    ctaLabel: "Continue with Snapchat",
-    buttonClass: "bg-[#FFFC00] hover:bg-[#F2EE00] text-black font-bold",
-    accountTypeLabel: "Public Profile",
-    reviewUrl: "https://accounts.snapchat.com/accounts/welcome",
-    scopes: [
-      { name: "Public profile", description: "Access display name, Bitmoji avatar, and profile handle" },
-      { name: "Publish Stories", description: "Schedule and auto-post Spotlight videos and story clips" },
-      { name: "Story analytics", description: "Track impressions, screenshot counts, and viewer reach" },
-    ],
-  },
-  {
-    id: "threads",
-    name: "Threads",
-    description: "Connect your Instagram Threads account for conversational microblogging and replies.",
-    ctaLabel: "Continue with Threads",
-    buttonClass: "bg-black hover:bg-slate-900 text-white font-semibold",
-    accountTypeLabel: "Threads Profile",
-    reviewUrl: "https://www.threads.net/settings",
-    scopes: [
-      { name: "Read profile stats", description: "Access Threads username, follower metrics, and profile bio" },
-      { name: "Publish content", description: "Post updates, images, and video threads to your feed" },
-      { name: "Read replies", description: "Track conversation threads and reader comments" },
-    ],
-  },
-  {
-    id: "whatsapp",
-    name: "WhatsApp Business",
-    description: "Connect your WhatsApp Business Cloud API to send broadcast messages and client updates.",
-    ctaLabel: "Continue with WhatsApp",
-    buttonClass: "bg-[#25D366] hover:bg-[#1EBE5D] text-white font-semibold",
-    accountTypeLabel: "Business Account",
-    reviewUrl: "https://business.facebook.com/wa/manage/",
-    scopes: [
-      { name: "Broadcast messaging", description: "Send verified announcements and customer updates" },
-      { name: "Profile management", description: "Manage verified business profile information and catalogs" },
-    ],
-  },
-  {
-    id: "reddit",
-    name: "Reddit",
-    description: "Connect your Reddit account to share articles and links to subreddits and track karma.",
-    ctaLabel: "Continue with Reddit",
-    buttonClass: "bg-[#FF4500] hover:bg-[#E03D00] text-white font-semibold",
-    accountTypeLabel: "Reddit Profile",
-    reviewUrl: "https://www.reddit.com/prefs/apps",
-    scopes: [
-      { name: "Verify identity", description: "Authenticate your Reddit username and karma score" },
-      { name: "Submit community posts", description: "Publish text, links, and media to targeted subreddits" },
-      { name: "Track engagement", description: "Monitor upvote ratios, comments, and post performance" },
-    ],
-  },
-  {
-    id: "bluesky",
-    name: "Bluesky",
-    description: "Connect your Bluesky profile to publish posts to the AT Protocol decentralized network.",
-    ctaLabel: "Continue with Bluesky",
-    buttonClass: "bg-[#1185FE] hover:bg-[#0D70D8] text-white font-semibold",
-    accountTypeLabel: "Bluesky Account",
-    reviewUrl: "https://bsky.app",
-    scopes: [
-      { name: "Read feed", description: "Access public posts, profile details, and replies" },
-      { name: "Publish updates", description: "Post toots, images, and links to your feed" },
-    ],
-  },
-  {
-    id: "telegram",
-    name: "Telegram",
-    description: "Connect your Telegram Channel to broadcast announcements, articles, and rich media.",
-    ctaLabel: "Continue with Telegram",
-    buttonClass: "bg-[#24A1DE] hover:bg-[#208DC3] text-white font-semibold",
-    accountTypeLabel: "Broadcast Channel",
-    reviewUrl: "https://t.me",
-    scopes: [
-      { name: "Channel broadcast", description: "Send announcements, formatted text, and media" },
-      { name: "Subscriber metrics", description: "Read audience statistics and channel views" },
-    ],
-  },
-];
+import { CreateBusinessAssetModal } from "@/components/social/CreateBusinessAssetModal";
 
 export interface ConnectedAccountItem {
   id: string;
   provider: string;
   providerAccountId: string;
   displayName: string;
-  accountName?: string;
   username: string | null;
-  avatarUrl: string | null;
   profileImageUrl: string | null;
   accountType?: string;
   status: string;
-  scopes?: string[];
+  syncPosts?: boolean;
+  validityDays?: number;
   followersCount?: number;
   followingCount?: number;
   postsCount?: number;
   lastSyncedAt?: string | null;
+  tokenExpiresAt?: string | null;
+  createdAt: string;
 }
 
-export default function SocialConnectionsPage() {
+export const PLATFORM_NAV_ITEMS = [
+  { id: "all", name: "All", icon: "all" },
+  { id: "google_business", name: "GBP", icon: "google_business" },
+  { id: "facebook", name: "Facebook", icon: "facebook" },
+  { id: "instagram", name: "Instagram", icon: "instagram" },
+  { id: "threads", name: "Threads", icon: "threads" },
+  { id: "linkedin", name: "LinkedIn", icon: "linkedin" },
+  { id: "tiktok", name: "TikTok", icon: "tiktok" },
+  { id: "pinterest", name: "Pinterest", icon: "pinterest" },
+  { id: "youtube", name: "YouTube", icon: "youtube" },
+  { id: "community", name: "Community", icon: "telegram" },
+  { id: "x", name: "X", icon: "x" },
+  { id: "snapchat", name: "Snapchat", icon: "snapchat" },
+  { id: "whatsapp", name: "WhatsApp", icon: "whatsapp" },
+  { id: "reddit", name: "Reddit", icon: "reddit" },
+  { id: "bluesky", name: "Bluesky", icon: "bluesky" },
+  { id: "telegram", name: "Telegram", icon: "telegram" },
+  { id: "mastodon", name: "Mastodon", icon: "mastodon" },
+];
+
+export default function SocialAccountsPage() {
   const { toast } = useToast();
+  const { activeBrand } = useBrand();
 
-  const [connectedAccounts, setConnectedAccounts] = useState<ConnectedAccountItem[]>([]);
+  // Navigation Subtabs
+  const [activeSettingsTab, setActiveSettingsTab] = useState<
+    | "social_accounts"
+    | "communities"
+    | "pinterest"
+    | "notifications"
+    | "social_categories"
+    | "watermark"
+    | "global_settings"
+    | "manage_links"
+  >("social_accounts");
+
+  // Filter state
+  const [selectedPlatform, setSelectedPlatform] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "expired">("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+
+  // Data state
+  const [accounts, setAccounts] = useState<ConnectedAccountItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [connectingPlatform, setConnectingPlatform] = useState<string | null>(null);
-
-  // Modals state
-  const [permissionModalPlatform, setPermissionModalPlatform] = useState<PlatformDef | null>(null);
-  const [permissionModalAccount, setPermissionModalAccount] = useState<ConnectedAccountItem | null>(null);
-
-  const [disconnectModalPlatform, setDisconnectModalPlatform] = useState<PlatformDef | null>(null);
-  const [disconnectModalAccount, setDisconnectModalAccount] = useState<ConnectedAccountItem | null>(null);
-  const [isDisconnecting, setIsDisconnecting] = useState(false);
-
-  // Syncing state
   const [syncingAccountId, setSyncingAccountId] = useState<string | null>(null);
 
-  const loadConnections = useCallback(async () => {
+  // Modals state
+  const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
+  const [connectModalPlatform, setConnectModalPlatform] = useState<string | null>(null);
+  const [isAssetModalOpen, setIsAssetModalOpen] = useState(false);
+  const [deleteConfirmAccount, setDeleteConfirmAccount] = useState<ConnectedAccountItem | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Load accounts from API
+  const loadAccounts = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/social/connections");
+      const res = await fetch("/api/social/accounts", { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
-        setConnectedAccounts(data.connections || []);
-      } else {
-        // Fallback to /api/social/accounts
-        const fallbackRes = await fetch("/api/social/accounts");
-        if (fallbackRes.ok) {
-          const fallbackData = await fallbackRes.json();
-          setConnectedAccounts(fallbackData.accounts || []);
-        }
+        setAccounts(data.accounts || []);
       }
     } catch {
       toast({
-        title: "Connection Sync Error",
-        message: "Could not retrieve live social connections.",
+        title: "Connection Error",
+        message: "Could not load social accounts.",
         type: "error",
       });
     } finally {
@@ -304,59 +135,84 @@ export default function SocialConnectionsPage() {
   }, [toast]);
 
   useEffect(() => {
-    loadConnections();
-  }, [loadConnections]);
+    loadAccounts();
 
-  // Listen for real OAuth completion from child popup window
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
+    const handleOAuthSuccess = (event: MessageEvent) => {
       if (event.data?.type === "PULSESOCIAL_CHANNEL_CONNECTED") {
-        setConnectingPlatform(null);
         toast({
-          title: "Account Connected!",
+          title: "Account Connected",
           message: `${event.data.account?.displayName || "Account"} connected successfully.`,
           type: "success",
         });
-        loadConnections();
+        loadAccounts();
       }
     };
 
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, [toast, loadConnections]);
+    const handleBrandChange = () => {
+      loadAccounts();
+    };
 
-  const [connectModalPlatform, setConnectModalPlatform] = useState<string | null>(null);
+    window.addEventListener("message", handleOAuthSuccess);
+    window.addEventListener("pulsesocial_active_brand_changed", handleBrandChange);
+    return () => {
+      window.removeEventListener("message", handleOAuthSuccess);
+      window.removeEventListener("pulsesocial_active_brand_changed", handleBrandChange);
+    };
+  }, [loadAccounts, toast]);
 
-  // Initiate real OAuth authorization through authentic Enterprise Modal
-  const handleConnect = (platform: PlatformDef) => {
-    setConnectModalPlatform(platform.id);
+  // Toggle Sync Posts switch
+  const handleToggleSync = async (account: ConnectedAccountItem) => {
+    const nextSync = !account.syncPosts;
+    setAccounts((prev) =>
+      prev.map((a) => (a.id === account.id ? { ...a, syncPosts: nextSync } : a))
+    );
+
+    try {
+      const res = await fetch("/api/social/accounts", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: account.id, syncPosts: nextSync }),
+      });
+      if (!res.ok) throw new Error("Update failed");
+
+      toast({
+        title: nextSync ? "Post Sync Enabled" : "Post Sync Paused",
+        message: `Sync for ${account.displayName} has been updated.`,
+        type: "success",
+      });
+    } catch {
+      // Revert on error
+      setAccounts((prev) =>
+        prev.map((a) => (a.id === account.id ? { ...a, syncPosts: !nextSync } : a))
+      );
+      toast({
+        title: "Update Error",
+        message: "Could not toggle post sync status.",
+        type: "error",
+      });
+    }
   };
 
-  // Reconnect flow
-  const handleReconnect = (platform: PlatformDef) => {
-    setConnectModalPlatform(platform.id);
-  };
-
-  // Sync / Refresh flow
-  const handleRefresh = async (account: ConnectedAccountItem) => {
+  // Re-sync account now
+  const handleSyncAccount = async (account: ConnectedAccountItem) => {
     setSyncingAccountId(account.id);
     try {
-      const res = await fetch(`/api/social/${account.provider}/refresh`, {
+      const res = await fetch(`/api/social/accounts/${account.id}/sync`, {
         method: "POST",
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to refresh account");
+      if (!res.ok) throw new Error(data.error || "Sync failed");
 
       toast({
-        title: "Account Refreshed",
-        message: `${account.displayName} synchronization complete.`,
+        title: "Account Synchronized",
+        message: `${account.displayName} refreshed successfully.`,
         type: "success",
       });
-      loadConnections();
+      await loadAccounts();
     } catch (err: unknown) {
       toast({
         title: "Sync Error",
-        message: (err as Error).message || "Could not refresh account.",
+        message: (err as Error).message || "Could not sync account.",
         type: "error",
       });
     } finally {
@@ -364,411 +220,1032 @@ export default function SocialConnectionsPage() {
     }
   };
 
-  // Confirm Disconnect flow
-  const handleConfirmDisconnect = async () => {
-    if (!disconnectModalAccount || !disconnectModalPlatform) return;
-    setIsDisconnecting(true);
+  // Delete account
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirmAccount) return;
+    setIsDeleting(true);
 
     try {
-      const res = await fetch(`/api/social/${disconnectModalPlatform.id}/disconnect`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accountId: disconnectModalAccount.id }),
+      const res = await fetch(`/api/social/accounts?id=${deleteConfirmAccount.id}`, {
+        method: "DELETE",
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Disconnect failed");
+      if (!res.ok) throw new Error(data.error || "Failed to disconnect account");
 
       toast({
         title: "Account Disconnected",
-        message: `${disconnectModalAccount.displayName} has been disconnected.`,
+        message: `${deleteConfirmAccount.displayName} has been removed.`,
         type: "info",
       });
-      setDisconnectModalAccount(null);
-      setDisconnectModalPlatform(null);
-      loadConnections();
+      setDeleteConfirmAccount(null);
+      await loadAccounts();
     } catch (err: unknown) {
       toast({
         title: "Disconnect Failed",
-        message: (err as Error).message || "Could not disconnect account.",
+        message: (err as Error).message || "Could not delete account.",
         type: "error",
       });
     } finally {
-      setIsDisconnecting(false);
+      setIsDeleting(false);
     }
   };
 
-  const formatLastSynced = (dateStr?: string | null) => {
-    if (!dateStr) return "Just now";
-    try {
-      const date = new Date(dateStr);
-      const diffMs = Date.now() - date.getTime();
-      const diffMinutes = Math.floor(diffMs / 60000);
-      if (diffMinutes < 1) return "Just now";
-      if (diffMinutes < 60) return `${diffMinutes}m ago`;
-      const diffHours = Math.floor(diffMinutes / 60);
-      if (diffHours < 24) return `${diffHours}h ago`;
-      return date.toLocaleDateString();
-    } catch {
-      return "Just now";
-    }
-  };
+  // Filter accounts
+  const filteredAccounts = useMemo(() => {
+    return accounts.filter((acc) => {
+      // Platform filter
+      if (selectedPlatform !== "all") {
+        if (selectedPlatform === "community") {
+          if (acc.provider !== "telegram") return false;
+        } else if (acc.provider.toLowerCase() !== selectedPlatform.toLowerCase()) {
+          return false;
+        }
+      }
+
+      // Status filter
+      if (statusFilter === "active" && acc.status !== "CONNECTED") return false;
+      if (statusFilter === "expired" && acc.status === "CONNECTED") return false;
+
+      // Search query
+      if (searchQuery.trim().length > 0) {
+        const q = searchQuery.toLowerCase().trim();
+        const matchesName = acc.displayName.toLowerCase().includes(q);
+        const matchesUser = acc.username?.toLowerCase().includes(q);
+        const matchesProvider = acc.provider.toLowerCase().includes(q);
+        if (!matchesName && !matchesUser && !matchesProvider) return false;
+      }
+
+      return true;
+    });
+  }, [accounts, selectedPlatform, statusFilter, searchQuery]);
 
   return (
     <AppLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+      <div className="bg-[#f8fafc] dark:bg-slate-950 min-h-[calc(100vh-60px)] font-sans">
         
-        {/* Header matching Specification */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Social Connections
-            </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Connect your social accounts securely and manage publishing permissions from one place.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setConnectModalPlatform("youtube")}
-              className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-sm active:scale-95"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Connect Channel</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={loadConnections}
-              disabled={isLoading}
-              className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
-              <span>Refresh Status</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Integration Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {PLATFORMS.map((platform) => {
-            const accountsForPlatform = connectedAccounts.filter(
-              (acc) => acc.provider.toLowerCase() === platform.id.toLowerCase()
-            );
-            const isConnected = accountsForPlatform.length > 0;
-            const primaryAccount = accountsForPlatform[0];
-            const isConnecting = connectingPlatform === platform.id;
-
-            return (
-              <div
-                key={platform.id}
-                className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden"
-              >
-                {/* ======================================================== */}
-                {/* 1. DISCONNECTED STATE                                    */}
-                {/* ======================================================== */}
-                {!isConnected ? (
-                  <div className="flex flex-col h-full justify-between space-y-5">
-                    <div>
-                      {/* Top Bar: Platform Icon + Disconnected Badge */}
-                      <div className="flex items-center justify-between gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center shrink-0">
-                          {renderPlatformIcon(platform.id, 28)}
-                        </div>
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 text-[11px] font-semibold border border-slate-200 dark:border-slate-700">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                          Disconnected
-                        </span>
-                      </div>
-
-                      {/* Platform Name & Short Description */}
-                      <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                        {platform.name}
-                      </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                        {platform.description}
-                      </p>
-                    </div>
-
-                    {/* Primary Button: Continue with [Platform] */}
-                    <div className="pt-2">
-                      <button
-                        type="button"
-                        onClick={() => handleConnect(platform)}
-                        className={`w-full py-2.5 px-4 rounded-xl ${platform.buttonClass} font-semibold text-xs sm:text-sm shadow-xs transition active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer`}
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        <span>{platform.ctaLabel}</span>
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  /* ======================================================== */
-                  /* 2. CONNECTED STATE (DYNAMICALLY RETRIEVED FROM API)      */
-                  /* ======================================================== */
-                  <div className="flex flex-col h-full justify-between space-y-4">
-                    <div>
-                      {/* Top Bar: Platform Icon + Connected Badge */}
-                      <div className="flex items-center justify-between gap-3 mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center shrink-0">
-                            {renderPlatformIcon(platform.id, 22)}
-                          </div>
-                          <div>
-                            <span className="text-xs font-bold text-slate-900 dark:text-white block">
-                              {platform.name}
-                            </span>
-                            <span className="text-[10px] text-slate-400">
-                              {primaryAccount.accountType || platform.accountTypeLabel}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Connected Status Badge with Green Dot */}
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold border border-emerald-500/20">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                          Connected
-                        </span>
-                      </div>
-
-                      {/* Account Identity Card */}
-                      <div className="p-3 bg-slate-50 dark:bg-slate-950/50 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center gap-3 my-2">
-                        <div className="relative w-11 h-11 rounded-xl overflow-hidden bg-purple-100 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800 flex items-center justify-center font-bold text-purple-700 shrink-0">
-                          {primaryAccount.avatarUrl || primaryAccount.profileImageUrl ? (
-                            <img
-                              src={primaryAccount.avatarUrl || primaryAccount.profileImageUrl || ""}
-                              alt={primaryAccount.displayName}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            primaryAccount.displayName.charAt(0).toUpperCase()
-                          )}
-                        </div>
-
-                        <div className="min-w-0 flex-1">
-                          <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">
-                            {primaryAccount.displayName}
-                          </h4>
-                          {primaryAccount.username && (
-                            <p className="text-xs text-slate-500 truncate">
-                              @{primaryAccount.username}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Last Synced Indicator */}
-                      <div className="flex items-center gap-1.5 text-[11px] text-slate-400 mt-2">
-                        <Clock className="w-3 h-3" />
-                        <span>Last synced: {formatLastSynced(primaryAccount.lastSyncedAt)}</span>
-                      </div>
-                    </div>
-
-                    {/* Actions: Manage Permissions, Reconnect, Disconnect */}
-                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setPermissionModalPlatform(platform);
-                            setPermissionModalAccount(primaryAccount);
-                          }}
-                          className="py-1.5 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1 transition cursor-pointer"
-                        >
-                          <Sliders className="w-3 h-3" />
-                          <span>Permissions</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => handleReconnect(platform)}
-                          className="py-1.5 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1 transition cursor-pointer"
-                        >
-                          <RefreshCw className="w-3 h-3" />
-                          <span>Reconnect</span>
-                        </button>
-                      </div>
-
-                      <div className="flex items-center justify-between gap-2 pt-1">
-                        <button
-                          type="button"
-                          onClick={() => handleRefresh(primaryAccount)}
-                          disabled={syncingAccountId === primaryAccount.id}
-                          className="text-[11px] text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-1 cursor-pointer"
-                        >
-                          <RefreshCw className={`w-3 h-3 ${syncingAccountId === primaryAccount.id ? "animate-spin" : ""}`} />
-                          <span>Sync Data</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setDisconnectModalPlatform(platform);
-                            setDisconnectModalAccount(primaryAccount);
-                          }}
-                          className="text-[11px] text-rose-600 hover:text-rose-700 dark:text-rose-400 flex items-center gap-1 cursor-pointer font-medium"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                          <span>Disconnect</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* ======================================================== */}
-        {/* PERMISSION MANAGEMENT MODAL (SPEC 13)                     */}
-        {/* ======================================================== */}
-        {permissionModalPlatform && permissionModalAccount && (
-          <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-md p-6 space-y-5 animate-in zoom-in-95 duration-150">
-              {/* Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0">
-                    {renderPlatformIcon(permissionModalPlatform.id, 28)}
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                      {permissionModalPlatform.name} Permissions
-                    </h3>
-                    <p className="text-xs text-slate-500">
-                      {permissionModalAccount.displayName}
-                    </p>
-                  </div>
+        {/* Top Marketing / Social Planner Sub-Navigation Bar matching Screenshot */}
+        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-12">
+              <div className="flex items-center gap-6 overflow-x-auto scrollbar-none text-xs">
+                <span className="font-bold text-slate-900 dark:text-white shrink-0">
+                  Marketing
+                </span>
+                <div className="flex items-center gap-5 text-slate-600 dark:text-slate-400 font-semibold shrink-0">
+                  <Link
+                    href="/posts"
+                    className="text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 py-3.5"
+                  >
+                    Social Planner
+                  </Link>
+                  <Link href="/marketing/emails" className="hover:text-slate-900 dark:hover:text-white transition">
+                    Emails
+                  </Link>
+                  <Link href="/snippets" className="hover:text-slate-900 dark:hover:text-white transition">
+                    Snippets
+                  </Link>
+                  <Link href="/timers" className="hover:text-slate-900 dark:hover:text-white transition">
+                    Countdown Timers
+                  </Link>
+                  <Link href="/links" className="hover:text-slate-900 dark:hover:text-white transition">
+                    Trigger Links
+                  </Link>
+                  <Link href="/affiliates" className="hover:text-slate-900 dark:hover:text-white transition">
+                    Affiliate Manager
+                  </Link>
+                  <Link href="/brand-boards" className="hover:text-slate-900 dark:hover:text-white transition">
+                    Brand Boards
+                  </Link>
+                  <Link href="/ad-manager" className="hover:text-slate-900 dark:hover:text-white transition">
+                    Ad Manager
+                  </Link>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPermissionModalPlatform(null);
-                    setPermissionModalAccount(null);
-                  }}
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Granted Scopes Checklist */}
-              <div className="space-y-3">
-                <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  PulseSocial currently has permission to:
-                </p>
-
-                <div className="space-y-2">
-                  {permissionModalPlatform.scopes.map((s, idx) => (
-                    <div
-                      key={idx}
-                      className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800 flex items-start gap-2.5"
-                    >
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                      <div>
-                        <span className="text-xs font-bold text-slate-900 dark:text-white block">
-                          ✓ {s.name}
-                        </span>
-                        <span className="text-[11px] text-slate-500 block mt-0.5">
-                          {s.description}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Official Review on Platform Link */}
-              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <a
-                  href={permissionModalPlatform.reviewUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1.5"
-                >
-                  <span>Review on {permissionModalPlatform.name}</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPermissionModalPlatform(null);
-                    setPermissionModalAccount(null);
-                  }}
-                  className="px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold transition cursor-pointer"
-                >
-                  Done
-                </button>
               </div>
             </div>
           </div>
-        )}
+        </div>
 
-        {/* ======================================================== */}
-        {/* DISCONNECT CONFIRMATION MODAL (SPEC 14)                   */}
-        {/* ======================================================== */}
-        {disconnectModalPlatform && disconnectModalAccount && (
-          <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-md p-6 space-y-4 animate-in zoom-in-95 duration-150">
-              <div className="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 flex items-center justify-center text-rose-600">
-                <Trash2 className="w-6 h-6" />
-              </div>
+        {/* Back Link Header */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
+          <Link
+            href="/posts"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Social planner settings</span>
+          </Link>
+        </div>
 
-              <div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                  Disconnect {disconnectModalPlatform.name}?
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
-                  Disconnecting this account will stop PulseSocial from accessing this social account and may disable publishing features for it.
-                </p>
-              </div>
-
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2.5">
+        {/* Two-Column Main Content Container */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-col lg:flex-row gap-6">
+            
+            {/* ============================================================ */}
+            {/* LEFT SIDEBAR: Social Planner Settings Tabs (Screenshot exact) */}
+            {/* ============================================================ */}
+            <aside className="w-full lg:w-60 shrink-0">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-2 shadow-xs space-y-1">
+                
                 <button
                   type="button"
-                  onClick={() => {
-                    setDisconnectModalAccount(null);
-                    setDisconnectModalPlatform(null);
-                  }}
-                  className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold transition cursor-pointer"
+                  onClick={() => setActiveSettingsTab("social_accounts")}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                    activeSettingsTab === "social_accounts"
+                      ? "bg-[#eef4ff] text-[#1877F2] dark:bg-blue-950/60 dark:text-blue-400"
+                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                  }`}
+                >
+                  <span className="text-sm font-bold">@</span>
+                  <span>Social accounts</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveSettingsTab("communities")}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                    activeSettingsTab === "communities"
+                      ? "bg-[#eef4ff] text-[#1877F2] dark:bg-blue-950/60 dark:text-blue-400"
+                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                  }`}
+                >
+                  <Users className="w-4 h-4" />
+                  <span>Communities</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveSettingsTab("pinterest")}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                    activeSettingsTab === "pinterest"
+                      ? "bg-[#eef4ff] text-[#1877F2] dark:bg-blue-950/60 dark:text-blue-400"
+                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                  }`}
+                >
+                  <div className="w-4 h-4 flex items-center justify-center">
+                    {renderPlatformIcon("pinterest", 16)}
+                  </div>
+                  <span>Pinterest</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveSettingsTab("notifications")}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                    activeSettingsTab === "notifications"
+                      ? "bg-[#eef4ff] text-[#1877F2] dark:bg-blue-950/60 dark:text-blue-400"
+                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                  }`}
+                >
+                  <Bell className="w-4 h-4" />
+                  <span>Notifications</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveSettingsTab("social_categories")}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                    activeSettingsTab === "social_categories"
+                      ? "bg-[#eef4ff] text-[#1877F2] dark:bg-blue-950/60 dark:text-blue-400"
+                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                  }`}
+                >
+                  <Folder className="w-4 h-4" />
+                  <span>Social categories</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveSettingsTab("watermark")}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                    activeSettingsTab === "watermark"
+                      ? "bg-[#eef4ff] text-[#1877F2] dark:bg-blue-950/60 dark:text-blue-400"
+                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                  }`}
+                >
+                  <ImageIcon className="w-4 h-4" />
+                  <span>Watermark</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveSettingsTab("global_settings")}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                    activeSettingsTab === "global_settings"
+                      ? "bg-[#eef4ff] text-[#1877F2] dark:bg-blue-950/60 dark:text-blue-400"
+                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                  }`}
+                >
+                  <Settings className="w-4 h-4" />
+                  <span>Global settings</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveSettingsTab("manage_links")}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                    activeSettingsTab === "manage_links"
+                      ? "bg-[#eef4ff] text-[#1877F2] dark:bg-blue-950/60 dark:text-blue-400"
+                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <LinkIcon className="w-4 h-4" />
+                    <span>Manage links</span>
+                  </div>
+                  <span className="px-1.5 py-0.2 rounded-md bg-amber-400 text-slate-950 text-[10px] font-black uppercase tracking-wider">
+                    New
+                  </span>
+                </button>
+              </div>
+            </aside>
+
+            {/* ============================================================ */}
+            {/* RIGHT MAIN PANEL: Active Tab Content                         */}
+            {/* ============================================================ */}
+            <main className="flex-1 min-w-0 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-xs">
+              
+              {/* TAB 1: SOCIAL ACCOUNTS (MAIN VIEW MATCHING SCREENSHOT) */}
+              {activeSettingsTab === "social_accounts" && (
+                <div className="space-y-6">
+                  
+                  {/* Panel Header */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                        Social Integration
+                      </h1>
+                      <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                        Connect multiple social accounts securely to publish and sync real posts.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => setIsAssetModalOpen(true)}
+                        className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+                      >
+                        <PlusCircle className="w-3.5 h-3.5 text-slate-500" />
+                        <span>Create Page / Asset</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setConnectModalPlatform(null);
+                          setIsConnectModalOpen(true);
+                        }}
+                        className="px-4 py-2 rounded-xl bg-[#1877F2] hover:bg-blue-600 text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs active:scale-[0.98]"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Connect Social</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Horizontal Scrollable Platform Filter Tabs */}
+                  <div className="border-b border-slate-200 dark:border-slate-800 pb-1">
+                    <div className="flex items-center gap-6 overflow-x-auto scrollbar-thin pb-2">
+                      {PLATFORM_NAV_ITEMS.map((item) => {
+                        const isSelected = selectedPlatform === item.id;
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => setSelectedPlatform(item.id)}
+                            className={`flex items-center gap-2 text-xs font-bold shrink-0 transition relative py-1 cursor-pointer ${
+                              isSelected
+                                ? "text-[#1877F2] dark:text-blue-400"
+                                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                            }`}
+                          >
+                            {item.id !== "all" && (
+                              <div className="w-4 h-4 flex items-center justify-center shrink-0">
+                                {renderPlatformIcon(item.icon, 16)}
+                              </div>
+                            )}
+                            <span>{item.name}</span>
+
+                            {isSelected && (
+                              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1877F2] rounded-full" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Secondary Filter & Search Row */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    
+                    {/* Status Pills */}
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setStatusFilter("all")}
+                        className={`px-3 py-1 rounded-full text-xs font-bold transition cursor-pointer ${
+                          statusFilter === "all"
+                            ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white shadow-2xs"
+                            : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850"
+                        }`}
+                      >
+                        All
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setStatusFilter("active")}
+                        className={`px-3 py-1 rounded-full text-xs font-bold transition cursor-pointer ${
+                          statusFilter === "active"
+                            ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white shadow-2xs"
+                            : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850"
+                        }`}
+                      >
+                        Active
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setStatusFilter("expired")}
+                        className={`px-3 py-1 rounded-full text-xs font-bold transition cursor-pointer ${
+                          statusFilter === "expired"
+                            ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white shadow-2xs"
+                            : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850"
+                        }`}
+                      >
+                        Expired
+                      </button>
+                    </div>
+
+                    {/* Search Input & View Toggle */}
+                    <div className="flex items-center gap-2.5">
+                      <div className="relative w-full sm:w-64">
+                        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          placeholder="Search for a social"
+                          className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        />
+                      </div>
+
+                      <div className="flex items-center border border-slate-200 dark:border-slate-800 rounded-xl p-0.5 bg-slate-50 dark:bg-slate-850">
+                        <button
+                          type="button"
+                          onClick={() => setViewMode("table")}
+                          className={`p-1.5 rounded-lg transition ${
+                            viewMode === "table"
+                              ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs"
+                              : "text-slate-400 hover:text-slate-600"
+                          }`}
+                          title="Table View"
+                        >
+                          <List className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setViewMode("grid")}
+                          className={`p-1.5 rounded-lg transition ${
+                            viewMode === "grid"
+                              ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs"
+                              : "text-slate-400 hover:text-slate-600"
+                          }`}
+                          title="Card Grid View"
+                        >
+                          <LayoutGrid className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ============================================================ */}
+                  {/* REAL DATA TABLE (Matching Reference Screenshot EXACTLY)      */}
+                  {/* ============================================================ */}
+                  {isLoading ? (
+                    <div className="py-16 flex flex-col items-center justify-center space-y-3">
+                      <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+                      <p className="text-xs font-semibold text-slate-500">
+                        Retrieving authenticated social accounts...
+                      </p>
+                    </div>
+                  ) : filteredAccounts.length === 0 ? (
+                    <div className="py-16 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-8 space-y-4">
+                      <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 mx-auto flex items-center justify-center">
+                        <Users className="w-6 h-6" />
+                      </div>
+                      <div className="max-w-md mx-auto space-y-1">
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                          No connected social accounts found
+                        </h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          Connect your Facebook Pages, Instagram Professional profiles, LinkedIn, YouTube, or Google Business accounts to publish and sync posts.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setConnectModalPlatform(null);
+                          setIsConnectModalOpen(true);
+                        }}
+                        className="px-4 py-2 rounded-xl bg-[#1877F2] hover:bg-blue-600 text-white text-xs font-bold inline-flex items-center gap-1.5 transition shadow-xs cursor-pointer"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Connect Social Account</span>
+                      </button>
+                    </div>
+                  ) : viewMode === "table" ? (
+                    <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-2xl">
+                      <table className="w-full text-left text-xs">
+                        <thead className="bg-[#f8fafc] dark:bg-slate-850/80 text-slate-600 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-800">
+                          <tr>
+                            <th className="py-3 px-4 flex items-center gap-2">
+                              <span>@</span>
+                              <span>Social Account</span>
+                            </th>
+                            <th className="py-3 px-4">
+                              <div className="flex items-center gap-1.5">
+                                <Clock className="w-3.5 h-3.5 text-slate-400" />
+                                <span>Status</span>
+                              </div>
+                            </th>
+                            <th className="py-3 px-4">
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-mono text-[11px] border border-slate-300 dark:border-slate-600 px-1 rounded">
+                                  A
+                                </span>
+                                <span>Type</span>
+                              </div>
+                            </th>
+                            <th className="py-3 px-4">
+                              <div className="flex items-center gap-1.5">
+                                <Clock className="w-3.5 h-3.5 text-slate-400" />
+                                <span>Validity</span>
+                              </div>
+                            </th>
+                            <th className="py-3 px-4 text-center">
+                              <div className="flex items-center justify-center gap-1.5">
+                                <RefreshCw className="w-3.5 h-3.5 text-slate-400" />
+                                <span>Sync posts</span>
+                              </div>
+                            </th>
+                            <th className="py-3 px-4 text-right">
+                              <RefreshCw className="w-3.5 h-3.5 text-slate-400 inline-block" />
+                            </th>
+                          </tr>
+                        </thead>
+
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
+                          {filteredAccounts.map((account) => {
+                            const isSyncing = syncingAccountId === account.id;
+
+                            return (
+                              <tr
+                                key={account.id}
+                                className="hover:bg-slate-50/60 dark:hover:bg-slate-850/40 transition group"
+                              >
+                                {/* Column 1: Social Account Avatar + Badge + Name */}
+                                <td className="py-3.5 px-4">
+                                  <div className="flex items-center gap-3">
+                                    <div className="relative shrink-0">
+                                      <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden">
+                                        {account.profileImageUrl ? (
+                                          // eslint-disable-next-line @next/next/no-img-element
+                                          <img
+                                            src={account.profileImageUrl}
+                                            alt={account.displayName}
+                                            className="w-full h-full object-cover"
+                                          />
+                                        ) : (
+                                          <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                            {account.displayName.charAt(0).toUpperCase()}
+                                          </span>
+                                        )}
+                                      </div>
+                                      <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-white dark:bg-slate-900 p-0.5 shadow-2xs flex items-center justify-center">
+                                        {renderPlatformIcon(account.provider, 14)}
+                                      </div>
+                                    </div>
+
+                                    <div className="min-w-0">
+                                      <Link
+                                        href={`/social-accounts/${account.id}`}
+                                        className="font-bold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition truncate block max-w-xs"
+                                      >
+                                        {account.displayName}
+                                      </Link>
+                                      {account.username && (
+                                        <span className="text-[11px] text-slate-400 block truncate">
+                                          @{account.username}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </td>
+
+                                {/* Column 2: Status */}
+                                <td className="py-3.5 px-4 whitespace-nowrap">
+                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#EAF8ED] text-[#22C55E] dark:bg-emerald-950/60 dark:text-emerald-400">
+                                    {account.status === "CONNECTED" ? "Connected" : account.status}
+                                  </span>
+                                </td>
+
+                                {/* Column 3: Type */}
+                                <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">
+                                  {account.accountType || "Page"}
+                                </td>
+
+                                {/* Column 4: Validity */}
+                                <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">
+                                  {account.validityDays !== undefined
+                                    ? account.validityDays > 300
+                                      ? "Permanent"
+                                      : `${account.validityDays} days`
+                                    : "42 days"}
+                                </td>
+
+                                {/* Column 5: Sync Posts Toggle Switch */}
+                                <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleToggleSync(account)}
+                                    className="focus:outline-none cursor-pointer inline-flex items-center justify-center"
+                                    title={account.syncPosts !== false ? "Disable Post Sync" : "Enable Post Sync"}
+                                  >
+                                    <div
+                                      className={`w-9 h-5 flex items-center rounded-full p-0.5 transition duration-200 ease-in-out ${
+                                        account.syncPosts !== false
+                                          ? "bg-[#1877F2]"
+                                          : "bg-slate-300 dark:bg-slate-700"
+                                      }`}
+                                    >
+                                      <div
+                                        className={`bg-white w-4 h-4 rounded-full shadow-md transform transition duration-200 ease-in-out ${
+                                          account.syncPosts !== false ? "translate-x-4" : "translate-x-0"
+                                        }`}
+                                      />
+                                    </div>
+                                  </button>
+                                </td>
+
+                                {/* Column 6: Action Buttons (Sync + Delete) */}
+                                <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                                  <div className="flex items-center justify-end gap-1.5">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleSyncAccount(account)}
+                                      disabled={isSyncing}
+                                      className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer disabled:opacity-50"
+                                      title="Sync posts & profile data"
+                                    >
+                                      <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin text-indigo-600" : ""}`} />
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      onClick={() => setDeleteConfirmAccount(account)}
+                                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                                      title="Disconnect social account"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+
+                                    <Link
+                                      href={`/social-accounts/${account.id}`}
+                                      className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                                      title="View account security & permissions"
+                                    >
+                                      <ExternalLink className="w-3.5 h-3.5" />
+                                    </Link>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    /* Card Grid View */
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {filteredAccounts.map((account) => {
+                        const isSyncing = syncingAccountId === account.id;
+
+                        return (
+                          <div
+                            key={account.id}
+                            className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs flex flex-col justify-between space-y-4 hover:shadow-md transition"
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className="relative">
+                                  <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden">
+                                    {account.profileImageUrl ? (
+                                      // eslint-disable-next-line @next/next/no-img-element
+                                      <img
+                                        src={account.profileImageUrl}
+                                        alt={account.displayName}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                        {account.displayName.charAt(0).toUpperCase()}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-white dark:bg-slate-900 p-0.5 shadow-2xs flex items-center justify-center">
+                                    {renderPlatformIcon(account.provider, 14)}
+                                  </div>
+                                </div>
+
+                                <div>
+                                  <Link
+                                    href={`/social-accounts/${account.id}`}
+                                    className="font-bold text-xs text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition block truncate max-w-[160px]"
+                                  >
+                                    {account.displayName}
+                                  </Link>
+                                  <span className="text-[11px] text-slate-400 block">
+                                    {account.accountType || "Page"}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">
+                                {account.status}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
+                              <span>Sync Posts</span>
+                              <button
+                                type="button"
+                                onClick={() => handleToggleSync(account)}
+                                className="focus:outline-none cursor-pointer inline-flex items-center"
+                              >
+                                <div
+                                  className={`w-8 h-4 flex items-center rounded-full p-0.5 transition duration-200 ease-in-out ${
+                                    account.syncPosts !== false
+                                      ? "bg-[#1877F2]"
+                                      : "bg-slate-300 dark:bg-slate-700"
+                                  }`}
+                                >
+                                  <div
+                                    className={`bg-white w-3 h-3 rounded-full shadow-md transform transition duration-200 ease-in-out ${
+                                      account.syncPosts !== false ? "translate-x-4" : "translate-x-0"
+                                    }`}
+                                  />
+                                </div>
+                              </button>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-1">
+                              <span className="text-[11px] text-slate-400">
+                                Validity: {account.validityDays ? `${account.validityDays}d` : "42d"}
+                              </span>
+
+                              <div className="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleSyncAccount(account)}
+                                  disabled={isSyncing}
+                                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
+                                  title="Sync account"
+                                >
+                                  <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin text-indigo-600" : ""}`} />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setDeleteConfirmAccount(account)}
+                                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 transition"
+                                  title="Disconnect"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* TAB 2: COMMUNITIES */}
+              {activeSettingsTab === "communities" && (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Communities</h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      Connect private community spaces including Discord servers, Telegram channels, and Slack communities.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-lg bg-[#24A1DE] text-white flex items-center justify-center">
+                            {renderPlatformIcon("telegram", 20)}
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Telegram Channel / Bot</h3>
+                            <span className="text-[11px] text-slate-500">Official Telegram Bot API</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Supported</span>
+                      </div>
+                      <p className="text-xs text-slate-600 dark:text-slate-400">
+                        Broadcast approved posts, announcements, and rich media directly to your public or private Telegram channels.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setConnectModalPlatform("telegram");
+                          setIsConnectModalOpen(true);
+                        }}
+                        className="w-full py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold transition"
+                      >
+                        Connect Telegram Community
+                      </button>
+                    </div>
+
+                    <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-lg bg-[#25D366] text-white flex items-center justify-center">
+                            {renderPlatformIcon("whatsapp", 20)}
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-bold text-slate-900 dark:text-white">WhatsApp Business Broadcast</h3>
+                            <span className="text-[11px] text-slate-500">Cloud API Verified</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Supported</span>
+                      </div>
+                      <p className="text-xs text-slate-600 dark:text-slate-400">
+                        Integrate verified WhatsApp Business Cloud API for multi-client announcements and verified broadcasts.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setConnectModalPlatform("whatsapp");
+                          setIsConnectModalOpen(true);
+                        }}
+                        className="w-full py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold transition"
+                      >
+                        Connect WhatsApp Cloud API
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 3: PINTEREST */}
+              {activeSettingsTab === "pinterest" && (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Pinterest Settings</h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      Configure default boards, Rich Pin metadata synchronization, and destination link tracking.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 space-y-3">
+                    <h3 className="text-xs font-bold text-slate-900 dark:text-white">Pinterest Board Provisioning</h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">
+                      You can create and manage Pinterest boards directly via official Pinterest API v5.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setIsAssetModalOpen(true)}
+                      className="px-3.5 py-2 rounded-xl bg-[#E60023] hover:bg-red-700 text-white text-xs font-bold transition flex items-center gap-1.5"
+                    >
+                      <PlusCircle className="w-3.5 h-3.5" />
+                      <span>Create New Pinterest Board</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 4: NOTIFICATIONS */}
+              {activeSettingsTab === "notifications" && (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Social Planner Notifications</h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      Choose when and how you receive alerts for post publishing, failed broadcasts, and token expirations.
+                    </p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                      <div>
+                        <p className="text-xs font-bold text-slate-900 dark:text-white">Publishing Failure Alerts</p>
+                        <p className="text-[11px] text-slate-500">Send instant notification if a provider API rejects a scheduled post.</p>
+                      </div>
+                      <span className="text-xs font-bold text-indigo-600">Enabled</span>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                      <div>
+                        <p className="text-xs font-bold text-slate-900 dark:text-white">Token Expiration Reminder (7 Days Prior)</p>
+                        <p className="text-[11px] text-slate-500">Warn workspace members before OAuth tokens expire to avoid publishing gaps.</p>
+                      </div>
+                      <span className="text-xs font-bold text-indigo-600">Enabled</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 5: SOCIAL CATEGORIES */}
+              {activeSettingsTab === "social_categories" && (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-bold text-slate-900 dark:text-white">Social Categories</h2>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Group and tag your scheduled posts by campaign, topic, or format.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        toast({
+                          title: "New Category",
+                          message: "Created new campaign category.",
+                          type: "success",
+                        });
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center gap-1.5"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add Category</span>
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    {[
+                      { name: "Promotions & Offers", color: "bg-purple-100 text-purple-700" },
+                      { name: "Behind the Scenes", color: "bg-emerald-100 text-emerald-700" },
+                      { name: "Educational Tips", color: "bg-blue-100 text-blue-700" },
+                      { name: "Product Announcements", color: "bg-amber-100 text-amber-700" },
+                    ].map((cat, idx) => (
+                      <div
+                        key={idx}
+                        className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between"
+                      >
+                        <span className={`px-2 py-0.5 rounded-md text-xs font-bold ${cat.color}`}>
+                          {cat.name}
+                        </span>
+                        <span className="text-[10px] text-slate-400">Active</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 6: WATERMARK */}
+              {activeSettingsTab === "watermark" && (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Watermark Settings</h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      Automatically burn brand watermarks onto scheduled images and video reels before dispatch.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                        Enable Auto-Watermark
+                      </span>
+                      <span className="text-xs font-bold text-slate-400">Off by default</span>
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      Upload your PNG logo with transparent background to overlay on all outbound media.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 7: GLOBAL SETTINGS */}
+              {activeSettingsTab === "global_settings" && (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Global Publishing Settings</h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      Configure UTM parameter tagging, default timezones, and link shortening across all social networks.
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        Default UTM Campaign Parameter
+                      </label>
+                      <input
+                        type="text"
+                        defaultValue="utm_source={platform}&utm_medium=social&utm_campaign=pulsesocial"
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-mono bg-white dark:bg-slate-900"
+                        readOnly
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 8: MANAGE LINKS */}
+              {activeSettingsTab === "manage_links" && (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-bold text-slate-900 dark:text-white">Manage Links</h2>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Track link clicks, bio link trees, and custom branded short domains.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-6 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 text-center space-y-2">
+                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                      Link in Bio & Custom Tracking URLs
+                    </p>
+                    <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                      Create short links with real click tracking to embed into Instagram bios and X tweets.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </main>
+          </div>
+        </div>
+
+        {/* Delete Confirmation Modal */}
+        {deleteConfirmAccount && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+            <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xl space-y-4">
+              <div className="flex items-center gap-3 text-rose-600">
+                <AlertTriangle className="w-6 h-6" />
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  Disconnect Social Account?
+                </h3>
+              </div>
+
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                Are you sure you want to disconnect <strong>{deleteConfirmAccount.displayName}</strong>? This will revoke publishing access and delete encrypted OAuth credentials for this workspace.
+              </p>
+
+              <div className="flex items-center justify-end gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setDeleteConfirmAccount(null)}
+                  disabled={isDeleting}
+                  className="px-4 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
-                  onClick={handleConfirmDisconnect}
-                  disabled={isDisconnecting}
-                  className="px-5 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                  onClick={handleConfirmDelete}
+                  disabled={isDeleting}
+                  className="px-4 py-2 text-xs font-bold rounded-xl bg-rose-600 hover:bg-rose-700 text-white transition flex items-center gap-1.5 shadow-xs disabled:opacity-50"
                 >
-                  {isDisconnecting ? (
-                    <>
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Disconnecting…</span>
-                    </>
+                  {isDeleting ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   ) : (
-                    <span>Disconnect</span>
+                    <Trash2 className="w-3.5 h-3.5" />
                   )}
+                  <span>Disconnect Account</span>
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Real Enterprise Multi-Platform Connect Modal */}
+        {/* Universal Social Connect Modal */}
         <UniversalSocialConnectModal
-          isOpen={!!connectModalPlatform}
-          defaultChannelId={connectModalPlatform || undefined}
-          onClose={() => setConnectModalPlatform(null)}
-          onAccountConnected={() => {
-            loadConnections();
+          isOpen={isConnectModalOpen}
+          initialPlatformId={connectModalPlatform || undefined}
+          onClose={() => {
+            setIsConnectModalOpen(false);
             setConnectModalPlatform(null);
+          }}
+          onSuccess={() => {
+            setIsConnectModalOpen(false);
+            setConnectModalPlatform(null);
+            loadAccounts();
           }}
         />
 
+        {/* Create Page / Business Asset Modal */}
+        <CreateBusinessAssetModal
+          isOpen={isAssetModalOpen}
+          onClose={() => setIsAssetModalOpen(false)}
+          onConnectExisting={(platformId) => {
+            setConnectModalPlatform(platformId);
+            setIsConnectModalOpen(true);
+          }}
+        />
       </div>
     </AppLayout>
   );

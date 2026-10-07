@@ -35,7 +35,7 @@ interface BrandContextType {
   brands: Brand[];
   activeBrand: Brand;
   switchBrand: (id: string) => void;
-  addBrand: (data: { name: string; industry?: string; website?: string; color?: string; avatarUrl?: string }) => Brand;
+  addBrand: (data: { name: string; industry?: string; website?: string; color?: string; avatarUrl?: string }) => Promise<Brand> | Brand;
   updateBrand: (id: string, data: Partial<Brand>) => void;
   deleteBrand: (id: string) => void;
   refreshBrands: () => Promise<void>;
@@ -49,18 +49,45 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
 
   const syncActiveBrandFromBackend = async () => {
     try {
-      // 1. Clean legacy demo data from localStorage if present
-      try {
-        const savedBrands = localStorage.getItem("pulsesocial_brands");
-        if (savedBrands) {
-          const parsed = JSON.parse(savedBrands);
-          if (parsed.length > 0) {
-            setBrands(parsed);
-          }
-        }
-      } catch {}
+      // 1. Fetch user brands from /api/brand/all
+      const resAll = await fetch("/api/brand/all", {
+        headers: { "Cache-Control": "no-cache" },
+      });
 
-      // 2. Fetch authenticated session
+      if (resAll.ok) {
+        const dataAll = await resAll.json();
+        if (Array.isArray(dataAll.brands) && dataAll.brands.length > 0) {
+          const loadedBrands: Brand[] = dataAll.brands.map((b: any) => ({
+            id: b.id,
+            name: b.name,
+            slug: b.slug,
+            handle: b.handle || `@${b.slug}`,
+            avatarUrl: b.avatarUrl || b.logoUrl || "",
+            coverUrl: b.coverUrl || "",
+            connectedAccountsCount: b.connectedAccountsCount || 0,
+            industry: b.description || "Digital Media & Tech",
+            description: b.description || "",
+            timezone: b.timezone || "Asia/Kolkata",
+            color: "#2563eb",
+            createdAt: b.createdAt || new Date().toISOString(),
+          }));
+
+          setBrands(loadedBrands);
+
+          const savedId = typeof window !== "undefined" ? localStorage.getItem("pulsesocial_active_brand") : null;
+          const targetId = (savedId && loadedBrands.some((x) => x.id === savedId))
+            ? savedId
+            : dataAll.activeBrandId || loadedBrands[0].id;
+
+          setActiveBrandId(targetId);
+          try {
+            localStorage.setItem("pulsesocial_active_brand", targetId);
+          } catch {}
+          return;
+        }
+      }
+
+      // 2. Fallback to /api/auth/me
       const res = await fetch("/api/auth/me", {
         headers: { "Cache-Control": "no-cache" },
       });
@@ -69,39 +96,24 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
         if (data.user?.activeOrganization) {
           const org = data.user.activeOrganization;
 
-          // Fetch full brand metadata
-          let brandMeta: any = {};
-          try {
-            const bRes = await fetch("/api/brand");
-            if (bRes.ok) {
-              const bData = await bRes.json();
-              if (bData.brand) brandMeta = bData.brand;
-            }
-          } catch {}
-
           const orgBrand: Brand = {
             id: org.id,
-            name: brandMeta.name || org.name,
-            slug: brandMeta.slug || org.slug,
-            handle: `@${brandMeta.slug || org.slug}`,
-            avatarUrl: brandMeta.avatarUrl || org.logoUrl || data.user.avatarUrl || "",
-            coverUrl: brandMeta.coverUrl || org.coverUrl || "",
-            connectedAccountsCount: brandMeta.channelsCount || 0,
-            industry: brandMeta.description ? "Enterprise SaaS" : "General Business",
-            description: brandMeta.description || "",
-            timezone: brandMeta.timezone || org.timezone || "Asia/Kolkata",
+            name: org.name,
+            slug: org.slug,
+            handle: `@${org.slug}`,
+            avatarUrl: org.logoUrl || data.user.avatarUrl || "",
+            coverUrl: org.coverUrl || "",
+            connectedAccountsCount: org._count?.socialAccounts || 0,
+            industry: "Enterprise Media",
+            description: "",
+            timezone: org.timezone || "Asia/Kolkata",
             color: "#2563eb",
             createdAt: org.createdAt || new Date().toISOString(),
           };
 
           setBrands((prev) => {
             const filtered = prev.filter((b) => b.id !== org.id);
-            const updated = [orgBrand, ...filtered];
-            try {
-              localStorage.setItem("pulsesocial_brands", JSON.stringify(updated));
-              localStorage.setItem("pulsesocial_active_brand", org.id);
-            } catch {}
-            return updated;
+            return [orgBrand, ...filtered];
           });
           setActiveBrandId(org.id);
         }
@@ -126,16 +138,65 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
 
   const activeBrand = brands.find((b) => b.id === activeBrandId) || brands[0] || DEFAULT_BRANDS[0];
 
-  const switchBrand = (id: string) => {
+  const switchBrand = async (id: string) => {
     setActiveBrandId(id);
     try {
       localStorage.setItem("pulsesocial_active_brand", id);
+      await fetch("/api/brand/switch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ brandId: id }),
+      });
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("pulsesocial_active_brand_changed", { detail: { id } }));
+      }
+      await syncActiveBrandFromBackend();
     } catch {}
   };
 
-  const addBrand = (data: { name: string; industry?: string; website?: string; color?: string; avatarUrl?: string }) => {
+  const addBrand = async (data: { name: string; industry?: string; website?: string; color?: string; avatarUrl?: string }) => {
+    try {
+      const res = await fetch("/api/brand", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.name,
+          industry: data.industry,
+          website: data.website,
+          color: data.color,
+        }),
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        if (json.brand) {
+          const created: Brand = {
+            id: json.brand.id,
+            name: json.brand.name,
+            slug: json.brand.slug,
+            handle: `@${json.brand.slug}`,
+            avatarUrl: json.brand.avatarUrl || data.avatarUrl || "",
+            connectedAccountsCount: 0,
+            industry: data.industry || "Digital Media",
+            color: data.color || "#2563eb",
+            createdAt: json.brand.createdAt || new Date().toISOString(),
+          };
+
+          setBrands((prev) => [...prev, created]);
+          setActiveBrandId(created.id);
+          try {
+            localStorage.setItem("pulsesocial_active_brand", created.id);
+          } catch {}
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("pulsesocial_active_brand_changed", { detail: { id: created.id } }));
+          }
+          return created;
+        }
+      }
+    } catch {}
+
     const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-    const newBrand: Brand = {
+    const fallbackBrand: Brand = {
       id: `brand-${Date.now()}`,
       name: data.name,
       slug,
@@ -147,16 +208,9 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
       createdAt: new Date().toISOString(),
     };
 
-    const updated = [...brands, newBrand];
-    setBrands(updated);
-    setActiveBrandId(newBrand.id);
-
-    try {
-      localStorage.setItem("pulsesocial_brands", JSON.stringify(updated));
-      localStorage.setItem("pulsesocial_active_brand", newBrand.id);
-    } catch {}
-
-    return newBrand;
+    setBrands((prev) => [...prev, fallbackBrand]);
+    setActiveBrandId(fallbackBrand.id);
+    return fallbackBrand;
   };
 
   const updateBrand = (id: string, data: Partial<Brand>) => {

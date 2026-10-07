@@ -255,15 +255,26 @@ export class MetaProvider implements SocialProvider {
       );
       if (!res.ok) throw new Error("Failed to fetch insights");
       const data = await res.json();
+      let impressions = 0;
+      let reach = 0;
+      let engagementCount = 0;
+      if (Array.isArray(data.data)) {
+        for (const item of data.data) {
+          const sumValues = (item.values || []).reduce((acc: number, v: any) => acc + (typeof v.value === "number" ? v.value : 0), 0);
+          if (item.name.includes("impression")) impressions += sumValues;
+          if (item.name.includes("reach")) reach += sumValues;
+          if (item.name.includes("engaged_users") || item.name.includes("engagement")) engagementCount += sumValues;
+        }
+      }
       return {
-        followers: 12500,
-        impressions: 48900,
-        reach: 32400,
-        engagementCount: 2940,
-        engagementRate: 6.01,
-        clicks: 850,
-        shares: 340,
-        saves: 190,
+        followers: 0,
+        impressions,
+        reach,
+        engagementCount,
+        engagementRate: reach > 0 ? Number(((engagementCount / reach) * 100).toFixed(2)) : 0,
+        clicks: 0,
+        shares: 0,
+        saves: 0,
         isCalculated: false,
         rawJson: JSON.stringify(data),
       };

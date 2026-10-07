@@ -19,6 +19,7 @@ import {
   MessageSquare,
   LayoutDashboard,
   LogOut,
+  Settings,
 } from "lucide-react";
 import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
 
@@ -28,36 +29,48 @@ export function MarketingHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isResourcesOpen, setIsResourcesOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState<{ id: string; email: string; name?: string } | null>(null);
+  const [currentUser, setCurrentUser] = useState<{
+    id: string;
+    email: string;
+    name?: string;
+    avatarUrl?: string | null;
+    activeOrganization?: { id: string; name: string } | null;
+  } | null>(null);
   const resourcesRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    let isMounted = true;
-    fetch("/api/auth/me")
+  const checkAuth = () => {
+    fetch("/api/auth/me", { cache: "no-store" })
       .then((res) => {
         if (res.ok) return res.json();
         return null;
       })
       .then((data) => {
-        if (isMounted) {
-          if (data?.user) {
-            setIsLoggedIn(true);
-            setCurrentUser(data.user);
-          } else {
-            setIsLoggedIn(false);
-            setCurrentUser(null);
-          }
-        }
-      })
-      .catch(() => {
-        if (isMounted) {
+        if (data?.user) {
+          setIsLoggedIn(true);
+          setCurrentUser(data.user);
+        } else {
           setIsLoggedIn(false);
           setCurrentUser(null);
         }
+      })
+      .catch(() => {
+        setIsLoggedIn(false);
+        setCurrentUser(null);
       });
+  };
 
+  useEffect(() => {
+    checkAuth();
+
+    const handleAuthEvent = () => {
+      checkAuth();
+    };
+
+    window.addEventListener("pulsesocial_auth_changed", handleAuthEvent);
+    window.addEventListener("storage", handleAuthEvent);
     return () => {
-      isMounted = false;
+      window.removeEventListener("pulsesocial_auth_changed", handleAuthEvent);
+      window.removeEventListener("storage", handleAuthEvent);
     };
   }, [pathname]);
 
@@ -65,9 +78,17 @@ export function MarketingHeader() {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
     } catch {}
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("pulsesocial_active_user");
+        localStorage.removeItem("pulsesocial_active_brand");
+      } catch {}
+      document.cookie = "pulsesocial_auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      window.dispatchEvent(new Event("pulsesocial_auth_changed"));
+    }
     setIsLoggedIn(false);
     setCurrentUser(null);
-    window.location.href = "/login?logout=true";
+    window.location.replace("/login?logout=true");
   };
 
   useEffect(() => {
@@ -201,18 +222,40 @@ export function MarketingHeader() {
         <div className="hidden sm:flex items-center gap-2.5">
           {isLoggedIn ? (
             <>
+              {/* Workspace indicator */}
+              {currentUser?.activeOrganization?.name && (
+                <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900/60 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 max-w-[150px] truncate">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="truncate">{currentUser.activeOrganization.name}</span>
+                </div>
+              )}
+
+              {/* Profile Avatar / Settings Link */}
+              <Link
+                href="/settings"
+                className="p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition"
+                title="Workspace Settings"
+              >
+                <Settings className="w-3.5 h-3.5" />
+              </Link>
+
+              {/* Go to Dashboard */}
               <Link
                 href="/dashboard"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:opacity-95 text-white text-xs font-bold shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/35 transition active:scale-[0.98] group"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:opacity-95 text-white text-xs font-bold shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/35 transition active:scale-[0.98] group"
               >
-                <LayoutDashboard className="w-3.5 h-3.5" />
-                <span>Go to Dashboard</span>
+                <div className="w-4 h-4 rounded-full bg-white/20 text-white flex items-center justify-center text-[10px] font-bold">
+                  {(currentUser?.name || currentUser?.email || "U").charAt(0).toUpperCase()}
+                </div>
+                <span>Dashboard</span>
                 <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
               </Link>
+
+              {/* Logout button */}
               <button
                 type="button"
                 onClick={handleLogout}
-                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-2.5 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition cursor-pointer"
                 title="Log out from PulseSocial"
               >
                 <LogOut className="w-3.5 h-3.5" />

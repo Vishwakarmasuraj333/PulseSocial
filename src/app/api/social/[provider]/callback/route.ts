@@ -21,8 +21,8 @@ export async function GET(
     const url = new URL(req.url);
     const code = url.searchParams.get("code");
     const state = url.searchParams.get("state");
-    const errorParam = url.searchParams.get("error");
-    const errorDesc = url.searchParams.get("error_description");
+    const errorParam = url.searchParams.get("error") || url.searchParams.get("error_reason");
+    const errorDesc = url.searchParams.get("error_description") || url.searchParams.get("error_message");
 
     if (errorParam) {
       return NextResponse.redirect(
@@ -34,8 +34,9 @@ export async function GET(
     }
 
     if (!code) {
+      const reason = errorDesc || errorParam || "Social connection was cancelled or did not provide an authorization code.";
       return NextResponse.redirect(
-        new URL("/onboarding/socials?error=Missing+authorization+code", req.url)
+        new URL(`/onboarding/socials?error=${encodeURIComponent(reason)}`, req.url)
       );
     }
 

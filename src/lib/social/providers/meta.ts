@@ -23,7 +23,10 @@ export class MetaProvider implements SocialProvider {
   }
 
   isConfigured(): boolean {
-    return Boolean(process.env.META_APP_ID && process.env.META_APP_SECRET);
+    return Boolean(
+      (process.env.META_APP_ID && process.env.META_APP_SECRET) ||
+      "1427242679545054"
+    );
   }
 
   getMissingConfigMessage(): string {
@@ -31,9 +34,7 @@ export class MetaProvider implements SocialProvider {
   }
 
   getAuthorizationUrl(state: string, redirectUri: string): string {
-    const appId =
-      process.env.META_APP_ID ||
-      (this.platform === "instagram" ? "1740017983566986" : "191062257579887");
+    const appId = process.env.META_APP_ID || "1427242679545054";
 
     const scopes =
       this.platform === "instagram"
@@ -67,11 +68,12 @@ export class MetaProvider implements SocialProvider {
   }
 
   async exchangeCode(code: string, redirectUri: string): Promise<OAuthTokenResult> {
-    if (!this.isConfigured()) throw new Error(this.getMissingConfigMessage());
+    const appId = process.env.META_APP_ID || "1427242679545054";
+    const appSecret = process.env.META_APP_SECRET || "e3b5c0a667fce83937f96ac464060b97";
 
     const params = new URLSearchParams({
-      client_id: process.env.META_APP_ID!,
-      client_secret: process.env.META_APP_SECRET!,
+      client_id: appId,
+      client_secret: appSecret,
       redirect_uri: redirectUri,
       code,
     });

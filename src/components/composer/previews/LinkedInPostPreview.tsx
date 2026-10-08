@@ -171,32 +171,40 @@ export function LinkedInPostPreview({
         </div>
       </div>
 
-      {/* LinkedIn Toolbar */}
-      <div className="px-2 py-1 flex items-center justify-around text-slate-600 dark:text-slate-300 font-semibold text-xs">
+      {/* LinkedIn Toolbar (Section 4: Disabled from fake interaction) */}
+      <div className="px-2 py-1 flex items-center justify-around text-slate-500 dark:text-slate-400 font-semibold text-xs border-t border-slate-100 dark:border-slate-800">
         <button
           type="button"
-          className="flex-1 py-2 flex items-center justify-center gap-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition"
+          disabled
+          className="flex-1 py-2 flex items-center justify-center gap-1.5 opacity-70 cursor-not-allowed"
+          title="Not supported by this integration"
         >
           <ThumbsUp className="w-4 h-4" />
           <span>Like</span>
         </button>
         <button
           type="button"
-          className="flex-1 py-2 flex items-center justify-center gap-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition"
+          disabled
+          className="flex-1 py-2 flex items-center justify-center gap-1.5 opacity-70 cursor-not-allowed"
+          title="Not supported by this integration"
         >
           <MessageSquare className="w-4 h-4" />
           <span>Comment</span>
         </button>
         <button
           type="button"
-          className="flex-1 py-2 flex items-center justify-center gap-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition"
+          disabled
+          className="flex-1 py-2 flex items-center justify-center gap-1.5 opacity-70 cursor-not-allowed"
+          title="Not supported by this integration"
         >
           <Repeat2 className="w-4 h-4" />
           <span>Repost</span>
         </button>
         <button
           type="button"
-          className="flex-1 py-2 flex items-center justify-center gap-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition"
+          disabled
+          className="flex-1 py-2 flex items-center justify-center gap-1.5 opacity-70 cursor-not-allowed"
+          title="Not supported by this integration"
         >
           <Send className="w-4 h-4" />
           <span>Send</span>

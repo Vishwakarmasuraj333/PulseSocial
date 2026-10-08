@@ -1,22 +1,37 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
-import { PLATFORM_CAPABILITIES, PlatformIntegrationStatus } from "@/lib/social/capabilities";
+import { PLATFORM_CAPABILITIES } from "@/lib/social/capabilities";
 import { getSocialProvider } from "@/lib/social/registry";
 import { SupportedPlatform } from "@/lib/social/types";
+
+export type ProductionAuditStatus =
+  | "CODE VERIFIED"
+  | "EXTERNAL API VERIFIED"
+  | "LIVE ACCOUNT TESTED"
+  | "APPROVAL REQUIRED"
+  | "CREDENTIALS REQUIRED"
+  | "REAUTH REQUIRED"
+  | "BLOCKED";
 
 export interface PlatformHealthReport {
   platform: string;
   displayName: string;
   apiVersion: string;
-  status: PlatformIntegrationStatus;
+  auditStatus: ProductionAuditStatus;
+
+  // Separate operational states (Point 2)
+  CONNECTED: boolean;
+  TOKEN_VALID: "VALID" | "EXPIRED" | "MISSING";
+  ACCOUNT_SYNCED: boolean;
+  PUBLISHING_AVAILABLE: boolean;
+  LIVE_API_VERIFIED: boolean;
+  LIVE_ACCOUNT_TESTED: boolean;
+
+  // Granular check details
   oauthStatus: "PASS" | "FAIL";
-  tokenStatus: "VALID" | "EXPIRED" | "NOT_CONNECTED";
-  accountSyncStatus: "PASS" | "FAIL" | "NOT_SYNCED";
-  publishingStatus: "READY" | "BLOCKED" | "APPROVAL_REQUIRED";
   approvalStatus: "APPROVED" | "REQUIRED" | "NOT_REQUIRED";
   mediaStatus: "READY" | "BLOCKED";
-  isConnected: boolean;
   accountCount: number;
   lastApiCheck: string | null;
   lastError: string | null;
@@ -45,13 +60,13 @@ export async function GET() {
       },
     });
 
-    // Fetch recent publishing attempts to identify real last errors (admin safe)
+    // Fetch publishing attempts to verify real live successes/failures
     const recentAttempts = await prisma.publishingAttempt.findMany({
       where: {
         post: { organizationId: orgId },
       },
       orderBy: { attemptedAt: "desc" },
-      take: 50,
+      take: 100,
       select: {
         provider: true,
         status: true,
@@ -100,86 +115,80 @@ export async function GET() {
       const isConnected = matchingAccounts.length > 0;
       const primaryAccount = matchingAccounts[0];
 
-      // OAuth status: PASS if environment credentials exist, FAIL otherwise
-      const oauthStatus: "PASS" | "FAIL" = isConfigured ? "PASS" : "FAIL";
-
-      // Token status: VALID, EXPIRED, or NOT_CONNECTED
-      let tokenStatus: "VALID" | "EXPIRED" | "NOT_CONNECTED" = "NOT_CONNECTED";
+      // Check token status
+      let tokenStatus: "VALID" | "EXPIRED" | "MISSING" = "MISSING";
       if (isConnected) {
         if (primaryAccount.token?.expiresAt && primaryAccount.token.expiresAt < new Date()) {
           tokenStatus = "EXPIRED";
-        } else {
+        } else if (primaryAccount.token) {
           tokenStatus = "VALID";
         }
       }
 
-      // Account Sync status
-      const accountSyncStatus: "PASS" | "FAIL" | "NOT_SYNCED" = isConnected
-        ? primaryAccount.lastSyncedAt
-          ? "PASS"
-          : "FAIL"
-        : "NOT_SYNCED";
+      // Check account synced
+      const isSynced = Boolean(isConnected && primaryAccount.lastSyncedAt);
 
-      // Approval requirement status
-      const approvalStatus: "APPROVED" | "REQUIRED" | "NOT_REQUIRED" = capability.APPROVAL_REQUIRED
-        ? capability.PUBLISHING_APPROVED
-          ? "APPROVED"
-          : "REQUIRED"
-        : "NOT_REQUIRED";
-
-      // Publishing readiness
-      let publishingStatus: "READY" | "BLOCKED" | "APPROVAL_REQUIRED" = "READY";
-      if (capability.status === "BLOCKED" || !capability.canPublish) {
-        publishingStatus = "BLOCKED";
-      } else if (capability.APPROVAL_REQUIRED && !capability.PUBLISHING_APPROVED) {
-        publishingStatus = "APPROVAL_REQUIRED";
-      }
-
-      // Media status
-      const mediaStatus: "READY" | "BLOCKED" = capability.MEDIA_UPLOAD_SUPPORTED ? "READY" : "BLOCKED";
-
-      // Last error from attempts (admin safe, zero secrets)
-      const lastAttempt = recentAttempts.find(
+      // Check live publishing history for this workspace
+      const providerAttempts = recentAttempts.filter(
         (a) => a.provider.toLowerCase() === p.toLowerCase()
       );
-      const lastError =
-        lastAttempt && lastAttempt.status === "FAILED"
-          ? lastAttempt.errorMessage
-          : null;
+      const hasLiveSuccess = providerAttempts.some((a) => a.status === "SUCCESS");
+      const lastFailedAttempt = providerAttempts.find((a) => a.status === "FAILED");
+      const lastError = lastFailedAttempt ? lastFailedAttempt.errorMessage : null;
 
-      // Last checked at
+      // Approval requirement
+      const isApprovalRequired = capability.APPROVAL_REQUIRED && !capability.PUBLISHING_APPROVED;
+
+      // Publishing availability: true only if connected, token valid, publishing supported, and not blocked by approval
+      const isPublishingAvailable = Boolean(
+        capability.canPublish &&
+        !isApprovalRequired &&
+        capability.status !== "BLOCKED" &&
+        (!isConnected || tokenStatus === "VALID")
+      );
+
+      // Determine strict production audit status (Point 1)
+      let auditStatus: ProductionAuditStatus;
+      if (capability.status === "BLOCKED" || p === "snapchat") {
+        auditStatus = "BLOCKED";
+      } else if (!isConfigured) {
+        auditStatus = "CREDENTIALS REQUIRED";
+      } else if (isConnected && tokenStatus === "EXPIRED") {
+        auditStatus = "REAUTH REQUIRED";
+      } else if (isApprovalRequired) {
+        auditStatus = "APPROVAL REQUIRED";
+      } else if (hasLiveSuccess) {
+        auditStatus = "LIVE ACCOUNT TESTED";
+      } else if (isConnected && tokenStatus === "VALID" && capability.REAL_API_VERIFIED) {
+        auditStatus = "EXTERNAL API VERIFIED";
+      } else {
+        auditStatus = "CODE VERIFIED";
+      }
+
       const lastApiCheck = primaryAccount?.lastSyncedAt
         ? primaryAccount.lastSyncedAt.toISOString()
         : primaryAccount?.token?.updatedAt
         ? primaryAccount.token.updatedAt.toISOString()
         : null;
 
-      // Final status according to Section 27 classification
-      let currentStatus: PlatformIntegrationStatus = capability.status;
-      if (!isConfigured) {
-        currentStatus = "CONFIGURATION REQUIRED";
-      } else if (isConnected && tokenStatus === "EXPIRED") {
-        currentStatus = "REAUTH REQUIRED";
-      } else if (p === "snapchat") {
-        currentStatus = "BLOCKED";
-      } else if (capability.APPROVAL_REQUIRED && !capability.PUBLISHING_APPROVED) {
-        currentStatus = "APPROVAL REQUIRED";
-      } else if (isConnected) {
-        currentStatus = "REAL API CONNECTED";
-      }
-
       health.push({
         platform: p,
         displayName: capability.displayName,
         apiVersion: capability.apiVersion,
-        status: currentStatus,
-        oauthStatus,
-        tokenStatus,
-        accountSyncStatus,
-        publishingStatus,
-        approvalStatus,
-        mediaStatus,
-        isConnected,
+        auditStatus,
+        CONNECTED: isConnected,
+        TOKEN_VALID: tokenStatus,
+        ACCOUNT_SYNCED: isSynced,
+        PUBLISHING_AVAILABLE: isPublishingAvailable,
+        LIVE_API_VERIFIED: capability.REAL_API_VERIFIED,
+        LIVE_ACCOUNT_TESTED: hasLiveSuccess,
+        oauthStatus: isConfigured ? "PASS" : "FAIL",
+        approvalStatus: capability.APPROVAL_REQUIRED
+          ? capability.PUBLISHING_APPROVED
+            ? "APPROVED"
+            : "REQUIRED"
+          : "NOT_REQUIRED",
+        mediaStatus: capability.MEDIA_UPLOAD_SUPPORTED ? "READY" : "BLOCKED",
         accountCount: matchingAccounts.length,
         lastApiCheck,
         lastError,

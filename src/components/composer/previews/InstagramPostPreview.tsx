@@ -137,27 +137,47 @@ export function InstagramPostPreview({
         )}
       </div>
 
-      {/* Instagram Action Icons */}
-      <div className="px-3 pt-2.5 pb-1 flex items-center justify-between text-slate-800 dark:text-slate-200">
+      {/* Instagram Action Icons (Section 4: Disabled from fake interaction) */}
+      <div className="px-3 pt-2.5 pb-1 flex items-center justify-between text-slate-500 dark:text-slate-400">
         <div className="flex items-center gap-3.5">
-          <button type="button" className="hover:text-rose-500 transition" title="Like">
+          <button
+            type="button"
+            disabled
+            className="cursor-not-allowed opacity-75"
+            title="Not supported by this integration"
+          >
             <Heart className="w-5 h-5 stroke-[1.75]" />
           </button>
-          <button type="button" className="hover:text-blue-500 transition" title="Comment">
+          <button
+            type="button"
+            disabled
+            className="cursor-not-allowed opacity-75"
+            title="Not supported by this integration"
+          >
             <MessageCircle className="w-5 h-5 stroke-[1.75]" />
           </button>
-          <button type="button" className="hover:text-slate-500 transition" title="Share">
+          <button
+            type="button"
+            disabled
+            className="cursor-not-allowed opacity-75"
+            title="Not supported by this integration"
+          >
             <Send className="w-5 h-5 stroke-[1.75]" />
           </button>
         </div>
-        <button type="button" className="hover:text-slate-500 transition" title="Save">
+        <button
+          type="button"
+          disabled
+          className="cursor-not-allowed opacity-75"
+          title="Not supported by this integration"
+        >
           <Bookmark className="w-5 h-5 stroke-[1.75]" />
         </button>
       </div>
 
       {/* Likes line */}
-      <div className="px-3 text-[11px] font-semibold text-slate-900 dark:text-white">
-        <span>Be the first to like this</span>
+      <div className="px-3 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+        <span>0 likes · Real interactions sync after publishing</span>
       </div>
 
       {/* Caption Content */}

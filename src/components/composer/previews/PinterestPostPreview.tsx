@@ -117,7 +117,7 @@ export function PinterestPostPreview({
 
         {/* Notice */}
         <p className="text-[10px] text-slate-400 text-center italic pt-1">
-          Save action preview · Real stats sync after publishing
+          Preview only — engagement actions are not supported by this integration
         </p>
       </div>
     </div>

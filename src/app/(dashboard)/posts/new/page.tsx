@@ -79,6 +79,17 @@ export default function NewPostPage() {
               username: p.connectedAccount.username,
               profileImageUrl: p.connectedAccount.profileImageUrl,
               isRealConnected: true,
+              publishingStatus:
+                p.connectedAccount.publishingStatus || p.publishingStatus || "Ready to publish",
+              publishingAvailable: Boolean(
+                p.connectedAccount.publishingAvailable ?? p.publishingAvailable ?? false
+              ),
+              tokenStatus:
+                p.connectedAccount.tokenStatus || p.tokenStatus || "MISSING",
+              capabilityNotes:
+                p.connectedAccount.capabilityNotes ||
+                p.platformCapability?.unsupportedMessage ||
+                p.platformCapability?.notes,
             });
           }
         });
@@ -205,10 +216,9 @@ export default function NewPostPage() {
       return;
     }
 
-    // Check if selected accounts are real connected accounts
-    const hasRealConnected = accounts.some(
-      (a) => selectedAccountIds.includes(a.id) && a.isRealConnected
-    );
+    // Check if selected accounts are real connected accounts and publishable
+    const selectedAccs = accounts.filter((a) => selectedAccountIds.includes(a.id));
+    const hasRealConnected = selectedAccs.some((a) => a.isRealConnected);
 
     if (action === "PUBLISH_NOW" && !hasRealConnected) {
       toast({
@@ -216,6 +226,17 @@ export default function NewPostPage() {
         message:
           "Publishing requires a verified connected social account. Connect your channel in Settings -> Connected Accounts.",
         type: "error",
+      });
+      return;
+    }
+
+    const unpublishable = selectedAccs.filter((a) => !a.publishingAvailable);
+    if (action === "PUBLISH_NOW" && unpublishable.length > 0) {
+      const first = unpublishable[0];
+      toast({
+        title: first.publishingStatus || "Publishing Restricted",
+        message: `${first.displayName}: ${first.publishingStatus}${first.capabilityNotes ? ` (${first.capabilityNotes})` : ""}. Please save as draft or reauthorize.`,
+        type: "warning",
       });
       return;
     }
@@ -368,39 +389,97 @@ export default function NewPostPage() {
                   </Link>
                 </div>
               ) : (
-                <div className="flex items-center gap-2 flex-wrap">
-                  {accounts.map((acc) => {
-                    const isSelected = selectedAccountIds.includes(acc.id);
-                    return (
-                      <button
-                        key={acc.id}
-                        type="button"
-                        onClick={() => toggleAccount(acc.id, acc.provider)}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all border cursor-pointer ${
-                          isSelected
-                            ? "border-indigo-600 bg-indigo-50/80 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300 ring-2 ring-indigo-500/20 shadow-xs"
-                            : "border-slate-200 bg-white text-slate-600 opacity-60 hover:opacity-100 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400"
-                        }`}
-                      >
-                        {acc.profileImageUrl ? (
-                          <img
-                            src={acc.profileImageUrl}
-                            alt=""
-                            className="w-4 h-4 rounded-full object-cover"
-                          />
-                        ) : (
-                          renderPlatformIcon(acc.provider, 15)
-                        )}
-                        <span className="truncate max-w-[120px]">{acc.displayName}</span>
-                        {acc.username && (
-                          <span className="text-[10px] opacity-60">@{acc.username}</span>
-                        )}
-                        {isSelected ? (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 ml-0.5" />
-                        ) : null}
-                      </button>
-                    );
-                  })}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    {accounts.map((acc) => {
+                      const isSelected = selectedAccountIds.includes(acc.id);
+                      const status = acc.publishingStatus || "Ready to publish";
+
+                      const badgeStyle =
+                        status === "Ready to publish"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800"
+                          : status === "Connected — Publishing approval required"
+                          ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800"
+                          : status === "Reauthorization required"
+                          ? "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800"
+                          : "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700";
+
+                      return (
+                        <div key={acc.id} className="flex flex-col gap-1">
+                          <button
+                            type="button"
+                            onClick={() => toggleAccount(acc.id, acc.provider)}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all border cursor-pointer ${
+                              isSelected
+                                ? "border-indigo-600 bg-indigo-50/80 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300 ring-2 ring-indigo-500/20 shadow-xs"
+                                : "border-slate-200 bg-white text-slate-600 opacity-70 hover:opacity-100 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400"
+                            }`}
+                          >
+                            {acc.profileImageUrl ? (
+                              <img
+                                src={acc.profileImageUrl}
+                                alt=""
+                                className="w-4 h-4 rounded-full object-cover"
+                              />
+                            ) : (
+                              renderPlatformIcon(acc.provider, 15)
+                            )}
+                            <span className="truncate max-w-[120px]">{acc.displayName}</span>
+                            {acc.username && (
+                              <span className="text-[10px] opacity-60">@{acc.username}</span>
+                            )}
+                            {isSelected ? (
+                              <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 ml-0.5" />
+                            ) : null}
+                          </button>
+
+                          {/* Truthful Publishing Status Badge (Requirement 3) */}
+                          <span
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold border tracking-tight ${badgeStyle}`}
+                            title={acc.capabilityNotes || status}
+                          >
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                status === "Ready to publish"
+                                  ? "bg-emerald-500"
+                                  : status === "Connected — Publishing approval required"
+                                  ? "bg-amber-500"
+                                  : status === "Reauthorization required"
+                                  ? "bg-rose-500"
+                                  : "bg-slate-400"
+                              }`}
+                            />
+                            {status}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Warning banner for unpublishable channels */}
+                  {accounts
+                    .filter((a) => selectedAccountIds.includes(a.id) && !a.publishingAvailable)
+                    .length > 0 && (
+                    <div className="p-3 rounded-xl border border-amber-200/80 bg-amber-50/60 dark:bg-amber-950/20 dark:border-amber-800/60 text-xs text-amber-900 dark:text-amber-200 space-y-1">
+                      <div className="flex items-center gap-2 font-bold">
+                        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                        <span>Publishing Notice for Selected Channels:</span>
+                      </div>
+                      <ul className="list-disc list-inside space-y-0.5 text-[11px] pl-1">
+                        {accounts
+                          .filter((a) => selectedAccountIds.includes(a.id) && !a.publishingAvailable)
+                          .map((a) => (
+                            <li key={a.id}>
+                              <span className="font-semibold">{a.displayName}:</span> {a.publishingStatus}
+                              {a.capabilityNotes ? ` (${a.capabilityNotes})` : ""}
+                            </li>
+                          ))}
+                      </ul>
+                      <p className="text-[10px] text-amber-700/80 dark:text-amber-400 pt-0.5">
+                        Direct publishing is blocked until external approvals or credentials are ready. You can still save as draft or schedule.
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

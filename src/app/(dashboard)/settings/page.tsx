@@ -1301,7 +1301,7 @@ function SettingsContent() {
                     }`}
                   >
                     <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
-                    API Health & Compliance
+                    API Health
                   </button>
                 </div>
               </div>

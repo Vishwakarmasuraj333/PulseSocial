@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
-import Image from "next/image";
+import React from "react";
 import { PreviewAccount, PreviewMediaItem } from "./FacebookPostPreview";
 import { Heart, MessageCircle, Repeat2, Send, MoreHorizontal } from "lucide-react";
 
@@ -12,9 +11,6 @@ interface ThreadsPostPreviewProps {
 }
 
 export function ThreadsPostPreview({ account, content, media }: ThreadsPostPreviewProps) {
-  const [isLiked, setIsLiked] = useState(false);
-  const [isReposted, setIsReposted] = useState(false);
-
   const heroMedia = media[0];
 
   return (
@@ -65,41 +61,45 @@ export function ThreadsPostPreview({ account, content, media }: ThreadsPostPrevi
             </div>
           )}
 
-          {/* Actions */}
-          <div className="flex items-center gap-4 pt-1 text-slate-700 dark:text-zinc-300">
+          {/* Actions (Section 4: Disabled from fake interaction) */}
+          <div className="flex items-center gap-4 pt-1 text-slate-400 dark:text-zinc-500">
             <button
               type="button"
-              onClick={() => setIsLiked(!isLiked)}
-              className="hover:text-rose-500 transition cursor-pointer"
+              disabled
+              className="cursor-not-allowed opacity-75"
+              title="Not supported by this integration"
             >
-              <Heart
-                className={`w-4 h-4 transition ${
-                  isLiked ? "fill-rose-500 text-rose-500" : ""
-                }`}
-              />
+              <Heart className="w-4 h-4" />
             </button>
-            <button type="button" className="hover:text-indigo-500 transition cursor-pointer">
+            <button
+              type="button"
+              disabled
+              className="cursor-not-allowed opacity-75"
+              title="Not supported by this integration"
+            >
               <MessageCircle className="w-4 h-4" />
             </button>
             <button
               type="button"
-              onClick={() => setIsReposted(!isReposted)}
-              className="hover:text-emerald-500 transition cursor-pointer"
+              disabled
+              className="cursor-not-allowed opacity-75"
+              title="Not supported by this integration"
             >
-              <Repeat2
-                className={`w-4 h-4 transition ${
-                  isReposted ? "text-emerald-500" : ""
-                }`}
-              />
+              <Repeat2 className="w-4 h-4" />
             </button>
-            <button type="button" className="hover:text-slate-900 dark:hover:text-white transition cursor-pointer">
+            <button
+              type="button"
+              disabled
+              className="cursor-not-allowed opacity-75"
+              title="Not supported by this integration"
+            >
               <Send className="w-4 h-4" />
             </button>
           </div>
 
           {/* Engagement info */}
           <p className="text-[10px] text-slate-400 dark:text-zinc-500 pt-1">
-            {isLiked ? "1 preview like" : "Likes shown after publishing"}
+            Real engagements sync from Threads after publishing
           </p>
         </div>
       </div>

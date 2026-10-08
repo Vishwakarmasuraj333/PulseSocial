@@ -85,7 +85,9 @@ export function GoogleBusinessPostPreview({
         <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
           <button
             type="button"
-            className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-xs transition"
+            disabled
+            className="w-full py-2.5 px-4 rounded-xl bg-blue-600/70 text-white text-xs font-semibold flex items-center justify-center gap-1.5 opacity-80 cursor-not-allowed"
+            title="Preview only — not supported by this integration"
           >
             {ctaType === "CALL_NOW" ? (
               <PhoneCall className="w-3.5 h-3.5" />

@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { PreviewAccount, PreviewMediaItem } from "./FacebookPostPreview";
-import { MessageSquare, Repeat, Star, Bookmark, Share2, MoreHorizontal } from "lucide-react";
+import { MessageSquare, Repeat, Star, Bookmark, MoreHorizontal } from "lucide-react";
 
 interface MastodonPostPreviewProps {
   account: PreviewAccount;
@@ -11,10 +11,6 @@ interface MastodonPostPreviewProps {
 }
 
 export function MastodonPostPreview({ account, content, media }: MastodonPostPreviewProps) {
-  const [isBoosted, setIsBoosted] = useState(false);
-  const [isFavourited, setIsFavourited] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(false);
-
   const heroMedia = media[0];
   const instanceHandle = account.username?.includes("@")
     ? `@${account.username}`
@@ -63,53 +59,49 @@ export function MastodonPostPreview({ account, content, media }: MastodonPostPre
         </div>
       )}
 
-      {/* Action Row */}
+      {/* Action Row (Section 4: Disabled from fake interaction) */}
       <div className="flex items-center justify-between pt-2 border-t border-[#393f4f] text-[#9baec8]">
         <button
           type="button"
-          className="p-1.5 hover:text-white hover:bg-[#313543] rounded-lg transition cursor-pointer"
-          title="Reply"
+          disabled
+          className="p-1.5 opacity-70 cursor-not-allowed"
+          title="Not supported by this integration"
         >
           <MessageSquare className="w-4 h-4" />
         </button>
 
         <button
           type="button"
-          onClick={() => setIsBoosted(!isBoosted)}
-          className={`p-1.5 rounded-lg transition cursor-pointer ${
-            isBoosted ? "text-[#6364ff]" : "hover:text-[#6364ff] hover:bg-[#313543]"
-          }`}
-          title="Boost"
+          disabled
+          className="p-1.5 opacity-70 cursor-not-allowed"
+          title="Not supported by this integration"
         >
           <Repeat className="w-4 h-4" />
         </button>
 
         <button
           type="button"
-          onClick={() => setIsFavourited(!isFavourited)}
-          className={`p-1.5 rounded-lg transition cursor-pointer ${
-            isFavourited ? "text-amber-400 fill-amber-400" : "hover:text-amber-400 hover:bg-[#313543]"
-          }`}
-          title="Favourite"
+          disabled
+          className="p-1.5 opacity-70 cursor-not-allowed"
+          title="Not supported by this integration"
         >
-          <Star className={`w-4 h-4 ${isFavourited ? "fill-amber-400" : ""}`} />
+          <Star className="w-4 h-4" />
         </button>
 
         <button
           type="button"
-          onClick={() => setIsBookmarked(!isBookmarked)}
-          className={`p-1.5 rounded-lg transition cursor-pointer ${
-            isBookmarked ? "text-rose-400" : "hover:text-rose-400 hover:bg-[#313543]"
-          }`}
-          title="Bookmark"
+          disabled
+          className="p-1.5 opacity-70 cursor-not-allowed"
+          title="Not supported by this integration"
         >
           <Bookmark className="w-4 h-4" />
         </button>
 
         <button
           type="button"
-          className="p-1.5 hover:text-white hover:bg-[#313543] rounded-lg transition cursor-pointer"
-          title="More"
+          disabled
+          className="p-1.5 opacity-70 cursor-not-allowed"
+          title="Not supported by this integration"
         >
           <MoreHorizontal className="w-4 h-4" />
         </button>

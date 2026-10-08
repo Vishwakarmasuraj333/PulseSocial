@@ -100,7 +100,7 @@ export function TikTokPostPreview({ account, content, media }: TikTokPostPreview
           </div>
 
           {/* Heart / Like */}
-          <button type="button" className="flex flex-col items-center gap-0.5">
+          <button type="button" disabled className="flex flex-col items-center gap-0.5 opacity-75 cursor-not-allowed" title="Not supported by this integration">
             <div className="w-9 h-9 rounded-full bg-black/40 flex items-center justify-center backdrop-blur-xs">
               <Heart className="w-5 h-5 fill-white/10 text-white" />
             </div>
@@ -108,7 +108,7 @@ export function TikTokPostPreview({ account, content, media }: TikTokPostPreview
           </button>
 
           {/* Comment */}
-          <button type="button" className="flex flex-col items-center gap-0.5">
+          <button type="button" disabled className="flex flex-col items-center gap-0.5 opacity-75 cursor-not-allowed" title="Not supported by this integration">
             <div className="w-9 h-9 rounded-full bg-black/40 flex items-center justify-center backdrop-blur-xs">
               <MessageCircle className="w-5 h-5 fill-white/10 text-white" />
             </div>
@@ -116,7 +116,7 @@ export function TikTokPostPreview({ account, content, media }: TikTokPostPreview
           </button>
 
           {/* Bookmark */}
-          <button type="button" className="flex flex-col items-center gap-0.5">
+          <button type="button" disabled className="flex flex-col items-center gap-0.5 opacity-75 cursor-not-allowed" title="Not supported by this integration">
             <div className="w-9 h-9 rounded-full bg-black/40 flex items-center justify-center backdrop-blur-xs">
               <Bookmark className="w-5 h-5 fill-white/10 text-white" />
             </div>
@@ -124,7 +124,7 @@ export function TikTokPostPreview({ account, content, media }: TikTokPostPreview
           </button>
 
           {/* Share */}
-          <button type="button" className="flex flex-col items-center gap-0.5">
+          <button type="button" disabled className="flex flex-col items-center gap-0.5 opacity-75 cursor-not-allowed" title="Not supported by this integration">
             <div className="w-9 h-9 rounded-full bg-black/40 flex items-center justify-center backdrop-blur-xs">
               <Share2 className="w-5 h-5 text-white" />
             </div>

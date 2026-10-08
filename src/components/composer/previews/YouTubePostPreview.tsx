@@ -107,19 +107,19 @@ export function YouTubePostPreview({
 
           {/* Right Rail Icons */}
           <div className="flex flex-col items-center gap-3 shrink-0 pb-1">
-            <button type="button" className="flex flex-col items-center gap-0.5">
+            <button type="button" disabled className="flex flex-col items-center gap-0.5 opacity-75 cursor-not-allowed" title="Not supported by this integration">
               <div className="w-9 h-9 rounded-full bg-black/40 flex items-center justify-center">
                 <ThumbsUp className="w-5 h-5 text-white" />
               </div>
               <span className="text-[10px] font-semibold">0</span>
             </button>
-            <button type="button" className="flex flex-col items-center gap-0.5">
+            <button type="button" disabled className="flex flex-col items-center gap-0.5 opacity-75 cursor-not-allowed" title="Not supported by this integration">
               <div className="w-9 h-9 rounded-full bg-black/40 flex items-center justify-center">
                 <ThumbsDown className="w-5 h-5 text-white" />
               </div>
               <span className="text-[10px] font-semibold">Dislike</span>
             </button>
-            <button type="button" className="flex flex-col items-center gap-0.5">
+            <button type="button" disabled className="flex flex-col items-center gap-0.5 opacity-75 cursor-not-allowed" title="Not supported by this integration">
               <div className="w-9 h-9 rounded-full bg-black/40 flex items-center justify-center">
                 <Share2 className="w-5 h-5 text-white" />
               </div>
@@ -198,19 +198,23 @@ export function YouTubePostPreview({
           </div>
           <button
             type="button"
-            className="px-3 py-1.5 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold hover:opacity-90 transition flex items-center gap-1.5"
+            disabled
+            className="px-3 py-1.5 rounded-full bg-slate-900/60 dark:bg-white/60 text-white dark:text-slate-900 text-xs font-bold opacity-75 cursor-not-allowed flex items-center gap-1.5"
+            title="Not supported by this integration"
           >
             <Bell className="w-3.5 h-3.5" />
             <span>Subscribe</span>
           </button>
         </div>
 
-        {/* Video Actions Toolbar */}
-        <div className="mt-2.5 flex items-center gap-2 overflow-x-auto pb-1 text-slate-700 dark:text-slate-300 font-medium text-[11px]">
-          <div className="flex items-center rounded-full bg-slate-100 dark:bg-slate-800 p-0.5">
+        {/* Video Actions Toolbar (Section 4: Disabled from fake interaction) */}
+        <div className="mt-2.5 flex items-center gap-2 overflow-x-auto pb-1 text-slate-500 dark:text-slate-400 font-medium text-[11px]">
+          <div className="flex items-center rounded-full bg-slate-100 dark:bg-slate-800 p-0.5 opacity-75">
             <button
               type="button"
-              className="px-2.5 py-1 flex items-center gap-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-l-full transition"
+              disabled
+              className="px-2.5 py-1 flex items-center gap-1 rounded-l-full cursor-not-allowed"
+              title="Not supported by this integration"
             >
               <ThumbsUp className="w-3.5 h-3.5" />
               <span>0</span>
@@ -218,21 +222,27 @@ export function YouTubePostPreview({
             <div className="w-[1px] h-3.5 bg-slate-300 dark:bg-slate-700" />
             <button
               type="button"
-              className="px-2.5 py-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-r-full transition"
+              disabled
+              className="px-2.5 py-1 rounded-r-full cursor-not-allowed"
+              title="Not supported by this integration"
             >
               <ThumbsDown className="w-3.5 h-3.5" />
             </button>
           </div>
           <button
             type="button"
-            className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center gap-1 transition shrink-0"
+            disabled
+            className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 opacity-75 cursor-not-allowed flex items-center gap-1 shrink-0"
+            title="Not supported by this integration"
           >
             <Share2 className="w-3.5 h-3.5" />
             <span>Share</span>
           </button>
           <button
             type="button"
-            className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center gap-1 transition shrink-0"
+            disabled
+            className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 opacity-75 cursor-not-allowed flex items-center gap-1 shrink-0"
+            title="Not supported by this integration"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Download</span>

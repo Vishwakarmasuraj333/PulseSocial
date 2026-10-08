@@ -149,45 +149,50 @@ export function XPostPreview({ account, content, media, location }: XPostPreview
             </div>
           )}
 
-          {/* Action Toolbar */}
-          <div className="mt-3 flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs">
+          {/* Action Toolbar (Section 4: Disabled from fake interaction) */}
+          <div className="mt-3 flex items-center justify-between text-slate-400 dark:text-slate-500 text-xs">
             <button
               type="button"
-              className="flex items-center gap-1.5 hover:text-sky-500 transition group"
-              title="Reply"
+              disabled
+              className="flex items-center gap-1.5 opacity-70 cursor-not-allowed"
+              title="Not supported by this integration"
             >
-              <MessageSquare className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <MessageSquare className="w-4 h-4" />
               <span className="text-[11px]">0</span>
             </button>
             <button
               type="button"
-              className="flex items-center gap-1.5 hover:text-emerald-500 transition group"
-              title="Repost"
+              disabled
+              className="flex items-center gap-1.5 opacity-70 cursor-not-allowed"
+              title="Not supported by this integration"
             >
-              <Repeat2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <Repeat2 className="w-4 h-4" />
               <span className="text-[11px]">0</span>
             </button>
             <button
               type="button"
-              className="flex items-center gap-1.5 hover:text-rose-500 transition group"
-              title="Like"
+              disabled
+              className="flex items-center gap-1.5 opacity-70 cursor-not-allowed"
+              title="Not supported by this integration"
             >
-              <Heart className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <Heart className="w-4 h-4" />
               <span className="text-[11px]">0</span>
             </button>
             <button
               type="button"
-              className="flex items-center gap-1.5 hover:text-sky-500 transition group"
-              title="Bookmark"
+              disabled
+              className="flex items-center gap-1.5 opacity-70 cursor-not-allowed"
+              title="Not supported by this integration"
             >
-              <Bookmark className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <Bookmark className="w-4 h-4" />
             </button>
             <button
               type="button"
-              className="flex items-center gap-1.5 hover:text-sky-500 transition group"
-              title="Share"
+              disabled
+              className="flex items-center gap-1.5 opacity-70 cursor-not-allowed"
+              title="Not supported by this integration"
             >
-              <Share className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <Share className="w-4 h-4" />
             </button>
 
             {/* Character meter */}

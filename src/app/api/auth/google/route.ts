@@ -68,7 +68,7 @@ export async function GET(req: Request) {
   });
 
   const url = new URL(req.url);
-  const promptParam = url.searchParams.get("prompt") || "select_account";
+  const promptParam = url.searchParams.get("prompt") || "select_account consent";
 
   // Construct official Google authorization URL
   const googleAuthUrl = buildGoogleAuthUrl({

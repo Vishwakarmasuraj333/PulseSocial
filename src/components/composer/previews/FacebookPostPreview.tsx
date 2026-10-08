@@ -21,6 +21,14 @@ export interface PreviewAccount {
   profileImageUrl: string | null;
   accountType?: string;
   isRealConnected?: boolean;
+  publishingStatus?:
+    | "Ready to publish"
+    | "Connected — Publishing approval required"
+    | "Connected configuration incomplete"
+    | "Reauthorization required";
+  publishingAvailable?: boolean;
+  tokenStatus?: "VALID" | "EXPIRED" | "MISSING";
+  capabilityNotes?: string;
 }
 
 export interface PreviewMediaItem {
@@ -191,28 +199,31 @@ export function FacebookPostPreview({
         </div>
       </div>
 
-      {/* Action Buttons Toolbar */}
-      <div className="px-2 py-1.5 flex items-center justify-around text-slate-600 dark:text-slate-300 font-semibold text-xs">
+      {/* Action Buttons Toolbar (Section 4: Disabled from fake interaction) */}
+      <div className="px-2 py-1.5 flex items-center justify-around text-slate-500 dark:text-slate-400 font-semibold text-xs border-t border-slate-100 dark:border-slate-800">
         <button
           type="button"
-          className="flex-1 py-1.5 flex items-center justify-center gap-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition"
-          title="Like (Visual Preview)"
+          disabled
+          className="flex-1 py-1.5 flex items-center justify-center gap-1.5 opacity-70 cursor-not-allowed"
+          title="Not supported by this integration"
         >
           <ThumbsUp className="w-4 h-4" />
           <span>Like</span>
         </button>
         <button
           type="button"
-          className="flex-1 py-1.5 flex items-center justify-center gap-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition"
-          title="Comment (Visual Preview)"
+          disabled
+          className="flex-1 py-1.5 flex items-center justify-center gap-1.5 opacity-70 cursor-not-allowed"
+          title="Not supported by this integration"
         >
           <MessageCircle className="w-4 h-4" />
           <span>Comment</span>
         </button>
         <button
           type="button"
-          className="flex-1 py-1.5 flex items-center justify-center gap-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition"
-          title="Share (Visual Preview)"
+          disabled
+          className="flex-1 py-1.5 flex items-center justify-center gap-1.5 opacity-70 cursor-not-allowed"
+          title="Not supported by this integration"
         >
           <Share2 className="w-4 h-4" />
           <span>Share</span>

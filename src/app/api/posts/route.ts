@@ -4,12 +4,15 @@ import { getSession } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit/logger";
 import { getSocialProvider } from "@/lib/social/registry";
-import { decryptToken, encryptToken } from "@/lib/security/encryption";
+import { decryptToken } from "@/lib/security/encryption";
+import { getPlatformCapability } from "@/lib/social/capabilities";
 
 const CreatePostSchema = z.object({
-  content: z.string().min(1, "Post content is required"),
-  targetAccountIds: z.array(z.string()).min(1, "Select at least one social account"),
-  action: z.enum(["DRAFT", "SCHEDULE", "PUBLISH_NOW", "QUEUE"]).default("DRAFT"),
+  content: z.string().optional().default(""),
+  targetAccountIds: z.array(z.string()).optional(),
+  platforms: z.array(z.string()).optional(),
+  action: z.enum(["DRAFT", "SCHEDULE", "PUBLISH_NOW", "QUEUE"]).optional(),
+  status: z.enum(["DRAFT", "SCHEDULED", "PUBLISHED", "QUEUED"]).optional(),
   scheduledFor: z.string().optional(),
   mediaUrls: z
     .array(
@@ -64,6 +67,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
+    // 1. Session verification
     const session = await getSession();
     if (!session?.activeOrgId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -79,30 +83,56 @@ export async function POST(req: Request) {
       );
     }
 
-    const { content, targetAccountIds, action, scheduledFor, mediaUrls } = validated.data;
+    const {
+      content: rawContent,
+      targetAccountIds,
+      platforms,
+      action: explicitAction,
+      status: explicitStatus,
+      scheduledFor,
+      mediaUrls,
+    } = validated.data;
 
-    let initialStatus = "DRAFT";
-    if (action === "SCHEDULE") initialStatus = "SCHEDULED";
-    if (action === "QUEUE") initialStatus = "QUEUED";
-    if (action === "PUBLISH_NOW") initialStatus = "PUBLISHING";
+    const content = (rawContent || "").trim();
 
-    const scheduledDate = scheduledFor ? new Date(scheduledFor) : null;
+    // Map flexible action/status
+    let action: "DRAFT" | "SCHEDULE" | "PUBLISH_NOW" | "QUEUE" = explicitAction || "DRAFT";
+    if (!explicitAction && explicitStatus) {
+      if (explicitStatus === "PUBLISHED") action = "PUBLISH_NOW";
+      else if (explicitStatus === "SCHEDULED") action = "SCHEDULE";
+      else if (explicitStatus === "QUEUED") action = "QUEUE";
+      else action = "DRAFT";
+    }
 
-    // Fetch active brand / organization
+    // 2. Organization verification
     const org = await prisma.organization.findUnique({
       where: { id: session.activeOrgId },
     });
-    const orgName = org?.name || "Official Brand";
-    const orgSlug = org?.slug || "brand_official";
+    if (!org) {
+      return NextResponse.json({ error: "Organization workspace not found." }, { status: 404 });
+    }
 
-    // 1. Resolve valid connected SocialAccount IDs strictly belonging to this organization
+    // 3. Content and media presence validation
+    const hasMedia = Boolean(mediaUrls && mediaUrls.length > 0);
+    const hasContent = Boolean(content.length > 0);
+    if (!hasContent && !hasMedia) {
+      return NextResponse.json(
+        { error: "Post content or media attachment is required." },
+        { status: 400 }
+      );
+    }
+
+    // 4. Social account resolution
+    const requestedTargets = [
+      ...(targetAccountIds || []),
+      ...(platforms || []),
+    ];
+
     const validAccountIds: string[] = [];
-    const requestedTargets = targetAccountIds || [];
 
     for (const targetId of requestedTargets) {
       if (!targetId || targetId === "default-channel" || targetId === "auto") continue;
 
-      // Check if targetId is an existing SocialAccount ID in this workspace
       const byId = await prisma.socialAccount.findFirst({
         where: { id: targetId, organizationId: session.activeOrgId },
       });
@@ -111,10 +141,12 @@ export async function POST(req: Request) {
         continue;
       }
 
-      // Check if targetId is a provider identifier (e.g. "facebook", "channel-facebook")
       const cleanProvider = targetId.toLowerCase().replace(/^channel-/, "").trim();
       const existingByProvider = await prisma.socialAccount.findFirst({
-        where: { organizationId: session.activeOrgId, provider: cleanProvider },
+        where: {
+          organizationId: session.activeOrgId,
+          provider: cleanProvider === "google_business" ? "googlebusiness" : cleanProvider,
+        },
       });
 
       if (existingByProvider && !validAccountIds.includes(existingByProvider.id)) {
@@ -132,6 +164,103 @@ export async function POST(req: Request) {
       );
     }
 
+    // Fetch full accounts including tokens to perform pre-publish validations
+    const targetAccounts = await prisma.socialAccount.findMany({
+      where: { id: { in: validAccountIds } },
+      include: { token: true },
+    });
+
+    const normalizedMedia = (mediaUrls || []).map((m, index) => ({
+      url: typeof m === "string" ? m : m.url,
+      type: typeof m === "string" ? "IMAGE" : (m.type || "IMAGE"),
+      altText: typeof m === "string" ? "" : (m.altText || ""),
+      orderIndex: index,
+    }));
+
+    const hasVideo = normalizedMedia.some((m) => m.type === "VIDEO");
+
+    // 5. Pre-publish validations (Requirement 6) when action === "PUBLISH_NOW"
+    if (action === "PUBLISH_NOW") {
+      const preflightErrors: string[] = [];
+
+      for (const acc of targetAccounts) {
+        const cap = getPlatformCapability(acc.provider);
+
+        // a. Token existence
+        if (!acc.token) {
+          preflightErrors.push(
+            `Connected configuration incomplete: ${cap.displayName} account is not connected with OAuth credentials.`
+          );
+          continue;
+        }
+
+        // b. Token expiry
+        if (acc.token.expiresAt && acc.token.expiresAt < new Date()) {
+          preflightErrors.push(
+            `Reauthorization required: OAuth access token for ${cap.displayName} has expired. Please reauthorize account.`
+          );
+          continue;
+        }
+
+        // c. Platform capability
+        if (!cap.canPublish || cap.status === "BLOCKED") {
+          preflightErrors.push(
+            `Publishing blocked: ${cap.displayName} does not permit direct publishing (${cap.unsupportedMessage || "Policy restriction"}).`
+          );
+          continue;
+        }
+
+        // d. Approval state
+        if (cap.APPROVAL_REQUIRED && !cap.PUBLISHING_APPROVED) {
+          preflightErrors.push(
+            `Connected — Publishing approval required: ${cap.displayName} requires developer partner app review (${cap.unsupportedMessage || "Approval required"}).`
+          );
+          continue;
+        }
+
+        // e. Platform character limits
+        if (content.length > cap.maxCharacterLimit) {
+          preflightErrors.push(
+            `Platform limit exceeded: Content length (${content.length}) exceeds ${cap.displayName} limit of ${cap.maxCharacterLimit} characters.`
+          );
+          continue;
+        }
+
+        // f. Media requirements
+        if ((acc.provider === "tiktok" || acc.provider === "youtube") && !hasVideo) {
+          preflightErrors.push(
+            `${cap.displayName} requires a video attachment for publication.`
+          );
+          continue;
+        }
+
+        if (acc.provider === "pinterest" && normalizedMedia.length === 0) {
+          preflightErrors.push(
+            `Pinterest requires an image or video attachment for pin creation.`
+          );
+          continue;
+        }
+      }
+
+      // If all targets fail pre-flight validation, reject with actionable 422 error
+      if (preflightErrors.length === targetAccounts.length) {
+        return NextResponse.json(
+          {
+            error: preflightErrors[0],
+            allErrors: preflightErrors,
+          },
+          { status: 422 }
+        );
+      }
+    }
+
+    let initialStatus = "DRAFT";
+    if (action === "SCHEDULE") initialStatus = "SCHEDULED";
+    if (action === "QUEUE") initialStatus = "QUEUED";
+    if (action === "PUBLISH_NOW") initialStatus = "PUBLISHING";
+
+    const scheduledDate = scheduledFor ? new Date(scheduledFor) : null;
+
     // Resolve creator ID reliably
     const creatorId =
       session.id ||
@@ -143,7 +272,7 @@ export async function POST(req: Request) {
       (await prisma.user.findFirst({ select: { id: true } }))?.id ||
       "admin";
 
-    // Create SocialPost record with guaranteed valid target foreign keys for ALL selected channels
+    // Create SocialPost record
     const post = await prisma.socialPost.create({
       data: {
         organizationId: session.activeOrgId,
@@ -158,11 +287,11 @@ export async function POST(req: Request) {
           })),
         },
         media: {
-          create: (mediaUrls || []).map((m, index) => ({
-            url: typeof m === "string" ? m : m.url,
-            mediaType: typeof m === "string" ? "IMAGE" : (m.type || "IMAGE"),
-            altText: typeof m === "string" ? "" : (m.altText || ""),
-            orderIndex: index,
+          create: normalizedMedia.map((m) => ({
+            url: m.url,
+            mediaType: m.type as "IMAGE" | "VIDEO",
+            altText: m.altText,
+            orderIndex: m.orderIndex,
           })),
         },
       },
@@ -188,34 +317,75 @@ export async function POST(req: Request) {
       });
     }
 
-    // If PUBLISH_NOW, trigger real publishing execution across ALL targets
+    // If PUBLISH_NOW, trigger real publishing execution across all targets
     if (action === "PUBLISH_NOW") {
       let publishedCount = 0;
       let failureCount = 0;
+      const targetErrors: string[] = [];
+
       for (const target of post.targets) {
         const account = target.socialAccount;
-        try {
-          if (!account.token) {
-            failureCount++;
-            const errMsg = `${account.provider} account is not connected with live OAuth tokens.`;
-            await prisma.socialPostTarget.update({
-              where: { id: target.id },
-              data: {
-                status: "FAILED",
-                errorMessage: errMsg,
-              },
-            });
-            await prisma.publishingAttempt.create({
-              data: {
-                postId: post.id,
-                provider: account.provider,
-                status: "FAILED",
-                errorMessage: errMsg,
-              },
-            });
-            continue;
-          }
+        const cap = getPlatformCapability(account.provider);
 
+        // Pre-validate target before dispatch
+        if (!account.token) {
+          failureCount++;
+          const errMsg = `Connected configuration incomplete: ${cap.displayName} is missing live OAuth credentials.`;
+          targetErrors.push(errMsg);
+          await prisma.socialPostTarget.update({
+            where: { id: target.id },
+            data: { status: "FAILED", errorMessage: errMsg },
+          });
+          await prisma.publishingAttempt.create({
+            data: {
+              postId: post.id,
+              provider: account.provider,
+              status: "FAILED",
+              errorMessage: errMsg,
+            },
+          });
+          continue;
+        }
+
+        if (account.token.expiresAt && account.token.expiresAt < new Date()) {
+          failureCount++;
+          const errMsg = `Reauthorization required: OAuth token for ${cap.displayName} has expired.`;
+          targetErrors.push(errMsg);
+          await prisma.socialPostTarget.update({
+            where: { id: target.id },
+            data: { status: "FAILED", errorMessage: errMsg },
+          });
+          await prisma.publishingAttempt.create({
+            data: {
+              postId: post.id,
+              provider: account.provider,
+              status: "FAILED",
+              errorMessage: errMsg,
+            },
+          });
+          continue;
+        }
+
+        if (cap.APPROVAL_REQUIRED && !cap.PUBLISHING_APPROVED) {
+          failureCount++;
+          const errMsg = `Connected — Publishing approval required: ${cap.displayName} requires developer partner review (${cap.unsupportedMessage || "Approval required"}).`;
+          targetErrors.push(errMsg);
+          await prisma.socialPostTarget.update({
+            where: { id: target.id },
+            data: { status: "FAILED", errorMessage: errMsg },
+          });
+          await prisma.publishingAttempt.create({
+            data: {
+              postId: post.id,
+              provider: account.provider,
+              status: "FAILED",
+              errorMessage: errMsg,
+            },
+          });
+          continue;
+        }
+
+        try {
           const decryptedAccess = decryptToken(
             account.token.encryptedAccessToken,
             account.token.iv,
@@ -224,13 +394,11 @@ export async function POST(req: Request) {
 
           if (!decryptedAccess || decryptedAccess.startsWith("token_") || decryptedAccess.startsWith("direct_token_")) {
             failureCount++;
-            const errMsg = `Live OAuth credentials are not connected for ${account.provider}. Reconnect via official OAuth.`;
+            const errMsg = `Live OAuth credentials are not connected for ${cap.displayName}. Reconnect via official OAuth.`;
+            targetErrors.push(errMsg);
             await prisma.socialPostTarget.update({
               where: { id: target.id },
-              data: {
-                status: "FAILED",
-                errorMessage: errMsg,
-              },
+              data: { status: "FAILED", errorMessage: errMsg },
             });
             await prisma.publishingAttempt.create({
               data: {
@@ -258,6 +426,7 @@ export async function POST(req: Request) {
             mediaUrls: resolvedMedia,
           });
 
+          // Section 7: Only after real platform API returns success:
           if (result.success && result.platformPostId) {
             publishedCount++;
             await prisma.socialPostTarget.update({
@@ -277,8 +446,10 @@ export async function POST(req: Request) {
               },
             });
           } else {
+            // Section 8: Platform returned approval/permission or remote API error:
             failureCount++;
             const errMsg = result.error || "Remote platform API rejected publication.";
+            targetErrors.push(errMsg);
             await prisma.socialPostTarget.update({
               where: { id: target.id },
               data: {
@@ -297,7 +468,8 @@ export async function POST(req: Request) {
           }
         } catch (targetErr: any) {
           failureCount++;
-          const errMsg = targetErr?.message || "Platform API error.";
+          const errMsg = targetErr?.message || "Platform API network exception.";
+          targetErrors.push(errMsg);
           await prisma.socialPostTarget.update({
             where: { id: target.id },
             data: {
@@ -332,6 +504,40 @@ export async function POST(req: Request) {
           publishedAt: publishedCount > 0 ? new Date() : null,
         },
       });
+
+      const updatedPost = await prisma.socialPost.findUnique({
+        where: { id: post.id },
+        include: {
+          targets: {
+            include: {
+              socialAccount: {
+                include: { token: true },
+              },
+            },
+          },
+          media: true,
+        },
+      });
+
+      // If zero targets succeeded, return actionable failure (Section 8)
+      if (publishedCount === 0) {
+        return NextResponse.json(
+          {
+            error: targetErrors[0] || "Publishing failed across selected platforms.",
+            allErrors: targetErrors,
+            post: updatedPost,
+          },
+          { status: 422 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        post: updatedPost,
+        publishedCount,
+        failureCount,
+        partialWarning: failureCount > 0 ? targetErrors.join(" | ") : undefined,
+      });
     }
 
     await logAudit({
@@ -340,7 +546,7 @@ export async function POST(req: Request) {
       action: `POST_${action}`,
       resourceType: "SocialPost",
       resourceId: post.id,
-      details: { targetsCount: targetAccountIds.length },
+      details: { targetsCount: targetAccounts.length },
     });
 
     const updatedPost = await prisma.socialPost.findUnique({

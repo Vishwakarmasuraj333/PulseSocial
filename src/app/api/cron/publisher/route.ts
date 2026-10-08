@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { decryptToken } from "@/lib/security/encryption";
 import { getSocialProvider } from "@/lib/social/registry";
 import { SupportedPlatform } from "@/lib/social/types";
+import { getPlatformCapability } from "@/lib/social/capabilities";
 
 /**
  * Background Scheduler Worker
@@ -79,6 +80,7 @@ async function handleScheduleExecution(req: Request) {
 
       for (const target of post.targets) {
         const account = target.socialAccount;
+        const cap = getPlatformCapability(account.provider);
 
         if (!account.token) {
           failureCount++;
@@ -105,6 +107,19 @@ async function handleScheduleExecution(req: Request) {
           await prisma.socialAccount.update({
             where: { id: account.id },
             data: { status: "EXPIRED" },
+          });
+          continue;
+        }
+
+        // Check approval requirement
+        if (cap.APPROVAL_REQUIRED && !cap.PUBLISHING_APPROVED) {
+          failureCount++;
+          await prisma.socialPostTarget.update({
+            where: { id: target.id },
+            data: {
+              status: "FAILED",
+              errorMessage: `Connected — Publishing approval required: ${cap.displayName} requires developer partner review (${cap.unsupportedMessage || "Approval required"}).`,
+            },
           });
           continue;
         }

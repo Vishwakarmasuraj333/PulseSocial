@@ -149,7 +149,7 @@ export function buildGoogleAuthUrl(params: {
     code_challenge: params.codeChallenge,
     code_challenge_method: "S256",
     access_type: "offline",
-    prompt: params.prompt || "select_account",
+    prompt: params.prompt || "select_account consent",
     include_granted_scopes: "true",
   });
 

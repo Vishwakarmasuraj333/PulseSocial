@@ -24,6 +24,46 @@ import {
   buildPlatformGuidelines,
   SYSTEM_PERSONA_PROMPT,
 } from "./gemini-prompts";
+import { z } from "zod";
+import { prisma } from "@/lib/prisma";
+import {
+  PostGeneratorRequest,
+  PostGeneratorResponse,
+  PostGeneratorSchema,
+  ReplyAssistantRequest,
+  ReplyAssistantResponse,
+  ReplyAssistantSchema,
+  ContentRepurposeRequest,
+  ContentRepurposeResponse,
+  ContentRepurposeSchema,
+  ContentIdeasRequest,
+  ContentIdeasResponse,
+  ContentIdeasSchema,
+  HashtagSuggestionsRequest,
+  HashtagSuggestionsResponse,
+  HashtagSuggestionsSchema,
+  VisualPromptRequest,
+  VisualPromptResponse,
+  VisualPromptSchema,
+  AnalyticsInsightsRequest,
+  AnalyticsInsightsResponse,
+  AnalyticsInsightsSchema,
+  ContentRewriteRequest,
+  ContentRewriteResponse,
+  ContentRewriteSchema,
+  ModerationSuggestionRequest,
+  ModerationSuggestionResponse,
+  ModerationSuggestionSchema,
+} from "./types";
+import {
+  buildPostGeneratorPrompt,
+  buildReplyAssistantPrompt,
+  buildContentRepurposePrompt,
+  buildContentIdeasPrompt,
+  buildHashtagSuggestionsPrompt,
+  buildVisualPromptPrompt,
+  buildAnalyticsInsightsPrompt,
+} from "./prompts";
 import { parseGeminiJsonResponse, validateSocialCopyPayload } from "./gemini-validation";
 
 // Server-only singleton initialization
@@ -115,7 +155,396 @@ export function normalizeGeminiError(err: any): { error: string; message: string
 }
 
 /**
- * 1. Generate Structured Social Copy
+ * Core text generation with dynamic fallback across working models
+ */
+export async function generateText(
+  prompt: string,
+  options?: { model?: string; apiKey?: string; temperature?: number }
+): Promise<string> {
+  const ai = getGeminiClient(options?.apiKey);
+  const primaryModel = resolveGeminiTextModel(options?.model);
+  const candidateModels = [
+    primaryModel,
+    "gemini-3.1-flash-lite",
+    "gemini-3-flash-preview",
+    "gemini-3.8-flash",
+    "gemini-flash-latest",
+  ].filter((v, i, a) => a.indexOf(v) === i);
+
+  let lastError: any = null;
+  for (const currentModel of candidateModels) {
+    try {
+      const response = await ai.models.generateContent({
+        model: currentModel,
+        contents: prompt,
+        config: {
+          temperature: options?.temperature ?? 0.7,
+        },
+      });
+      return response.text || "";
+    } catch (err: any) {
+      lastError = err;
+      const normalized = normalizeGeminiError(err);
+      if (normalized.statusCode !== 503 && normalized.statusCode !== 429 && normalized.statusCode !== 404) {
+        throw err;
+      }
+      console.warn(`[AI:Gemini Text] Model ${currentModel} returned ${normalized.error}. Retrying next model.`);
+    }
+  }
+  throw lastError;
+}
+
+/**
+ * Core structured JSON generation validated by Zod
+ */
+export async function generateStructuredContent<T>(
+  prompt: string,
+  schema: z.ZodSchema<T>,
+  options?: { model?: string; apiKey?: string; taskType?: string }
+): Promise<T> {
+  const ai = getGeminiClient(options?.apiKey);
+  const primaryModel = resolveGeminiTextModel(options?.model);
+  const candidateModels = [
+    primaryModel,
+    "gemini-3.1-flash-lite",
+    "gemini-3-flash-preview",
+    "gemini-3.8-flash",
+    "gemini-flash-latest",
+  ].filter((v, i, a) => a.indexOf(v) === i);
+
+  let lastError: any = null;
+
+  for (const currentModel of candidateModels) {
+    try {
+      const response = await ai.models.generateContent({
+        model: currentModel,
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+          temperature: 0.7,
+        },
+      });
+
+      const raw = response.text || "";
+      let parsed = parseGeminiJsonResponse<any>(raw);
+      const valResult = schema.safeParse(parsed);
+
+      if (!valResult.success) {
+        console.warn(`[AI:Gemini] Malformed JSON from ${currentModel}. Retrying with correction.`);
+        const retryRes = await ai.models.generateContent({
+          model: currentModel,
+          contents: `${prompt}\n\nIMPORTANT CORRECTION: You previously returned an invalid structure. Return valid JSON adhering strictly to the schema.`,
+          config: { responseMimeType: "application/json" },
+        });
+        parsed = parseGeminiJsonResponse<any>(retryRes.text || "");
+        const retryVal = schema.safeParse(parsed);
+        if (retryVal.success) {
+          return retryVal.data;
+        }
+        throw new Error("Gemini output failed schema validation.");
+      }
+
+      return valResult.data;
+    } catch (err: any) {
+      lastError = err;
+      const normalized = normalizeGeminiError(err);
+      if (normalized.statusCode !== 503 && normalized.statusCode !== 429 && normalized.statusCode !== 404) {
+        throw err;
+      }
+      console.warn(`[AI:Gemini Structured] Model ${currentModel} returned ${normalized.error}. Retrying next model.`);
+    }
+  }
+
+  throw lastError;
+}
+
+/**
+ * Real Post Generator
+ */
+export async function generateSocialCaption(
+  req: PostGeneratorRequest
+): Promise<PostGeneratorResponse> {
+  const prompt = buildPostGeneratorPrompt(req);
+  const result = await generateStructuredContent(prompt, PostGeneratorSchema, {
+    model: req.model,
+  });
+
+  try {
+    await aiDb.create({
+      userId: req.userId || null,
+      workspaceId: req.workspaceId || null,
+      provider: "gemini",
+      taskType: "social-post-generator",
+      model: resolveGeminiTextModel(req.model),
+      prompt: req.topic,
+      outputText: JSON.stringify(result),
+      platform: req.platform || "Instagram",
+      tone: req.tone || "Engaging & Viral",
+      status: "SUCCESS",
+    });
+  } catch (dbErr) {
+    console.warn("[AI:Post DB Warning]", dbErr);
+  }
+
+  return result;
+}
+
+/**
+ * Real AI Reply Assistant
+ */
+export async function generateReply(
+  req: ReplyAssistantRequest
+): Promise<ReplyAssistantResponse> {
+  const prompt = buildReplyAssistantPrompt(req);
+  const result = await generateStructuredContent(prompt, ReplyAssistantSchema);
+
+  try {
+    await aiDb.create({
+      userId: req.userId || null,
+      workspaceId: req.workspaceId || null,
+      provider: "gemini",
+      taskType: "reply-assistant",
+      model: resolveGeminiTextModel(),
+      prompt: req.message,
+      outputText: JSON.stringify(result),
+      platform: req.platform || "Universal",
+      status: "SUCCESS",
+    });
+  } catch (dbErr) {
+    console.warn("[AI:Reply DB Warning]", dbErr);
+  }
+
+  return result;
+}
+
+export async function generateCommentReply(
+  req: ReplyAssistantRequest
+): Promise<ReplyAssistantResponse> {
+  return generateReply(req);
+}
+
+/**
+ * Real Content Repurposing (8 platforms independently optimized)
+ */
+export async function generateContentRepurpose(
+  req: ContentRepurposeRequest
+): Promise<ContentRepurposeResponse> {
+  const prompt = buildContentRepurposePrompt(req);
+  const result = await generateStructuredContent(prompt, ContentRepurposeSchema);
+
+  try {
+    await aiDb.create({
+      userId: req.userId || null,
+      workspaceId: req.workspaceId || null,
+      provider: "gemini",
+      taskType: "content-repurpose",
+      model: resolveGeminiTextModel(),
+      prompt: req.originalContent.slice(0, 200),
+      outputText: JSON.stringify(result),
+      status: "SUCCESS",
+    });
+  } catch (dbErr) {
+    console.warn("[AI:Repurpose DB Warning]", dbErr);
+  }
+
+  return result;
+}
+
+/**
+ * Real Content Ideas Generator
+ */
+export async function generatePostIdeas(
+  req: ContentIdeasRequest
+): Promise<ContentIdeasResponse> {
+  const prompt = buildContentIdeasPrompt(req);
+  const result = await generateStructuredContent(prompt, ContentIdeasSchema);
+
+  try {
+    await aiDb.create({
+      userId: req.userId || null,
+      workspaceId: req.workspaceId || null,
+      provider: "gemini",
+      taskType: "content-ideas",
+      model: resolveGeminiTextModel(),
+      prompt: `${req.brand} (${req.industry}) on ${req.platform}`,
+      outputText: JSON.stringify(result),
+      platform: req.platform,
+      status: "SUCCESS",
+    });
+  } catch (dbErr) {
+    console.warn("[AI:Ideas DB Warning]", dbErr);
+  }
+
+  return result;
+}
+
+/**
+ * Real Hashtag Suggestions Generator
+ */
+export async function generateHashtagSuggestions(
+  req: HashtagSuggestionsRequest
+): Promise<HashtagSuggestionsResponse> {
+  const prompt = buildHashtagSuggestionsPrompt(req);
+  const result = await generateStructuredContent(prompt, HashtagSuggestionsSchema);
+
+  try {
+    await aiDb.create({
+      userId: req.userId || null,
+      workspaceId: req.workspaceId || null,
+      provider: "gemini",
+      taskType: "hashtag-suggestions",
+      model: resolveGeminiTextModel(),
+      prompt: req.topic,
+      outputText: JSON.stringify(result),
+      platform: req.platform || "Instagram",
+      status: "SUCCESS",
+    });
+  } catch (dbErr) {
+    console.warn("[AI:Hashtags DB Warning]", dbErr);
+  }
+
+  return result;
+}
+
+/**
+ * Real Content Rewrite (Shorten, Expand, Professional, Friendly, Viral Hook, Hinglish)
+ */
+export async function generateContentRewrite(
+  req: ContentRewriteRequest
+): Promise<ContentRewriteResponse> {
+  const prompt = `${SYSTEM_PERSONA_PROMPT}
+
+You are an expert social media editor.
+Rewrite the following content with the requested action: '${req.action}'.
+${req.targetLanguage ? `Target Language: ${req.targetLanguage}` : ""}
+${req.platform ? `Target Platform: ${req.platform}` : ""}
+
+ORIGINAL TEXT:
+"""
+${req.content}
+"""
+
+Respond ONLY with valid JSON:
+{
+  "rewrittenText": "The refined, publication-ready rewritten content",
+  "hook": "The attention-grabbing first line",
+  "keyChanges": ["Summary of what was improved", "Why it converts better"],
+  "readingTimeSeconds": 15
+}`;
+
+  return generateStructuredContent(prompt, ContentRewriteSchema);
+}
+
+/**
+ * Real Visual Prompt Generation
+ */
+export async function generateImagePrompt(
+  req: VisualPromptRequest
+): Promise<VisualPromptResponse> {
+  const prompt = buildVisualPromptPrompt(req);
+  const structured = await generateStructuredContent(prompt, VisualPromptSchema);
+
+  return {
+    ...structured,
+    isGenerated: false,
+    providerNotice:
+      "Gemini prompt compiled with commercial 8K parameters. Ready to generate or copy for studio production.",
+  };
+}
+
+/**
+ * Real Analytics Insights & Social Strategist
+ */
+export async function generateAnalyticsInsights(
+  req: AnalyticsInsightsRequest
+): Promise<AnalyticsInsightsResponse> {
+  let realMetrics: any = {
+    totalPosts: 0,
+    followers: 0,
+    reach: 0,
+    impressions: 0,
+    engagementRate: 0,
+    topPlatform: "None",
+  };
+
+  if (req.workspaceId) {
+    try {
+      const postsCount = await prisma.socialPost.count({
+        where: { organizationId: req.workspaceId },
+      });
+      const publishedPosts = await prisma.socialPost.count({
+        where: { organizationId: req.workspaceId, status: "PUBLISHED" },
+      });
+      const accounts = await prisma.socialAccount.findMany({
+        where: { organizationId: req.workspaceId },
+        select: { provider: true, displayName: true },
+      });
+
+      realMetrics.totalPosts = postsCount;
+      realMetrics.publishedPosts = publishedPosts;
+      if (accounts.length > 0) {
+        realMetrics.topPlatform = accounts[0].provider;
+        realMetrics.accountsCount = accounts.length;
+      }
+    } catch (e) {
+      console.warn("[AI:Analytics DB query warning]", e);
+    }
+  }
+
+  const prompt = buildAnalyticsInsightsPrompt(req, realMetrics);
+  const structured = await generateStructuredContent(prompt, AnalyticsInsightsSchema);
+
+  return {
+    ...structured,
+    realDataSummary: {
+      totalPosts: realMetrics.totalPosts || 0,
+      followers: realMetrics.followers || 0,
+      reach: realMetrics.reach || 0,
+      engagementRate: realMetrics.engagementRate || 0,
+      topPlatform: realMetrics.topPlatform || "None",
+    },
+  };
+}
+
+export async function generateSocialStrategy(
+  req: AnalyticsInsightsRequest
+): Promise<AnalyticsInsightsResponse> {
+  return generateAnalyticsInsights(req);
+}
+
+/**
+ * Real Content Moderation Suggestion
+ */
+export async function generateModerationSuggestion(
+  req: ModerationSuggestionRequest
+): Promise<ModerationSuggestionResponse> {
+  const prompt = `${SYSTEM_PERSONA_PROMPT}
+
+You are an expert brand safety and community moderation engine.
+Evaluate this content for brand reputation, toxicity, sentiment, and safety.
+
+CONTENT:
+"""
+${req.content}
+"""
+
+PLATFORM: ${req.platform || "Universal"}
+
+Respond ONLY with valid JSON:
+{
+  "isFlagged": false,
+  "sentiment": "POSITIVE",
+  "category": "Clean",
+  "reason": "Content is compliant and respectful.",
+  "recommendedAction": "APPROVE",
+  "suggestedActionNote": "Safe to publish"
+}`;
+
+  return generateStructuredContent(prompt, ModerationSuggestionSchema);
+}
+
+/**
+ * 1. Generate Structured Social Copy (Backward compatible)
  */
 export async function generateSocialCopy(req: SocialCopyRequest): Promise<SocialCopyResponse> {
   const ai = getGeminiClient(req.apiKey);
@@ -127,11 +556,10 @@ export async function generateSocialCopy(req: SocialCopyRequest): Promise<Social
   // Fallback models in case primary model hits temporary 503 or 429
   const candidateModels = [
     modelId,
-    "gemini-flash-latest",
     "gemini-3.1-flash-lite",
-    GEMINI_MODELS.TEXT_FAST,
+    "gemini-3-flash-preview",
     "gemini-3.8-flash",
-    "gemini-3.7-flash",
+    "gemini-flash-latest",
   ].filter((v, i, a) => a.indexOf(v) === i);
 
   let lastError: any = null;

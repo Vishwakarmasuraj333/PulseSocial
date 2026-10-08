@@ -107,12 +107,18 @@ export default function LoginPage() {
       }
     }
 
-    fetch("/api/auth/me", { cache: "no-store", credentials: "include" })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data?.user) setExistingUser(data.user);
-      })
-      .catch(() => {});
+    const params = new URLSearchParams(window.location.search);
+    const hasError = Boolean(params.get("error"));
+    const isSwitching = params.get("switch") === "true" || params.get("force") === "true";
+
+    if (!hasError && !isSwitching) {
+      fetch("/api/auth/me", { cache: "no-store", credentials: "include" })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data?.user) setExistingUser(data.user);
+        })
+        .catch(() => {});
+    }
   }, []);
 
   const handleSignOutCurrent = async () => {

@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateSocialCopy, normalizeGeminiError } from "@/lib/ai/gemini";
+import {
+  generateSocialCaption,
+  generateHashtagSuggestions,
+  normalizeGeminiError,
+} from "@/lib/ai/gemini";
 import { getSession } from "@/lib/auth/session";
 
 export async function POST(req: NextRequest) {
@@ -7,91 +11,117 @@ export async function POST(req: NextRequest) {
     const session = await getSession();
     const body = await req.json().catch(() => ({}));
     const {
+      topic,
       prompt,
-      brandName = "PulseSocial",
-      industry = "Social Media Marketing",
-      tone = "Engaging & Viral",
+      action = "post",
       platform = "Instagram",
-      model = "gemini-flash-latest",
-      includeHashtags = true,
-      includeCta = true,
-      includeFirstComment = true,
+      contentType = "Engagement",
+      brandName = "PulseSocial",
+      brandVoice,
+      targetAudience,
+      tone = "Engaging & Viral",
       language = "English",
-      customApiKey,
-      apiKey,
+      cta,
+      keywords,
+      referenceText,
+      websiteInfo,
+      model,
     } = body;
 
-    if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
+    const effectiveTopic = (topic || prompt || "").trim();
+
+    if (!effectiveTopic) {
       return NextResponse.json(
-        { success: false, provider: "gemini", error: "PROMPT_REQUIRED", message: "Please provide a topic or prompt." },
+        {
+          success: false,
+          provider: "gemini",
+          error: "TOPIC_REQUIRED",
+          message: "Please provide a topic or prompt for content generation.",
+        },
         { status: 400 }
       );
     }
 
-    const copyResult = await generateSocialCopy({
-      prompt: prompt.trim(),
-      brandName,
-      industry,
-      tone,
-      platform,
-      model,
-      includeHashtags: Boolean(includeHashtags),
-      includeFirstComment: Boolean(includeFirstComment),
-      includeCta: Boolean(includeCta),
-      language,
-      userId: session?.id,
-      workspaceId: session?.activeOrgId,
-      apiKey: customApiKey || apiKey,
-    });
+    // Action: hashtags generation only
+    if (action === "hashtags") {
+      const hashtagsResult = await generateHashtagSuggestions({
+        topic: effectiveTopic,
+        platform,
+        brand: brandName,
+        userId: session?.id,
+        workspaceId: session?.activeOrgId,
+      });
 
-    // Provide both structured root response and backward-compatible result wrapper
-      const variations = [
-        {
-          id: 1,
-          label: `${tone} (Primary)`,
-          hook: copyResult.primaryCaption.split("\n")[0] || copyResult.primaryCaption,
-          caption: copyResult.primaryCaption,
-          hashtags: copyResult.hashtags,
-          firstComment: copyResult.firstComment,
-        },
-        ...copyResult.alternatives.map((alt, idx) => ({
-          id: idx + 2,
-          label: `Alternative Variation ${idx + 1}`,
-          hook: alt.split("\n")[0] || alt,
-          caption: alt,
-          hashtags: copyResult.hashtags,
-        })),
+      const combinedHashtags = [
+        ...hashtagsResult.primary,
+        ...hashtagsResult.secondary,
+        ...hashtagsResult.niche,
+        ...hashtagsResult.branded,
       ];
 
       return NextResponse.json({
         success: true,
         provider: "gemini",
-        model: copyResult.model,
-        platform: copyResult.platform,
-        tone: copyResult.tone,
-        primaryCaption: copyResult.primaryCaption,
-        hashtags: copyResult.hashtags,
-        firstComment: copyResult.firstComment,
-        cta: copyResult.cta,
-        alternatives: copyResult.alternatives,
-        universalVariants: copyResult.universalVariants,
-        suggestions: copyResult.suggestions,
-        imagePrompt: copyResult.imagePrompt,
-        createdAt: copyResult.createdAt,
-        id: copyResult.id,
-        variations,
+        hashtags: combinedHashtags,
+        breakdown: hashtagsResult,
         result: {
-          hook: copyResult.primaryCaption.split("\n")[0] || copyResult.primaryCaption,
-          caption: copyResult.primaryCaption,
-          hashtags: copyResult.hashtags,
-          firstComment: copyResult.firstComment,
-          cta: copyResult.cta,
-          alternatives: copyResult.alternatives,
-          universalVariants: copyResult.universalVariants,
-          suggestedLocation: `${brandName} HQ`,
-          variations,
+          hashtags: combinedHashtags,
         },
       });
+    }
+
+    // Action: Full Real Post Generation
+    const postResult = await generateSocialCaption({
+      topic: effectiveTopic,
+      platform,
+      contentType,
+      brandName,
+      brandVoice,
+      targetAudience,
+      tone,
+      language,
+      cta,
+      keywords: Array.isArray(keywords) ? keywords : keywords ? [keywords] : undefined,
+      referenceText,
+      websiteInfo,
+      model,
+      userId: session?.id,
+      workspaceId: session?.activeOrgId,
+    });
+
+    const variations = [
+      {
+        id: 1,
+        label: `${tone} (Optimized)`,
+        hook: postResult.hook,
+        caption: postResult.caption,
+        hashtags: postResult.hashtags,
+        firstComment: postResult.platformNotes?.[0] || "",
+      },
+    ];
+
+    return NextResponse.json({
+      success: true,
+      provider: "gemini",
+      platform,
+      caption: postResult.caption,
+      hook: postResult.hook,
+      cta: postResult.cta,
+      hashtags: postResult.hashtags,
+      platformNotes: postResult.platformNotes,
+      suggestedPostingTime: postResult.suggestedPostingTime,
+      imagePrompt: postResult.imagePrompt,
+      variations,
+      // Backward-compatible result wrapper
+      result: {
+        caption: postResult.caption,
+        hook: postResult.hook,
+        cta: postResult.cta,
+        hashtags: postResult.hashtags,
+        firstComment: postResult.platformNotes?.[0] || "",
+        variations,
+      },
+    });
   } catch (err: any) {
     const normalized = normalizeGeminiError(err);
     return NextResponse.json(

@@ -37,6 +37,7 @@ import {
   Info,
   Link as LinkIcon,
 } from "lucide-react";
+import { PostPreview, PreviewMediaItem } from "@/components/composer/previews/PostPreview";
 
 interface PostComposerModalProps {
   isOpen: boolean;
@@ -269,8 +270,14 @@ export function PostComposerModal({
       if (initialContent !== undefined) {
         setContent(initialContent);
       }
-      if (initialMediaUrl !== undefined) {
-        setMediaUrl(initialMediaUrl);
+      if (initialMediaUrl !== undefined && initialMediaUrl.trim()) {
+        setMedia([
+          {
+            id: `init-${Date.now()}`,
+            url: initialMediaUrl,
+            type: initialMediaUrl.match(/\.(mp4|webm|mov)$/i) ? "video" : "image",
+          },
+        ]);
       }
     }
   }, [isOpen, initialContent, initialMediaUrl]);
@@ -289,10 +296,17 @@ export function PostComposerModal({
     };
 
   const [content, setContent] = useState("");
-  const [mediaUrl, setMediaUrl] = useState<string | null>(null);
+  const [media, setMedia] = useState<PreviewMediaItem[]>([]);
+  const [activePreviewId, setActivePreviewId] = useState<string>("");
+  const [isUploadingMedia, setIsUploadingMedia] = useState(false);
+  const [youtubeTitle, setYoutubeTitle] = useState("");
+  const [isShorts, setIsShorts] = useState(false);
   const [publishingOption, setPublishingOption] = useState<"now" | "schedule" | "queue" | "smartq">("now");
   const [sendForApproval, setSendForApproval] = useState(false);
-  const [scheduledDate, setScheduledDate] = useState("2026-09-22");
+  const [scheduledDate, setScheduledDate] = useState(() => {
+    const d = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    return d.toISOString().split("T")[0];
+  });
   const [scheduledTime, setScheduledTime] = useState("10:00");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -352,48 +366,67 @@ export function PostComposerModal({
     });
   };
 
-  // Upload local media file from Desktop
+  // Upload local media file from Desktop (Multi-file & Video/Image support)
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-    // Instant local preview
-    const localUrl = URL.createObjectURL(file);
-    setMediaUrl(localUrl);
+    setIsUploadingMedia(true);
     setShowMediaMenu(false);
 
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
+    const uploadedList: PreviewMediaItem[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const isVideo = file.type.startsWith("video/") || Boolean(file.name.match(/\.(mp4|webm|mov|mkv)$/i));
+      const localUrl = URL.createObjectURL(file);
+      const tempId = `media-${Date.now()}-${i}`;
+
+      uploadedList.push({
+        id: tempId,
+        url: localUrl,
+        type: isVideo ? "video" : "image",
+        name: file.name,
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.url) {
-          setMediaUrl(data.url);
-          toast({
-            title: "Attached from Desktop",
-            message: `${file.name} saved to media library.`,
-            type: "success",
-          });
-          return;
-        }
-      }
-    } catch {}
+      // Background upload to server
+      const formData = new FormData();
+      formData.append("file", file);
+      fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data?.url) {
+            setMedia((prev) =>
+              prev.map((m) => (m.id === tempId ? { ...m, url: data.url } : m))
+            );
+          }
+        })
+        .catch(() => {});
+    }
 
+    setMedia((prev) => [...prev, ...uploadedList]);
+    setIsUploadingMedia(false);
     toast({
-      title: "Attached from Desktop",
-      message: `${file.name} ready for post.`,
+      title: "Media Attached",
+      message: `${files.length} file(s) attached to post.`,
       type: "success",
     });
+
+    if (desktopFileInputRef.current) {
+      desktopFileInputRef.current.value = "";
+    }
+  };
+
+  const handleRemoveMedia = (index: number) => {
+    setMedia((prev) => prev.filter((_, i) => i !== index));
   };
 
   // Real Database Save Draft
   const handleSaveDraft = async () => {
-    if (!content.trim() && !mediaUrl && !attachedUrlData) {
+    if (!content.trim() && media.length === 0 && !attachedUrlData) {
       toast({
         title: "Draft Empty",
         message: "Please enter text or attach media before saving draft.",
@@ -410,7 +443,7 @@ export function PostComposerModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           content: content.trim() || "Untitled Draft",
-          mediaUrls: mediaUrl ? [mediaUrl] : [],
+          mediaUrls: media.map((m) => ({ url: m.url, type: m.type === "video" ? "VIDEO" : "IMAGE" })),
           targetAccountIds: validTargetIds.length > 0 ? validTargetIds : [activeBrand.id || "auto"],
           action: "DRAFT",
           location: selectedLocation || undefined,
@@ -436,7 +469,7 @@ export function PostComposerModal({
       }
 
       setContent("");
-      setMediaUrl(null);
+      setMedia([]);
       setSelectedLocation(null);
       setAttachedUrlData(null);
       setAttachedComment(null);
@@ -532,27 +565,8 @@ export function PostComposerModal({
     setShowCommentPopup(false);
   };
 
-  const handleCreateWithZia = () => {
-    const brandName = activeBrand.name || "Brand";
-    const industry = activeBrand.industry || "digital content";
-    const ziaCaptions = [
-      `Excited to share the newest update from ${brandName}! 🚀 We're continually innovating in ${industry} to deliver exceptional value for our community. What features or content would you like to see next? Drop a comment below! 👇✨`,
-      `Behind the scenes at ${brandName} 🎬 Passion, dedication, and high-impact creativity every single day. Hit follow to stay updated with our latest releases! 💡💫`,
-      `Milestone celebration at ${brandName}! 🎉 Grateful for every single subscriber, fan, and partner supporting our journey. Drop a ❤️ if you're on this journey with us!`,
-    ];
-    const chosen = ziaCaptions[Math.floor(Math.random() * ziaCaptions.length)];
-    setContent(chosen);
-    if (!selectedLocation) setSelectedLocation("Mumbai, Maharashtra, India");
-    setAttachedComment(`Thanks for supporting ${brandName}! Let us know your thoughts below 👇`);
-    toast({
-      title: "Zia AI Assistant",
-      message: `Generated custom post tailored to ${brandName}.`,
-      type: "info",
-    });
-  };
-
   const handlePublish = async () => {
-    if (!content.trim() && !mediaUrl && !attachedUrlData) {
+    if (!content.trim() && media.length === 0 && !attachedUrlData) {
       toast({
         title: "Empty Post",
         message: "Please enter some text, attach media, or add a link to publish.",
@@ -581,9 +595,16 @@ export function PostComposerModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           content,
-          mediaUrls: mediaUrl ? [mediaUrl] : [],
+          mediaUrls: media.map((m) => ({ url: m.url, type: m.type === "video" ? "VIDEO" : "IMAGE" })),
           targetAccountIds: validTargetIds,
-          action: publishingOption === "schedule" ? "SCHEDULE" : "PUBLISH_NOW",
+          action:
+            sendForApproval
+              ? "DRAFT"
+              : publishingOption === "schedule"
+              ? "SCHEDULE"
+              : publishingOption === "queue"
+              ? "QUEUE"
+              : "PUBLISH_NOW",
           scheduledFor: publishingOption === "schedule" ? `${scheduledDate}T${scheduledTime}:00Z` : undefined,
           location: selectedLocation || undefined,
           firstComment: attachedComment || undefined,
@@ -605,8 +626,17 @@ export function PostComposerModal({
           .join(", ") || activeBrand.name;
 
       toast({
-        title: publishingOption === "schedule" ? "Post Scheduled!" : "Post Published!",
-        message: `Successfully posted to ${destinationNames}.`,
+        title:
+          sendForApproval
+            ? "Submitted for Approval"
+            : publishingOption === "schedule"
+            ? "Post Scheduled!"
+            : publishingOption === "queue"
+            ? "Added to Queue!"
+            : "Post Published!",
+        message: sendForApproval
+          ? "Sent to workspace approvers for review."
+          : `Successfully dispatched to ${destinationNames}.`,
         type: "success",
       });
 
@@ -615,7 +645,7 @@ export function PostComposerModal({
       }
 
       setContent("");
-      setMediaUrl(null);
+      setMedia([]);
       setSelectedLocation(null);
       setAttachedUrlData(null);
       setAttachedComment(null);
@@ -633,7 +663,15 @@ export function PostComposerModal({
   };
 
   const handleCanvaMediaSelected = (url: string, title?: string) => {
-    setMediaUrl(url);
+    setMedia((prev) => [
+      ...prev,
+      {
+        id: `canva-${Date.now()}`,
+        url,
+        type: "image",
+        name: title || "Canva Design",
+      },
+    ]);
     setIsCanvaConnected(true);
     toast({
       title: "Canva Design Attached",
@@ -649,7 +687,12 @@ export function PostComposerModal({
     location?: string;
     imageUrl?: string;
   }) => {
-    if (data.caption) setContent(data.caption);
+    let finalCaption = data.caption || "";
+    if (data.hashtags && data.hashtags.length > 0) {
+      finalCaption = `${finalCaption}\n\n${data.hashtags.join(" ")}`;
+    }
+    setContent(finalCaption);
+
     if (data.firstComment) {
       setAttachedComment(data.firstComment);
     }
@@ -657,13 +700,22 @@ export function PostComposerModal({
       setSelectedLocation(data.location);
     }
     if (data.imageUrl) {
-      setMediaUrl(data.imageUrl);
+      setMedia((prev) => [
+        ...prev,
+        {
+          id: `gemini-${Date.now()}`,
+          url: data.imageUrl!,
+          type: "image",
+          name: "Gemini Asset",
+        },
+      ]);
       toast({
         title: "AI Media Attached!",
-        message: "High-resolution AI image added to post preview.",
+        message: "High-resolution visual added to post preview.",
         type: "success",
       });
     }
+    setIsGeminiModalOpen(false);
   };
 
   // Filter emojis based on search
@@ -838,21 +890,53 @@ export function PostComposerModal({
                 ref={textareaRef}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="It's a beautiful day to create..."
+                placeholder="What would you like to share today? Enter post caption or click Create with Gemini AI..."
                 rows={6}
-                className="w-full text-sm placeholder:text-amber-700/60 bg-transparent resize-none focus:outline-none border-none p-0 text-slate-800 leading-relaxed font-normal"
+                className="w-full text-sm placeholder:text-slate-400 bg-transparent resize-none focus:outline-none border-none p-0 text-slate-800 dark:text-slate-100 leading-relaxed font-normal"
               />
 
-              {/* Media Thumbnail Preview if uploaded */}
-              {mediaUrl && (
-                <div className="relative mt-2 w-32 h-24 rounded-lg overflow-hidden border border-slate-200 group shadow-sm bg-slate-900">
-                  <Image src={mediaUrl} alt="Attached" fill className="object-cover" />
+              {/* Media Thumbnails Strip */}
+              {media.length > 0 && (
+                <div className="mt-3 flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-thin">
+                  {media.map((item, idx) => (
+                    <div
+                      key={item.id || idx}
+                      className="relative w-24 h-20 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-950 shrink-0 group shadow-xs"
+                    >
+                      {item.type === "video" ? (
+                        <div className="w-full h-full flex items-center justify-center bg-slate-900 text-white">
+                          <video src={item.url} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <span className="text-[9px] bg-red-600 px-1.5 py-0.5 rounded font-bold">
+                              VIDEO
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <Image src={item.url} alt="Attached" fill className="object-cover" unoptimized />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveMedia(idx)}
+                        className="absolute top-1 right-1 bg-black/80 hover:bg-rose-600 text-white rounded-full p-1 transition shadow cursor-pointer"
+                        title="Remove media"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                      <div className="absolute bottom-1 left-1 px-1 rounded bg-black/70 text-white text-[9px] font-mono">
+                        #{idx + 1}
+                      </div>
+                    </div>
+                  ))}
+                  {/* Add more button */}
                   <button
-                    onClick={() => setMediaUrl(null)}
-                    className="absolute top-1 right-1 bg-black/70 hover:bg-black text-white rounded-full p-1 transition"
-                    title="Remove media"
+                    type="button"
+                    onClick={() => desktopFileInputRef.current?.click()}
+                    className="w-20 h-20 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-600 flex flex-col items-center justify-center text-slate-400 hover:text-indigo-600 transition shrink-0 cursor-pointer"
+                    title="Add another photo or video"
                   >
-                    <X className="w-3 h-3" />
+                    <Plus className="w-4 h-4 mb-0.5" />
+                    <span className="text-[10px] font-semibold">Add Media</span>
                   </button>
                 </div>
               )}
@@ -891,7 +975,7 @@ export function PostComposerModal({
                   type="button"
                   onClick={() => setShowMediaMenu(!showMediaMenu)}
                   className={`hover:text-blue-600 transition p-1 rounded ${
-                    showMediaMenu || mediaUrl ? "text-blue-600" : ""
+                    showMediaMenu || media.length > 0 ? "text-blue-600" : ""
                   }`}
                   title="Attach media (Upload, Library, Canva)"
                 >
@@ -911,7 +995,7 @@ export function PostComposerModal({
                       className="w-full flex items-center gap-3 px-3.5 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium text-left transition cursor-pointer"
                     >
                       <Folder className="w-4 h-4 text-amber-500 shrink-0" />
-                      <span>Desktop</span>
+                      <span>Desktop (Image / Video)</span>
                     </button>
 
                     {/* 2. Media Library */}
@@ -965,6 +1049,7 @@ export function PostComposerModal({
                 <input
                   ref={desktopFileInputRef}
                   type="file"
+                  multiple
                   accept="image/*,video/*"
                   className="hidden"
                   onChange={handleFileUpload}
@@ -1503,128 +1588,68 @@ export function PostComposerModal({
                 </span>
               </label>
             </div>
+
+            {/* Platform-Specific Publishing Options if YouTube is selected */}
+            {effectiveChannels.some(
+              (c) => selectedAccountIds.includes(c.id) && c.provider.toLowerCase().includes("youtube")
+            ) && (
+              <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                  YouTube Settings
+                </h4>
+                <div>
+                  <label className="text-[11px] text-slate-500 font-medium block mb-1">
+                    Video Title
+                  </label>
+                  <input
+                    type="text"
+                    value={youtubeTitle}
+                    onChange={(e) => setYoutubeTitle(e.target.value)}
+                    placeholder="Enter YouTube video title..."
+                    className="w-full text-xs p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+                  />
+                </div>
+                <label className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isShorts}
+                    onChange={(e) => setIsShorts(e.target.checked)}
+                    className="rounded accent-red-600"
+                  />
+                  <span>Publish as YouTube Shorts (9:16)</span>
+                </label>
+              </div>
+            )}
           </div>
 
           {/* ============================================================ */}
-          {/* COLUMN 3: Live Post Preview (4 cols)                          */}
+          {/* COLUMN 3: Live Platform Post Preview (4 cols)                 */}
           {/* ============================================================ */}
-          <div className="lg:col-span-4 p-6 bg-slate-50/50 flex flex-col justify-between">
+          <div className="lg:col-span-4 p-6 bg-slate-50/50 dark:bg-slate-900/40 flex flex-col justify-between overflow-y-auto max-h-[75vh]">
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-slate-800 tracking-tight">Post Preview</h3>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 tracking-tight">Post Preview</h3>
+                  <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-950/60 px-1.5 py-0.5 rounded">
+                    LIVE
+                  </span>
+                </div>
                 <ChevronsRight className="w-4 h-4 text-slate-400" />
               </div>
 
-              {content.trim() || mediaUrl || attachedUrlData ? (
-                /* Live Authentic Facebook Card Preview */
-                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 text-xs space-y-3">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-200 shrink-0">
-                      <Image
-                        src={activePreviewChannel.profileImageUrl || activeBrand.avatarUrl || "/icons/pulse-logo.svg"}
-                        alt={activePreviewChannel.displayName || activeBrand.name}
-                        width={32}
-                        height={32}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <h4 className="font-semibold text-slate-900 leading-tight">
-                          {activePreviewChannel.displayName || activeBrand.name}
-                        </h4>
-                        {renderPlatformIcon(activePreviewChannel.provider, 14)}
-                      </div>
-                      <p className="text-[10px] text-slate-400 flex items-center gap-1">
-                        <span>Just now</span> · <span>🌐</span>
-                        {selectedLocation && (
-                          <span className="text-blue-600 font-medium">· 📍 in {selectedLocation}</span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-
-                  {content.trim() && (
-                    <p className="text-slate-800 whitespace-pre-wrap leading-relaxed text-xs">
-                      {content}
-                    </p>
-                  )}
-
-                  {/* Media Image / Video Preview */}
-                  {mediaUrl && (
-                    <div className="relative w-full h-44 rounded-lg overflow-hidden border border-slate-100 bg-slate-900 shadow-inner">
-                      <Image src={mediaUrl} alt="Post media" fill className="object-cover" />
-                    </div>
-                  )}
-
-                  {/* Attached Link Rich Social Preview */}
-                  {attachedUrlData && (
-                    <a
-                      href={attachedUrlData.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block rounded-lg overflow-hidden border border-slate-200 hover:border-blue-400 transition bg-slate-50/70"
-                    >
-                      <div className="p-3">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
-                          {attachedUrlData.domain}
-                        </span>
-                        <h5 className="font-semibold text-slate-900 line-clamp-1 mt-0.5">
-                          {attachedUrlData.title}
-                        </h5>
-                        <p className="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-normal">
-                          {attachedUrlData.description}
-                        </p>
-                      </div>
-                    </a>
-                  )}
-
-                  {/* First Comment Live Preview */}
-                  {attachedComment && (
-                    <div className="mt-2 pt-2 border-t border-slate-100 flex items-start gap-2 bg-slate-50/80 p-2 rounded-lg">
-                      <div className="w-5 h-5 rounded-full overflow-hidden shrink-0 border border-slate-200">
-                        <Image
-                          src={activePreviewChannel.profileImageUrl || activeBrand.avatarUrl || "/icons/pulse-logo.svg"}
-                          alt={activePreviewChannel.displayName || activeBrand.name}
-                          width={20}
-                          height={20}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="text-[11px] leading-tight">
-                        <span className="font-semibold text-slate-900 mr-1">
-                          {activePreviewChannel.displayName || activeBrand.name}
-                        </span>
-                        <span className="text-slate-700">{attachedComment}</span>
-                        <p className="text-[9px] text-slate-400 mt-1">1st Comment (Auto-Published)</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Facebook Action Footer */}
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-around text-slate-500 font-medium text-[11px]">
-                    <span className="flex items-center gap-1 hover:text-blue-600 cursor-pointer">
-                      <ThumbsUp className="w-3.5 h-3.5" /> Like
-                    </span>
-                    <span className="flex items-center gap-1 hover:text-blue-600 cursor-pointer">
-                      <MessageCircle className="w-3.5 h-3.5" /> Comment
-                    </span>
-                    <span className="flex items-center gap-1 hover:text-blue-600 cursor-pointer">
-                      <Share2 className="w-3.5 h-3.5" /> Share
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                /* Empty Preview matching screenshot */
-                <div className="h-64 flex flex-col items-center justify-center text-center p-6 text-slate-400">
-                  <div className="w-16 h-16 border-2 border-dashed border-slate-200 rounded-lg flex items-center justify-center mb-3">
-                    <ImageIcon className="w-8 h-8 text-slate-300" />
-                  </div>
-                  <p className="text-xs text-slate-400 leading-relaxed max-w-xs">
-                    A limited preview of how your post may appear at a glance on selected channels will show here.
-                  </p>
-                </div>
-              )}
+              <PostPreview
+                accounts={effectiveChannels.filter((c) => selectedAccountIds.includes(c.id))}
+                activeAccountId={activePreviewId}
+                onSelectAccount={(id) => setActivePreviewId(id)}
+                onOpenConnectModal={() => setIsConnectModalOpen(true)}
+                content={content}
+                media={media}
+                location={selectedLocation}
+                linkData={attachedUrlData}
+                firstComment={attachedComment}
+                youtubeTitle={youtubeTitle}
+                isShorts={isShorts}
+              />
             </div>
           </div>
         </div>
@@ -1654,18 +1679,32 @@ export function PostComposerModal({
             <button
               type="button"
               onClick={handleSaveDraft}
-              disabled={isSubmitting || (!content.trim() && !mediaUrl && !attachedUrlData)}
-              className="px-5 py-1.5 rounded-full border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-700 transition cursor-pointer disabled:opacity-50"
+              disabled={isSubmitting || (!content.trim() && media.length === 0 && !attachedUrlData)}
+              className="px-5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 transition cursor-pointer disabled:opacity-40"
             >
               {isSubmitting ? "Saving..." : "Save Draft"}
             </button>
             <button
               type="button"
               onClick={handlePublish}
-              disabled={isSubmitting || (!content.trim() && !mediaUrl && !attachedUrlData)}
-              className="px-6 py-1.5 rounded-full bg-[#0f71d3] hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition active:scale-95 disabled:opacity-50 cursor-pointer"
+              disabled={
+                isSubmitting ||
+                (!content.trim() && media.length === 0 && !attachedUrlData) ||
+                selectedAccountIds.length === 0
+              }
+              className="px-6 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
-              {isSubmitting ? "Publishing..." : "Post Now"}
+              {isSubmitting
+                ? "Processing..."
+                : sendForApproval
+                ? "Send for Approval"
+                : publishingOption === "schedule"
+                ? "Schedule Post"
+                : publishingOption === "queue"
+                ? "Add to Queue"
+                : publishingOption === "smartq"
+                ? "Schedule in SmartQ"
+                : "Post Now"}
             </button>
           </div>
         </div>
@@ -1766,7 +1805,15 @@ export function PostComposerModal({
                 <div
                   key={`${item.url}-${idx}`}
                   onClick={() => {
-                    setMediaUrl(item.url);
+                    setMedia((prev) => [
+                      ...prev,
+                      {
+                        id: `lib-${Date.now()}-${idx}`,
+                        url: item.url,
+                        type: item.type === "video" ? "video" : "image",
+                        name: item.title,
+                      },
+                    ]);
                     setIsMediaLibraryOpen(false);
                     toast({
                       title: "Media Selected",
@@ -1848,7 +1895,16 @@ export function PostComposerModal({
               disabled={!cloudPickerUrl.trim()}
               onClick={() => {
                 if (cloudPickerUrl.trim()) {
-                  setMediaUrl(cloudPickerUrl.trim());
+                  const url = cloudPickerUrl.trim();
+                  setMedia((prev) => [
+                    ...prev,
+                    {
+                      id: `cloud-${Date.now()}`,
+                      url,
+                      type: url.match(/\.(mp4|webm|mov)$/i) ? "video" : "image",
+                      name: "Cloud Asset",
+                    },
+                  ]);
                   setIsCloudPickerOpen(false);
                   toast({
                     title: "Cloud Media Attached",

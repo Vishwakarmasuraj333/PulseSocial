@@ -7,6 +7,8 @@ import {
   exchangeGoogleAuthCode,
   fetchGoogleUserInfo,
   getGoogleRedirectUri,
+  verifySignedOAuthState,
+  parseGoogleIdToken,
 } from "@/lib/auth/google-oauth";
 
 export async function GET(req: Request) {
@@ -43,8 +45,22 @@ export async function GET(req: Request) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // 2. Validate mandatory parameters and CSRF state match
-  if (!code || !state || !savedState || state !== savedState) {
+  // 2. Validate code and state
+  if (!code || !state) {
+    const loginUrl = new URL("/login", req.url);
+    loginUrl.searchParams.set("error", "missing_code");
+    loginUrl.searchParams.set(
+      "message",
+      "Google authentication did not provide an authorization code. Please try again."
+    );
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Cryptographically verify signed state token (works even if cross-domain cookies are dropped by browser)
+  const verifiedState = verifySignedOAuthState(state);
+  const isCookieStateValid = Boolean(savedState && savedState === state);
+
+  if (!verifiedState && !isCookieStateValid) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("error", "invalid_state");
     loginUrl.searchParams.set(
@@ -54,7 +70,10 @@ export async function GET(req: Request) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (!savedVerifier) {
+  const effectiveVerifier = verifiedState?.verifier || savedVerifier;
+  const effectiveRedirectUri = verifiedState?.redirectUri || savedRedirectUri || getGoogleRedirectUri(req);
+
+  if (!effectiveVerifier) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("error", "pkce_verifier_missing");
     loginUrl.searchParams.set(
@@ -74,7 +93,7 @@ export async function GET(req: Request) {
       );
     }
 
-    const redirectUri = savedRedirectUri || getGoogleRedirectUri(req);
+    const redirectUri = effectiveRedirectUri;
 
     // 3. Exchange authorization code for tokens using PKCE verifier
     const tokenData = await exchangeGoogleAuthCode({
@@ -82,23 +101,28 @@ export async function GET(req: Request) {
       clientId,
       clientSecret,
       redirectUri,
-      codeVerifier: savedVerifier,
+      codeVerifier: effectiveVerifier,
     });
 
     if (!tokenData.access_token) {
       throw new Error("No access token returned by Google OAuth server.");
     }
 
-    // 4. Retrieve real user information from Google OpenID Connect
+    // 4. Retrieve real user information from Google OpenID Connect and ID Token
     const googleProfile = await fetchGoogleUserInfo(tokenData.access_token);
+    const idTokenClaims = parseGoogleIdToken(tokenData.id_token);
 
-    if (!googleProfile.sub || !googleProfile.email) {
+    const googleSub = googleProfile.sub || idTokenClaims?.sub;
+    const cleanEmail = (googleProfile.email || idTokenClaims?.email || "").toLowerCase().trim();
+
+    if (!googleSub || !cleanEmail) {
       throw new Error("Google response did not contain required subject ID or email address.");
     }
 
-    const cleanEmail = googleProfile.email.toLowerCase().trim();
-    const displayName = googleProfile.name || cleanEmail.split("@")[0];
-    const googleSub = googleProfile.sub;
+    const displayName = googleProfile.name || idTokenClaims?.name || cleanEmail.split("@")[0];
+    const isEmailVerified = Boolean(
+      googleProfile.email_verified ?? idTokenClaims?.email_verified ?? true
+    );
 
     // 5. Look up user by Google Subject ID or verified email
     let user = await prisma.user.findFirst({
@@ -123,7 +147,7 @@ export async function GET(req: Request) {
         where: { id: user.id },
         data: {
           googleSubjectId: googleSub,
-          emailVerified: Boolean(googleProfile.email_verified ?? true),
+          emailVerified: isEmailVerified,
           emailVerifiedAt: user.emailVerifiedAt || now,
           name: user.name || displayName,
           firstName: googleProfile.given_name || undefined,

@@ -318,49 +318,116 @@ export const inboxService = {
 };
 
 // ==========================================
-// 7. PULSEAI SERVICE
+// 7. PULSEAI SERVICE (REAL GEMINI API)
 // ==========================================
 export const aiService = {
-  async generateCaption(prompt: string, platform: string, tone = "Engaging") {
-    try {
-      const res = await fetch("/api/ai/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, platform, tone, action: "caption" }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to generate caption");
-      const caption = data.result?.caption || data.content || data.result?.variations?.[0]?.caption;
-      if (!caption) throw new Error("No caption in response");
-      return caption as string;
-    } catch {
-      // High-quality deterministic AI fallback
-      return `Transforming the way you scale on ${platform}! 🚀 Discover how smart automation and deep insights can drive 3x more engagement. What's your biggest challenge right now? Drop your thoughts below! 👇✨`;
+  async generateCaption(
+    promptOrTopic: string,
+    platform = "Instagram",
+    tone = "Engaging & Viral",
+    options?: { language?: string; contentType?: string; cta?: string }
+  ) {
+    const res = await fetch("/api/ai/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        topic: promptOrTopic,
+        prompt: promptOrTopic,
+        platform,
+        tone,
+        language: options?.language || "English",
+        contentType: options?.contentType || "Engagement",
+        cta: options?.cta,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || data.error || "Failed to generate caption with Gemini");
     }
+    const caption =
+      data.caption || data.result?.caption || data.result?.variations?.[0]?.caption;
+    if (!caption) throw new Error("No caption returned by Gemini");
+    return caption as string;
   },
 
-  async generateHashtags(topic: string, count = 10) {
-    try {
-      const res = await fetch("/api/ai/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: topic, count, action: "hashtags" }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to generate hashtags");
-      return (data.result?.hashtags || data.hashtags || []) as string[];
-    } catch {
-      return [
-        "#SocialGrowth",
-        "#PulseSocial",
-        "#MarketingTips",
-        "#ContentStrategy",
-        "#CreatorEconomy",
-        "#SocialMediaAI",
-        "#SaaSMarketing",
-        "#GrowthHacking",
-      ];
+  async generateHashtags(topic: string, platformOrCount: string | number = "Instagram") {
+    const platform = typeof platformOrCount === "string" ? platformOrCount : "Instagram";
+    const count = typeof platformOrCount === "number" ? platformOrCount : undefined;
+    const res = await fetch("/api/ai/hashtags", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ topic, platform, count }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || data.error || "Failed to generate hashtags with Gemini");
     }
+    return (data.all || data.hashtags || []) as string[];
+  },
+
+  async generateReply(message: string, platform = "Universal", desiredTone = "Friendly") {
+    const res = await fetch("/api/ai/reply", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message, platform, desiredTone }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || data.error || "Failed to draft reply with Gemini");
+    }
+    return data;
+  },
+
+  async generateIdeas(options: { brand: string; industry: string; audience: string; platform: string; numberOfIdeas?: number }) {
+    const res = await fetch("/api/ai/ideas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(options),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || data.error || "Failed to generate ideas with Gemini");
+    }
+    return data.ideas || [];
+  },
+
+  async repurposeContent(originalContent: string, brandName = "PulseSocial") {
+    const res = await fetch("/api/ai/repurpose", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ originalContent, brandName }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || data.error || "Failed to repurpose content with Gemini");
+    }
+    return data.repurposed || data;
+  },
+
+  async getInsights(question?: string) {
+    const res = await fetch("/api/ai/insights", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || data.error || "Failed to generate insights with Gemini");
+    }
+    return data;
+  },
+
+  async chat(message: string) {
+    const res = await fetch("/api/ai/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || data.error || "Failed to get AI assistant response");
+    }
+    return data.reply || data.content;
   },
 
   async suggestBestTimes(platform: string) {

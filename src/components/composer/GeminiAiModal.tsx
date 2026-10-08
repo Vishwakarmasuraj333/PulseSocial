@@ -67,12 +67,10 @@ const PLATFORMS = [
 ];
 
 const TEXT_MODELS = [
-  { id: "gemini-3.5-flash", name: "Gemini 3.5 Flash", desc: "Ultra-fast & instant responses (Fastest)" },
-  { id: "gemini-3.7-flash", name: "Gemini 3.7 Flash", desc: "Next-gen multimodal reasoning" },
-  { id: "gemini-3.8-flash", name: "Gemini 3.8 Flash", desc: "Flagship intelligence & reasoning" },
-  { id: "gemini-flash-latest", name: "Gemini Flash Latest", desc: "Real-time production copy" },
-  { id: "gemini-3.1-flash-lite", name: "Gemini 3.1 Flash Lite", desc: "Instant micro-copy & hashtags" },
-  { id: "gemini-3.1-pro-preview", name: "Gemini 3.1 Pro", desc: "Deep reasoning & long-form" },
+  { id: "gemini-3.1-flash-lite", name: "Gemini 3.1 Flash Lite", desc: "Instant micro-copy & hashtags (Fastest · 600ms)" },
+  { id: "gemini-3-flash-preview", name: "Gemini 3 Flash", desc: "Next-gen multimodal reasoning & copy" },
+  { id: "gemini-3.8-flash", name: "Gemini 3.8 Flash", desc: "Flagship intelligence & deep creativity" },
+  { id: "gemini-flash-latest", name: "Gemini Flash Production", desc: "Real-time production social copy" },
 ];
 
 const IMAGE_MODELS = [
@@ -114,7 +112,7 @@ export function GeminiAiModal({
   const [prompt, setPrompt] = useState("");
   const [selectedTone, setSelectedTone] = useState("Engaging & Viral");
   const [selectedPlatform, setSelectedPlatform] = useState("general");
-  const [selectedTextModel, setSelectedTextModel] = useState("gemini-3.5-flash");
+  const [selectedTextModel, setSelectedTextModel] = useState("gemini-3.1-flash-lite");
   const [includeHashtags, setIncludeHashtags] = useState(true);
   const [includeFirstComment, setIncludeFirstComment] = useState(true);
   const [selectedLanguage, setSelectedLanguage] = useState("English");
@@ -145,6 +143,15 @@ export function GeminiAiModal({
   const [enhanceWithGemini, setEnhanceWithGemini] = useState(true);
   const [isEnhancingPrompt, setIsEnhancingPrompt] = useState(false);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [referenceImageBase64, setReferenceImageBase64] = useState<string | null>(null);
 
@@ -425,8 +432,16 @@ export function GeminiAiModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-        <div className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
+      <div
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200 cursor-pointer"
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] cursor-default"
+        >
           {/* Header */}
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-purple-50 via-indigo-50/50 to-white">
             <div className="flex items-center gap-3">
@@ -450,8 +465,16 @@ export function GeminiAiModal({
               <button
                 type="button"
                 onClick={onClose}
+                className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-500 hover:text-slate-800 rounded-lg border border-slate-200 hover:bg-slate-100 transition cursor-pointer"
+              >
+                <span>Hide Studio</span>
+                <span className="text-[10px] text-slate-400 bg-slate-100 px-1 py-0.5 rounded font-mono">ESC</span>
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
                 className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition cursor-pointer"
-                title="Close"
+                title="Close Studio (ESC)"
               >
                 <X className="w-5 h-5" />
               </button>

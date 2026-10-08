@@ -99,11 +99,17 @@ export const SUPPORTED_ASPECT_RATIOS = [
 ];
 
 export function resolveGeminiTextModel(rawInput?: string): string {
-  if (!rawInput) return "gemini-flash-latest";
+  const envModel = process.env.GEMINI_MODEL?.trim();
+  if (envModel) return envModel;
+
+  if (!rawInput) return "gemini-3.1-flash-lite";
   const normalized = rawInput.trim().toLowerCase();
 
-  if (normalized.includes("latest") || normalized === "gemini-flash-latest") {
-    return "gemini-flash-latest";
+  if (normalized.includes("3.1-flash-lite") || normalized.includes("lite")) {
+    return "gemini-3.1-flash-lite";
+  }
+  if (normalized.includes("3-flash-preview") || normalized.includes("preview")) {
+    return "gemini-3-flash-preview";
   }
   if (normalized.includes("3.8") || normalized === "gemini-3.8-flash") {
     return "gemini-3.8-flash";
@@ -111,14 +117,14 @@ export function resolveGeminiTextModel(rawInput?: string): string {
   if (normalized.includes("3.7") || normalized === "gemini-3.7-flash") {
     return "gemini-3.7-flash";
   }
-  if (normalized.includes("lite") || normalized.includes("3.1-flash-lite")) {
-    return "gemini-3.1-flash-lite";
-  }
-  if (normalized.includes("3.1") || normalized.includes("pro") || normalized === "gemini-3.1-pro-preview") {
+  if (normalized.includes("pro")) {
     return "gemini-3.1-pro-preview";
   }
+  if (normalized.includes("latest") || normalized === "gemini-flash-latest") {
+    return "gemini-flash-latest";
+  }
 
-  return "gemini-flash-latest";
+  return "gemini-3.1-flash-lite";
 }
 
 export function resolveGeminiImageModel(rawInput?: string): string {

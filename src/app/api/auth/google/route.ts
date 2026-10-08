@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import {
   generatePkcePair,
-  generateOAuthState,
   generateOAuthNonce,
+  createSignedOAuthState,
   buildGoogleAuthUrl,
   getGoogleRedirectUri,
 } from "@/lib/auth/google-oauth";
@@ -28,8 +28,8 @@ export async function GET(req: Request) {
 
   // Generate cryptographic PKCE, state, and nonce
   const { verifier, challenge } = generatePkcePair();
-  const state = generateOAuthState();
   const nonce = generateOAuthNonce();
+  const state = createSignedOAuthState({ verifier, nonce, redirectUri });
 
   // Store in secure HttpOnly cookies
   const cookieStore = await cookies();
@@ -40,7 +40,7 @@ export async function GET(req: Request) {
     secure: isProd,
     sameSite: "lax",
     path: "/",
-    maxAge: 600, // 10 minutes
+    maxAge: 900, // 15 minutes
   });
 
   cookieStore.set("google_oauth_code_verifier", verifier, {
@@ -67,6 +67,9 @@ export async function GET(req: Request) {
     maxAge: 600,
   });
 
+  const url = new URL(req.url);
+  const promptParam = url.searchParams.get("prompt") || "select_account";
+
   // Construct official Google authorization URL
   const googleAuthUrl = buildGoogleAuthUrl({
     clientId,
@@ -74,6 +77,7 @@ export async function GET(req: Request) {
     state,
     codeChallenge: challenge,
     nonce,
+    prompt: promptParam,
     scopes: process.env.GOOGLE_OAUTH_SCOPES
       ? process.env.GOOGLE_OAUTH_SCOPES.split(" ")
       : ["openid", "email", "profile"],

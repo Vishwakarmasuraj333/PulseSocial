@@ -8,10 +8,15 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { useBrand } from "@/context/BrandContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
 import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
 import { GeminiAiModal } from "@/components/composer/GeminiAiModal";
+import {
+  PostPreview,
+  PreviewAccount,
+  PreviewMediaItem,
+} from "@/components/composer/previews/PostPreview";
+import { getPlatformCapability } from "@/lib/social/capabilities";
 import {
   Send,
   Calendar,
@@ -22,51 +27,14 @@ import {
   Sparkles,
   AlertCircle,
   CheckCircle2,
-  ChevronRight,
-  Heart,
-  MessageCircle,
-  Share2,
-  Bookmark,
   UploadCloud,
   X,
   Loader2,
-  Globe,
-  Repeat2,
-  ThumbsUp,
-  ThumbsDown,
-  Eye,
   Plus,
+  Video,
+  FileText,
+  AlertTriangle,
 } from "lucide-react";
-
-interface SocialAccount {
-  id: string;
-  provider: string;
-  displayName: string;
-  username: string | null;
-  profileImageUrl: string | null;
-  isRealConnected?: boolean;
-}
-
-const DEFAULT_WORKSPACE_CHANNELS: SocialAccount[] = [
-  { id: "ch-linkedin", provider: "linkedin", displayName: "LinkedIn", username: "company", profileImageUrl: null },
-  { id: "ch-x", provider: "x", displayName: "X (Twitter)", username: "brand_official", profileImageUrl: null },
-  { id: "ch-instagram", provider: "instagram", displayName: "Instagram", username: "brand_official", profileImageUrl: null },
-  { id: "ch-facebook", provider: "facebook", displayName: "Facebook Page", username: "brand_page", profileImageUrl: null },
-  { id: "ch-youtube", provider: "youtube", displayName: "YouTube", username: "brand_channel", profileImageUrl: null },
-  { id: "ch-pinterest", provider: "pinterest", displayName: "Pinterest", username: "brand_pins", profileImageUrl: null },
-  { id: "ch-threads", provider: "threads", displayName: "Threads", username: "brand_threads", profileImageUrl: null },
-];
-
-const PLATFORM_LIMITS: Record<string, number> = {
-  x: 280,
-  instagram: 2200,
-  linkedin: 3000,
-  facebook: 63206,
-  youtube: 5000,
-  tiktok: 2200,
-  pinterest: 500,
-  threads: 500,
-};
 
 export default function NewPostPage() {
   const router = useRouter();
@@ -74,14 +42,16 @@ export default function NewPostPage() {
   const { activeBrand } = useBrand();
 
   const [content, setContent] = useState("");
-  const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>(["ch-linkedin", "ch-x"]);
-  const [accounts, setAccounts] = useState<SocialAccount[]>(DEFAULT_WORKSPACE_CHANNELS);
+  const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([]);
+  const [accounts, setAccounts] = useState<PreviewAccount[]>([]);
+  const [isLoadingAccounts, setIsLoadingAccounts] = useState(true);
   const [previewPlatform, setPreviewPlatform] = useState<string>("instagram");
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
 
-  // Media
-  const [mediaUrl, setMediaUrl] = useState("");
+  // Multi-media state
+  const [media, setMedia] = useState<PreviewMediaItem[]>([]);
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
+  const [directMediaUrl, setDirectMediaUrl] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Scheduling
@@ -89,15 +59,17 @@ export default function NewPostPage() {
   const [scheduledTime, setScheduledTime] = useState("12:00");
   const [isPublishing, setIsPublishing] = useState(false);
 
-  // Interactive like on preview
-  const [isLikedPreview, setIsLikedPreview] = useState(false);
+  // Platform specific settings
+  const [youtubeTitle, setYoutubeTitle] = useState("");
+  const [isShorts, setIsShorts] = useState(false);
 
   // Load connected accounts from backend
   useEffect(() => {
+    setIsLoadingAccounts(true);
     fetch("/api/social/providers")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        const liveAccs: SocialAccount[] = [];
+        const liveAccs: PreviewAccount[] = [];
         (data?.providers || []).forEach((p: any) => {
           if (p.isConnected && p.connectedAccount) {
             liveAccs.push({
@@ -112,22 +84,20 @@ export default function NewPostPage() {
         });
 
         if (liveAccs.length > 0) {
-          // Merge live accounts with default workspace channels so user always has full fleet
-          const combined = [
-            ...liveAccs,
-            ...DEFAULT_WORKSPACE_CHANNELS.filter(
-              (def) => !liveAccs.some((l) => l.provider === def.provider)
-            ),
-          ];
-          setAccounts(combined);
-          setSelectedAccountIds(liveAccs.map((a) => a.id));
+          setAccounts(liveAccs);
+          setSelectedAccountIds([liveAccs[0].id]);
           setPreviewPlatform(liveAccs[0].provider);
         } else {
-          setAccounts(DEFAULT_WORKSPACE_CHANNELS);
+          // If no accounts are connected yet, create platform preview presets for the active workspace
+          setAccounts([]);
+          setSelectedAccountIds([]);
         }
       })
       .catch(() => {
-        setAccounts(DEFAULT_WORKSPACE_CHANNELS);
+        setAccounts([]);
+      })
+      .finally(() => {
+        setIsLoadingAccounts(false);
       });
   }, []);
 
@@ -135,7 +105,8 @@ export default function NewPostPage() {
     setSelectedAccountIds((prev) => {
       const isAlreadySelected = prev.includes(id);
       if (isAlreadySelected) {
-        return prev.filter((item) => item !== id);
+        const next = prev.filter((item) => item !== id);
+        return next;
       } else {
         setPreviewPlatform(provider);
         return [...prev, id];
@@ -144,23 +115,40 @@ export default function NewPostPage() {
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
     setIsUploadingMedia(true);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
-      setMediaUrl(data.url);
+      const uploadedItems: PreviewMediaItem[] = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `Upload failed for ${file.name}`);
+
+        const isVideo = file.type.startsWith("video/");
+        uploadedItems.push({
+          id: `media-${Date.now()}-${i}`,
+          url: data.url,
+          type: isVideo ? "VIDEO" : "IMAGE",
+          name: file.name,
+          size: file.size,
+        });
+      }
+
+      setMedia((prev) => [...prev, ...uploadedItems]);
       toast({
         title: "Media Attached",
-        message: "Creative visual uploaded successfully.",
+        message: `${uploadedItems.length} file(s) uploaded successfully.`,
         type: "success",
       });
     } catch (err: unknown) {
@@ -175,14 +163,60 @@ export default function NewPostPage() {
     }
   };
 
+  const handleAddDirectUrl = () => {
+    if (!directMediaUrl.trim()) return;
+    const isVideo = directMediaUrl.match(/\.(mp4|mov|webm)$/i);
+    setMedia((prev) => [
+      ...prev,
+      {
+        id: `url-${Date.now()}`,
+        url: directMediaUrl.trim(),
+        type: isVideo ? "VIDEO" : "IMAGE",
+      },
+    ]);
+    setDirectMediaUrl("");
+    toast({
+      title: "Media URL Attached",
+      message: "Creative visual added from external link.",
+      type: "success",
+    });
+  };
+
+  const handleRemoveMedia = (index: number) => {
+    setMedia((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleAction = async (action: "DRAFT" | "SCHEDULE" | "PUBLISH_NOW") => {
-    if (!content.trim() && !mediaUrl) {
-      toast({ title: "Content Required", message: "Please enter your message or attach media.", type: "warning" });
+    if (!content.trim() && media.length === 0) {
+      toast({
+        title: "Content Required",
+        message: "Please enter your message caption or attach media.",
+        type: "warning",
+      });
       return;
     }
 
     if (selectedAccountIds.length === 0) {
-      toast({ title: "Select Channel", message: "Please select at least one social channel.", type: "warning" });
+      toast({
+        title: "Select Channel",
+        message: "Please select at least one connected social channel.",
+        type: "warning",
+      });
+      return;
+    }
+
+    // Check if selected accounts are real connected accounts
+    const hasRealConnected = accounts.some(
+      (a) => selectedAccountIds.includes(a.id) && a.isRealConnected
+    );
+
+    if (action === "PUBLISH_NOW" && !hasRealConnected) {
+      toast({
+        title: "No Live Connection",
+        message:
+          "Publishing requires a verified connected social account. Connect your channel in Settings -> Connected Accounts.",
+        type: "error",
+      });
       return;
     }
 
@@ -191,51 +225,73 @@ export default function NewPostPage() {
     try {
       let scheduledFor: string | undefined = undefined;
       if (action === "SCHEDULE" && scheduledDate) {
-        scheduledFor = new Date(`${scheduledDate}T${scheduledTime || "12:00"}:00Z`).toISOString();
+        scheduledFor = new Date(
+          `${scheduledDate}T${scheduledTime || "12:00"}:00Z`
+        ).toISOString();
       }
-
-      // Filter real account IDs or pass fallback
-      const realTargetIds = selectedAccountIds.filter((id) => !id.startsWith("ch-"));
 
       const res = await fetch("/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           content,
-          targetAccountIds: realTargetIds.length > 0 ? realTargetIds : ["default"],
+          targetAccountIds: selectedAccountIds,
           action,
           scheduledFor,
-          mediaUrls: mediaUrl ? [{ url: mediaUrl, type: "IMAGE" }] : [],
+          mediaUrls: media.map((m) => ({ url: m.url, type: m.type })),
         }),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Broadcast action failed");
+      if (!res.ok) throw new Error(data.error || "Post action failed");
 
       toast({
-        title: action === "PUBLISH_NOW" ? "Broadcast Live!" : "Post Saved!",
+        title:
+          action === "PUBLISH_NOW"
+            ? "Published Successfully!"
+            : action === "SCHEDULE"
+            ? "Post Scheduled!"
+            : "Draft Saved!",
         message:
           action === "PUBLISH_NOW"
             ? "Your post is now live across your selected networks."
-            : "Post saved to your publishing queue.",
+            : action === "SCHEDULE"
+            ? `Post scheduled for ${scheduledDate} at ${scheduledTime}.`
+            : "Post saved to your drafts queue.",
         type: "success",
       });
 
-      router.push("/calendar");
+      router.push(action === "SCHEDULE" ? "/calendar" : "/posts");
     } catch (err: unknown) {
-      toast({ title: "Publish Error", message: (err as Error).message, type: "error" });
+      toast({
+        title: "Publish Error",
+        message: (err as Error).message,
+        type: "error",
+      });
     } finally {
       setIsPublishing(false);
     }
   };
 
-  const currentLimit = PLATFORM_LIMITS[previewPlatform] || 2200;
-  const isOverLimit = content.length > currentLimit;
+  const capability = getPlatformCapability(previewPlatform);
+  const isOverLimit = content.length > capability.maxCharacterLimit;
 
-  // Active channel details for preview
-  const activeAccount = accounts.find((a) => a.provider === previewPlatform);
-  const brandDisplayName = activeAccount?.displayName || activeBrand?.name || "PulseSocial Workspace";
-  const brandAvatar = activeAccount?.profileImageUrl || activeBrand?.avatarUrl || "";
+  // Selected accounts for preview
+  const previewAccounts = accounts.filter((a) =>
+    selectedAccountIds.includes(a.id)
+  );
+
+  // Fallback active preview account if none connected
+  const activeFallbackAccount: PreviewAccount = {
+    id: `preview-${previewPlatform}`,
+    provider: previewPlatform,
+    displayName: activeBrand?.name || "PulseSocial Workspace",
+    username: activeBrand?.slug || "pulsesocial",
+    profileImageUrl: activeBrand?.avatarUrl || null,
+  };
+
+  const previewList =
+    previewAccounts.length > 0 ? previewAccounts : [activeFallbackAccount];
 
   return (
     <AppLayout>
@@ -247,7 +303,7 @@ export default function NewPostPage() {
               Studio Post Composer
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Simultaneous multi-network broadcast with real-time native preview simulator.
+              Simultaneous multi-network broadcast with real-time native platform preview simulator.
             </p>
           </div>
 
@@ -255,14 +311,15 @@ export default function NewPostPage() {
             <Button
               variant="outline"
               onClick={() => handleAction("DRAFT")}
-              className="text-xs font-semibold rounded-xl"
+              className="text-xs font-semibold rounded-xl cursor-pointer"
             >
               Save Draft
             </Button>
             <Button
               onClick={() => handleAction("PUBLISH_NOW")}
               isLoading={isPublishing}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold px-5 shadow-xs"
+              disabled={isPublishing || isOverLimit}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold px-5 shadow-xs cursor-pointer disabled:opacity-50"
             >
               <Send className="w-3.5 h-3.5 mr-1.5" /> Publish Now
             </Button>
@@ -283,34 +340,97 @@ export default function NewPostPage() {
                   href="/connections"
                   className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 hover:underline flex items-center gap-1"
                 >
-                  <Plus className="w-3 h-3" /> Connect New Channel
+                  <Plus className="w-3 h-3" /> Connect Social Account
                 </Link>
               </div>
 
-              <div className="flex items-center gap-2 flex-wrap">
-                {accounts.map((acc) => {
-                  const isSelected = selectedAccountIds.includes(acc.id);
-                  return (
-                    <button
-                      key={acc.id}
-                      type="button"
-                      onClick={() => toggleAccount(acc.id, acc.provider)}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all border cursor-pointer ${
-                        isSelected
-                          ? "border-indigo-600 bg-indigo-50/80 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300 ring-2 ring-indigo-500/20 shadow-xs"
-                          : "border-slate-200 bg-white text-slate-600 opacity-60 hover:opacity-100 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400"
-                      }`}
-                    >
-                      {renderPlatformIcon(acc.provider, 16)}
-                      <span>{acc.displayName}</span>
-                      {isSelected ? (
-                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 ml-0.5" />
-                      ) : null}
-                    </button>
-                  );
-                })}
-              </div>
+              {isLoadingAccounts ? (
+                <div className="flex items-center gap-2 py-3 text-xs text-slate-500">
+                  <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
+                  <span>Loading connected social channels...</span>
+                </div>
+              ) : accounts.length === 0 ? (
+                <div className="p-4 rounded-xl border border-dashed border-amber-300/80 bg-amber-50/50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
+                    <div>
+                      <p className="text-xs font-bold">No social accounts connected yet</p>
+                      <p className="text-[11px] text-amber-700/80 dark:text-amber-400">
+                        Connect your official accounts (Instagram, LinkedIn, X, Facebook, etc.) to publish live.
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    href="/connections"
+                    className="shrink-0 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs transition"
+                  >
+                    + Connect Social Account
+                  </Link>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 flex-wrap">
+                  {accounts.map((acc) => {
+                    const isSelected = selectedAccountIds.includes(acc.id);
+                    return (
+                      <button
+                        key={acc.id}
+                        type="button"
+                        onClick={() => toggleAccount(acc.id, acc.provider)}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all border cursor-pointer ${
+                          isSelected
+                            ? "border-indigo-600 bg-indigo-50/80 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300 ring-2 ring-indigo-500/20 shadow-xs"
+                            : "border-slate-200 bg-white text-slate-600 opacity-60 hover:opacity-100 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400"
+                        }`}
+                      >
+                        {acc.profileImageUrl ? (
+                          <img
+                            src={acc.profileImageUrl}
+                            alt=""
+                            className="w-4 h-4 rounded-full object-cover"
+                          />
+                        ) : (
+                          renderPlatformIcon(acc.provider, 15)
+                        )}
+                        <span className="truncate max-w-[120px]">{acc.displayName}</span>
+                        {acc.username && (
+                          <span className="text-[10px] opacity-60">@{acc.username}</span>
+                        )}
+                        {isSelected ? (
+                          <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 ml-0.5" />
+                        ) : null}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
+
+            {/* YouTube Specific Fields when YouTube selected */}
+            {(previewPlatform === "youtube" ||
+              selectedAccountIds.some(
+                (id) => accounts.find((a) => a.id === id)?.provider === "youtube"
+              )) && (
+              <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-red-200/80 dark:border-red-900/40 shadow-xs space-y-3">
+                <span className="text-xs font-bold text-red-600 uppercase tracking-wider flex items-center gap-1.5">
+                  {renderPlatformIcon("youtube", 16)} YouTube Broadcast Settings
+                </span>
+                <Input
+                  placeholder="Enter YouTube Video Title (Required for YouTube)..."
+                  value={youtubeTitle}
+                  onChange={(e) => setYoutubeTitle(e.target.value)}
+                  className="rounded-xl text-xs"
+                />
+                <label className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-300 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isShorts}
+                    onChange={(e) => setIsShorts(e.target.checked)}
+                    className="rounded text-red-600 focus:ring-red-500"
+                  />
+                  <span>Format as YouTube Shorts (Vertical 9:16 Video)</span>
+                </label>
+              </div>
+            )}
 
             {/* Text Editor Area */}
             <div className="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
@@ -318,7 +438,7 @@ export default function NewPostPage() {
                 rows={6}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="What would you like to share across your channels? Craft your message, paste links, or use AI Assistant..."
+                placeholder="What would you like to share across your channels? Craft your message, paste links, or generate publication-ready copy with Gemini AI..."
                 className="w-full text-sm bg-transparent border-none focus:outline-none resize-none placeholder:text-slate-400 text-slate-900 dark:text-white leading-relaxed"
               />
 
@@ -327,7 +447,9 @@ export default function NewPostPage() {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => setContent((prev) => `${prev} #Growth #Innovation #Trending `)}
+                    onClick={() =>
+                      setContent((prev) => `${prev} #Growth #Innovation #Trending `)
+                    }
                     className="p-1.5 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-800 cursor-pointer transition"
                     title="Insert Hashtags"
                   >
@@ -346,16 +468,23 @@ export default function NewPostPage() {
                     onClick={() => setIsAiModalOpen(true)}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl text-indigo-700 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:text-indigo-300 cursor-pointer transition border border-indigo-200/60 dark:border-indigo-800"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-indigo-600" /> AI Assistant
+                    <Sparkles className="w-3.5 h-3.5 text-indigo-600" /> Create with Gemini AI
                   </button>
                 </div>
 
                 {/* Character Counter */}
                 <div className="text-xs font-semibold">
-                  <span className={isOverLimit ? "text-rose-600 font-bold" : "text-slate-400"}>
+                  <span
+                    className={
+                      isOverLimit ? "text-rose-600 font-bold" : "text-slate-400"
+                    }
+                  >
                     {content.length}
                   </span>
-                  <span className="text-slate-400"> / {currentLimit} ({previewPlatform.toUpperCase()})</span>
+                  <span className="text-slate-400">
+                    {" "}
+                    / {capability.maxCharacterLimit} ({capability.displayName})
+                  </span>
                 </div>
               </div>
             </div>
@@ -364,53 +493,111 @@ export default function NewPostPage() {
             <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <ImageIcon className="w-4 h-4 text-indigo-600" /> Attached Creative Visuals
+                  <ImageIcon className="w-4 h-4 text-indigo-600" /> Attached Creative Visuals ({media.length})
                 </label>
-                {mediaUrl && (
+                {media.length > 0 && (
                   <button
                     type="button"
-                    onClick={() => setMediaUrl("")}
-                    className="text-xs font-medium text-rose-500 hover:underline flex items-center gap-1"
+                    onClick={() => setMedia([])}
+                    className="text-xs font-medium text-rose-500 hover:underline flex items-center gap-1 cursor-pointer"
                   >
-                    <X className="w-3.5 h-3.5" /> Remove Visual
+                    <X className="w-3.5 h-3.5" /> Remove All
                   </button>
                 )}
               </div>
 
+              {/* Upload Controls */}
               <div className="flex flex-col sm:flex-row items-center gap-2">
                 <input
                   type="file"
                   ref={fileInputRef}
                   onChange={handleFileUpload}
                   accept="image/*,video/*"
+                  multiple
                   className="hidden"
                 />
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploadingMedia}
-                  className="w-full sm:w-auto px-4 py-2 rounded-xl border border-indigo-200 bg-indigo-50/60 text-indigo-700 hover:bg-indigo-100 text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2 rounded-xl border border-indigo-200 bg-indigo-50/60 text-indigo-700 hover:bg-indigo-100 text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer disabled:opacity-50"
                 >
                   {isUploadingMedia ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <UploadCloud className="w-4 h-4" />
                   )}
-                  <span>{isUploadingMedia ? "Uploading..." : "Upload Media"}</span>
+                  <span>
+                    {isUploadingMedia ? "Uploading Media..." : "Upload Images / Video"}
+                  </span>
                 </button>
                 <span className="text-xs text-slate-400 hidden sm:inline">or</span>
-                <Input
-                  type="url"
-                  placeholder="Paste direct image or video URL..."
-                  value={mediaUrl}
-                  onChange={(e) => setMediaUrl(e.target.value)}
-                  className="flex-1 rounded-xl text-xs"
-                />
+                <div className="flex items-center gap-1 flex-1 w-full">
+                  <Input
+                    type="url"
+                    placeholder="Paste direct image or video URL..."
+                    value={directMediaUrl}
+                    onChange={(e) => setDirectMediaUrl(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddDirectUrl();
+                      }
+                    }}
+                    className="flex-1 rounded-xl text-xs"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleAddDirectUrl}
+                    disabled={!directMediaUrl.trim()}
+                    className="text-xs rounded-xl cursor-pointer"
+                  >
+                    Add
+                  </Button>
+                </div>
               </div>
 
-              {mediaUrl && (
-                <div className="relative w-32 h-24 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 mt-2 shadow-xs">
-                  <img src={mediaUrl} alt="Post Attachment" className="w-full h-full object-cover" />
+              {/* Multi-Media Gallery Strip */}
+              {media.length > 0 && (
+                <div className="flex items-center gap-2.5 overflow-x-auto pt-2 pb-1 scrollbar-none">
+                  {media.map((item, idx) => (
+                    <div
+                      key={item.id || idx}
+                      className="relative w-24 h-20 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 shrink-0 group shadow-xs"
+                    >
+                      {item.type?.toUpperCase() === "VIDEO" ? (
+                        <div className="w-full h-full bg-slate-900 flex items-center justify-center text-white">
+                          <Video className="w-6 h-6" />
+                        </div>
+                      ) : (
+                        <img
+                          src={item.url}
+                          alt="Attachment"
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveMedia(idx)}
+                        className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/70 hover:bg-rose-600 text-white flex items-center justify-center transition cursor-pointer"
+                        title="Remove visual"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                      <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-black/60 text-white">
+                        {item.type}
+                      </span>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-24 h-20 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-indigo-500 text-slate-400 hover:text-indigo-600 flex flex-col items-center justify-center gap-1 shrink-0 transition cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span className="text-[10px] font-semibold">+ Add More</span>
+                  </button>
                 </div>
               )}
             </div>
@@ -440,7 +627,7 @@ export default function NewPostPage() {
                 <Button
                   onClick={() => handleAction("SCHEDULE")}
                   isLoading={isPublishing}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl"
+                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl cursor-pointer"
                 >
                   <Calendar className="w-3.5 h-3.5 mr-1.5" /> Schedule for {scheduledDate} at {scheduledTime}
                 </Button>
@@ -455,11 +642,23 @@ export default function NewPostPage() {
                 Live Native Preview
               </span>
 
-              {/* Switch Preview Channel */}
-              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-                {["instagram", "facebook", "linkedin", "x", "youtube", "pinterest"].map((plat) => (
+              {/* Quick Preview Channel Switcher across all supported networks */}
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl overflow-x-auto max-w-[280px] scrollbar-none">
+                {[
+                  "instagram",
+                  "facebook",
+                  "linkedin",
+                  "x",
+                  "tiktok",
+                  "youtube",
+                  "pinterest",
+                  "threads",
+                  "google",
+                  "mastodon",
+                ].map((plat) => (
                   <button
                     key={plat}
+                    type="button"
                     onClick={() => setPreviewPlatform(plat)}
                     className={`p-1.5 rounded-lg transition-all cursor-pointer ${
                       previewPlatform === plat
@@ -468,272 +667,37 @@ export default function NewPostPage() {
                     }`}
                     title={plat.toUpperCase()}
                   >
-                    {renderPlatformIcon(plat, 16)}
+                    {renderPlatformIcon(plat, 15)}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* INSTAGRAM NATIVE CARD SIMULATOR */}
-            {previewPlatform === "instagram" && (
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden max-w-sm mx-auto text-slate-900 dark:text-white">
-                <div className="p-3 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
-                  <div className="flex items-center gap-2.5">
-                    {brandAvatar ? (
-                      <div className="w-8 h-8 rounded-full ring-2 ring-pink-500/40 p-0.5 overflow-hidden">
-                        <img src={brandAvatar} alt="Avatar" className="w-full h-full object-cover rounded-full" />
-                      </div>
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs ring-2 ring-pink-500/30">
-                        {brandDisplayName.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                    <div>
-                      <p className="text-xs font-bold leading-tight">{brandDisplayName}</p>
-                      <p className="text-[10px] text-slate-400">Direct Post</p>
-                    </div>
-                  </div>
-                  <span className="text-slate-400 font-bold">•••</span>
-                </div>
-
-                {mediaUrl ? (
-                  <div className="aspect-square w-full bg-slate-100 dark:bg-slate-800 relative">
-                    <img src={mediaUrl} alt="Post Visual" className="w-full h-full object-cover" />
-                  </div>
-                ) : (
-                  <div className="aspect-video w-full bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 flex items-center justify-center p-6 text-center border-y border-slate-100 dark:border-slate-800">
-                    <p className="text-xs text-slate-600 dark:text-slate-300 font-medium italic line-clamp-3">
-                      {content || "Craft your message in the composer to simulate your live post..."}
-                    </p>
-                  </div>
-                )}
-
-                <div className="p-3 pb-2 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Heart
-                        onClick={() => setIsLikedPreview(!isLikedPreview)}
-                        className={`w-5 h-5 cursor-pointer transition ${isLikedPreview ? "text-rose-500 fill-rose-500" : "text-slate-800 dark:text-slate-200"}`}
-                      />
-                      <MessageCircle className="w-5 h-5 text-slate-800 dark:text-slate-200" />
-                      <Send className="w-5 h-5 text-slate-800 dark:text-slate-200" />
-                    </div>
-                    <Bookmark className="w-5 h-5 text-slate-800 dark:text-slate-200" />
-                  </div>
-
-                  <p className="text-xs font-bold">{isLikedPreview ? "1 like" : "0 likes"}</p>
-
-                  <div className="text-xs leading-relaxed">
-                    <span className="font-bold mr-1.5">{brandDisplayName}</span>
-                    <span className="whitespace-pre-wrap text-slate-700 dark:text-slate-300">
-                      {content || "Your caption will appear here..."}
-                    </span>
-                  </div>
-
-                  <p className="text-[10px] text-slate-400 uppercase tracking-wider pt-1">Just now</p>
-                </div>
-              </div>
-            )}
-
-            {/* FACEBOOK NATIVE CARD SIMULATOR */}
-            {previewPlatform === "facebook" && (
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden max-w-sm mx-auto text-slate-900 dark:text-white p-3 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-full bg-[#1877F2] text-white flex items-center justify-center font-bold text-xs">
-                      {brandDisplayName.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold leading-tight flex items-center gap-1">
-                        {brandDisplayName}
-                      </p>
-                      <p className="text-[10px] text-slate-400 flex items-center gap-1">
-                        Just now · <Globe className="w-2.5 h-2.5" />
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-slate-400 font-bold">•••</span>
-                </div>
-
-                <p className="text-xs leading-relaxed whitespace-pre-wrap text-slate-800 dark:text-slate-200">
-                  {content || "Your Facebook post update will appear here..."}
-                </p>
-
-                {mediaUrl && (
-                  <div className="rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 aspect-video w-full bg-slate-100">
-                    <img src={mediaUrl} alt="FB Media" className="w-full h-full object-cover" />
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-100 dark:border-slate-800">
-                  <span className="flex items-center gap-1">👍 ❤️ 42</span>
-                  <span>6 comments · 2 shares</span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-1 pt-1 border-t border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-300">
-                  <button className="py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg flex items-center justify-center gap-1.5">
-                    <ThumbsUp className="w-3.5 h-3.5" /> Like
-                  </button>
-                  <button className="py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg flex items-center justify-center gap-1.5">
-                    <MessageCircle className="w-3.5 h-3.5" /> Comment
-                  </button>
-                  <button className="py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg flex items-center justify-center gap-1.5">
-                    <Share2 className="w-3.5 h-3.5" /> Share
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* LINKEDIN NATIVE CARD SIMULATOR */}
-            {previewPlatform === "linkedin" && (
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden max-w-sm mx-auto text-slate-900 dark:text-white p-3 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-md bg-[#0A66C2] text-white flex items-center justify-center font-bold text-xs">
-                      {brandDisplayName.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold leading-tight">{brandDisplayName}</p>
-                      <p className="text-[10px] text-slate-400">Organization · 1,420 followers</p>
-                      <p className="text-[10px] text-slate-400 flex items-center gap-1">
-                        Now · <Globe className="w-2.5 h-2.5" />
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-slate-400 font-bold">•••</span>
-                </div>
-
-                <p className="text-xs leading-relaxed whitespace-pre-wrap text-slate-800 dark:text-slate-200">
-                  {content || "Your professional LinkedIn update will appear here..."}
-                </p>
-
-                {mediaUrl && (
-                  <div className="rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 aspect-video w-full bg-slate-100">
-                    <img src={mediaUrl} alt="LinkedIn Media" className="w-full h-full object-cover" />
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-100 dark:border-slate-800">
-                  <span className="flex items-center gap-1">👏 💡 ❤️ 68</span>
-                  <span>9 comments · 4 reposts</span>
-                </div>
-
-                <div className="grid grid-cols-4 gap-1 pt-1 border-t border-slate-100 dark:border-slate-800 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
-                  <button className="py-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded flex items-center justify-center gap-1">
-                    <ThumbsUp className="w-3 h-3" /> Like
-                  </button>
-                  <button className="py-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded flex items-center justify-center gap-1">
-                    <MessageCircle className="w-3 h-3" /> Comment
-                  </button>
-                  <button className="py-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded flex items-center justify-center gap-1">
-                    <Repeat2 className="w-3 h-3" /> Repost
-                  </button>
-                  <button className="py-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded flex items-center justify-center gap-1">
-                    <Send className="w-3 h-3" /> Send
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* X / TWITTER NATIVE CARD SIMULATOR */}
-            {previewPlatform === "x" && (
-              <div className="bg-white dark:bg-black rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden max-w-sm mx-auto text-slate-900 dark:text-white p-3 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-full bg-black text-white dark:bg-white dark:text-black flex items-center justify-center font-bold text-xs">
-                      {brandDisplayName.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold leading-tight">{brandDisplayName}</p>
-                      <p className="text-[10px] text-slate-400">@brand_official · Just now</p>
-                    </div>
-                  </div>
-                  {renderPlatformIcon("x", "w-4 h-4 text-slate-800 dark:text-white")}
-                </div>
-
-                <p className="text-xs leading-relaxed whitespace-pre-wrap text-slate-900 dark:text-slate-100">
-                  {content || "What is happening?! Craft your post to view real-time simulator..."}
-                </p>
-
-                {mediaUrl && (
-                  <div className="rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 aspect-video w-full bg-slate-100 dark:bg-slate-900">
-                    <img src={mediaUrl} alt="X media" className="w-full h-full object-cover" />
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between text-slate-500 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs px-2">
-                  <span className="flex items-center gap-1"><MessageCircle className="w-3.5 h-3.5" /> 8</span>
-                  <span className="flex items-center gap-1"><Repeat2 className="w-3.5 h-3.5" /> 14</span>
-                  <span className="flex items-center gap-1"><Heart className="w-3.5 h-3.5" /> 95</span>
-                  <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> 1.2K</span>
-                  <Share2 className="w-3.5 h-3.5" />
-                </div>
-              </div>
-            )}
-
-            {/* YOUTUBE COMMUNITY / SHORTS PREVIEW */}
-            {previewPlatform === "youtube" && (
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden max-w-sm mx-auto text-slate-900 dark:text-white p-3 space-y-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-full bg-[#FF0000] text-white flex items-center justify-center font-bold text-xs">
-                    {brandDisplayName.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold leading-tight">{brandDisplayName}</p>
-                    <p className="text-[10px] text-slate-400">Community Post · Just now</p>
-                  </div>
-                </div>
-
-                <p className="text-xs leading-relaxed whitespace-pre-wrap text-slate-800 dark:text-slate-200">
-                  {content || "Your YouTube community announcement will appear here..."}
-                </p>
-
-                {mediaUrl && (
-                  <div className="rounded-xl overflow-hidden aspect-video w-full bg-slate-100">
-                    <img src={mediaUrl} alt="YouTube Visual" className="w-full h-full object-cover" />
-                  </div>
-                )}
-
-                <div className="flex items-center gap-4 text-xs text-slate-500 pt-2 border-t border-slate-100 dark:border-slate-800">
-                  <span className="flex items-center gap-1"><ThumbsUp className="w-3.5 h-3.5" /> 210</span>
-                  <span className="flex items-center gap-1"><ThumbsDown className="w-3.5 h-3.5" /></span>
-                  <span className="flex items-center gap-1"><MessageCircle className="w-3.5 h-3.5" /> 34</span>
-                </div>
-              </div>
-            )}
-
-            {/* PINTEREST PIN PREVIEW */}
-            {previewPlatform === "pinterest" && (
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden max-w-xs mx-auto text-slate-900 dark:text-white space-y-2">
-                <div className="aspect-[3/4] w-full bg-slate-100 dark:bg-slate-800 relative flex items-center justify-center">
-                  {mediaUrl ? (
-                    <img src={mediaUrl} alt="Pin" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="p-4 text-center">
-                      <p className="text-xs font-semibold text-slate-400">Attach an image to preview Pin</p>
-                    </div>
-                  )}
-                  <button className="absolute top-3 right-3 bg-[#E60023] hover:bg-red-700 text-white font-bold text-xs px-3 py-1.5 rounded-full shadow-md">
-                    Save
-                  </button>
-                </div>
-
-                <div className="p-3 space-y-1">
-                  <h4 className="text-xs font-bold truncate">{content ? content.slice(0, 40) : "Pin Title"}</h4>
-                  <p className="text-[11px] text-slate-500 line-clamp-2">
-                    {content || "Pin description and hashtags will appear here..."}
-                  </p>
-                </div>
-              </div>
-            )}
+            {/* Dynamic Native Platform Preview Renderer */}
+            <PostPreview
+              accounts={previewList}
+              activeAccountId={
+                previewAccounts.find((a) => a.provider === previewPlatform)?.id ||
+                previewList[0]?.id
+              }
+              onSelectAccount={(id) => {
+                const found = accounts.find((a) => a.id === id);
+                if (found) setPreviewPlatform(found.provider);
+              }}
+              onOpenConnectModal={() => router.push("/connections")}
+              content={content}
+              media={media}
+              youtubeTitle={youtubeTitle}
+              isShorts={isShorts}
+            />
           </div>
         </div>
 
-        {/* Real Clean Gemini AI Assistant Modal */}
+        {/* Real Verified Gemini AI Assistant Modal */}
         <GeminiAiModal
           isOpen={isAiModalOpen}
           onClose={() => setIsAiModalOpen(false)}
-          brandName={brandDisplayName}
+          brandName={activeBrand?.name || "PulseSocial"}
           onApply={(data) => {
             setContent(data.caption);
             if (data.hashtags && data.hashtags.length > 0) {

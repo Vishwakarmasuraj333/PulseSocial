@@ -36,10 +36,11 @@ export function MarketingHeader() {
     avatarUrl?: string | null;
     activeOrganization?: { id: string; name: string } | null;
   } | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const resourcesRef = useRef<HTMLDivElement>(null);
 
   const checkAuth = () => {
-    fetch("/api/auth/me", { cache: "no-store" })
+    fetch("/api/auth/me", { cache: "no-store", credentials: "include" })
       .then((res) => {
         if (res.ok) return res.json();
         return null;
@@ -60,6 +61,23 @@ export function MarketingHeader() {
   };
 
   useEffect(() => {
+    // If arriving with logout flag, force clear all client data immediately
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("logout") === "true") {
+        setIsLoggedIn(false);
+        setCurrentUser(null);
+        try {
+          localStorage.removeItem("pulsesocial_active_user");
+          localStorage.removeItem("pulsesocial_active_brand");
+          sessionStorage.clear();
+        } catch {}
+        fetch("/api/auth/logout", { method: "POST", credentials: "include" }).catch(() => {});
+        window.history.replaceState({}, "", window.location.pathname);
+        return;
+      }
+    }
+
     checkAuth();
 
     const handleAuthEvent = () => {
@@ -75,22 +93,38 @@ export function MarketingHeader() {
   }, [pathname]);
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
     } catch {}
+
     if (typeof window !== "undefined") {
       try {
         localStorage.removeItem("pulsesocial_active_user");
         localStorage.removeItem("pulsesocial_active_brand");
         sessionStorage.clear();
       } catch {}
-      document.cookie = "pulsesocial_auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0";
-      document.cookie = "pulsesocial_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0";
+
+      // Clear client-side cookie shadows
+      const cookieNames = ["pulsesocial_auth_session", "pulsesocial_session", "next-auth.session-token"];
+      cookieNames.forEach((name) => {
+        document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0;`;
+        if (window.location.hostname) {
+          document.cookie = `${name}=; path=/; domain=${window.location.hostname}; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0;`;
+        }
+      });
+
       window.dispatchEvent(new Event("pulsesocial_auth_changed"));
     }
+
     setIsLoggedIn(false);
     setCurrentUser(null);
-    window.location.href = "/login?logout=true";
+    setIsLoggingOut(false);
+    window.location.href = "/?logout=true";
   };
 
   useEffect(() => {
@@ -257,11 +291,12 @@ export function MarketingHeader() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="inline-flex items-center gap-1.5 px-2.5 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition cursor-pointer"
+                disabled={isLoggingOut}
+                className="inline-flex items-center gap-1.5 px-2.5 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition cursor-pointer disabled:opacity-50"
                 title="Log out from PulseSocial"
               >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Log out</span>
+                <LogOut className={`w-3.5 h-3.5 ${isLoggingOut ? "animate-spin" : ""}`} />
+                <span>{isLoggingOut ? "Logging out..." : "Log out"}</span>
               </button>
             </>
           ) : (
@@ -338,14 +373,15 @@ export function MarketingHeader() {
                 </Link>
                 <button
                   type="button"
+                  disabled={isLoggingOut}
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     handleLogout();
                   }}
-                  className="w-full py-2.5 text-center text-xs font-bold rounded-xl border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="w-full py-2.5 text-center text-xs font-bold rounded-xl border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span>Log Out of Account</span>
+                  <LogOut className={`w-3.5 h-3.5 ${isLoggingOut ? "animate-spin" : ""}`} />
+                  <span>{isLoggingOut ? "Logging Out..." : "Log Out of Account"}</span>
                 </button>
               </>
             ) : (

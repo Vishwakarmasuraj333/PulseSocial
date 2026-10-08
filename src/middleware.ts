@@ -50,13 +50,8 @@ export async function middleware(req: any) {
     }
   }
 
-  // If visiting the root of the app (/), ALWAYS show the frontend marketing landing page!
-  if (pathname === "/") {
-    return NextResponse.next();
-  }
-
-  // If visiting /login or /signup with ?logout=true or ?force=true, clear session and show login page
-  if (AUTH_ROUTES.includes(pathname) && (searchParams.get("logout") === "true" || searchParams.has("force") || searchParams.get("switch") === "true")) {
+  // If visiting with ?logout=true or ?force=true, aggressively clear session cookies across all routes
+  if (searchParams.get("logout") === "true" || searchParams.has("force") || searchParams.get("switch") === "true") {
     const res = NextResponse.next();
     const isProd = process.env.NODE_ENV === "production" || req.url.startsWith("https:");
     const cookieOpts = {
@@ -67,9 +62,16 @@ export async function middleware(req: any) {
       maxAge: 0,
       expires: new Date(0),
     };
+    res.cookies.delete("pulsesocial_auth_session");
+    res.cookies.delete("pulsesocial_session");
     res.cookies.set("pulsesocial_auth_session", "", cookieOpts);
     res.cookies.set("pulsesocial_session", "", cookieOpts);
     return res;
+  }
+
+  // If visiting the root of the app (/), ALWAYS show the frontend marketing landing page!
+  if (pathname === "/") {
+    return NextResponse.next();
   }
 
   // Check if requested route requires authentication

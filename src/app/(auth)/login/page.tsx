@@ -92,12 +92,22 @@ export default function LoginPage() {
           localStorage.removeItem("pulsesocial_active_brand");
           sessionStorage.clear();
         } catch {}
-        fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+
+        const cookieNames = ["pulsesocial_auth_session", "pulsesocial_session", "next-auth.session-token"];
+        cookieNames.forEach((name) => {
+          document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0;`;
+          if (window.location.hostname) {
+            document.cookie = `${name}=; path=/; domain=${window.location.hostname}; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0;`;
+          }
+        });
+
+        fetch("/api/auth/logout", { method: "POST", credentials: "include" }).catch(() => {});
+        window.dispatchEvent(new Event("pulsesocial_auth_changed"));
         return;
       }
     }
 
-    fetch("/api/auth/me")
+    fetch("/api/auth/me", { cache: "no-store", credentials: "include" })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.user) setExistingUser(data.user);
@@ -107,7 +117,7 @@ export default function LoginPage() {
 
   const handleSignOutCurrent = async () => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
     } catch {}
     setExistingUser(null);
     if (typeof window !== "undefined") {
@@ -116,6 +126,15 @@ export default function LoginPage() {
         localStorage.removeItem("pulsesocial_active_brand");
         sessionStorage.clear();
       } catch {}
+
+      const cookieNames = ["pulsesocial_auth_session", "pulsesocial_session", "next-auth.session-token"];
+      cookieNames.forEach((name) => {
+        document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0;`;
+        if (window.location.hostname) {
+          document.cookie = `${name}=; path=/; domain=${window.location.hostname}; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0;`;
+        }
+      });
+      window.dispatchEvent(new Event("pulsesocial_auth_changed"));
     }
     toast({
       title: "Signed Out",

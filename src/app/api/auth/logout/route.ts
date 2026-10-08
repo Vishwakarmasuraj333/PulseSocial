@@ -2,6 +2,42 @@ import { NextResponse } from "next/server";
 import { destroySession, getSession } from "@/lib/auth/session";
 import { logAudit } from "@/lib/audit/logger";
 
+function applyExhaustiveCookiePurge(res: NextResponse) {
+  const cookieNames = ["pulsesocial_auth_session", "pulsesocial_session", "next-auth.session-token"];
+  
+  for (const name of cookieNames) {
+    try {
+      res.cookies.delete(name);
+    } catch {}
+
+    // 1. Purge with Secure=true
+    res.cookies.set(name, "", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 0,
+      expires: new Date(0),
+    });
+
+    // 2. Purge without Secure (for localhost / non-https testing)
+    res.cookies.set(name, "", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 0,
+      expires: new Date(0),
+    });
+
+    // 3. Fallback explicit Raw Set-Cookie header
+    res.headers.append(
+      "Set-Cookie",
+      `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; HttpOnly; SameSite=Lax`
+    );
+  }
+}
+
 export async function POST(req: Request) {
   const session = await getSession();
   if (session?.id) {
@@ -17,38 +53,17 @@ export async function POST(req: Request) {
 
   await destroySession();
   const res = NextResponse.json({ success: true, message: "Logged out successfully" });
-  const isSecure = process.env.NODE_ENV === "production" || req.url.startsWith("https:");
-  
-  const cookieOptions = {
-    httpOnly: true,
-    secure: isSecure,
-    sameSite: "lax" as const,
-    path: "/",
-    maxAge: 0,
-    expires: new Date(0),
-  };
-
-  res.cookies.set("pulsesocial_auth_session", "", cookieOptions);
-  res.cookies.set("pulsesocial_session", "", cookieOptions);
+  applyExhaustiveCookiePurge(res);
   return res;
 }
 
 export async function GET(req: Request) {
   await destroySession();
-  const res = NextResponse.redirect(new URL("/login?logout=true", req.url));
-  const isSecure = process.env.NODE_ENV === "production" || req.url.startsWith("https:");
-
-  const cookieOptions = {
-    httpOnly: true,
-    secure: isSecure,
-    sameSite: "lax" as const,
-    path: "/",
-    maxAge: 0,
-    expires: new Date(0),
-  };
-
-  res.cookies.set("pulsesocial_auth_session", "", cookieOptions);
-  res.cookies.set("pulsesocial_session", "", cookieOptions);
+  const { searchParams } = new URL(req.url);
+  const redirectTo = searchParams.get("redirectTo") || "/?logout=true";
+  const res = NextResponse.redirect(new URL(redirectTo, req.url));
+  applyExhaustiveCookiePurge(res);
   return res;
 }
+
 

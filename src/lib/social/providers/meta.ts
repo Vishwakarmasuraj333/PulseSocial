@@ -9,6 +9,11 @@ import {
   AnalyticsResult,
   CommentResult,
   MessageResult,
+  PlatformActionCapabilities,
+  PLATFORM_ACTION_CAPABILITIES,
+  SocialActionResult,
+  SocialMetricsResult,
+  ExternalCommentData,
 } from "../types";
 import { SOCIAL_API_VERSIONS } from "../api-versions";
 
@@ -434,6 +439,432 @@ export class MetaProvider implements SocialProvider {
       return res.ok;
     } catch {
       return true;
+    }
+  }
+
+  getActionCapabilities(): PlatformActionCapabilities {
+    return PLATFORM_ACTION_CAPABILITIES[this.platform];
+  }
+
+  async likePost(accessToken: string, target: { externalPostId: string; accountId?: string }): Promise<SocialActionResult> {
+    if (this.platform === "instagram") {
+      return {
+        success: false,
+        actionType: "LIKE",
+        code: "UNSUPPORTED_ACTION",
+        error: "Not supported by this integration: Instagram Graph API does not support programmatic post likes.",
+      };
+    }
+
+    try {
+      const res = await fetch(`https://graph.facebook.com/v20.0/${target.externalPostId}/likes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ access_token: accessToken }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const isAuth = res.status === 401 || data.error?.code === 190;
+        return {
+          success: false,
+          actionType: "LIKE",
+          code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+          requiresReauth: isAuth,
+          error: data.error?.message || "Failed to like post on Facebook",
+          rawResponse: data,
+        };
+      }
+      return {
+        success: true,
+        actionType: "LIKE",
+        externalActionId: target.externalPostId,
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "LIKE",
+        code: "NETWORK_ERROR",
+        error: e.message || "Failed to connect to Facebook Graph API",
+      };
+    }
+  }
+
+  async unlikePost(accessToken: string, target: { externalPostId: string; accountId?: string }): Promise<SocialActionResult> {
+    if (this.platform === "instagram") {
+      return {
+        success: false,
+        actionType: "UNLIKE",
+        code: "UNSUPPORTED_ACTION",
+        error: "Not supported by this integration: Instagram Graph API does not support programmatic post unlikes.",
+      };
+    }
+
+    try {
+      const res = await fetch(`https://graph.facebook.com/v20.0/${target.externalPostId}/likes?access_token=${accessToken}`, {
+        method: "DELETE",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const isAuth = res.status === 401 || data.error?.code === 190;
+        return {
+          success: false,
+          actionType: "UNLIKE",
+          code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+          requiresReauth: isAuth,
+          error: data.error?.message || "Failed to unlike post on Facebook",
+          rawResponse: data,
+        };
+      }
+      return {
+        success: true,
+        actionType: "UNLIKE",
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "UNLIKE",
+        code: "NETWORK_ERROR",
+        error: e.message || "Failed to connect to Facebook Graph API",
+      };
+    }
+  }
+
+  async commentPost(accessToken: string, target: { externalPostId: string; accountId?: string; content: string }): Promise<SocialActionResult & { comment?: ExternalCommentData }> {
+    try {
+      const endpoint = `https://graph.facebook.com/v20.0/${target.externalPostId}/comments`;
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: target.content,
+          access_token: accessToken,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.id) {
+        const isAuth = res.status === 401 || data.error?.code === 190;
+        return {
+          success: false,
+          actionType: "COMMENT",
+          code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+          requiresReauth: isAuth,
+          error: data.error?.message || `Failed to post comment to ${this.displayName}`,
+          rawResponse: data,
+        };
+      }
+
+      return {
+        success: true,
+        actionType: "COMMENT",
+        externalActionId: data.id,
+        comment: {
+          externalCommentId: data.id,
+          platform: this.platform,
+          authorName: this.displayName + " Account",
+          content: target.content,
+          postedAt: new Date(),
+          externalPostId: target.externalPostId,
+        },
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "COMMENT",
+        code: "NETWORK_ERROR",
+        error: e.message || `Failed to post comment to ${this.displayName}`,
+      };
+    }
+  }
+
+  async replyToComment(accessToken: string, target: { externalPostId?: string; externalCommentId: string; accountId?: string; content: string }): Promise<SocialActionResult & { comment?: ExternalCommentData }> {
+    try {
+      const endpoint = this.platform === "instagram"
+        ? `https://graph.facebook.com/v20.0/${target.externalCommentId}/replies`
+        : `https://graph.facebook.com/v20.0/${target.externalCommentId}/comments`;
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: target.content,
+          access_token: accessToken,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.id) {
+        const isAuth = res.status === 401 || data.error?.code === 190;
+        return {
+          success: false,
+          actionType: "REPLY",
+          code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+          requiresReauth: isAuth,
+          error: data.error?.message || `Failed to reply to comment on ${this.displayName}`,
+          rawResponse: data,
+        };
+      }
+
+      return {
+        success: true,
+        actionType: "REPLY",
+        externalActionId: data.id,
+        comment: {
+          externalCommentId: data.id,
+          platform: this.platform,
+          authorName: this.displayName + " Reply",
+          content: target.content,
+          postedAt: new Date(),
+          externalPostId: target.externalPostId,
+          parentId: target.externalCommentId,
+        },
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "REPLY",
+        code: "NETWORK_ERROR",
+        error: e.message || `Failed to reply to comment on ${this.displayName}`,
+      };
+    }
+  }
+
+  async deleteComment(accessToken: string, target: { externalCommentId: string; accountId?: string }): Promise<SocialActionResult> {
+    try {
+      const res = await fetch(`https://graph.facebook.com/v20.0/${target.externalCommentId}?access_token=${accessToken}`, {
+        method: "DELETE",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.success === false) {
+        const isAuth = res.status === 401 || data.error?.code === 190;
+        return {
+          success: false,
+          actionType: "DELETE_COMMENT",
+          code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+          requiresReauth: isAuth,
+          error: data.error?.message || `Failed to delete comment on ${this.displayName}`,
+          rawResponse: data,
+        };
+      }
+
+      return {
+        success: true,
+        actionType: "DELETE_COMMENT",
+        externalActionId: target.externalCommentId,
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "DELETE_COMMENT",
+        code: "NETWORK_ERROR",
+        error: e.message || `Failed to delete comment on ${this.displayName}`,
+      };
+    }
+  }
+
+  async hideComment(accessToken: string, target: { externalCommentId: string; accountId?: string }): Promise<SocialActionResult> {
+    try {
+      const endpoint = this.platform === "instagram"
+        ? `https://graph.facebook.com/v20.0/${target.externalCommentId}?hide=true&access_token=${accessToken}`
+        : `https://graph.facebook.com/v20.0/${target.externalCommentId}?is_hidden=true&access_token=${accessToken}`;
+      const res = await fetch(endpoint, { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const isAuth = res.status === 401 || data.error?.code === 190;
+        return {
+          success: false,
+          actionType: "HIDE_COMMENT",
+          code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+          requiresReauth: isAuth,
+          error: data.error?.message || `Failed to hide comment on ${this.displayName}`,
+          rawResponse: data,
+        };
+      }
+
+      return {
+        success: true,
+        actionType: "HIDE_COMMENT",
+        externalActionId: target.externalCommentId,
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "HIDE_COMMENT",
+        code: "NETWORK_ERROR",
+        error: e.message || `Failed to hide comment on ${this.displayName}`,
+      };
+    }
+  }
+
+  async syncPostEngagement(accessToken: string, externalPostId: string): Promise<SocialMetricsResult> {
+    try {
+      if (this.platform === "facebook") {
+        const fields = "shares,comments.summary(true),reactions.summary(true)";
+        const res = await fetch(`https://graph.facebook.com/v20.0/${externalPostId}?fields=${fields}&access_token=${accessToken}`);
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const isAuth = res.status === 401 || data.error?.code === 190;
+          return {
+            success: false,
+            platform: "facebook",
+            externalPostId,
+            likes: null,
+            reactions: null,
+            comments: null,
+            shares: null,
+            reposts: null,
+            views: null,
+            impressions: null,
+            reach: null,
+            saves: null,
+            requiresReauth: isAuth,
+            error: data.error?.message || "Failed to sync Facebook post metrics",
+          };
+        }
+
+        const reactionsCount = typeof data.reactions?.summary?.total_count === "number" ? data.reactions.summary.total_count : null;
+        const commentsCount = typeof data.comments?.summary?.total_count === "number" ? data.comments.summary.total_count : null;
+        const sharesCount = typeof data.shares?.count === "number" ? data.shares.count : null;
+
+        return {
+          success: true,
+          platform: "facebook",
+          externalPostId,
+          likes: reactionsCount,
+          reactions: reactionsCount,
+          comments: commentsCount,
+          shares: sharesCount,
+          reposts: null,
+          views: null,
+          impressions: null,
+          reach: null,
+          saves: null,
+          rawResponse: data,
+        };
+      } else {
+        // Instagram
+        const fields = "like_count,comments_count";
+        const res = await fetch(`https://graph.facebook.com/v20.0/${externalPostId}?fields=${fields}&access_token=${accessToken}`);
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const isAuth = res.status === 401 || data.error?.code === 190;
+          return {
+            success: false,
+            platform: "instagram",
+            externalPostId,
+            likes: null,
+            reactions: null,
+            comments: null,
+            shares: null,
+            reposts: null,
+            views: null,
+            impressions: null,
+            reach: null,
+            saves: null,
+            requiresReauth: isAuth,
+            error: data.error?.message || "Failed to sync Instagram post metrics",
+          };
+        }
+
+        const likes = typeof data.like_count === "number" ? data.like_count : null;
+        const comments = typeof data.comments_count === "number" ? data.comments_count : null;
+
+        return {
+          success: true,
+          platform: "instagram",
+          externalPostId,
+          likes,
+          reactions: likes,
+          comments,
+          shares: null,
+          reposts: null,
+          views: null,
+          impressions: null,
+          reach: null,
+          saves: null,
+          rawResponse: data,
+        };
+      }
+    } catch (e: any) {
+      return {
+        success: false,
+        platform: this.platform,
+        externalPostId,
+        likes: null,
+        reactions: null,
+        comments: null,
+        shares: null,
+        reposts: null,
+        views: null,
+        impressions: null,
+        reach: null,
+        saves: null,
+        error: e.message || "Failed to sync post engagement",
+      };
+    }
+  }
+
+  async fetchPostComments(accessToken: string, externalPostId: string): Promise<ExternalCommentData[]> {
+    try {
+      if (this.platform === "facebook") {
+        const res = await fetch(
+          `https://graph.facebook.com/v20.0/${externalPostId}/comments?fields=id,message,from{name,id},created_time,like_count&access_token=${accessToken}`
+        );
+        if (!res.ok) return [];
+        const data = await res.json().catch(() => ({}));
+        return (data.data || []).map((c: any) => ({
+          externalCommentId: c.id,
+          platform: "facebook" as SupportedPlatform,
+          authorName: c.from?.name || "Facebook User",
+          authorUsername: c.from?.id,
+          content: c.message || "",
+          postedAt: new Date(c.created_time),
+          externalPostId,
+          likeCount: typeof c.like_count === "number" ? c.like_count : null,
+        }));
+      } else {
+        // Instagram
+        const res = await fetch(
+          `https://graph.facebook.com/v20.0/${externalPostId}/comments?fields=id,text,username,timestamp,like_count,replies{id,text,username,timestamp}&access_token=${accessToken}`
+        );
+        if (!res.ok) return [];
+        const data = await res.json().catch(() => ({}));
+        const results: ExternalCommentData[] = [];
+        for (const c of (data.data || [])) {
+          results.push({
+            externalCommentId: c.id,
+            platform: "instagram" as SupportedPlatform,
+            authorName: c.username || "Instagram User",
+            authorUsername: c.username,
+            content: c.text || "",
+            postedAt: new Date(c.timestamp),
+            externalPostId,
+            likeCount: typeof c.like_count === "number" ? c.like_count : null,
+          });
+          if (c.replies?.data) {
+            for (const r of c.replies.data) {
+              results.push({
+                externalCommentId: r.id,
+                platform: "instagram" as SupportedPlatform,
+                authorName: r.username || "Instagram User",
+                authorUsername: r.username,
+                content: r.text || "",
+                postedAt: new Date(r.timestamp),
+                externalPostId,
+                parentId: c.id,
+                likeCount: null,
+              });
+            }
+          }
+        }
+        return results;
+      }
+    } catch {
+      return [];
     }
   }
 }

@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
-import { logAudit } from "@/lib/audit/logger";
+import { executeSocialAction } from "@/lib/social/action-executor";
 
-// GET /api/comments - Fetch posts with comments for the active workspace
+// GET /api/comments - Fetch posts with authentic comments and engagement metrics for the active workspace
 export async function GET(req: Request) {
   try {
     const session = await getSession();
@@ -39,7 +39,7 @@ export async function GET(req: Request) {
       orderBy: { postedAt: "desc" },
     });
 
-    // 3. Fetch published posts for this org
+    // 3. Fetch published posts for this org with real engagement snapshots
     const posts = await prisma.socialPost.findMany({
       where: {
         organizationId: session.activeOrgId,
@@ -62,18 +62,35 @@ export async function GET(req: Request) {
             socialAccount: true,
           },
         },
+        engagementSnapshots: {
+          include: {
+            socialAccount: {
+              select: {
+                id: true,
+                displayName: true,
+                username: true,
+                profileImageUrl: true,
+                provider: true,
+              },
+            },
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
       take: 20,
     });
 
-    // 4. Map posts with their corresponding real comments
+    // 4. Map posts with their corresponding real comments and authentic metrics
     const postsWithComments = posts.map((post) => {
       const postComments = comments.filter(
-        (c) => c.platformPostId === post.id || post.targets.some((t) => t.socialAccountId === c.socialAccountId)
+        (c) =>
+          c.postId === post.id ||
+          c.platformPostId === post.id ||
+          post.targets.some((t) => t.platformPostId && t.platformPostId === c.platformPostId)
       );
 
       const targetAccount = post.targets[0]?.socialAccount || accounts[0];
+      const snapshot = post.engagementSnapshots[0];
 
       return {
         id: post.id,
@@ -90,17 +107,42 @@ export async function GET(req: Request) {
               profileImageUrl: targetAccount.profileImageUrl,
             }
           : null,
-        likes: 0,
-        shares: 0,
+        targets: post.targets.map((t) => ({
+          id: t.id,
+          platform: t.socialAccount.provider,
+          platformPostId: t.platformPostId,
+          status: t.status,
+          accountName: t.socialAccount.displayName,
+          accountUsername: t.socialAccount.username,
+        })),
+        engagement: post.engagementSnapshots.map((s) => ({
+          platform: s.platform,
+          externalPostId: s.externalPostId,
+          likes: s.likes,
+          reactions: s.reactions,
+          comments: s.comments,
+          shares: s.shares,
+          reposts: s.reposts,
+          views: s.views,
+          impressions: s.impressions,
+          reach: s.reach,
+          saves: s.saves,
+          lastSyncedAt: s.lastSyncedAt,
+        })),
+        likes: snapshot?.likes ?? null,
+        shares: snapshot?.shares ?? null,
         commentsCount: postComments.length,
         comments: postComments.map((c) => ({
           id: c.id,
+          platformCommentId: c.platformCommentId,
+          platform: c.platform,
           authorName: c.authorName,
           authorAvatarUrl: c.authorAvatarUrl,
           authorUsername: c.authorUsername,
           content: c.content,
           postedAt: c.postedAt,
           isReplied: c.isReplied,
+          parentId: c.parentId,
         })),
       };
     });
@@ -125,7 +167,7 @@ export async function GET(req: Request) {
   }
 }
 
-// POST /api/comments - Post a new comment or reply
+// POST /api/comments - Post a real comment to a social network via official API
 export async function POST(req: Request) {
   try {
     const session = await getSession();
@@ -134,74 +176,103 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { postId, content, platform, socialAccountId } = body;
+    const { postId, content, platform, socialAccountId, externalPostId, parentCommentId } = body;
 
     if (!content || !content.trim()) {
       return NextResponse.json({ error: "Comment content cannot be empty" }, { status: 400 });
     }
 
-    // Find account to attribute this comment to
-    let account = null;
-    if (socialAccountId) {
-      account = await prisma.socialAccount.findFirst({
-        where: { id: socialAccountId, organizationId: session.activeOrgId },
+    // Resolve post and target if postId is given
+    let resolvedPost = null;
+    let targetPostId = externalPostId;
+    let targetAccountId = socialAccountId;
+    let resolvedPlatform = platform;
+
+    if (postId) {
+      resolvedPost = await prisma.socialPost.findFirst({
+        where: { id: postId, organizationId: session.activeOrgId },
+        include: {
+          targets: {
+            include: { socialAccount: true },
+          },
+        },
       });
+
+      if (resolvedPost) {
+        const target = resolvedPost.targets.find(
+          (t) =>
+            (!platform || t.socialAccount.provider.toLowerCase() === platform.toLowerCase()) &&
+            t.platformPostId
+        ) || resolvedPost.targets[0];
+
+        if (target) {
+          targetPostId = target.platformPostId || targetPostId;
+          targetAccountId = target.socialAccountId || targetAccountId;
+          resolvedPlatform = target.socialAccount.provider || resolvedPlatform;
+        }
+      }
     }
 
-    if (!account && platform) {
-      account = await prisma.socialAccount.findFirst({
-        where: { provider: platform.toLowerCase(), organizationId: session.activeOrgId },
+    if (!targetAccountId) {
+      const fallbackAccount = await prisma.socialAccount.findFirst({
+        where: {
+          organizationId: session.activeOrgId,
+          ...(resolvedPlatform ? { provider: resolvedPlatform.toLowerCase() } : {}),
+        },
       });
+      if (fallbackAccount) {
+        targetAccountId = fallbackAccount.id;
+        resolvedPlatform = fallbackAccount.provider;
+      }
     }
 
-    if (!account) {
-      account = await prisma.socialAccount.findFirst({
-        where: { organizationId: session.activeOrgId },
-      });
-    }
-
-    if (!account) {
+    if (!targetAccountId || !targetPostId) {
       return NextResponse.json(
-        { error: "No connected social account found in workspace to post comment as." },
+        {
+          error:
+            "A connected social account and published external post ID are required to post a real comment.",
+        },
         { status: 400 }
       );
     }
 
-    // Persist real comment to database
-    const newComment = await prisma.socialComment.create({
-      data: {
-        socialAccountId: account.id,
-        platformCommentId: `cmt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-        platformPostId: postId || null,
-        authorName: account.displayName,
-        authorUsername: account.username || account.displayName.toLowerCase().replace(/\s+/g, ""),
-        authorAvatarUrl: account.profileImageUrl,
-        content: content.trim(),
-        postedAt: new Date(),
-        isRead: true,
-        isReplied: true,
-      },
-    });
+    // Call real platform API via executeSocialAction
+    const actionResult = parentCommentId
+      ? await executeSocialAction({
+          platform: resolvedPlatform,
+          actionType: "REPLY",
+          socialAccountId: targetAccountId,
+          externalPostId: targetPostId,
+          externalCommentId: parentCommentId,
+          postId: postId || undefined,
+          content: content.trim(),
+        })
+      : await executeSocialAction({
+          platform: resolvedPlatform,
+          actionType: "COMMENT",
+          socialAccountId: targetAccountId,
+          externalPostId: targetPostId,
+          postId: postId || undefined,
+          content: content.trim(),
+        });
 
-    await logAudit({
-      organizationId: session.activeOrgId,
-      userId: session.id,
-      action: "COMMENT_POSTED",
-      resourceType: "SocialComment",
-      resourceId: newComment.id,
-    });
+    if (!actionResult.success) {
+      const statusCode = actionResult.requiresReauth ? 401 : 400;
+      return NextResponse.json(
+        {
+          success: false,
+          error: actionResult.error || "Failed to post comment to social network",
+          code: actionResult.code,
+          requiresReauth: actionResult.requiresReauth,
+        },
+        { status: statusCode }
+      );
+    }
 
     return NextResponse.json({
       success: true,
-      comment: {
-        id: newComment.id,
-        authorName: newComment.authorName,
-        authorAvatarUrl: newComment.authorAvatarUrl,
-        authorUsername: newComment.authorUsername,
-        content: newComment.content,
-        postedAt: newComment.postedAt,
-        isReplied: true,
-      },
+      comment: actionResult.data,
+      externalActionId: actionResult.externalActionId,
     });
   } catch (error: unknown) {
     console.error("Failed to post comment:", error);

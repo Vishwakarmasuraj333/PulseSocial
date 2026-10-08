@@ -139,6 +139,8 @@ model SocialAccount {
   messages          SocialMessage[]
   analytics         SocialAnalytics[]
   snapshots         AnalyticsSnapshot[]
+  actions           SocialAction[]
+  engagementSnapshots SocialEngagementSnapshot[]
 
   @@unique([organizationId, provider, providerAccountId])
 }
@@ -191,6 +193,9 @@ model SocialPost {
   media           PostMedia[]
   scheduledPost   ScheduledPost?
   attempts        PublishingAttempt[]
+  comments        SocialComment[]
+  actions         SocialAction[]
+  engagementSnapshots SocialEngagementSnapshot[]
 }
 
 model SocialPostTarget {
@@ -277,6 +282,9 @@ model SocialComment {
   socialAccountId String
   platformCommentId String
   platformPostId  String?
+  postId          String?
+  platform        String        @default("facebook")
+  parentId        String?
   authorName      String
   authorAvatarUrl String?
   authorUsername  String?
@@ -287,9 +295,76 @@ model SocialComment {
   sentiment       String?       // POSITIVE, NEUTRAL, NEGATIVE
   postedAt        DateTime
   createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @default(now()) @updatedAt
 
   socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
   assignedUser    User?         @relation(fields: [assignedUserId], references: [id], onDelete: SetNull)
+  post            SocialPost?   @relation(fields: [postId], references: [id], onDelete: SetNull)
+  parent          SocialComment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies         SocialComment[] @relation("CommentReplies")
+
+  @@unique([platform, platformCommentId])
+  @@index([socialAccountId])
+  @@index([platformPostId])
+  @@index([postId])
+  @@index([parentId])
+}
+
+model SocialAction {
+  id               String         @id @default(cuid())
+  organizationId   String
+  socialAccountId  String
+  postId           String?
+  platform         String         // facebook, instagram, linkedin, x, youtube, mastodon, etc.
+  actionType       String         // LIKE, UNLIKE, COMMENT, REPLY, SHARE, REPOST, SAVE, DELETE_COMMENT, HIDE_COMMENT
+  actionIdentifier String         // e.g. "like:12345" or "repost:12345" or "comment:98765"
+  externalPostId   String?
+  externalCommentId String?
+  targetUrl        String?
+  status           String         @default("SUCCESS") // SUCCESS, FAILED, UNSUPPORTED
+  errorMessage     String?
+  rawResponse      String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  socialAccount    SocialAccount  @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+  post             SocialPost?    @relation(fields: [postId], references: [id], onDelete: SetNull)
+
+  @@unique([platform, socialAccountId, actionIdentifier])
+  @@index([organizationId])
+  @@index([socialAccountId])
+  @@index([postId])
+  @@index([externalPostId])
+}
+
+model SocialEngagementSnapshot {
+  id              String        @id @default(cuid())
+  postId          String?
+  socialAccountId String
+  platform        String        // facebook, instagram, linkedin, x, youtube, tiktok, etc.
+  externalPostId  String
+  externalPostUrl String?
+  likes           Int?          // Nullable: only saved if returned by official platform API
+  reactions       Int?
+  comments        Int?
+  shares          Int?
+  reposts         Int?
+  views           Int?
+  impressions     Int?
+  reach           Int?
+  saves           Int?
+  rawMetricsJson  String?
+  lastSyncedAt    DateTime      @default(now())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  post            SocialPost?   @relation(fields: [postId], references: [id], onDelete: SetNull)
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+
+  @@unique([platform, externalPostId])
+  @@index([postId])
+  @@index([socialAccountId])
+  @@index([lastSyncedAt])
 }
 
 model SocialMessage {

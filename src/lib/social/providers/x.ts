@@ -9,6 +9,11 @@ import {
   AnalyticsResult,
   CommentResult,
   MessageResult,
+  PlatformActionCapabilities,
+  PLATFORM_ACTION_CAPABILITIES,
+  SocialActionResult,
+  SocialMetricsResult,
+  ExternalCommentData,
 } from "../types";
 
 import crypto from "crypto";
@@ -290,5 +295,463 @@ export class XProvider implements SocialProvider {
 
   async disconnect(): Promise<boolean> {
     return true;
+  }
+
+  getActionCapabilities(): PlatformActionCapabilities {
+    return PLATFORM_ACTION_CAPABILITIES.x;
+  }
+
+  private async resolveUserId(accessToken: string, accountId?: string): Promise<string> {
+    if (accountId && /^\d+$/.test(accountId)) return accountId;
+    try {
+      const res = await fetch("https://api.twitter.com/2/users/me", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        return json.data?.id || accountId || "";
+      }
+    } catch {}
+    return accountId || "";
+  }
+
+  async likePost(accessToken: string, target: { externalPostId: string; accountId?: string }): Promise<SocialActionResult> {
+    try {
+      const userId = await this.resolveUserId(accessToken, target.accountId);
+      const res = await fetch(`https://api.twitter.com/2/users/${userId}/likes`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ tweet_id: target.externalPostId }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.data?.liked) {
+        return {
+          success: true,
+          actionType: "LIKE",
+          externalActionId: target.externalPostId,
+          rawResponse: data,
+        };
+      }
+
+      const isAuth = res.status === 401;
+      return {
+        success: false,
+        actionType: "LIKE",
+        code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+        requiresReauth: isAuth,
+        error: data.detail || data.title || "Failed to like tweet on X",
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "LIKE",
+        code: "NETWORK_ERROR",
+        error: e.message || "Failed to connect to X API",
+      };
+    }
+  }
+
+  async unlikePost(accessToken: string, target: { externalPostId: string; accountId?: string }): Promise<SocialActionResult> {
+    try {
+      const userId = await this.resolveUserId(accessToken, target.accountId);
+      const res = await fetch(`https://api.twitter.com/2/users/${userId}/likes/${target.externalPostId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && (data.data?.liked === false || res.status === 200)) {
+        return {
+          success: true,
+          actionType: "UNLIKE",
+          rawResponse: data,
+        };
+      }
+
+      const isAuth = res.status === 401;
+      return {
+        success: false,
+        actionType: "UNLIKE",
+        code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+        requiresReauth: isAuth,
+        error: data.detail || data.title || "Failed to unlike tweet on X",
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "UNLIKE",
+        code: "NETWORK_ERROR",
+        error: e.message || "Failed to connect to X API",
+      };
+    }
+  }
+
+  async commentPost(accessToken: string, target: { externalPostId: string; accountId?: string; content: string }): Promise<SocialActionResult & { comment?: ExternalCommentData }> {
+    try {
+      const res = await fetch("https://api.twitter.com/2/tweets", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: target.content,
+          reply: { in_reply_to_tweet_id: target.externalPostId },
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.data?.id) {
+        return {
+          success: true,
+          actionType: "COMMENT",
+          externalActionId: data.data.id,
+          comment: {
+            externalCommentId: data.data.id,
+            platform: "x",
+            authorName: "X User",
+            content: target.content,
+            postedAt: new Date(),
+            externalPostId: target.externalPostId,
+          },
+          rawResponse: data,
+        };
+      }
+
+      const isAuth = res.status === 401;
+      return {
+        success: false,
+        actionType: "COMMENT",
+        code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+        requiresReauth: isAuth,
+        error: data.detail || data.title || "Failed to post reply on X",
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "COMMENT",
+        code: "NETWORK_ERROR",
+        error: e.message || "Failed to connect to X API",
+      };
+    }
+  }
+
+  async replyToComment(accessToken: string, target: { externalPostId?: string; externalCommentId: string; accountId?: string; content: string }): Promise<SocialActionResult & { comment?: ExternalCommentData }> {
+    try {
+      const res = await fetch("https://api.twitter.com/2/tweets", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: target.content,
+          reply: { in_reply_to_tweet_id: target.externalCommentId },
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.data?.id) {
+        return {
+          success: true,
+          actionType: "REPLY",
+          externalActionId: data.data.id,
+          comment: {
+            externalCommentId: data.data.id,
+            platform: "x",
+            authorName: "X User",
+            content: target.content,
+            postedAt: new Date(),
+            externalPostId: target.externalPostId,
+            parentId: target.externalCommentId,
+          },
+          rawResponse: data,
+        };
+      }
+
+      const isAuth = res.status === 401;
+      return {
+        success: false,
+        actionType: "REPLY",
+        code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+        requiresReauth: isAuth,
+        error: data.detail || data.title || "Failed to reply to tweet on X",
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "REPLY",
+        code: "NETWORK_ERROR",
+        error: e.message || "Failed to connect to X API",
+      };
+    }
+  }
+
+  async repostPost(accessToken: string, target: { externalPostId: string; accountId?: string }): Promise<SocialActionResult> {
+    try {
+      const userId = await this.resolveUserId(accessToken, target.accountId);
+      const res = await fetch(`https://api.twitter.com/2/users/${userId}/retweets`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ tweet_id: target.externalPostId }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.data?.retweeted) {
+        return {
+          success: true,
+          actionType: "REPOST",
+          externalActionId: target.externalPostId,
+          rawResponse: data,
+        };
+      }
+
+      const isAuth = res.status === 401;
+      return {
+        success: false,
+        actionType: "REPOST",
+        code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+        requiresReauth: isAuth,
+        error: data.detail || data.title || "Failed to retweet post on X",
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "REPOST",
+        code: "NETWORK_ERROR",
+        error: e.message || "Failed to connect to X API",
+      };
+    }
+  }
+
+  async savePost(accessToken: string, target: { externalPostId: string; accountId?: string }): Promise<SocialActionResult> {
+    try {
+      const userId = await this.resolveUserId(accessToken, target.accountId);
+      const res = await fetch(`https://api.twitter.com/2/users/${userId}/bookmarks`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ tweet_id: target.externalPostId }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.data?.bookmarked) {
+        return {
+          success: true,
+          actionType: "SAVE",
+          externalActionId: target.externalPostId,
+          rawResponse: data,
+        };
+      }
+
+      const isAuth = res.status === 401;
+      return {
+        success: false,
+        actionType: "SAVE",
+        code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+        requiresReauth: isAuth,
+        error: data.detail || data.title || "Failed to bookmark tweet on X",
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "SAVE",
+        code: "NETWORK_ERROR",
+        error: e.message || "Failed to connect to X API",
+      };
+    }
+  }
+
+  async deleteComment(accessToken: string, target: { externalCommentId: string; accountId?: string }): Promise<SocialActionResult> {
+    try {
+      const res = await fetch(`https://api.twitter.com/2/tweets/${target.externalCommentId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.data?.deleted) {
+        return {
+          success: true,
+          actionType: "DELETE_COMMENT",
+          externalActionId: target.externalCommentId,
+        };
+      }
+
+      const isAuth = res.status === 401;
+      return {
+        success: false,
+        actionType: "DELETE_COMMENT",
+        code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+        requiresReauth: isAuth,
+        error: data.detail || data.title || "Failed to delete tweet on X",
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "DELETE_COMMENT",
+        code: "NETWORK_ERROR",
+        error: e.message || "Failed to connect to X API",
+      };
+    }
+  }
+
+  async hideComment(accessToken: string, target: { externalCommentId: string; accountId?: string }): Promise<SocialActionResult> {
+    try {
+      const res = await fetch(`https://api.twitter.com/2/tweets/${target.externalCommentId}/hidden`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ hidden: true }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.data?.hidden) {
+        return {
+          success: true,
+          actionType: "HIDE_COMMENT",
+          externalActionId: target.externalCommentId,
+        };
+      }
+
+      const isAuth = res.status === 401;
+      return {
+        success: false,
+        actionType: "HIDE_COMMENT",
+        code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+        requiresReauth: isAuth,
+        error: data.detail || data.title || "Failed to hide reply on X",
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "HIDE_COMMENT",
+        code: "NETWORK_ERROR",
+        error: e.message || "Failed to connect to X API",
+      };
+    }
+  }
+
+  async syncPostEngagement(accessToken: string, externalPostId: string): Promise<SocialMetricsResult> {
+    try {
+      const res = await fetch(
+        `https://api.twitter.com/2/tweets/${externalPostId}?tweet.fields=public_metrics,non_public_metrics`,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const isAuth = res.status === 401;
+        return {
+          success: false,
+          platform: "x",
+          externalPostId,
+          likes: null,
+          reactions: null,
+          comments: null,
+          shares: null,
+          reposts: null,
+          views: null,
+          impressions: null,
+          reach: null,
+          saves: null,
+          requiresReauth: isAuth,
+          error: data.detail || data.title || "Failed to fetch X tweet metrics",
+        };
+      }
+
+      const m = data.data?.public_metrics || {};
+      const likes = typeof m.like_count === "number" ? m.like_count : null;
+      const comments = typeof m.reply_count === "number" ? m.reply_count : null;
+      const reposts = typeof m.retweet_count === "number" ? m.retweet_count : null;
+      const impressions = typeof m.impression_count === "number" ? m.impression_count : null;
+      const saves = typeof m.bookmark_count === "number" ? m.bookmark_count : null;
+
+      return {
+        success: true,
+        platform: "x",
+        externalPostId,
+        likes,
+        reactions: likes,
+        comments,
+        shares: null,
+        reposts,
+        views: impressions,
+        impressions,
+        reach: null,
+        saves,
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        platform: "x",
+        externalPostId,
+        likes: null,
+        reactions: null,
+        comments: null,
+        shares: null,
+        reposts: null,
+        views: null,
+        impressions: null,
+        reach: null,
+        saves: null,
+        error: e.message || "Failed to sync X engagement",
+      };
+    }
+  }
+
+  async fetchPostComments(accessToken: string, externalPostId: string): Promise<ExternalCommentData[]> {
+    try {
+      const res = await fetch(
+        `https://api.twitter.com/2/tweets/search/recent?query=conversation_id:${externalPostId}&tweet.fields=author_id,created_at,public_metrics&expansions=author_id&user.fields=username,name,profile_image_url`,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+
+      if (!res.ok) return [];
+      const data = await res.json().catch(() => ({}));
+      const usersMap = new Map<string, any>();
+      (data.includes?.users || []).forEach((u: any) => usersMap.set(u.id, u));
+
+      return (data.data || []).map((t: any) => {
+        const author = usersMap.get(t.author_id);
+        return {
+          externalCommentId: t.id,
+          platform: "x" as SupportedPlatform,
+          authorName: author?.name || "X User",
+          authorUsername: author?.username,
+          authorAvatarUrl: author?.profile_image_url,
+          content: t.text || "",
+          postedAt: t.created_at ? new Date(t.created_at) : new Date(),
+          externalPostId,
+          likeCount: typeof t.public_metrics?.like_count === "number" ? t.public_metrics.like_count : null,
+        };
+      });
+    } catch {
+      return [];
+    }
   }
 }

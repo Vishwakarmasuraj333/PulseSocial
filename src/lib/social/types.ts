@@ -259,6 +259,240 @@ export interface PublishResult {
   rawResponse?: unknown;
 }
 
+export type SocialActionType =
+  | "LIKE"
+  | "UNLIKE"
+  | "COMMENT"
+  | "REPLY"
+  | "SHARE"
+  | "REPOST"
+  | "SAVE"
+  | "DELETE_COMMENT"
+  | "HIDE_COMMENT";
+
+export interface PlatformActionCapabilities {
+  like: boolean;
+  unlike: boolean;
+  comment: boolean;
+  reply: boolean;
+  deleteComment: boolean;
+  hideComment: boolean;
+  share: boolean;
+  repost: boolean;
+  save: boolean;
+}
+
+export const PLATFORM_ACTION_CAPABILITIES: Record<SupportedPlatform, PlatformActionCapabilities> = {
+  facebook: {
+    like: true,
+    unlike: true,
+    comment: true,
+    reply: true,
+    deleteComment: true,
+    hideComment: true,
+    share: false,
+    repost: false,
+    save: false,
+  },
+  instagram: {
+    like: false, // Instagram Graph API explicitly forbids programmatic post liking
+    unlike: false,
+    comment: true,
+    reply: true,
+    deleteComment: true,
+    hideComment: true,
+    share: false,
+    repost: false,
+    save: false,
+  },
+  linkedin: {
+    like: true, // LinkedIn Reactions API (/rest/reactions)
+    unlike: true,
+    comment: true, // LinkedIn Social Actions Comments API (/rest/socialActions/.../comments)
+    reply: true,
+    deleteComment: true,
+    hideComment: false,
+    share: true,
+    repost: true,
+    save: false,
+  },
+  x: {
+    like: true, // X API v2 POST /2/users/:id/likes
+    unlike: true, // X API v2 DELETE /2/users/:id/likes/:tweet_id
+    comment: true, // X API v2 POST /2/tweets (reply)
+    reply: true,
+    deleteComment: true, // X API v2 DELETE /2/tweets/:id
+    hideComment: true, // X API v2 PUT /2/tweets/:id/hidden
+    share: false,
+    repost: true, // X API v2 POST /2/users/:id/retweets
+    save: true, // X API v2 POST /2/users/:id/bookmarks
+  },
+  youtube: {
+    like: true, // YouTube Data API v3 POST /videos/rate?rating=like
+    unlike: true, // YouTube Data API v3 POST /videos/rate?rating=none
+    comment: true, // YouTube Data API v3 POST /commentThreads
+    reply: true, // YouTube Data API v3 POST /comments
+    deleteComment: true, // YouTube Data API v3 DELETE /comments
+    hideComment: false,
+    share: false,
+    repost: false,
+    save: false,
+  },
+  mastodon: {
+    like: true, // Mastodon REST API POST /api/v1/statuses/:id/favourite
+    unlike: true, // Mastodon REST API POST /api/v1/statuses/:id/unfavourite
+    comment: true, // Mastodon REST API POST /api/v1/statuses with in_reply_to_id
+    reply: true,
+    deleteComment: true, // Mastodon REST API DELETE /api/v1/statuses/:id
+    hideComment: false,
+    share: false,
+    repost: true, // Mastodon REST API POST /api/v1/statuses/:id/reblog
+    save: true, // Mastodon REST API POST /api/v1/statuses/:id/bookmark
+  },
+  tiktok: {
+    like: false,
+    unlike: false,
+    comment: false,
+    reply: false,
+    deleteComment: false,
+    hideComment: false,
+    share: false,
+    repost: false,
+    save: false,
+  },
+  pinterest: {
+    like: false,
+    unlike: false,
+    comment: false,
+    reply: false,
+    deleteComment: false,
+    hideComment: false,
+    share: false,
+    repost: false,
+    save: false,
+  },
+  threads: {
+    like: false,
+    unlike: false,
+    comment: true,
+    reply: true,
+    deleteComment: true,
+    hideComment: true,
+    share: false,
+    repost: false,
+    save: false,
+  },
+  google_business: {
+    like: false,
+    unlike: false,
+    comment: false,
+    reply: true,
+    deleteComment: false,
+    hideComment: false,
+    share: false,
+    repost: false,
+    save: false,
+  },
+  snapchat: {
+    like: false,
+    unlike: false,
+    comment: false,
+    reply: false,
+    deleteComment: false,
+    hideComment: false,
+    share: false,
+    repost: false,
+    save: false,
+  },
+  whatsapp: {
+    like: false,
+    unlike: false,
+    comment: false,
+    reply: false,
+    deleteComment: false,
+    hideComment: false,
+    share: false,
+    repost: false,
+    save: false,
+  },
+  reddit: {
+    like: true,
+    unlike: true,
+    comment: true,
+    reply: true,
+    deleteComment: true,
+    hideComment: false,
+    share: false,
+    repost: false,
+    save: true,
+  },
+  bluesky: {
+    like: true,
+    unlike: true,
+    comment: true,
+    reply: true,
+    deleteComment: true,
+    hideComment: false,
+    share: false,
+    repost: true,
+    save: false,
+  },
+  telegram: {
+    like: false,
+    unlike: false,
+    comment: false,
+    reply: false,
+    deleteComment: false,
+    hideComment: false,
+    share: false,
+    repost: false,
+    save: false,
+  },
+};
+
+export interface SocialActionResult {
+  success: boolean;
+  actionType: SocialActionType;
+  externalActionId?: string;
+  code?: string;
+  error?: string;
+  requiresReauth?: boolean;
+  requiresApproval?: boolean;
+  rawResponse?: unknown;
+}
+
+export interface SocialMetricsResult {
+  success: boolean;
+  platform: SupportedPlatform;
+  externalPostId: string;
+  likes: number | null;
+  reactions: number | null;
+  comments: number | null;
+  shares: number | null;
+  reposts: number | null;
+  views: number | null;
+  impressions: number | null;
+  reach: number | null;
+  saves: number | null;
+  rawResponse?: unknown;
+  error?: string;
+  code?: string;
+  requiresReauth?: boolean;
+}
+
+export interface ExternalCommentData {
+  externalCommentId: string;
+  platform: SupportedPlatform;
+  authorName: string;
+  authorUsername?: string;
+  authorAvatarUrl?: string;
+  content: string;
+  postedAt: Date;
+  externalPostId?: string;
+  parentId?: string;
+  likeCount?: number | null;
+}
+
 export interface AnalyticsResult {
   followers: number;
   impressions: number;
@@ -308,4 +542,18 @@ export interface SocialProvider {
   getComments(accessToken: string, accountId: string): Promise<CommentResult[]>;
   getMessages(accessToken: string, accountId: string): Promise<MessageResult[]>;
   disconnect(accessToken: string): Promise<boolean>;
+
+  // Real Social Engagement Layer additions
+  getActionCapabilities?(): PlatformActionCapabilities;
+  likePost?(accessToken: string, target: { externalPostId: string; accountId?: string }): Promise<SocialActionResult>;
+  unlikePost?(accessToken: string, target: { externalPostId: string; accountId?: string }): Promise<SocialActionResult>;
+  commentPost?(accessToken: string, target: { externalPostId: string; accountId?: string; content: string }): Promise<SocialActionResult & { comment?: ExternalCommentData }>;
+  replyToComment?(accessToken: string, target: { externalPostId?: string; externalCommentId: string; accountId?: string; content: string }): Promise<SocialActionResult & { comment?: ExternalCommentData }>;
+  deleteComment?(accessToken: string, target: { externalCommentId: string; accountId?: string }): Promise<SocialActionResult>;
+  hideComment?(accessToken: string, target: { externalCommentId: string; accountId?: string }): Promise<SocialActionResult>;
+  sharePost?(accessToken: string, target: { externalPostId: string; accountId?: string }): Promise<SocialActionResult>;
+  repostPost?(accessToken: string, target: { externalPostId: string; accountId?: string }): Promise<SocialActionResult>;
+  savePost?(accessToken: string, target: { externalPostId: string; accountId?: string }): Promise<SocialActionResult>;
+  syncPostEngagement?(accessToken: string, externalPostId: string, accountId?: string): Promise<SocialMetricsResult>;
+  fetchPostComments?(accessToken: string, externalPostId: string, accountId?: string): Promise<ExternalCommentData[]>;
 }

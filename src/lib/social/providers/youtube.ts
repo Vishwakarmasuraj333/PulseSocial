@@ -9,6 +9,11 @@ import {
   AnalyticsResult,
   CommentResult,
   MessageResult,
+  PlatformActionCapabilities,
+  PLATFORM_ACTION_CAPABILITIES,
+  SocialActionResult,
+  SocialMetricsResult,
+  ExternalCommentData,
 } from "../types";
 
 export class YouTubeProvider implements SocialProvider {
@@ -283,5 +288,345 @@ export class YouTubeProvider implements SocialProvider {
 
   async disconnect(): Promise<boolean> {
     return true;
+  }
+
+  getActionCapabilities(): PlatformActionCapabilities {
+    return PLATFORM_ACTION_CAPABILITIES.youtube;
+  }
+
+  async likePost(accessToken: string, target: { externalPostId: string; accountId?: string }): Promise<SocialActionResult> {
+    try {
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/videos/rate?id=${target.externalPostId}&rating=like`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (res.status === 204 || res.ok) {
+        return {
+          success: true,
+          actionType: "LIKE",
+          externalActionId: target.externalPostId,
+        };
+      }
+
+      const isAuth = res.status === 401;
+      const data = await res.json().catch(() => ({}));
+      return {
+        success: false,
+        actionType: "LIKE",
+        code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+        requiresReauth: isAuth,
+        error: data.error?.message || "Failed to like video on YouTube",
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "LIKE",
+        code: "NETWORK_ERROR",
+        error: e.message || "Failed to connect to YouTube API",
+      };
+    }
+  }
+
+  async unlikePost(accessToken: string, target: { externalPostId: string; accountId?: string }): Promise<SocialActionResult> {
+    try {
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/videos/rate?id=${target.externalPostId}&rating=none`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (res.status === 204 || res.ok) {
+        return {
+          success: true,
+          actionType: "UNLIKE",
+        };
+      }
+
+      const isAuth = res.status === 401;
+      const data = await res.json().catch(() => ({}));
+      return {
+        success: false,
+        actionType: "UNLIKE",
+        code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+        requiresReauth: isAuth,
+        error: data.error?.message || "Failed to remove video like on YouTube",
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "UNLIKE",
+        code: "NETWORK_ERROR",
+        error: e.message || "Failed to connect to YouTube API",
+      };
+    }
+  }
+
+  async commentPost(accessToken: string, target: { externalPostId: string; accountId?: string; content: string }): Promise<SocialActionResult & { comment?: ExternalCommentData }> {
+    try {
+      const res = await fetch("https://www.googleapis.com/youtube/v3/commentThreads?part=snippet", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          snippet: {
+            videoId: target.externalPostId,
+            topLevelComment: {
+              snippet: {
+                textOriginal: target.content,
+              },
+            },
+          },
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.id) {
+        return {
+          success: true,
+          actionType: "COMMENT",
+          externalActionId: data.id,
+          comment: {
+            externalCommentId: data.id,
+            platform: "youtube",
+            authorName: data.snippet?.topLevelComment?.snippet?.authorDisplayName || "YouTube User",
+            authorAvatarUrl: data.snippet?.topLevelComment?.snippet?.authorProfileImageUrl,
+            content: target.content,
+            postedAt: new Date(),
+            externalPostId: target.externalPostId,
+          },
+          rawResponse: data,
+        };
+      }
+
+      const isAuth = res.status === 401;
+      return {
+        success: false,
+        actionType: "COMMENT",
+        code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+        requiresReauth: isAuth,
+        error: data.error?.message || "Failed to comment on YouTube video",
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "COMMENT",
+        code: "NETWORK_ERROR",
+        error: e.message || "Failed to connect to YouTube API",
+      };
+    }
+  }
+
+  async replyToComment(accessToken: string, target: { externalPostId?: string; externalCommentId: string; accountId?: string; content: string }): Promise<SocialActionResult & { comment?: ExternalCommentData }> {
+    try {
+      const res = await fetch("https://www.googleapis.com/youtube/v3/comments?part=snippet", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          snippet: {
+            parentId: target.externalCommentId,
+            textOriginal: target.content,
+          },
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.id) {
+        return {
+          success: true,
+          actionType: "REPLY",
+          externalActionId: data.id,
+          comment: {
+            externalCommentId: data.id,
+            platform: "youtube",
+            authorName: data.snippet?.authorDisplayName || "YouTube User",
+            authorAvatarUrl: data.snippet?.authorProfileImageUrl,
+            content: target.content,
+            postedAt: new Date(),
+            externalPostId: target.externalPostId,
+            parentId: target.externalCommentId,
+          },
+          rawResponse: data,
+        };
+      }
+
+      const isAuth = res.status === 401;
+      return {
+        success: false,
+        actionType: "REPLY",
+        code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+        requiresReauth: isAuth,
+        error: data.error?.message || "Failed to reply to comment on YouTube",
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "REPLY",
+        code: "NETWORK_ERROR",
+        error: e.message || "Failed to connect to YouTube API",
+      };
+    }
+  }
+
+  async deleteComment(accessToken: string, target: { externalCommentId: string; accountId?: string }): Promise<SocialActionResult> {
+    try {
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/comments?id=${target.externalCommentId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (res.status === 204 || res.ok) {
+        return {
+          success: true,
+          actionType: "DELETE_COMMENT",
+          externalActionId: target.externalCommentId,
+        };
+      }
+
+      const isAuth = res.status === 401;
+      const data = await res.json().catch(() => ({}));
+      return {
+        success: false,
+        actionType: "DELETE_COMMENT",
+        code: isAuth ? "REAUTH_REQUIRED" : "ACTION_FAILED",
+        requiresReauth: isAuth,
+        error: data.error?.message || "Failed to delete comment on YouTube",
+        rawResponse: data,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        actionType: "DELETE_COMMENT",
+        code: "NETWORK_ERROR",
+        error: e.message || "Failed to connect to YouTube API",
+      };
+    }
+  }
+
+  async syncPostEngagement(accessToken: string, externalPostId: string): Promise<SocialMetricsResult> {
+    try {
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${externalPostId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const isAuth = res.status === 401;
+        return {
+          success: false,
+          platform: "youtube",
+          externalPostId,
+          likes: null,
+          reactions: null,
+          comments: null,
+          shares: null,
+          reposts: null,
+          views: null,
+          impressions: null,
+          reach: null,
+          saves: null,
+          requiresReauth: isAuth,
+          error: data.error?.message || "Failed to fetch YouTube video metrics",
+        };
+      }
+
+      const stats = data.items?.[0]?.statistics || {};
+      const views = stats.viewCount ? parseInt(stats.viewCount, 10) : null;
+      const likes = stats.likeCount ? parseInt(stats.likeCount, 10) : null;
+      const comments = stats.commentCount ? parseInt(stats.commentCount, 10) : null;
+
+      return {
+        success: true,
+        platform: "youtube",
+        externalPostId,
+        likes,
+        reactions: likes,
+        comments,
+        shares: null,
+        reposts: null,
+        views,
+        impressions: null,
+        reach: null,
+        saves: null,
+        rawResponse: stats,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        platform: "youtube",
+        externalPostId,
+        likes: null,
+        reactions: null,
+        comments: null,
+        shares: null,
+        reposts: null,
+        views: null,
+        impressions: null,
+        reach: null,
+        saves: null,
+        error: e.message || "Failed to sync YouTube metrics",
+      };
+    }
+  }
+
+  async fetchPostComments(accessToken: string, externalPostId: string): Promise<ExternalCommentData[]> {
+    try {
+      const res = await fetch(
+        `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet,replies&videoId=${externalPostId}&maxResults=50`,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+
+      if (!res.ok) return [];
+      const data = await res.json().catch(() => ({}));
+      const results: ExternalCommentData[] = [];
+
+      for (const item of (data.items || [])) {
+        const top = item.snippet?.topLevelComment?.snippet;
+        if (top) {
+          results.push({
+            externalCommentId: item.snippet.topLevelComment.id,
+            platform: "youtube",
+            authorName: top.authorDisplayName || "YouTube User",
+            authorUsername: top.authorDisplayName,
+            authorAvatarUrl: top.authorProfileImageUrl,
+            content: top.textOriginal || top.textDisplay || "",
+            postedAt: top.publishedAt ? new Date(top.publishedAt) : new Date(),
+            externalPostId,
+            likeCount: typeof top.likeCount === "number" ? top.likeCount : null,
+          });
+        }
+        if (item.replies?.comments) {
+          for (const rep of item.replies.comments) {
+            const snip = rep.snippet;
+            results.push({
+              externalCommentId: rep.id,
+              platform: "youtube",
+              authorName: snip.authorDisplayName || "YouTube User",
+              authorUsername: snip.authorDisplayName,
+              authorAvatarUrl: snip.authorProfileImageUrl,
+              content: snip.textOriginal || snip.textDisplay || "",
+              postedAt: snip.publishedAt ? new Date(snip.publishedAt) : new Date(),
+              externalPostId,
+              parentId: item.snippet.topLevelComment.id,
+              likeCount: typeof snip.likeCount === "number" ? snip.likeCount : null,
+            });
+          }
+        }
+      }
+
+      return results;
+    } catch {
+      return [];
+    }
   }
 }

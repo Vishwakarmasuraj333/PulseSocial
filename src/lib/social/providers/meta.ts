@@ -33,12 +33,20 @@ export class MetaProvider implements SocialProvider {
     return `${this.displayName} integration is not configured yet. Configure META_APP_ID and META_APP_SECRET in your environment to enable this connection.`;
   }
 
-  getAuthorizationUrl(state: string, redirectUri: string): string {
+  getAuthorizationUrl(state: string, redirectUri: string, codeVerifier?: string, options?: Record<string, any>): string {
     const appId = process.env.META_APP_ID || "1427242679545054";
+    const tier = options?.tier || "full";
 
-    const scopes =
-      this.platform === "instagram"
-        ? [
+    let scopes: string;
+
+    if (process.env.META_SCOPES_FACEBOOK && this.platform === "facebook") {
+      scopes = process.env.META_SCOPES_FACEBOOK;
+    } else if (process.env.META_SCOPES_INSTAGRAM && this.platform === "instagram") {
+      scopes = process.env.META_SCOPES_INSTAGRAM;
+    } else if (this.platform === "instagram") {
+      scopes = tier === "basic"
+        ? ["public_profile", "instagram_basic"].join(",")
+        : [
             "public_profile",
             "instagram_basic",
             "instagram_content_publish",
@@ -46,14 +54,19 @@ export class MetaProvider implements SocialProvider {
             "instagram_manage_insights",
             "pages_show_list",
             "pages_read_engagement",
-          ].join(",")
-        : [
-            "public_profile",
-            "email",
-            "pages_show_list",
-            "pages_read_engagement",
-            "pages_manage_posts",
           ].join(",");
+    } else {
+      // Facebook
+      if (tier === "basic") {
+        scopes = "public_profile,email";
+      } else if (tier === "standard") {
+        // Standard Page read without requiring pages_manage_posts permission approval
+        scopes = "public_profile,email,pages_show_list,pages_read_engagement";
+      } else {
+        // Full Page publishing
+        scopes = "public_profile,email,pages_show_list,pages_read_engagement,pages_manage_posts";
+      }
+    }
 
     const params = new URLSearchParams({
       client_id: appId,
@@ -90,8 +103,8 @@ export class MetaProvider implements SocialProvider {
     // Exchange for long-lived 60-day token
     const exchangeParams = new URLSearchParams({
       grant_type: "fb_exchange_token",
-      client_id: process.env.META_APP_ID!,
-      client_secret: process.env.META_APP_SECRET!,
+      client_id: appId,
+      client_secret: appSecret,
       fb_exchange_token: shortLivedToken,
     });
 
@@ -141,6 +154,27 @@ export class MetaProvider implements SocialProvider {
           metadata: { pageId: page.id, pageAccessToken: page.access_token },
         });
       }
+    }
+
+    // Fallback: If no Facebook Pages found, link the authenticated personal Facebook profile
+    if (accounts.length === 0 && this.platform === "facebook") {
+      try {
+        const meRes = await fetch(
+          `https://graph.facebook.com/v20.0/me?fields=id,name,picture{url},email&access_token=${accessToken}`
+        );
+        if (meRes.ok) {
+          const meData = await meRes.json();
+          if (meData?.id) {
+            accounts.push({
+              providerAccountId: meData.id,
+              displayName: meData.name || "Facebook User",
+              profileImageUrl: meData.picture?.data?.url,
+              accountType: "PROFILE",
+              metadata: { isPersonalProfile: true },
+            });
+          }
+        }
+      } catch {}
     }
 
     return accounts;

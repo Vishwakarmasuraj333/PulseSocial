@@ -169,7 +169,8 @@ export async function GET(
     });
 
     // Direct redirection to official third-party authorization consent screen
-    const authUrl = socialProvider.getAuthorizationUrl(state, redirectUri, codeVerifier);
+    const tier = url.searchParams.get("tier") || "full";
+    const authUrl = socialProvider.getAuthorizationUrl(state, redirectUri, codeVerifier, { tier });
 
     if (wantsJson) {
       return NextResponse.json({

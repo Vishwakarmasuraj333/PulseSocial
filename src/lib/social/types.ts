@@ -292,7 +292,7 @@ export interface SocialProvider {
   iconName: string;
   isConfigured(): boolean;
   getMissingConfigMessage(): string;
-  getAuthorizationUrl(state: string, redirectUri: string, codeVerifier?: string): string;
+  getAuthorizationUrl(state: string, redirectUri: string, codeVerifier?: string, options?: Record<string, any>): string;
   exchangeCode(code: string, redirectUri: string, codeVerifier?: string): Promise<OAuthTokenResult>;
   refreshToken?(refreshToken: string): Promise<OAuthTokenResult>;
   getAccounts(accessToken: string): Promise<SocialAccountInfo[]>;

@@ -344,12 +344,12 @@ export function UniversalSocialConnectModal({
     : `http://localhost:3000/api/social/${activeTab}/callback`;
 
   // Launch official OAuth authorization directly in new window
-  const handleLaunchOfficialOAuth = async () => {
+  const handleLaunchOfficialOAuth = async (tier: "full" | "standard" = "full") => {
     setOauthError(null);
     setIsOpeningOAuth(true);
 
     try {
-      const res = await fetch(`/api/social/${activeTab}/connect?format=json`);
+      const res = await fetch(`/api/social/${activeTab}/connect?format=json&tier=${tier}`);
       const data = await res.json();
 
       if (!res.ok || !data.success || !data.authUrl) {
@@ -504,7 +504,7 @@ export function UniversalSocialConnectModal({
                 {/* Big Action Button */}
                 <button
                   type="button"
-                  onClick={handleLaunchOfficialOAuth}
+                  onClick={() => handleLaunchOfficialOAuth("full")}
                   disabled={isOpeningOAuth}
                   className={`w-full py-3 px-4 rounded-xl ${currentConfig.buttonClass} font-semibold text-sm shadow-sm transition active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50`}
                 >
@@ -520,6 +520,20 @@ export function UniversalSocialConnectModal({
                     </>
                   )}
                 </button>
+
+                {/* Standard Permissions Fallback for Facebook */}
+                {activeTab === "facebook" && (
+                  <div className="text-center pt-1">
+                    <button
+                      type="button"
+                      onClick={() => handleLaunchOfficialOAuth("standard")}
+                      disabled={isOpeningOAuth}
+                      className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+                    >
+                      ⚡ Getting "permission scope not valid"? Click here to connect with Standard Permissions
+                    </button>
+                  </div>
+                )}
               </div>
 
             </div>

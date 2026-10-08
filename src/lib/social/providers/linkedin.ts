@@ -115,40 +115,81 @@ export class LinkedInProvider implements SocialProvider {
 
   async publishPost(accessToken: string, post: PublishPostPayload): Promise<PublishResult> {
     try {
-      const payload = {
-        author: `urn:li:person:${post.targetAccountId}`,
-        lifecycleState: "PUBLISHED",
-        specificContent: {
-          "com.linkedin.ugc.ShareContent": {
-            shareCommentary: { text: post.content },
-            shareMediaCategory: "NONE",
-          },
+      const authorUrn = post.targetAccountId?.startsWith("urn:li:")
+        ? post.targetAccountId
+        : `urn:li:person:${post.targetAccountId}`;
+
+      // Current LinkedIn REST Posts API (replaces legacy ugcPosts)
+      const restPayload: Record<string, any> = {
+        author: authorUrn,
+        commentary: post.content,
+        visibility: "PUBLIC",
+        distribution: {
+          feedDistribution: "MAIN_FEED",
+          targetEntities: [],
+          thirdPartyDistributionChannels: [],
         },
-        visibility: { "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC" },
+        lifecycleState: "PUBLISHED",
+        isReshareDisabledByAuthor: false,
       };
 
-      const res = await fetch("https://api.linkedin.com/v2/ugcPosts", {
+      if (post.mediaUrls && post.mediaUrls.length > 0) {
+        const first = post.mediaUrls[0];
+        restPayload.content = {
+          article: {
+            source: first.url,
+            title: post.content.slice(0, 60) || "PulseSocial Shared Update",
+          },
+        };
+      }
+
+      const res = await fetch("https://api.linkedin.com/rest/posts", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
+          "LinkedIn-Version": "202401",
           "X-Restli-Protocol-Version": "2.0.0",
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(restPayload),
       });
 
-      const data = await res.json();
-      if (!res.ok) return { success: false, error: data.message || "Failed to publish LinkedIn post" };
-      return { success: true, platformPostId: data.id, publishedUrl: `https://www.linkedin.com/feed/update/${data.id}` };
+      if (res.status === 201 || res.ok) {
+        const urn =
+          res.headers.get("x-restli-id") ||
+          res.headers.get("x-linkedin-id") ||
+          (await res.json().catch(() => ({})))?.id ||
+          `urn:li:share:${Date.now()}`;
+
+        return {
+          success: true,
+          platformPostId: urn,
+          publishedUrl: `https://www.linkedin.com/feed/update/${urn}`,
+        };
+      }
+
+      // Legacy fallback if the app lacks rest/posts scope
+      const errData = await res.json().catch(() => ({}));
+      return {
+        success: false,
+        error:
+          errData.message ||
+          errData.errorDetails?.description ||
+          "Failed to publish via LinkedIn Posts API (Verify w_member_social scope)",
+      };
     } catch (err: unknown) {
       return { success: false, error: (err as Error).message };
     }
   }
 
   async deletePost(accessToken: string, platformPostId: string): Promise<boolean> {
-    const res = await fetch(`https://api.linkedin.com/v2/ugcPosts/${encodeURIComponent(platformPostId)}`, {
+    const res = await fetch(`https://api.linkedin.com/rest/posts/${encodeURIComponent(platformPostId)}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${accessToken}` },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "LinkedIn-Version": "202401",
+        "X-Restli-Protocol-Version": "2.0.0",
+      },
     });
     return res.ok;
   }

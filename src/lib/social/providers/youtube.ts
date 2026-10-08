@@ -161,15 +161,48 @@ export class YouTubeProvider implements SocialProvider {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        return { success: false, error: err.error?.message || "YouTube video upload failed" };
+        return { success: false, error: err.error?.message || "YouTube video initialization failed" };
       }
 
       const location = res.headers.get("location");
-      return {
-        success: true,
-        platformPostId: `yt_${Date.now()}`,
-        publishedUrl: location || "https://www.youtube.com",
-      };
+      if (!location) {
+        return { success: false, error: "YouTube did not return a valid upload location header" };
+      }
+
+      // Upload actual video bytes to the resumable session
+      try {
+        const videoStreamRes = await fetch(video.url);
+        if (!videoStreamRes.ok) {
+          return { success: false, error: `Could not fetch video file from ${video.url}` };
+        }
+
+        const videoBuffer = await videoStreamRes.arrayBuffer();
+        const uploadRes = await fetch(location, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "video/mp4",
+            "Content-Length": String(videoBuffer.byteLength),
+          },
+          body: videoBuffer,
+        });
+
+        const uploadData = await uploadRes.json().catch(() => ({}));
+        if (!uploadRes.ok || !uploadData.id) {
+          const errDetail = uploadData.error?.message || "YouTube binary upload failed";
+          return { success: false, error: errDetail };
+        }
+
+        const videoId = uploadData.id;
+        const isPrivate = uploadData.status?.privacyStatus === "private";
+
+        return {
+          success: true,
+          platformPostId: videoId,
+          publishedUrl: `https://www.youtube.com/watch?v=${videoId}`,
+        };
+      } catch (uploadErr: unknown) {
+        return { success: false, error: (uploadErr as Error).message || "YouTube upload stream failed" };
+      }
     } catch (e: any) {
       return { success: false, error: e.message || "Failed to initiate YouTube upload" };
     }

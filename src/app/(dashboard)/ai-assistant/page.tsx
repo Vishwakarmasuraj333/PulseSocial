@@ -5,8 +5,10 @@ import Image from "next/image";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useToast } from "@/components/ui/toast";
 import { PostComposerModal } from "@/components/composer/PostComposerModal";
+import { GeminiChatPanel } from "@/components/composer/GeminiChatPanel";
 import {
   Sparkles,
+  MessageSquare,
   Copy,
   Check,
   Wand2,
@@ -133,7 +135,7 @@ const PLATFORMS_LIST = [
 export default function GeminiAiStudioPage() {
   const { toast } = useToast();
 
-  const [activeTab, setActiveTab] = useState<"text" | "image" | "rules">("text");
+  const [activeTab, setActiveTab] = useState<"chat" | "text" | "image" | "rules">("chat");
 
   // Text generation state
   const [prompt, setPrompt] = useState("");
@@ -530,11 +532,27 @@ export default function GeminiAiStudioPage() {
         )}
 
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-100 border border-slate-200/80 max-w-lg">
+        <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-100 border border-slate-200/80 max-w-2xl">
+          <button
+            type="button"
+            onClick={() => setActiveTab("chat")}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer ${
+              activeTab === "chat"
+                ? "bg-white text-indigo-700 shadow-sm"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+            <span>Gemini AI Chat Copilot</span>
+            <span className="px-1.5 py-0.2 rounded-full bg-indigo-100 text-indigo-700 text-[9px] font-bold">
+              Featured
+            </span>
+          </button>
+
           <button
             type="button"
             onClick={() => setActiveTab("text")}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition ${
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer ${
               activeTab === "text"
                 ? "bg-white text-purple-700 shadow-sm"
                 : "text-slate-600 hover:text-slate-900"
@@ -547,7 +565,7 @@ export default function GeminiAiStudioPage() {
           <button
             type="button"
             onClick={() => setActiveTab("image")}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition ${
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer ${
               activeTab === "image"
                 ? "bg-white text-pink-700 shadow-sm"
                 : "text-slate-600 hover:text-slate-900"
@@ -555,15 +573,12 @@ export default function GeminiAiStudioPage() {
           >
             <ImageIcon className="w-3.5 h-3.5 text-pink-500" />
             <span>AI Image Studio</span>
-            <span className="px-1.5 py-0.2 rounded-full bg-pink-100 text-pink-700 text-[9px] font-bold">
-              Flux.1
-            </span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab("rules")}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition ${
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer ${
               activeTab === "rules"
                 ? "bg-white text-indigo-700 shadow-sm"
                 : "text-slate-600 hover:text-slate-900"
@@ -573,6 +588,20 @@ export default function GeminiAiStudioPage() {
             <span>Platform Rules</span>
           </button>
         </div>
+
+        {/* ============================================================ */}
+        {/* TAB 0: GEMINI AI CHAT COPILOT (MATCHING SCREENSHOT 2)       */}
+        {/* ============================================================ */}
+        {activeTab === "chat" && (
+          <div className="rounded-2xl overflow-hidden shadow-xl border border-slate-800">
+            <GeminiChatPanel
+              brandName="Suraj Vishwakarma's Workspace"
+              onApply={(data) =>
+                handleAddToComposer(data.caption, data.hashtags, data.imageUrl)
+              }
+            />
+          </div>
+        )}
 
         {/* ============================================================ */}
         {/* TAB 1: CAPTIONS & MULTI-VARIATION TEXT STUDIO                */}

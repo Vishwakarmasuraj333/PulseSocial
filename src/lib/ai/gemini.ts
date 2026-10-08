@@ -164,11 +164,12 @@ export async function generateText(
   const ai = getGeminiClient(options?.apiKey);
   const primaryModel = resolveGeminiTextModel(options?.model);
   const candidateModels = [
+    "gemini-flash-lite-latest",
     primaryModel,
+    "gemini-pro-latest",
     "gemini-3.1-flash-lite",
-    "gemini-3-flash-preview",
-    "gemini-3.8-flash",
     "gemini-flash-latest",
+    "gemini-3-flash-preview",
   ].filter((v, i, a) => a.indexOf(v) === i);
 
   let lastError: any = null;
@@ -205,11 +206,12 @@ export async function generateStructuredContent<T>(
   const ai = getGeminiClient(options?.apiKey);
   const primaryModel = resolveGeminiTextModel(options?.model);
   const candidateModels = [
+    "gemini-flash-lite-latest",
     primaryModel,
+    "gemini-pro-latest",
     "gemini-3.1-flash-lite",
-    "gemini-3-flash-preview",
-    "gemini-3.8-flash",
     "gemini-flash-latest",
+    "gemini-3-flash-preview",
   ].filter((v, i, a) => a.indexOf(v) === i);
 
   let lastError: any = null;

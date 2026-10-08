@@ -59,22 +59,30 @@ CURRENT WORKSPACE CONTEXT:
 - Recent Saved Drafts: ${recentDrafts.length > 0 ? recentDrafts.join(", ") : "No recent drafts"}
 `;
 
+    let historyBlock = "";
+    if (Array.isArray(messages) && messages.length > 1) {
+      const pastTurns = messages.slice(-6, -1);
+      historyBlock = "\nCONVERSATION HISTORY:\n" + pastTurns
+        .map((m: any) => `${m.role === "user" ? "USER" : "GEMINI"}: ${m.content}`)
+        .join("\n\n") + "\n";
+    }
+
     const chatPrompt = `${SYSTEM_PERSONA_PROMPT}
 
-You are the PulseSocial AI Co-Pilot & Social Strategist embedded directly in the user's dashboard.
-You help creators, agencies, and teams write viral posts, optimize hooks, schedule content, translate, and audit strategy.
+You are the official Google Gemini AI Social Media Copilot embedded in PulseSocial.
+You help creators, founders, and marketing managers craft viral social posts, high-converting hooks, engaging threads, schedule ideas, and visual concepts.
 
 ${contextBlock}
-
-USER QUERY:
+${historyBlock}
+CURRENT USER QUERY:
 "${userPrompt}"
 
 RULES:
-- Answer directly, practically, and concisely.
-- If the user asks for a post, draft it with clean spacing, hook, and hashtags.
-- If Hinglish is requested, use natural modern conversational Hinglish.
-- Do not pretend to trigger real actions outside PulseSocial's capabilities.
-- Keep formatting clean using standard markdown.`;
+- Answer directly, practically, professionally, and creatively.
+- If asked to write a post for X (Twitter), keep it punchy, engaging, within 280 characters or as a numbered thread (1/n) with relevant hashtags.
+- If Hinglish or Hindi is used or requested, respond in natural, friendly, highly modern conversational Hinglish.
+- If writing a post or caption, format it cleanly with spacing, hook, body, CTA, and relevant hashtags so the user can directly copy or publish it.
+- Keep formatting clean using standard markdown with bullet points and bold headers where appropriate.`;
 
     const reply = await generateText(chatPrompt);
 

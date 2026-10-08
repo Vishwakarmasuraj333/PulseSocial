@@ -35,10 +35,13 @@ const providerFactories: Record<SupportedPlatform, () => SocialProvider> = {
 const providerInstances: Partial<Record<SupportedPlatform, SocialProvider>> = {};
 
 export function getSocialProvider(platform: string): SocialProvider {
+  const raw = platform.toLowerCase();
   const normalized = (
-    platform === "google" || platform === "google-business"
+    raw === "google" || raw === "google-business"
       ? "google_business"
-      : platform.toLowerCase()
+      : raw === "twitter"
+      ? "x"
+      : raw
   ) as SupportedPlatform;
 
   if (!providerInstances[normalized]) {

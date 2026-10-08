@@ -40,7 +40,14 @@ export async function GET(
       );
     }
 
-    const platformKey = provider.toLowerCase() as SupportedPlatform;
+    const rawKey = provider.toLowerCase();
+    const platformKey = (
+      rawKey === "google" || rawKey === "google-business"
+        ? "google_business"
+        : rawKey === "twitter"
+        ? "x"
+        : rawKey
+    ) as SupportedPlatform;
     const socialProvider = getSocialProvider(platformKey);
 
     // Retrieve active organization

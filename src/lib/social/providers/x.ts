@@ -18,17 +18,26 @@ export class XProvider implements SocialProvider {
   displayName = "X (Twitter)";
   iconName = "x";
 
+  private getCredentials() {
+    return {
+      clientId: process.env.X_CLIENT_ID || process.env.TWITTER_CLIENT_ID || "",
+      clientSecret: process.env.X_CLIENT_SECRET || process.env.TWITTER_CLIENT_SECRET || "",
+    };
+  }
+
   isConfigured(): boolean {
-    return Boolean(process.env.X_CLIENT_ID && process.env.X_CLIENT_SECRET);
+    const { clientId, clientSecret } = this.getCredentials();
+    return Boolean(clientId && clientSecret);
   }
 
   getMissingConfigMessage(): string {
-    return "X integration is not configured yet. Configure X_CLIENT_ID and X_CLIENT_SECRET to enable this connection.";
+    return "X integration is not configured yet. Configure X_CLIENT_ID (or TWITTER_CLIENT_ID) and X_CLIENT_SECRET in your environment.";
   }
 
   getAuthorizationUrl(state: string, redirectUri: string, codeVerifier?: string): string {
     if (!this.isConfigured()) throw new Error(this.getMissingConfigMessage());
 
+    const { clientId } = this.getCredentials();
     const verifier = codeVerifier || state;
     const challenge = crypto
       .createHash("sha256")
@@ -38,7 +47,7 @@ export class XProvider implements SocialProvider {
     const scopes = ["tweet.read", "tweet.write", "users.read", "offline.access"].join(" ");
     const params = new URLSearchParams({
       response_type: "code",
-      client_id: process.env.X_CLIENT_ID!,
+      client_id: clientId,
       redirect_uri: redirectUri,
       scope: scopes,
       state,
@@ -52,19 +61,18 @@ export class XProvider implements SocialProvider {
   async exchangeCode(code: string, redirectUri: string, codeVerifier?: string): Promise<OAuthTokenResult> {
     if (!this.isConfigured()) throw new Error(this.getMissingConfigMessage());
 
-    const authHeader = Buffer.from(
-      `${process.env.X_CLIENT_ID}:${process.env.X_CLIENT_SECRET}`
-    ).toString("base64");
+    const { clientId, clientSecret } = this.getCredentials();
+    const authHeader = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
 
+    // Standard RFC 6749 confidential client body (no duplicate client_id when Basic auth header is present)
     const body = new URLSearchParams({
-      client_id: process.env.X_CLIENT_ID!,
       code,
       grant_type: "authorization_code",
       redirect_uri: redirectUri,
       code_verifier: codeVerifier || "",
     });
 
-    const res = await fetch("https://api.twitter.com/2/oauth2/token", {
+    let res = await fetch("https://api.twitter.com/2/oauth2/token", {
       method: "POST",
       headers: {
         Authorization: `Basic ${authHeader}`,
@@ -74,8 +82,36 @@ export class XProvider implements SocialProvider {
     });
 
     if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error_description || "Failed to exchange authorization code with X");
+      // Fallback for public client or body-based client credentials
+      const fallbackBody = new URLSearchParams({
+        client_id: clientId,
+        client_secret: clientSecret,
+        code,
+        grant_type: "authorization_code",
+        redirect_uri: redirectUri,
+        code_verifier: codeVerifier || "",
+      });
+
+      const fallbackRes = await fetch("https://api.twitter.com/2/oauth2/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: fallbackBody,
+      });
+
+      if (fallbackRes.ok) {
+        res = fallbackRes;
+      } else {
+        let errDesc = "Failed to exchange authorization code with X";
+        try {
+          const errData = await res.json();
+          errDesc = errData.error_description || errData.error || errDesc;
+        } catch {
+          // keep default error description
+        }
+        throw new Error(errDesc);
+      }
     }
 
     const data = await res.json();

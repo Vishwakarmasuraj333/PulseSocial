@@ -39,33 +39,68 @@ export class BlueskyProvider implements SocialProvider {
   }
 
   async getAccounts(accessToken: string): Promise<SocialAccountInfo[]> {
-    const handle = process.env.BLUESKY_HANDLE || "brand.bsky.social";
+    const handle = process.env.BLUESKY_HANDLE || "creator.bsky.social";
     return [
       {
         providerAccountId: `did:plc:bsky-${handle.replace(/[^a-z0-9]/gi, "")}`,
         displayName: handle,
         username: `@${handle}`,
-        profileImageUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&h=100&fit=crop",
-        accountType: "AT_PROTOCOL_PROFILE",
+        profileImageUrl: undefined,
+        accountType: "PROFILE",
       },
     ];
   }
 
   async getProfile(accessToken: string, accountId: string): Promise<SocialProfileResult> {
     return {
-      followersCount: 19800,
-      followingCount: 310,
-      postsCount: 540,
-      bio: "Official Brand Feed on Bluesky AT Protocol",
+      followersCount: 0,
+      followingCount: 0,
+      postsCount: 0,
+      bio: "Bluesky AT Protocol Profile",
     };
   }
 
   async publishPost(accessToken: string, post: PublishPostPayload): Promise<PublishResult> {
-    return {
-      success: true,
-      platformPostId: `atproto-post-${Date.now()}`,
-      publishedUrl: "https://bsky.app",
-    };
+    try {
+      const did = post.targetAccountId || "did:plc:self";
+      const now = new Date().toISOString();
+
+      const res = await fetch("https://bsky.social/xrpc/com.atproto.repo.createRecord", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          repo: did,
+          collection: "app.bsky.feed.post",
+          record: {
+            $type: "app.bsky.feed.post",
+            text: post.content,
+            createdAt: now,
+          },
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.uri) {
+        return {
+          success: false,
+          error: data.message || "Failed to post to Bluesky AT Protocol repository",
+        };
+      }
+
+      return {
+        success: true,
+        platformPostId: data.cid || data.uri,
+        publishedUrl: `https://bsky.app/profile/${did}/post/${data.uri.split("/").pop()}`,
+      };
+    } catch (err: unknown) {
+      return {
+        success: false,
+        error: (err as Error).message || "AT Protocol network request failed",
+      };
+    }
   }
 
   async deletePost(accessToken: string, platformPostId: string): Promise<boolean> {

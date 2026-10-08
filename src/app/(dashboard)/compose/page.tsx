@@ -25,6 +25,11 @@ import {
   X,
   Eye,
 } from "lucide-react";
+import {
+  PostPreview,
+  PreviewAccount,
+  PreviewMediaItem,
+} from "@/components/composer/previews/PostPreview";
 
 const PLATFORM_LIMITS: Record<string, number> = {
   x: 280,
@@ -457,85 +462,79 @@ export default function ComposePage() {
           {/* ============================================================ */}
           {/* RIGHT: Live Social Preview (5 Cols)                          */}
           {/* ============================================================ */}
-          <div className="lg:col-span-5 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 sticky top-6">
-            
-            {/* Preview Platform Switcher */}
-            <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-200 dark:border-slate-800">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
-                <Eye className="w-4 h-4 text-[#5846A8]" />
-                <span>Live Feed Preview</span>
-              </div>
+          <div className="lg:col-span-5 space-y-4 sticky top-6">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                Live Native Preview
+              </span>
 
-              <div className="flex items-center gap-1">
-                {selectedPlatforms.map((plat) => (
+              {/* Quick Preview Channel Switcher */}
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl overflow-x-auto max-w-[280px] scrollbar-none">
+                {[
+                  "instagram",
+                  "facebook",
+                  "linkedin",
+                  "x",
+                  "tiktok",
+                  "youtube",
+                  "pinterest",
+                  "threads",
+                  "google",
+                  "mastodon",
+                ].map((plat) => (
                   <button
                     key={plat}
                     type="button"
                     onClick={() => setActivePreviewPlatform(plat)}
-                    className={`p-1.5 rounded-lg transition cursor-pointer ${
+                    className={`p-1.5 rounded-lg transition-all cursor-pointer ${
                       activePreviewPlatform === plat
-                        ? "bg-white dark:bg-slate-800 shadow-xs text-[#5846A8]"
-                        : "opacity-40 hover:opacity-100"
+                        ? "bg-white dark:bg-slate-900 shadow-xs text-indigo-600"
+                        : "opacity-60 hover:opacity-100"
                     }`}
-                    title={`Preview on ${plat}`}
+                    title={plat.toUpperCase()}
                   >
-                    {renderPlatformIcon(plat, 18)}
+                    {renderPlatformIcon(plat, 15)}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Social Post Mockup Card */}
-            <div className="bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 shadow-md p-4 overflow-hidden">
-              
-              {/* Profile Header */}
-              {(() => {
-                const currentAcc = connectedAccounts.find((a) => a.platform === activePreviewPlatform);
-                const displayName = currentAcc?.name || activeBrand?.name || "PulseSocial Workspace";
-                const handle = currentAcc?.username ? `@${currentAcc.username}` : "@pulsesocial";
-                return (
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-full bg-[#5846A8] text-white p-0.5 flex items-center justify-center font-bold text-sm overflow-hidden shrink-0">
-                      {currentAcc?.avatar ? (
-                        <img
-                          src={currentAcc.avatar}
-                          alt="Author"
-                          className="w-full h-full object-cover rounded-full"
-                        />
-                      ) : (
-                        displayName.charAt(0).toUpperCase()
-                      )}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-bold text-slate-900 dark:text-white">{displayName}</span>
-                        <span className="text-[10px] text-slate-400">{handle}</span>
-                      </div>
-                      <span className="text-[10px] text-slate-400">Just now • Published via PulseSocial</span>
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* Post Text */}
-              <div className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-wrap mb-3">
-                {content || "Your post caption will appear here in real-time as you write..."}
-              </div>
-
-              {/* Post Image Preview */}
-              {mediaUrls.length > 0 && (
-                <div className="rounded-lg overflow-hidden mb-3 border border-slate-100 dark:border-slate-800">
-                  <img src={mediaUrls[0]} alt="Post Visual" className="w-full h-48 object-cover" />
-                </div>
-              )}
-
-              {/* Interaction Metrics */}
-              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-around text-xs text-slate-400">
-                <span>❤️ 0 Likes</span>
-                <span>💬 0 Comments</span>
-                <span>🔄 0 Shares</span>
-              </div>
-            </div>
+            {/* Dynamic Native Platform Post Preview */}
+            <PostPreview
+              accounts={
+                connectedAccounts.length > 0
+                  ? connectedAccounts.map((a) => ({
+                      id: a.id,
+                      provider: a.platform,
+                      displayName: a.name || activeBrand?.name || "PulseSocial Workspace",
+                      username: a.username || "pulsesocial",
+                      profileImageUrl: a.avatar || activeBrand?.avatarUrl || null,
+                    }))
+                  : [
+                      {
+                        id: `preview-${activePreviewPlatform}`,
+                        provider: activePreviewPlatform,
+                        displayName: activeBrand?.name || "PulseSocial Workspace",
+                        username: activeBrand?.slug || "pulsesocial",
+                        profileImageUrl: activeBrand?.avatarUrl || null,
+                      },
+                    ]
+              }
+              activeAccountId={
+                connectedAccounts.find((a) => a.platform === activePreviewPlatform)?.id ||
+                `preview-${activePreviewPlatform}`
+              }
+              onSelectAccount={(id) => {
+                const found = connectedAccounts.find((a) => a.id === id);
+                if (found) setActivePreviewPlatform(found.platform);
+              }}
+              content={content}
+              media={mediaUrls.map((url, idx) => ({
+                id: `media-${idx}`,
+                url,
+                type: url.match(/\.(mp4|mov|webm)$/i) ? "VIDEO" : "IMAGE",
+              }))}
+            />
           </div>
         </div>
       </div>

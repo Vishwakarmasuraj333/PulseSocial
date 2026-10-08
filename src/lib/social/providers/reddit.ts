@@ -100,20 +100,68 @@ export class RedditProvider implements SocialProvider {
   }
 
   async getProfile(accessToken: string, accountId: string): Promise<SocialProfileResult> {
+    try {
+      const res = await fetch("https://oauth.reddit.com/api/v1/me", {
+        headers: { Authorization: `Bearer ${accessToken}`, "User-Agent": "PulseSocial/1.0" },
+      });
+      if (res.ok) {
+        const me = await res.json();
+        return {
+          followersCount: me.num_friends || 0,
+          followingCount: 0,
+          postsCount: 0,
+          bio: me.subreddit?.public_description || undefined,
+          raw: me,
+        };
+      }
+    } catch {}
     return {
-      followersCount: 5200,
-      followingCount: 45,
-      postsCount: 160,
-      bio: "Official Brand Subreddit & Creator Account",
+      followersCount: 0,
+      followingCount: 0,
+      postsCount: 0,
     };
   }
 
   async publishPost(accessToken: string, post: PublishPostPayload): Promise<PublishResult> {
-    return {
-      success: true,
-      platformPostId: `reddit-submission-${Date.now()}`,
-      publishedUrl: "https://reddit.com",
-    };
+    try {
+      const subreddit = post.targetAccountId || "u_me";
+      const title = post.content.slice(0, 100) || "Post from PulseSocial";
+
+      const body = new URLSearchParams({
+        sr: subreddit.replace(/^r\//, ""),
+        kind: "self",
+        title,
+        text: post.content,
+        resubmit: "true",
+      });
+
+      const res = await fetch("https://oauth.reddit.com/api/submit", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "User-Agent": "PulseSocial/1.0",
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body,
+      });
+
+      const data = await res.json();
+      if (!res.ok || (data.json?.errors && data.json.errors.length > 0)) {
+        const errorMsg = data.json?.errors?.[0]?.[1] || "Failed to submit post to Reddit";
+        return { success: false, error: errorMsg };
+      }
+
+      const postUrl = data.json?.data?.url || "https://reddit.com";
+      const postId = data.json?.data?.id || `reddit_${Date.now()}`;
+
+      return {
+        success: true,
+        platformPostId: postId,
+        publishedUrl: postUrl,
+      };
+    } catch (err: unknown) {
+      return { success: false, error: (err as Error).message || "Reddit publication failed" };
+    }
   }
 
   async deletePost(accessToken: string, platformPostId: string): Promise<boolean> {

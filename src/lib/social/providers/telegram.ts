@@ -36,33 +36,67 @@ export class TelegramProvider implements SocialProvider {
   }
 
   async getAccounts(accessToken: string): Promise<SocialAccountInfo[]> {
-    const channel = process.env.TELEGRAM_CHANNEL_ID || "@pulsesocial_official";
+    const channel = process.env.TELEGRAM_CHANNEL_ID || "@pulsesocial";
     return [
       {
         providerAccountId: `tg-channel-${channel.replace(/[^a-z0-9]/gi, "")}`,
-        displayName: "Official Telegram Channel",
+        displayName: "Telegram Channel",
         username: channel.startsWith("@") ? channel : `@${channel}`,
-        profileImageUrl: "https://images.unsplash.com/photo-1577563908411-5077b6dc7624?w=100&h=100&fit=crop",
-        accountType: "BROADCAST_CHANNEL",
+        profileImageUrl: undefined,
+        accountType: "CHANNEL",
       },
     ];
   }
 
   async getProfile(accessToken: string, accountId: string): Promise<SocialProfileResult> {
     return {
-      followersCount: 34200,
+      followersCount: 0,
       followingCount: 0,
-      postsCount: 890,
-      bio: "Official Telegram Broadcast Channel & Community Announcements",
+      postsCount: 0,
+      bio: "Telegram Channel",
     };
   }
 
   async publishPost(accessToken: string, post: PublishPostPayload): Promise<PublishResult> {
-    return {
-      success: true,
-      platformPostId: `tg-msg-${Date.now()}`,
-      publishedUrl: "https://t.me",
-    };
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = post.targetAccountId?.replace(/^tg-channel-/, "") || process.env.TELEGRAM_CHANNEL_ID;
+
+    if (!botToken || !chatId) {
+      return {
+        success: false,
+        error: "Telegram Bot API credentials (TELEGRAM_BOT_TOKEN / TELEGRAM_CHANNEL_ID) not configured.",
+      };
+    }
+
+    try {
+      const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId.startsWith("@") ? chatId : `@${chatId}`,
+          text: post.content,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        return {
+          success: false,
+          error: data.description || "Failed to post message to Telegram channel",
+        };
+      }
+
+      return {
+        success: true,
+        platformPostId: String(data.result?.message_id),
+        publishedUrl: `https://t.me/${chatId.replace(/^@/, "")}/${data.result?.message_id}`,
+      };
+    } catch (err: unknown) {
+      return {
+        success: false,
+        error: (err as Error).message || "Telegram network request failed",
+      };
+    }
   }
 
   async deletePost(accessToken: string, platformPostId: string): Promise<boolean> {

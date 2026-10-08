@@ -107,18 +107,17 @@ export class SnapchatProvider implements SocialProvider {
 
   async getProfile(accessToken: string, accountId: string): Promise<SocialProfileResult> {
     return {
-      followersCount: 14500,
-      followingCount: 320,
-      postsCount: 184,
-      bio: "Official Snapchat Public Profile & Spotlight Publisher",
+      followersCount: 0,
+      followingCount: 0,
+      postsCount: 0,
+      bio: "Snapchat Public Profile",
     };
   }
 
   async publishPost(accessToken: string, post: PublishPostPayload): Promise<PublishResult> {
     return {
-      success: true,
-      platformPostId: `snap-${Date.now()}`,
-      publishedUrl: "https://story.snapchat.com",
+      success: false,
+      error: "Snapchat Content Publishing API requires an approved Snapchat Creative Kit and Business Ad Account integration. Story posting via standard token is restricted by Snap Inc.",
     };
   }
 

@@ -23,9 +23,7 @@ import {
   Upload,
   Lightbulb,
   Edit3,
-  MessageSquare,
 } from "lucide-react";
-import { GeminiChatPanel } from "@/components/composer/GeminiChatPanel";
 
 interface GeminiAiModalProps {
   isOpen: boolean;
@@ -108,7 +106,7 @@ export function GeminiAiModal({
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [activeTab, setActiveTab] = useState<"chat" | "copy" | "image">("chat");
+  const [activeTab, setActiveTab] = useState<"copy" | "image">("copy");
 
   // Copy state
   const [prompt, setPrompt] = useState("");
@@ -442,25 +440,23 @@ export function GeminiAiModal({
       >
         <div
           onClick={(e) => e.stopPropagation()}
-          className={`relative w-full ${
-            activeTab === "chat" ? "max-w-6xl" : "max-w-4xl"
-          } bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[94vh] cursor-default`}
+          className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] cursor-default"
         >
           {/* Header */}
-          <div className="px-6 py-3.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-gradient-to-r from-purple-50 via-indigo-50/50 to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+          <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-purple-50 via-indigo-50/50 to-white">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-pink-500 flex items-center justify-center text-white shadow-md shadow-purple-500/20">
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-base font-bold text-slate-900 dark:text-white">Gemini AI Studio</h2>
-                  <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 uppercase tracking-wider">
+                  <h2 className="text-base font-bold text-slate-900">Gemini AI Studio</h2>
+                  <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-purple-100 text-purple-700 uppercase tracking-wider">
                     Official Models
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Real-time conversational copy, hooks, and live channel previews for {brandName}
+                <p className="text-xs text-slate-500">
+                  Generate viral post captions and photorealistic AI images for {brandName}
                 </p>
               </div>
             </div>
@@ -469,15 +465,15 @@ export function GeminiAiModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-500 hover:text-slate-800 rounded-lg border border-slate-200 hover:bg-slate-100 transition cursor-pointer"
               >
                 <span>Hide Studio</span>
-                <span className="text-[10px] text-slate-400 bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded font-mono">ESC</span>
+                <span className="text-[10px] text-slate-400 bg-slate-100 px-1 py-0.5 rounded font-mono">ESC</span>
               </button>
               <button
                 type="button"
                 onClick={onClose}
-                className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition cursor-pointer"
                 title="Close Studio (ESC)"
               >
                 <X className="w-5 h-5" />
@@ -486,67 +482,46 @@ export function GeminiAiModal({
           </div>
 
           {/* Mode Switcher Tabs */}
-          <div className="px-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 flex items-center justify-between">
+          <div className="px-6 border-b border-slate-100 bg-slate-50/80 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setActiveTab("chat")}
-                className={`py-3 px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition cursor-pointer ${
-                  activeTab === "chat"
-                    ? "border-indigo-600 text-indigo-700 dark:text-indigo-400 bg-white dark:bg-slate-800"
-                    : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                }`}
-              >
-                <MessageSquare className="w-3.5 h-3.5 text-indigo-500" />
-                <span>Gemini AI Chat Copilot</span>
-                <span className="px-1.5 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-[9px] font-bold">
-                  Featured
-                </span>
-              </button>
-
               <button
                 type="button"
                 onClick={() => setActiveTab("copy")}
                 className={`py-3 px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition cursor-pointer ${
                   activeTab === "copy"
-                    ? "border-purple-600 text-purple-700 dark:text-purple-400 bg-white dark:bg-slate-800"
-                    : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                    ? "border-purple-600 text-purple-700 bg-white"
+                    : "border-transparent text-slate-600 hover:text-slate-900"
                 }`}
               >
                 <PenTool className="w-3.5 h-3.5" />
                 <span>Captions & Social Copy</span>
               </button>
-
               <button
                 type="button"
                 onClick={() => setActiveTab("image")}
                 className={`py-3 px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition cursor-pointer ${
                   activeTab === "image"
-                    ? "border-purple-600 text-purple-700 dark:text-purple-400 bg-white dark:bg-slate-800"
-                    : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                    ? "border-purple-600 text-purple-700 bg-white"
+                    : "border-transparent text-slate-600 hover:text-slate-900"
                 }`}
               >
                 <ImageIcon className="w-3.5 h-3.5" />
-                <span>AI Visual Studio</span>
+                <span>AI Image Generator</span>
+                <span className="px-1.5 py-0.5 rounded bg-pink-100 text-pink-700 text-[9px] font-bold">
+                  Nano Banana
+                </span>
               </button>
             </div>
 
-            <div className="hidden sm:flex items-center gap-2 text-[11px] text-indigo-700 dark:text-indigo-300 font-medium">
+            <div className="hidden sm:flex items-center gap-2 text-[11px] text-purple-700 font-medium">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Google Gemini Active</span>
+              <span>Gemini 3.8 Production</span>
             </div>
           </div>
 
           {/* Body */}
-          <div className={`flex-1 overflow-y-auto ${activeTab === "chat" ? "p-0" : "p-6"} scrollbar-thin`}>
-            {activeTab === "chat" ? (
-              <GeminiChatPanel
-                brandName={brandName}
-                industry={industry}
-                onApply={onApply}
-                onClose={onClose}
-              />
-            ) : activeTab === "copy" ? (
+          <div className="flex-1 overflow-y-auto p-6 scrollbar-thin">
+            {activeTab === "copy" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Left column: Input controls */}
                 <div className="space-y-4">

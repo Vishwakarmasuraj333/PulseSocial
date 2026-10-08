@@ -16,19 +16,32 @@ export class MastodonProvider implements SocialProvider {
   displayName = "Mastodon";
   iconName = "mastodon";
 
-  private defaultInstance = "https://mastodon.social";
+  private resolveInstance(options?: Record<string, any>, targetId?: string): string {
+    if (options?.instanceUrl && typeof options.instanceUrl === "string") {
+      return options.instanceUrl.replace(/\/+$/, "");
+    }
+    if (targetId && targetId.includes("@")) {
+      const parts = targetId.split("@");
+      const host = parts[parts.length - 1];
+      if (host && host.includes(".")) {
+        return `https://${host}`;
+      }
+    }
+    return (process.env.MASTODON_INSTANCE_URL || "https://mastodon.social").replace(/\/+$/, "");
+  }
 
   isConfigured(): boolean {
     return Boolean(process.env.MASTODON_CLIENT_ID && process.env.MASTODON_CLIENT_SECRET);
   }
 
   getMissingConfigMessage(): string {
-    return "Mastodon integration is not configured yet. Configure MASTODON_CLIENT_ID and MASTODON_CLIENT_SECRET to enable this connection.";
+    return "Mastodon integration is not configured yet. Configure MASTODON_CLIENT_ID and MASTODON_CLIENT_SECRET in your environment to enable this connection.";
   }
 
-  getAuthorizationUrl(state: string, redirectUri: string): string {
+  getAuthorizationUrl(state: string, redirectUri: string, codeVerifier?: string, options?: Record<string, any>): string {
     if (!this.isConfigured()) throw new Error(this.getMissingConfigMessage());
 
+    const instance = this.resolveInstance(options);
     const scopes = "read write follow";
     const params = new URLSearchParams({
       client_id: process.env.MASTODON_CLIENT_ID!,
@@ -38,12 +51,13 @@ export class MastodonProvider implements SocialProvider {
       state,
     });
 
-    return `${this.defaultInstance}/oauth/authorize?${params.toString()}`;
+    return `${instance}/oauth/authorize?${params.toString()}`;
   }
 
-  async exchangeCode(code: string, redirectUri: string): Promise<OAuthTokenResult> {
+  async exchangeCode(code: string, redirectUri: string, codeVerifier?: string): Promise<OAuthTokenResult> {
     if (!this.isConfigured()) throw new Error(this.getMissingConfigMessage());
 
+    const instance = this.resolveInstance();
     const body = new URLSearchParams({
       client_id: process.env.MASTODON_CLIENT_ID!,
       client_secret: process.env.MASTODON_CLIENT_SECRET!,
@@ -53,14 +67,14 @@ export class MastodonProvider implements SocialProvider {
       scope: "read write follow",
     });
 
-    const res = await fetch(`${this.defaultInstance}/oauth/token`, {
+    const res = await fetch(`${instance}/oauth/token`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body,
     });
 
     if (!res.ok) {
-      const err = await res.json();
+      const err = await res.json().catch(() => ({}));
       throw new Error(err.error_description || "Failed to exchange code with Mastodon");
     }
 
@@ -68,30 +82,36 @@ export class MastodonProvider implements SocialProvider {
     return {
       accessToken: data.access_token,
       scopes: (data.scope || "").split(" "),
+      metadata: { instanceUrl: instance },
     };
   }
 
   async getAccounts(accessToken: string): Promise<SocialAccountInfo[]> {
-    const res = await fetch(`${this.defaultInstance}/api/v1/accounts/verify_credentials`, {
+    const instance = this.resolveInstance();
+    const res = await fetch(`${instance}/api/v1/accounts/verify_credentials`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
 
     if (!res.ok) throw new Error("Failed to verify Mastodon credentials");
     const account = await res.json();
+    const host = new URL(instance).host;
 
     return [
       {
-        providerAccountId: account.id,
+        providerAccountId: `${account.id}@${host}`,
         displayName: account.display_name || account.username,
-        username: `@${account.acct}@mastodon.social`,
+        username: `@${account.acct}@${host}`,
         profileImageUrl: account.avatar,
         accountType: "PROFILE",
+        metadata: { instanceUrl: instance },
       },
     ];
   }
 
   async getProfile(accessToken: string, accountId: string): Promise<SocialProfileResult> {
-    const res = await fetch(`${this.defaultInstance}/api/v1/accounts/${accountId}`);
+    const instance = this.resolveInstance(undefined, accountId);
+    const rawId = accountId.split("@")[0] || accountId;
+    const res = await fetch(`${instance}/api/v1/accounts/${rawId}`);
     if (!res.ok) {
       return { followersCount: 0, followingCount: 0, postsCount: 0 };
     }
@@ -105,7 +125,8 @@ export class MastodonProvider implements SocialProvider {
   }
 
   async publishPost(accessToken: string, post: PublishPostPayload): Promise<PublishResult> {
-    const res = await fetch(`${this.defaultInstance}/api/v1/statuses`, {
+    const instance = this.resolveInstance(undefined, post.targetAccountId);
+    const res = await fetch(`${instance}/api/v1/statuses`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -127,7 +148,8 @@ export class MastodonProvider implements SocialProvider {
   }
 
   async deletePost(accessToken: string, platformPostId: string): Promise<boolean> {
-    const res = await fetch(`${this.defaultInstance}/api/v1/statuses/${platformPostId}`, {
+    const instance = this.resolveInstance();
+    const res = await fetch(`${instance}/api/v1/statuses/${platformPostId}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${accessToken}` },
     });

@@ -84,30 +84,23 @@ export class GoogleBusinessProvider implements SocialProvider {
   }
 
   async getAccounts(accessToken: string): Promise<SocialAccountInfo[]> {
-    try {
-      const res = await fetch("https://mybusinessaccountmanagement.googleapis.com/v1/accounts", {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        const accounts = data.accounts || [];
-        return accounts.map((acc: any) => ({
-          providerAccountId: acc.name,
-          displayName: acc.accountName || "Google Business Profile",
-          username: acc.accountName,
-          accountType: "BUSINESS",
-        }));
-      }
-    } catch {}
+    const res = await fetch("https://mybusinessaccountmanagement.googleapis.com/v1/accounts", {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
 
-    return [
-      {
-        providerAccountId: "gbp_account",
-        displayName: "Google Business Profile",
-        username: "google_business",
-        accountType: "BUSINESS",
-      },
-    ];
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || "Failed to fetch accounts from Google Business Profile API. Verification may be required.");
+    }
+
+    const data = await res.json();
+    const accounts = data.accounts || [];
+    return accounts.map((acc: any) => ({
+      providerAccountId: acc.name,
+      displayName: acc.accountName || "Google Business Profile",
+      username: acc.accountName,
+      accountType: "BUSINESS",
+    }));
   }
 
   async getProfile(): Promise<SocialProfileResult> {
@@ -123,7 +116,11 @@ export class GoogleBusinessProvider implements SocialProvider {
     try {
       const locationId = post.targetAccountId;
       if (!locationId) {
-        return { success: false, error: "Google Business Profile location ID is required to publish local posts." };
+        return {
+          success: false,
+          code: "LOCATION_REQUIRED",
+          error: "Google Business Profile location ID is required to publish local posts.",
+        };
       }
 
       const res = await fetch(
@@ -143,18 +140,34 @@ export class GoogleBusinessProvider implements SocialProvider {
         }
       );
 
-      const data = await res.json();
-      if (!res.ok) {
-        return { success: false, error: data.error?.message || "Failed to publish post to Google Business Profile" };
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.name) {
+        const isForbidden = res.status === 403;
+        const isAuth = res.status === 401;
+        return {
+          success: false,
+          code: isForbidden ? "GBP_APPROVAL_REQUIRED" : isAuth ? "TOKEN_EXPIRED" : "GBP_API_ERROR",
+          requiresApproval: isForbidden,
+          requiresReauth: isAuth,
+          capabilityState: isForbidden ? "APPROVAL REQUIRED" : undefined,
+          error:
+            data.error?.message ||
+            `Failed to publish post to Google Business Profile (HTTP ${res.status}). Verify Business Profile API access.`,
+        };
       }
 
       return {
         success: true,
-        platformPostId: data.name || `gbp_${Date.now()}`,
+        platformPostId: data.name,
         publishedUrl: data.searchUrl || "https://business.google.com",
       };
     } catch (err: unknown) {
-      return { success: false, error: (err as Error).message || "Failed to connect to Google Business API" };
+      return {
+        success: false,
+        code: "NETWORK_ERROR",
+        retryable: true,
+        error: (err as Error).message || "Failed to connect to Google Business API",
+      };
     }
   }
 

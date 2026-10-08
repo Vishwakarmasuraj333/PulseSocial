@@ -190,7 +190,15 @@ export class WhatsAppProvider implements SocialProvider {
       throw new Error(`WhatsApp API message failed: ${data.error?.message || res.statusText}`);
     }
 
-    const messageId = data.messages?.[0]?.id || `wa-${Date.now()}`;
+    const messageId = data.messages?.[0]?.id;
+    if (!messageId) {
+      return {
+        success: false,
+        code: "MISSING_MESSAGE_ID",
+        error: "WhatsApp API response did not contain a valid message ID.",
+      };
+    }
+
     return {
       success: true,
       platformPostId: messageId,

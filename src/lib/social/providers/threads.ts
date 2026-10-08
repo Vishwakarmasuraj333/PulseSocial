@@ -10,6 +10,7 @@ import {
   CommentResult,
   MessageResult,
 } from "../types";
+import { SOCIAL_API_VERSIONS } from "../api-versions";
 
 export class ThreadsProvider implements SocialProvider {
   platform: SupportedPlatform = "threads";
@@ -127,15 +128,20 @@ export class ThreadsProvider implements SocialProvider {
         }
       }
 
-      const containerRes = await fetch(`https://graph.threads.net/v1.0/${userId}/threads`, {
+      const containerRes = await fetch(`https://graph.threads.net/${SOCIAL_API_VERSIONS.THREADS_API}/${userId}/threads`, {
         method: "POST",
         body: containerParams,
       });
 
-      const containerData = await containerRes.json();
+      const containerData = await containerRes.json().catch(() => ({}));
       if (!containerRes.ok || !containerData.id) {
+        const isAuth = containerRes.status === 401;
+        const isPermission = containerRes.status === 403;
         return {
           success: false,
+          code: isAuth ? "TOKEN_EXPIRED" : isPermission ? "PERMISSION_DENIED" : "CONTAINER_FAILED",
+          requiresReauth: isAuth,
+          requiresApproval: isPermission,
           error: containerData.error?.message || "Failed to create Threads post container",
         };
       }
@@ -146,15 +152,16 @@ export class ThreadsProvider implements SocialProvider {
         access_token: accessToken,
       });
 
-      const publishRes = await fetch(`https://graph.threads.net/v1.0/${userId}/threads_publish`, {
+      const publishRes = await fetch(`https://graph.threads.net/${SOCIAL_API_VERSIONS.THREADS_API}/${userId}/threads_publish`, {
         method: "POST",
         body: publishParams,
       });
 
-      const publishData = await publishRes.json();
+      const publishData = await publishRes.json().catch(() => ({}));
       if (!publishRes.ok || !publishData.id) {
         return {
           success: false,
+          code: "PUBLISH_FAILED",
           error: publishData.error?.message || "Failed to publish Threads container",
         };
       }
@@ -167,6 +174,8 @@ export class ThreadsProvider implements SocialProvider {
     } catch (err: unknown) {
       return {
         success: false,
+        code: "NETWORK_ERROR",
+        retryable: true,
         error: (err as Error).message || "Threads publish request failed",
       };
     }

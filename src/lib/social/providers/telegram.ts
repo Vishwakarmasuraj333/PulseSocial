@@ -36,14 +36,32 @@ export class TelegramProvider implements SocialProvider {
   }
 
   async getAccounts(accessToken: string): Promise<SocialAccountInfo[]> {
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const channel = process.env.TELEGRAM_CHANNEL_ID || "@pulsesocial";
+
+    let botName = "Telegram Bot";
+    let botUsername = "pulsesocial_bot";
+
+    if (botToken) {
+      try {
+        const meRes = await fetch(`https://api.telegram.org/bot${botToken}/getMe`);
+        if (meRes.ok) {
+          const meData = await meRes.json();
+          if (meData.ok && meData.result) {
+            botName = meData.result.first_name || botName;
+            botUsername = meData.result.username || botUsername;
+          }
+        }
+      } catch {}
+    }
+
     return [
       {
         providerAccountId: `tg-channel-${channel.replace(/[^a-z0-9]/gi, "")}`,
-        displayName: "Telegram Channel",
+        displayName: `${botName} (${channel})`,
         username: channel.startsWith("@") ? channel : `@${channel}`,
         profileImageUrl: undefined,
-        accountType: "CHANNEL",
+        accountType: "BOT_CHANNEL",
       },
     ];
   }
@@ -69,13 +87,36 @@ export class TelegramProvider implements SocialProvider {
     }
 
     try {
-      const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      const targetChat = chatId.startsWith("@") ? chatId : `@${chatId}`;
+      let endpoint = `https://api.telegram.org/bot${botToken}/sendMessage`;
+      let body: Record<string, any> = {
+        chat_id: targetChat,
+        text: post.content,
+      };
+
+      if (post.mediaUrls && post.mediaUrls.length > 0) {
+        const first = post.mediaUrls[0];
+        if (first.type === "VIDEO") {
+          endpoint = `https://api.telegram.org/bot${botToken}/sendVideo`;
+          body = {
+            chat_id: targetChat,
+            video: first.url,
+            caption: post.content,
+          };
+        } else {
+          endpoint = `https://api.telegram.org/bot${botToken}/sendPhoto`;
+          body = {
+            chat_id: targetChat,
+            photo: first.url,
+            caption: post.content,
+          };
+        }
+      }
+
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: chatId.startsWith("@") ? chatId : `@${chatId}`,
-          text: post.content,
-        }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
@@ -86,10 +127,11 @@ export class TelegramProvider implements SocialProvider {
         };
       }
 
+      const messageId = String(data.result?.message_id);
       return {
         success: true,
-        platformPostId: String(data.result?.message_id),
-        publishedUrl: `https://t.me/${chatId.replace(/^@/, "")}/${data.result?.message_id}`,
+        platformPostId: messageId,
+        publishedUrl: `https://t.me/${chatId.replace(/^@/, "")}/${messageId}`,
       };
     } catch (err: unknown) {
       return {

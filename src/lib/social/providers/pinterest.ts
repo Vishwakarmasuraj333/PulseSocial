@@ -121,10 +121,37 @@ export class PinterestProvider implements SocialProvider {
   async publishPost(accessToken: string, post: PublishPostPayload): Promise<PublishResult> {
     const image = post.mediaUrls?.find((m) => m.type === "IMAGE");
     if (!image) {
-      return { success: false, error: "Pinterest requires an image URL to publish a pin." };
+      return {
+        success: false,
+        code: "INVALID_MEDIA",
+        error: "Pinterest requires an image URL to publish a pin.",
+      };
     }
 
     try {
+      // Resolve Board ID (Pinterest API v5 mandates board_id)
+      let boardId = post.targetAccountId;
+      if (!boardId || !boardId.match(/^\d+$/)) {
+        try {
+          const boardsRes = await fetch("https://api.pinterest.com/v5/boards", {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+          if (boardsRes.ok) {
+            const boardsData = await boardsRes.json().catch(() => ({}));
+            boardId = boardsData.items?.[0]?.id;
+          }
+        } catch {}
+      }
+
+      if (!boardId || !boardId.match(/^\d+$/)) {
+        return {
+          success: false,
+          code: "BOARD_REQUIRED",
+          requiresApproval: false,
+          error: "Pinterest API requires a valid Board ID to create a pin. Please create or select a board first.",
+        };
+      }
+
       const res = await fetch("https://api.pinterest.com/v5/pins", {
         method: "POST",
         headers: {
@@ -132,7 +159,8 @@ export class PinterestProvider implements SocialProvider {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: post.content.slice(0, 100),
+          board_id: boardId,
+          title: post.content.slice(0, 100) || "Pin from PulseSocial",
           description: post.content,
           media_source: {
             source_type: "image_url",
@@ -141,9 +169,17 @@ export class PinterestProvider implements SocialProvider {
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        return { success: false, error: data.message || "Failed to publish pin to Pinterest" };
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.id) {
+        const isAuth = res.status === 401;
+        const isPermission = res.status === 403;
+        return {
+          success: false,
+          code: isAuth ? "TOKEN_EXPIRED" : isPermission ? "PERMISSION_DENIED" : "PINTEREST_API_ERROR",
+          requiresReauth: isAuth,
+          requiresApproval: isPermission,
+          error: data.message || `Failed to publish pin to Pinterest (HTTP ${res.status})`,
+        };
       }
 
       return {
@@ -152,7 +188,12 @@ export class PinterestProvider implements SocialProvider {
         publishedUrl: `https://pinterest.com/pin/${data.id}`,
       };
     } catch (err: unknown) {
-      return { success: false, error: (err as Error).message || "Failed to connect to Pinterest API" };
+      return {
+        success: false,
+        code: "NETWORK_ERROR",
+        retryable: true,
+        error: (err as Error).message || "Failed to connect to Pinterest API",
+      };
     }
   }
 

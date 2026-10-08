@@ -10,6 +10,7 @@ import {
   CommentResult,
   MessageResult,
 } from "../types";
+import { SOCIAL_API_VERSIONS } from "../api-versions";
 
 export class LinkedInProvider implements SocialProvider {
   platform: SupportedPlatform = "linkedin";
@@ -147,8 +148,8 @@ export class LinkedInProvider implements SocialProvider {
         method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          "LinkedIn-Version": "202401",
-          "X-Restli-Protocol-Version": "2.0.0",
+          "LinkedIn-Version": SOCIAL_API_VERSIONS.LINKEDIN_REST,
+          "X-Restli-Protocol-Version": SOCIAL_API_VERSIONS.LINKEDIN_RESTLI_PROTOCOL,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(restPayload),
@@ -158,8 +159,15 @@ export class LinkedInProvider implements SocialProvider {
         const urn =
           res.headers.get("x-restli-id") ||
           res.headers.get("x-linkedin-id") ||
-          (await res.json().catch(() => ({})))?.id ||
-          `urn:li:share:${Date.now()}`;
+          (await res.json().catch(() => ({})))?.id;
+
+        if (!urn) {
+          return {
+            success: false,
+            code: "MISSING_POST_ID",
+            error: "LinkedIn API returned HTTP success but omitted the expected x-restli-id header.",
+          };
+        }
 
         return {
           success: true,
@@ -168,17 +176,28 @@ export class LinkedInProvider implements SocialProvider {
         };
       }
 
-      // Legacy fallback if the app lacks rest/posts scope
       const errData = await res.json().catch(() => ({}));
+      const statusCode = res.status;
+      const requiresReauth = statusCode === 401;
+      const requiresApproval = statusCode === 403;
+
       return {
         success: false,
+        code: requiresReauth ? "TOKEN_EXPIRED" : requiresApproval ? "PERMISSION_DENIED" : "API_ERROR",
+        requiresReauth,
+        requiresApproval,
         error:
           errData.message ||
           errData.errorDetails?.description ||
-          "Failed to publish via LinkedIn Posts API (Verify w_member_social scope)",
+          `Failed to publish via LinkedIn Posts API (HTTP ${statusCode}). Verify w_member_social scope.`,
       };
     } catch (err: unknown) {
-      return { success: false, error: (err as Error).message };
+      return {
+        success: false,
+        code: "NETWORK_ERROR",
+        retryable: true,
+        error: (err as Error).message || "LinkedIn API network failure",
+      };
     }
   }
 
@@ -187,8 +206,8 @@ export class LinkedInProvider implements SocialProvider {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "LinkedIn-Version": "202401",
-        "X-Restli-Protocol-Version": "2.0.0",
+        "LinkedIn-Version": SOCIAL_API_VERSIONS.LINKEDIN_REST,
+        "X-Restli-Protocol-Version": SOCIAL_API_VERSIONS.LINKEDIN_RESTLI_PROTOCOL,
       },
     });
     return res.ok;

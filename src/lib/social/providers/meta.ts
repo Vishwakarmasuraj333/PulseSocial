@@ -10,6 +10,7 @@ import {
   CommentResult,
   MessageResult,
 } from "../types";
+import { SOCIAL_API_VERSIONS } from "../api-versions";
 
 export class MetaProvider implements SocialProvider {
   platform: SupportedPlatform;
@@ -213,6 +214,7 @@ export class MetaProvider implements SocialProvider {
   }
 
   async publishPost(accessToken: string, post: PublishPostPayload): Promise<PublishResult> {
+    const version = SOCIAL_API_VERSIONS.META_GRAPH;
     try {
       if (this.platform === "facebook") {
         const body = new URLSearchParams({
@@ -224,24 +226,37 @@ export class MetaProvider implements SocialProvider {
           body.append("link", post.mediaUrls[0].url);
         }
 
-        const res = await fetch(`https://graph.facebook.com/v20.0/${post.targetAccountId || "me"}/feed`, {
+        const res = await fetch(`https://graph.facebook.com/${version}/${post.targetAccountId || "me"}/feed`, {
           method: "POST",
           body,
         });
 
-        const data = await res.json();
-        if (!res.ok) {
-          return { success: false, error: data.error?.message || "Failed to publish to Facebook" };
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.id) {
+          const errCode = data.error?.code;
+          const isToken = errCode === 190 || errCode === 102;
+          const isPermission = errCode === 200 || errCode === 10;
+          return {
+            success: false,
+            code: isToken ? "TOKEN_EXPIRED" : isPermission ? "PERMISSION_DENIED" : "GRAPH_API_ERROR",
+            requiresReauth: isToken,
+            requiresApproval: isPermission,
+            error: data.error?.message || "Failed to publish to Facebook Page",
+          };
         }
         return { success: true, platformPostId: data.id, publishedUrl: `https://facebook.com/${data.id}` };
       } else {
-        // Instagram Content Publishing: Step 1 Create Container, Step 2 Publish
+        // Instagram Content Publishing: Step 1 Create Container, Step 2 Processing Check, Step 3 Publish
         if (!post.mediaUrls || post.mediaUrls.length === 0) {
-          return { success: false, error: "Instagram requires at least one image or video to publish a post." };
+          return {
+            success: false,
+            code: "INVALID_MEDIA",
+            error: "Instagram requires at least one image or video to publish a post.",
+          };
         }
 
         const firstMedia = post.mediaUrls[0];
-        const containerUrl = `https://graph.facebook.com/v20.0/${post.targetAccountId}/media`;
+        const containerUrl = `https://graph.facebook.com/${version}/${post.targetAccountId}/media`;
         const containerParams = new URLSearchParams({
           caption: post.content,
           access_token: accessToken,
@@ -251,26 +266,70 @@ export class MetaProvider implements SocialProvider {
         });
 
         const containerRes = await fetch(containerUrl, { method: "POST", body: containerParams });
-        const containerData = await containerRes.json();
-        if (!containerRes.ok) {
-          return { success: false, error: containerData.error?.message || "Failed to create Instagram media container" };
+        const containerData = await containerRes.json().catch(() => ({}));
+        if (!containerRes.ok || !containerData.id) {
+          const errCode = containerData.error?.code;
+          const isToken = errCode === 190;
+          return {
+            success: false,
+            code: isToken ? "TOKEN_EXPIRED" : "CONTAINER_CREATION_FAILED",
+            requiresReauth: isToken,
+            error: containerData.error?.message || "Failed to create Instagram media container",
+          };
         }
 
         const creationId = containerData.id;
-        // Step 2: Publish container
-        const publishRes = await fetch(`https://graph.facebook.com/v20.0/${post.targetAccountId}/media_publish`, {
+
+        // For video / Reels, verify status before publishing
+        if (firstMedia.type === "VIDEO") {
+          let ready = false;
+          let checkCount = 0;
+          while (!ready && checkCount < 6) {
+            await new Promise((r) => setTimeout(r, 2000));
+            const statusRes = await fetch(
+              `https://graph.facebook.com/${version}/${creationId}?fields=status_code,status&access_token=${accessToken}`
+            );
+            const statusData = await statusRes.json().catch(() => ({}));
+            if (statusData.status_code === "FINISHED") {
+              ready = true;
+            } else if (statusData.status_code === "ERROR") {
+              return {
+                success: false,
+                code: "VIDEO_PROCESSING_FAILED",
+                error: "Instagram video processing failed before publishing could complete.",
+              };
+            }
+            checkCount++;
+          }
+        }
+
+        // Step 2 / 3: Publish container
+        const publishRes = await fetch(`https://graph.facebook.com/${version}/${post.targetAccountId}/media_publish`, {
           method: "POST",
           body: new URLSearchParams({ creation_id: creationId, access_token: accessToken }),
         });
-        const publishData = await publishRes.json();
-        if (!publishRes.ok) {
-          return { success: false, error: publishData.error?.message || "Failed to publish Instagram container" };
+        const publishData = await publishRes.json().catch(() => ({}));
+        if (!publishRes.ok || !publishData.id) {
+          return {
+            success: false,
+            code: "PUBLISH_FAILED",
+            error: publishData.error?.message || "Failed to publish Instagram media container",
+          };
         }
 
-        return { success: true, platformPostId: publishData.id, publishedUrl: `https://instagram.com/p/${publishData.id}` };
+        return {
+          success: true,
+          platformPostId: publishData.id,
+          publishedUrl: `https://instagram.com/p/${publishData.id}`,
+        };
       }
     } catch (err: unknown) {
-      return { success: false, error: (err as Error).message };
+      return {
+        success: false,
+        code: "NETWORK_ERROR",
+        retryable: true,
+        error: (err as Error).message || "Meta API network request failed",
+      };
     }
   }
 

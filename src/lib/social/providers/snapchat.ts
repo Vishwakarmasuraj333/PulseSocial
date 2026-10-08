@@ -90,16 +90,22 @@ export class SnapchatProvider implements SocialProvider {
       }),
     });
 
-    if (!res.ok) throw new Error("Failed to fetch Snapchat profile");
+    if (!res.ok) {
+      throw new Error("Failed to fetch Snapchat profile: Creative Kit authorization required");
+    }
     const json = await res.json().catch(() => ({}));
-    const me = json?.data?.me || { displayName: "Snapchat Creator", externalId: "snap-creator-1" };
+    const me = json?.data?.me;
+
+    if (!me || !me.externalId) {
+      throw new Error("Snapchat profile did not return externalId");
+    }
 
     return [
       {
-        providerAccountId: me.externalId || "snap-public-profile",
-        displayName: me.displayName || "Snapchat Public Profile",
-        username: me.displayName ? `@${me.displayName.toLowerCase().replace(/\s+/g, "_")}` : "@snap_creator",
-        profileImageUrl: me.bitmoji?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop",
+        providerAccountId: me.externalId,
+        displayName: me.displayName || "Snapchat User",
+        username: me.displayName ? `@${me.displayName.toLowerCase().replace(/\s+/g, "_")}` : undefined,
+        profileImageUrl: me.bitmoji?.avatar,
         accountType: "PUBLIC_PROFILE",
       },
     ];
@@ -117,7 +123,10 @@ export class SnapchatProvider implements SocialProvider {
   async publishPost(accessToken: string, post: PublishPostPayload): Promise<PublishResult> {
     return {
       success: false,
-      error: "Snapchat Content Publishing API requires an approved Snapchat Creative Kit and Business Ad Account integration. Story posting via standard token is restricted by Snap Inc.",
+      code: "BLOCKED_PARTNER_APPROVAL_REQUIRED",
+      capabilityState: "BLOCKED — PARTNER APPROVAL REQUIRED",
+      requiresApproval: true,
+      error: "BLOCKED — PARTNER APPROVAL REQUIRED: Snapchat Content Publishing API requires an approved Snapchat Creative Kit and Business Ad Account integration. Story posting via standard token is restricted by Snap Inc.",
     };
   }
 

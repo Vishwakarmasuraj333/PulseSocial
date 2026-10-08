@@ -165,7 +165,20 @@ export class XProvider implements SocialProvider {
   async publishPost(accessToken: string, post: PublishPostPayload): Promise<PublishResult> {
     try {
       if (post.content.length > 280) {
-        return { success: false, error: "X post exceeds the 280-character limit." };
+        return {
+          success: false,
+          code: "CHAR_LIMIT_EXCEEDED",
+          error: "X post exceeds the strict 280-character limit.",
+        };
+      }
+
+      let tweetText = post.content;
+      // In X API v2, media URLs are included as links unless uploaded via v1.1 media upload endpoint
+      if (post.mediaUrls && post.mediaUrls.length > 0) {
+        const mediaLinks = post.mediaUrls.map((m) => m.url).join(" ");
+        if (!tweetText.includes(post.mediaUrls[0].url) && tweetText.length + mediaLinks.length + 1 <= 280) {
+          tweetText = `${tweetText} ${mediaLinks}`;
+        }
       }
 
       const res = await fetch("https://api.twitter.com/2/tweets", {
@@ -174,12 +187,33 @@ export class XProvider implements SocialProvider {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: post.content }),
+        body: JSON.stringify({ text: tweetText }),
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        return { success: false, error: data.detail || data.title || "Failed to publish tweet to X" };
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.data?.id) {
+        const status = res.status;
+        const isRateLimit = status === 429;
+        const isAuth = status === 401;
+        const isForbidden = status === 403;
+
+        return {
+          success: false,
+          code: isRateLimit
+            ? "RATE_LIMITED"
+            : isAuth
+            ? "TOKEN_EXPIRED"
+            : isForbidden
+            ? "TIER_RESTRICTION"
+            : "X_API_ERROR",
+          retryable: isRateLimit,
+          requiresReauth: isAuth,
+          requiresApproval: isForbidden,
+          error:
+            data.detail ||
+            data.title ||
+            `Failed to publish tweet to X (HTTP ${status}). Check write permissions & monthly tweet caps.`,
+        };
       }
 
       return {
@@ -188,7 +222,12 @@ export class XProvider implements SocialProvider {
         publishedUrl: `https://x.com/i/status/${data.data.id}`,
       };
     } catch (err: unknown) {
-      return { success: false, error: (err as Error).message };
+      return {
+        success: false,
+        code: "NETWORK_ERROR",
+        retryable: true,
+        error: (err as Error).message || "X API network failure",
+      };
     }
   }
 

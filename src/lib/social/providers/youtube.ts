@@ -193,18 +193,36 @@ export class YouTubeProvider implements SocialProvider {
         }
 
         const videoId = uploadData.id;
-        const isPrivate = uploadData.status?.privacyStatus === "private";
+        const privacyStatus = uploadData.status?.privacyStatus;
+        const isPrivate = privacyStatus === "private";
 
         return {
           success: true,
           platformPostId: videoId,
           publishedUrl: `https://www.youtube.com/watch?v=${videoId}`,
+          capabilityState: isPrivate ? "CONFIGURED — YOUTUBE API AUDIT REQUIRED FOR PUBLIC UPLOADS" : undefined,
+          requiresApproval: isPrivate,
+          rawResponse: {
+            videoId,
+            privacyStatus,
+            uploadStatus: uploadData.status?.uploadStatus,
+            processingDetails: uploadData.processingDetails,
+          },
         };
       } catch (uploadErr: unknown) {
-        return { success: false, error: (uploadErr as Error).message || "YouTube upload stream failed" };
+        return {
+          success: false,
+          code: "BINARY_UPLOAD_FAILED",
+          retryable: true,
+          error: (uploadErr as Error).message || "YouTube binary upload stream failed",
+        };
       }
     } catch (e: any) {
-      return { success: false, error: e.message || "Failed to initiate YouTube upload" };
+      return {
+        success: false,
+        code: "INITIALIZATION_FAILED",
+        error: e.message || "Failed to initiate YouTube resumable upload",
+      };
     }
   }
 

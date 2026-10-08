@@ -251,6 +251,11 @@ export interface PublishResult {
   platformPostId?: string;
   publishedUrl?: string;
   error?: string;
+  code?: string;
+  retryable?: boolean;
+  requiresReauth?: boolean;
+  requiresApproval?: boolean;
+  capabilityState?: string;
   rawResponse?: unknown;
 }
 

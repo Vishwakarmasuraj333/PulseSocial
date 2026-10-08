@@ -85,14 +85,21 @@ export class RedditProvider implements SocialProvider {
       },
     });
 
-    if (!res.ok) throw new Error("Failed to fetch Reddit user profile");
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || "Failed to fetch Reddit user profile");
+    }
     const user = await res.json();
+
+    if (!user.id) {
+      throw new Error("Reddit authentication did not return a valid user identity");
+    }
 
     return [
       {
-        providerAccountId: user.id || "reddit-user-1",
+        providerAccountId: user.id,
         displayName: user.subreddit?.title || user.name || "Reddit User",
-        username: user.name ? `u/${user.name}` : "u/reddit_user",
+        username: user.name ? `u/${user.name}` : undefined,
         profileImageUrl: user.icon_img?.split("?")[0] || "https://www.redditstatic.com/avatars/avatar_default_02_FF4500.png",
         accountType: "COMMUNITY_USER",
       },
@@ -129,11 +136,17 @@ export class RedditProvider implements SocialProvider {
 
       const body = new URLSearchParams({
         sr: subreddit.replace(/^r\//, ""),
-        kind: "self",
         title,
-        text: post.content,
         resubmit: "true",
       });
+
+      if (post.mediaUrls && post.mediaUrls.length > 0) {
+        body.append("kind", "link");
+        body.append("url", post.mediaUrls[0].url);
+      } else {
+        body.append("kind", "self");
+        body.append("text", post.content);
+      }
 
       const res = await fetch("https://oauth.reddit.com/api/submit", {
         method: "POST",
@@ -145,14 +158,30 @@ export class RedditProvider implements SocialProvider {
         body,
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok || (data.json?.errors && data.json.errors.length > 0)) {
         const errorMsg = data.json?.errors?.[0]?.[1] || "Failed to submit post to Reddit";
-        return { success: false, error: errorMsg };
+        const isAuth = res.status === 401;
+        const isForbidden = res.status === 403;
+        return {
+          success: false,
+          code: isAuth ? "TOKEN_EXPIRED" : isForbidden ? "PERMISSION_DENIED" : "REDDIT_SUBMIT_ERROR",
+          requiresReauth: isAuth,
+          requiresApproval: isForbidden,
+          error: errorMsg,
+        };
       }
 
       const postUrl = data.json?.data?.url || "https://reddit.com";
-      const postId = data.json?.data?.id || `reddit_${Date.now()}`;
+      const postId = data.json?.data?.name || data.json?.data?.id;
+
+      if (!postId) {
+        return {
+          success: false,
+          code: "MISSING_POST_ID",
+          error: "Reddit submit succeeded but did not return a valid post fullname or ID.",
+        };
+      }
 
       return {
         success: true,
@@ -160,7 +189,12 @@ export class RedditProvider implements SocialProvider {
         publishedUrl: postUrl,
       };
     } catch (err: unknown) {
-      return { success: false, error: (err as Error).message || "Reddit publication failed" };
+      return {
+        success: false,
+        code: "NETWORK_ERROR",
+        retryable: true,
+        error: (err as Error).message || "Reddit publication failed",
+      };
     }
   }
 

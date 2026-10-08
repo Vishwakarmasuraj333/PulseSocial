@@ -10,6 +10,7 @@ import { useBrand } from "@/context/BrandContext";
 import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
 import { InviteTeamModal } from "@/components/team/InviteTeamModal";
 import { UniversalSocialConnectModal } from "@/components/social/UniversalSocialConnectModal";
+import { ApiHealthCheckView } from "@/components/settings/ApiHealthCheckView";
 import {
   ArrowLeft,
   Info,
@@ -39,6 +40,7 @@ import {
   Image as ImageIcon,
   CheckSquare,
   ShieldAlert,
+  ShieldCheck,
 } from "lucide-react";
 
 export type SettingsTab =
@@ -108,6 +110,20 @@ function SettingsContent() {
     const tabParam = searchParams.get("tab");
     if (tabParam) {
       setActiveTab(mapQueryToTab(tabParam));
+    }
+  }, [searchParams]);
+
+  const [integrationsSubTab, setIntegrationsSubTab] = useState<"services" | "health">(() => {
+    const view = searchParams.get("view");
+    const sub = searchParams.get("sub");
+    return view === "health" || sub === "api_health" ? "health" : "services";
+  });
+
+  useEffect(() => {
+    const view = searchParams.get("view");
+    const sub = searchParams.get("sub");
+    if (view === "health" || sub === "api_health") {
+      setIntegrationsSubTab("health");
     }
   }, [searchParams]);
 
@@ -1253,59 +1269,92 @@ function SettingsContent() {
           {/* TAB 3: Integrations                                          */}
           {/* ============================================================ */}
           {activeTab === "integrations" && (
-            <div className="max-w-4xl space-y-6">
-              <div className="pb-4 border-b border-slate-200 dark:border-slate-800">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white">Integrations</h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Connect third-party design, storage, and automation services to PulseSocial.
-                </p>
-              </div>
+            <div className="max-w-5xl space-y-6">
+              <div className="pb-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">Integrations & API Health</h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Connect third-party design and automation tools, or inspect real-time platform API compliance.
+                  </p>
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  { id: "canva", name: "Canva Design Studio", desc: "Design graphics and import directly into the post composer.", connected: true },
-                  { id: "gdrive", name: "Google Drive", desc: "Sync video assets, episode thumbnails, and brand folders.", connected: true },
-                  { id: "slack", name: "Slack Notifications", desc: "Send publishing confirmations and approval alerts to your Slack channels.", connected: false },
-                  { id: "zapier", name: "Zapier", desc: "Automate cross-platform ingestion and RSS webhook workflows.", connected: false },
-                  { id: "bitly", name: "Custom Link Shortener (zurl.co)", desc: "Automatic click tracking and UTM campaign tagging.", connected: true },
-                  { id: "gemini", name: "Google Gemini AI Studio", desc: "Official Google Gemini 3.8 Flash & Nano Banana models for viral copy & photorealistic media.", connected: true },
-                ].map((integ) => (
-                  <div
-                    key={integ.id}
-                    className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs flex items-start justify-between gap-3"
+                {/* Sub Tab Switcher */}
+                <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => setIntegrationsSubTab("services")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                      integrationsSubTab === "services"
+                        ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                    }`}
                   >
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        {integ.name}
-                        {integ.connected && (
-                          <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">
-                            Active
-                          </span>
-                        )}
-                      </h4>
-                      <p className="text-[11px] text-slate-500 mt-1 leading-normal">{integ.desc}</p>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        toast({
-                          title: integ.connected ? "Configuration Saved" : "Integration Connected",
-                          message: `${integ.name} status updated.`,
-                          type: "success",
-                        });
-                      }}
-                      className={`px-3 py-1 rounded text-xs font-semibold shrink-0 cursor-pointer ${
-                        integ.connected
-                          ? "border border-slate-300 dark:border-slate-700 hover:bg-slate-50 text-slate-700 dark:text-slate-300"
-                          : "bg-blue-600 hover:bg-blue-700 text-white"
-                      }`}
-                    >
-                      {integ.connected ? "Configure" : "Connect"}
-                    </button>
-                  </div>
-                ))}
+                    Third-Party Services
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIntegrationsSubTab("health")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                      integrationsSubTab === "health"
+                        ? "bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-300 shadow-2xs font-bold"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                    }`}
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
+                    API Health & Compliance
+                  </button>
+                </div>
               </div>
+
+              {integrationsSubTab === "health" ? (
+                <ApiHealthCheckView />
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    { id: "canva", name: "Canva Design Studio", desc: "Design graphics and import directly into the post composer.", connected: true },
+                    { id: "gdrive", name: "Google Drive", desc: "Sync video assets, episode thumbnails, and brand folders.", connected: true },
+                    { id: "slack", name: "Slack Notifications", desc: "Send publishing confirmations and approval alerts to your Slack channels.", connected: false },
+                    { id: "zapier", name: "Zapier", desc: "Automate cross-platform ingestion and RSS webhook workflows.", connected: false },
+                    { id: "bitly", name: "Custom Link Shortener (zurl.co)", desc: "Automatic click tracking and UTM campaign tagging.", connected: true },
+                    { id: "gemini", name: "Google Gemini AI Studio", desc: "Official Google Gemini 3.8 Flash & Nano Banana models for viral copy & photorealistic media.", connected: true },
+                  ].map((integ) => (
+                    <div
+                      key={integ.id}
+                      className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs flex items-start justify-between gap-3"
+                    >
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                          {integ.name}
+                          {integ.connected && (
+                            <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">
+                              Active
+                            </span>
+                          )}
+                        </h4>
+                        <p className="text-[11px] text-slate-500 mt-1 leading-normal">{integ.desc}</p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast({
+                            title: integ.connected ? "Configuration Saved" : "Integration Connected",
+                            message: `${integ.name} status updated.`,
+                            type: "success",
+                          });
+                        }}
+                        className={`px-3 py-1 rounded text-xs font-semibold shrink-0 cursor-pointer ${
+                          integ.connected
+                            ? "border border-slate-300 dark:border-slate-700 hover:bg-slate-50 text-slate-700 dark:text-slate-300"
+                            : "bg-blue-600 hover:bg-blue-700 text-white"
+                        }`}
+                      >
+                        {integ.connected ? "Configure" : "Connect"}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 

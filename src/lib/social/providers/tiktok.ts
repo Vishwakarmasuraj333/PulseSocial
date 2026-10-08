@@ -124,20 +124,79 @@ export class TikTokProvider implements SocialProvider {
   }
 
   async publishPost(accessToken: string, post: PublishPostPayload): Promise<PublishResult> {
-    // Check if video is provided
     const video = post.mediaUrls?.find((m) => m.type === "VIDEO");
     if (!video) {
       return {
         success: false,
+        code: "INVALID_MEDIA",
         error: "TikTok Content Posting API requires a video file. Photo publishing is not supported by standard TikTok API endpoints.",
       };
     }
 
-    // Direct publishing requires specific partner approval on TikTok
-    return {
-      success: false,
-      error: "TikTok Direct Video Posting requires Direct Post approval under your TikTok for Developers account. Use inbox share or apply for Content Posting API permissions.",
-    };
+    try {
+      // Step 1: Initialize Direct Post with TikTok Content Posting API v2
+      const initRes = await fetch("https://open.tiktokapis.com/v2/post/publish/video/init/", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          post_info: {
+            title: post.content.slice(0, 150) || "PulseSocial Post",
+            privacy_level: "PUBLIC_TO_EVERYONE",
+            disable_duet: false,
+            disable_comment: false,
+            disable_stitch: false,
+            video_cover_timestamp_ms: 1000,
+          },
+          source_info: {
+            source: "PULL_FROM_URL",
+            video_url: video.url,
+          },
+        }),
+      });
+
+      const initData = await initRes.json().catch(() => ({}));
+
+      // TikTok returns error if app does not have verified Direct Post partner approval
+      if (!initRes.ok || initData.error?.code !== "ok") {
+        const errCode = initData.error?.code || String(initRes.status);
+        const errMsg = initData.error?.message || "TikTok API error";
+
+        return {
+          success: false,
+          code: "WAITING_FOR_TIKTOK_APPROVAL",
+          capabilityState: "WAITING_FOR_TIKTOK_APPROVAL",
+          requiresApproval: true,
+          error: `TikTok Direct Video Posting requires Direct Post approval under your TikTok for Developers account (video.publish scope). Remote response: ${errMsg} (${errCode})`,
+        };
+      }
+
+      const publishId = initData.data?.publish_id;
+      if (!publishId) {
+        return {
+          success: false,
+          code: "MISSING_PUBLISH_ID",
+          error: "TikTok initialized successfully but did not return a valid publish_id.",
+        };
+      }
+
+      return {
+        success: true,
+        platformPostId: publishId,
+        publishedUrl: `https://www.tiktok.com`,
+        rawResponse: initData,
+      };
+    } catch (err: unknown) {
+      return {
+        success: false,
+        code: "WAITING_FOR_TIKTOK_APPROVAL",
+        capabilityState: "WAITING_FOR_TIKTOK_APPROVAL",
+        requiresApproval: true,
+        error: "TikTok Direct Video Posting requires Direct Post approval under your TikTok for Developers account.",
+      };
+    }
   }
 
   async deletePost(): Promise<boolean> {

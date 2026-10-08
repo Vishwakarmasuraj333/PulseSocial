@@ -244,10 +244,18 @@ export async function POST(req: Request) {
           }
 
           const provider = getSocialProvider(account.provider as any);
+          const appUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || "https://pulsesocial1.vercel.app").replace(/\/$/, "");
+          const resolvedMedia = post.media.map((m) => ({
+            url: m.url.startsWith("http://") || m.url.startsWith("https://")
+              ? m.url
+              : `${appUrl}${m.url.startsWith("/") ? "" : "/"}${m.url}`,
+            type: m.mediaType as "IMAGE" | "VIDEO",
+          }));
+
           const result = await provider.publishPost(decryptedAccess, {
             content,
             targetAccountId: account.providerAccountId,
-            mediaUrls: post.media.map((m) => ({ url: m.url, type: m.mediaType as "IMAGE" | "VIDEO" })),
+            mediaUrls: resolvedMedia,
           });
 
           if (result.success && result.platformPostId) {

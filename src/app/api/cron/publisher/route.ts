@@ -60,7 +60,15 @@ async function handleScheduleExecution(req: Request) {
     for (const schedule of pendingSchedules) {
       const post = schedule.post;
 
-      // 2. Mark post as PUBLISHING to prevent duplicate processing
+      // 2. Atomically lock scheduled post to prevent concurrent duplicate worker execution
+      const claim = await prisma.scheduledPost.updateMany({
+        where: { id: schedule.id, isLocked: false },
+        data: { isLocked: true },
+      });
+      if (claim.count === 0) {
+        continue; // Already claimed by another worker instance
+      }
+
       await prisma.socialPost.update({
         where: { id: post.id },
         data: { status: "PUBLISHING" },
@@ -109,13 +117,18 @@ async function handleScheduleExecution(req: Request) {
           );
 
           const provider = getSocialProvider(account.provider as SupportedPlatform);
+          const appUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || "https://pulsesocial1.vercel.app").replace(/\/$/, "");
+          const resolvedMedia = post.media.map((m) => ({
+            url: m.url.startsWith("http://") || m.url.startsWith("https://")
+              ? m.url
+              : `${appUrl}${m.url.startsWith("/") ? "" : "/"}${m.url}`,
+            type: m.mediaType as "IMAGE" | "VIDEO",
+          }));
+
           const publishResult = await provider.publishPost(decryptedAccess, {
             content: post.content,
             targetAccountId: account.providerAccountId,
-            mediaUrls: post.media.map((m) => ({
-              url: m.url,
-              type: m.mediaType as "IMAGE" | "VIDEO",
-            })),
+            mediaUrls: resolvedMedia,
           });
 
           if (publishResult.success) {

@@ -24,7 +24,7 @@ export class BlueskyProvider implements SocialProvider {
   }
 
   getMissingConfigMessage(): string {
-    return "Bluesky integration is not configured yet. Configure BLUESKY_HANDLE and BLUESKY_APP_PASSWORD (or OAuth credentials) to enable this connection.";
+    return "Bluesky integration is not configured yet. Configure BLUESKY_HANDLE and BLUESKY_APP_PASSWORD in your environment to enable this connection.";
   }
 
   getAuthorizationUrl(state: string, redirectUri: string): string {
@@ -32,26 +32,87 @@ export class BlueskyProvider implements SocialProvider {
   }
 
   async exchangeCode(code: string, redirectUri: string): Promise<OAuthTokenResult> {
+    const handle = process.env.BLUESKY_HANDLE;
+    const password = process.env.BLUESKY_APP_PASSWORD;
+
+    if (!handle || !password) {
+      throw new Error(this.getMissingConfigMessage());
+    }
+
+    // AT Protocol real session creation
+    const res = await fetch("https://bsky.social/xrpc/com.atproto.server.createSession", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ identifier: handle, password }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || "Failed to authenticate with Bluesky AT Protocol");
+    }
+
+    const data = await res.json();
     return {
-      accessToken: process.env.BLUESKY_APP_PASSWORD || "bsky_app_pass",
+      accessToken: data.accessJwt,
+      refreshToken: data.refreshJwt,
       scopes: ["atproto"],
+      metadata: {
+        did: data.did,
+        handle: data.handle,
+      },
     };
   }
 
   async getAccounts(accessToken: string): Promise<SocialAccountInfo[]> {
-    const handle = process.env.BLUESKY_HANDLE || "creator.bsky.social";
+    const res = await fetch("https://bsky.social/xrpc/com.atproto.server.getSession", {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    if (!res.ok) {
+      const handle = process.env.BLUESKY_HANDLE;
+      if (handle) {
+        return [
+          {
+            providerAccountId: `did:plc:${handle.replace(/[^a-z0-9]/gi, "")}`,
+            displayName: handle,
+            username: `@${handle}`,
+            accountType: "PROFILE",
+          },
+        ];
+      }
+      throw new Error("Failed to verify Bluesky AT Protocol session");
+    }
+
+    const session = await res.json();
     return [
       {
-        providerAccountId: `did:plc:bsky-${handle.replace(/[^a-z0-9]/gi, "")}`,
-        displayName: handle,
-        username: `@${handle}`,
+        providerAccountId: session.did,
+        displayName: session.handle,
+        username: `@${session.handle}`,
         profileImageUrl: undefined,
         accountType: "PROFILE",
+        metadata: { did: session.did, handle: session.handle },
       },
     ];
   }
 
   async getProfile(accessToken: string, accountId: string): Promise<SocialProfileResult> {
+    try {
+      const did = accountId.startsWith("did:") ? accountId : (process.env.BLUESKY_HANDLE || accountId);
+      const res = await fetch(`https://bsky.social/xrpc/app.bsky.actor.getProfile?actor=${encodeURIComponent(did)}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (res.ok) {
+        const actor = await res.json();
+        return {
+          followersCount: actor.followersCount || 0,
+          followingCount: actor.followsCount || 0,
+          postsCount: actor.postsCount || 0,
+          bio: actor.description,
+          raw: actor,
+        };
+      }
+    } catch {}
     return {
       followersCount: 0,
       followingCount: 0,
@@ -62,8 +123,16 @@ export class BlueskyProvider implements SocialProvider {
 
   async publishPost(accessToken: string, post: PublishPostPayload): Promise<PublishResult> {
     try {
-      const did = post.targetAccountId || "did:plc:self";
+      const did = post.targetAccountId?.startsWith("did:")
+        ? post.targetAccountId
+        : "did:plc:self";
       const now = new Date().toISOString();
+
+      const record: Record<string, any> = {
+        $type: "app.bsky.feed.post",
+        text: post.content,
+        createdAt: now,
+      };
 
       const res = await fetch("https://bsky.social/xrpc/com.atproto.repo.createRecord", {
         method: "POST",
@@ -72,32 +141,35 @@ export class BlueskyProvider implements SocialProvider {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          repo: did,
+          repo: did === "did:plc:self" ? undefined : did,
           collection: "app.bsky.feed.post",
-          record: {
-            $type: "app.bsky.feed.post",
-            text: post.content,
-            createdAt: now,
-          },
+          record,
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok || !data.uri) {
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.uri || !data.cid) {
+        const isAuth = res.status === 401;
         return {
           success: false,
-          error: data.message || "Failed to post to Bluesky AT Protocol repository",
+          code: isAuth ? "TOKEN_EXPIRED" : "ATPROTO_RECORD_ERROR",
+          requiresReauth: isAuth,
+          error: data.message || `Failed to create record on Bluesky repository (HTTP ${res.status})`,
         };
       }
 
+      const rkey = data.uri.split("/").pop();
       return {
         success: true,
-        platformPostId: data.cid || data.uri,
-        publishedUrl: `https://bsky.app/profile/${did}/post/${data.uri.split("/").pop()}`,
+        platformPostId: data.cid,
+        publishedUrl: `https://bsky.app/profile/${did}/post/${rkey}`,
+        rawResponse: { uri: data.uri, cid: data.cid },
       };
     } catch (err: unknown) {
       return {
         success: false,
+        code: "NETWORK_ERROR",
+        retryable: true,
         error: (err as Error).message || "AT Protocol network request failed",
       };
     }

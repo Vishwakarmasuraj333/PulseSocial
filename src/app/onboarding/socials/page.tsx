@@ -198,7 +198,9 @@ function SocialConnectInner() {
         <PulseSocialLogo size="md" theme="light" variant="with-tagline" />
         <button
           type="button"
-          onClick={() => router.push("/dashboard")}
+          onClick={() => {
+            window.location.href = "/dashboard";
+          }}
           className="text-xs font-semibold px-4 py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition flex items-center gap-1.5 cursor-pointer"
         >
           <span>Continue to Dashboard</span>
@@ -396,7 +398,9 @@ function SocialConnectInner() {
         </div>
         <button
           type="button"
-          onClick={() => router.push("/dashboard")}
+          onClick={() => {
+            window.location.href = "/dashboard";
+          }}
           className="px-5 py-2.5 rounded-lg bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs shadow-md transition cursor-pointer flex items-center gap-1.5"
         >
           <span>Complete Setup & Open Dashboard</span>

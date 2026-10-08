@@ -153,11 +153,17 @@ export class MetaProvider implements SocialProvider {
 
   async getAccounts(accessToken: string): Promise<SocialAccountInfo[]> {
     const res = await fetch(
-      `https://graph.facebook.com/v20.0/me/accounts?fields=id,name,picture{url},access_token,instagram_business_account{id,username,profile_picture_url}&access_token=${accessToken}`
+      `https://graph.facebook.com/v20.0/me/accounts?fields=id,name,picture{url},access_token,instagram_business_account{id,username,profile_picture_url}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/json",
+        },
+      }
     );
 
     if (!res.ok) {
-      const err = await res.json();
+      const err = await res.json().catch(() => ({}));
       throw new Error(err.error?.message || "Failed to fetch accounts from Meta");
     }
 
@@ -192,7 +198,13 @@ export class MetaProvider implements SocialProvider {
     if (accounts.length === 0 && this.platform === "facebook") {
       try {
         const meRes = await fetch(
-          `https://graph.facebook.com/v20.0/me?fields=id,name,picture{url},email&access_token=${accessToken}`
+          `https://graph.facebook.com/v20.0/me?fields=id,name,picture{url},email`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              Accept: "application/json",
+            },
+          }
         );
         if (meRes.ok) {
           const meData = await meRes.json();
@@ -215,7 +227,13 @@ export class MetaProvider implements SocialProvider {
   async getProfile(accessToken: string, accountId: string): Promise<SocialProfileResult> {
     if (this.platform === "instagram") {
       const res = await fetch(
-        `https://graph.facebook.com/v20.0/${accountId}?fields=biography,followers_count,follows_count,media_count,website,profile_picture_url&access_token=${accessToken}`
+        `https://graph.facebook.com/v20.0/${accountId}?fields=biography,followers_count,follows_count,media_count,website,profile_picture_url`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            Accept: "application/json",
+          },
+        }
       );
       if (!res.ok) throw new Error("Failed to fetch Instagram profile metrics");
       const data = await res.json();
@@ -229,7 +247,13 @@ export class MetaProvider implements SocialProvider {
       };
     } else {
       const res = await fetch(
-        `https://graph.facebook.com/v20.0/${accountId}?fields=fan_count,followers_count,about,website&access_token=${accessToken}`
+        `https://graph.facebook.com/v20.0/${accountId}?fields=fan_count,followers_count,about,website`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            Accept: "application/json",
+          },
+        }
       );
       if (!res.ok) throw new Error("Failed to fetch Facebook Page profile");
       const data = await res.json();

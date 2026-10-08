@@ -18,6 +18,8 @@ import {
   Calendar,
   MessageSquare,
   LayoutDashboard,
+  LogOut,
+  User,
 } from "lucide-react";
 import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
 
@@ -55,6 +57,21 @@ export function MarketingHeader() {
         setIsLoggedIn(false);
         setCurrentUser(null);
       });
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+    } catch {}
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+    try {
+      localStorage.removeItem("pulsesocial_active_user");
+      localStorage.removeItem("pulsesocial_active_brand");
+      sessionStorage.clear();
+    } catch {}
+    window.dispatchEvent(new Event("pulsesocial_auth_changed"));
+    window.location.href = "/";
   };
 
   useEffect(() => {
@@ -219,13 +236,33 @@ export function MarketingHeader() {
         {/* Right: Auth Action Buttons */}
         <div className="hidden sm:flex items-center gap-2.5">
           {isLoggedIn ? (
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:opacity-95 text-white text-xs font-bold shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/35 transition active:scale-[0.98] group"
-            >
-              <span>Dashboard</span>
-              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-            </Link>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 text-xs font-semibold">
+                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-[10px] font-bold">
+                  {currentUser?.name?.[0] || currentUser?.email?.[0]?.toUpperCase() || "U"}
+                </div>
+                <span className="max-w-[120px] truncate text-[11px] font-medium">
+                  {currentUser?.name || currentUser?.email?.split("@")[0] || "Account"}
+                </span>
+              </div>
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:opacity-95 text-white text-xs font-bold shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/35 transition active:scale-[0.98] group"
+              >
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                <span>Dashboard</span>
+                <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="px-2.5 py-2 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition flex items-center gap-1 cursor-pointer"
+                title="Sign out of account"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">Sign Out</span>
+              </button>
+            </div>
           ) : (
             <>
               <Link
@@ -238,7 +275,7 @@ export function MarketingHeader() {
                 href="/signup"
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:opacity-95 text-white text-xs font-bold shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/35 transition active:scale-[0.98] group"
               >
-                <span>Get Started Free</span>
+                <span>Start Free Trial</span>
                 <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </>
@@ -289,14 +326,39 @@ export function MarketingHeader() {
 
           <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2.5">
             {isLoggedIn ? (
-              <Link
-                href="/dashboard"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full py-2.5 text-center text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20 transition flex items-center justify-center gap-1.5"
-              >
-                <LayoutDashboard className="w-3.5 h-3.5" />
-                <span>Go to Dashboard</span>
-              </Link>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-xs font-bold">
+                      {currentUser?.name?.[0] || currentUser?.email?.[0]?.toUpperCase() || "U"}
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-900 dark:text-white">
+                        {currentUser?.name || "Logged In"}
+                      </p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-[170px]">
+                        {currentUser?.email}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="text-xs text-red-600 hover:text-red-700 font-semibold p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center gap-1"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+                <Link
+                  href="/dashboard"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full py-2.5 text-center text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20 transition flex items-center justify-center gap-1.5"
+                >
+                  <LayoutDashboard className="w-3.5 h-3.5" />
+                  <span>Go to Dashboard</span>
+                </Link>
+              </div>
             ) : (
               <>
                 <Link
@@ -304,14 +366,15 @@ export function MarketingHeader() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="w-full py-2.5 text-center text-xs font-bold rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
                 >
-                  Sign In to Account
+                  Log in
                 </Link>
                 <Link
                   href="/signup"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full py-2.5 text-center text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20 transition"
+                  className="w-full py-2.5 text-center text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20 transition flex items-center justify-center gap-1.5"
                 >
-                  Create Free Account (14-Day Trial)
+                  <span>Start Free Trial (14-Day Free Trial)</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </>
             )}

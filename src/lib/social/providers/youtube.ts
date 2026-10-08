@@ -89,6 +89,37 @@ export class YouTubeProvider implements SocialProvider {
     };
   }
 
+  async refreshToken(refreshToken: string): Promise<OAuthTokenResult> {
+    const clientId = process.env.YOUTUBE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || "";
+    const clientSecret = process.env.YOUTUBE_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET || "";
+
+    const body = new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+      client_id: clientId,
+      client_secret: clientSecret,
+    });
+
+    const res = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body,
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error_description || err.error || "Failed to refresh Google/YouTube OAuth token");
+    }
+
+    const data = await res.json();
+    return {
+      accessToken: data.access_token,
+      expiresIn: data.expires_in,
+      refreshToken: data.refresh_token || refreshToken,
+      scopes: (data.scope || "").split(" "),
+    };
+  }
+
   async getAccounts(accessToken: string): Promise<SocialAccountInfo[]> {
     const res = await fetch("https://www.googleapis.com/youtube/v3/channels?part=snippet,contentDetails,statistics&mine=true", {
       headers: { Authorization: `Bearer ${accessToken}` },

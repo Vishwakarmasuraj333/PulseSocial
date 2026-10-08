@@ -1,6 +1,6 @@
 import { getSession } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
-import { decryptToken } from "@/lib/security/encryption";
+import { decryptToken, encryptToken } from "@/lib/security/encryption";
 import { getSocialProvider } from "@/lib/social/registry";
 import {
   PLATFORM_ACTION_CAPABILITIES,
@@ -183,35 +183,95 @@ export async function executeSocialAction(
     };
   }
 
+  let decryptedToken = "";
+
   if (account.token.expiresAt && account.token.expiresAt < new Date()) {
-    await prisma.socialAccount.update({
-      where: { id: account.id },
-      data: { status: "RECONNECT_REQUIRED" },
-    });
-    return {
-      success: false,
-      actionType,
-      code: "REAUTH_REQUIRED",
-      requiresReauth: true,
-      error: `OAuth token expired for ${account.displayName}. Reconnect account.`,
-    };
+    const provider = getSocialProvider(normalizedPlatform);
+    let refreshed = false;
+
+    if (account.token.encryptedRefreshToken && typeof provider.refreshToken === "function") {
+      try {
+        const decryptedRefreshToken = decryptToken(
+          account.token.encryptedRefreshToken,
+          account.token.iv,
+          account.token.tag
+        );
+        if (decryptedRefreshToken) {
+          const newTokens = await provider.refreshToken(decryptedRefreshToken);
+          if (newTokens.accessToken) {
+            const encryptedAccess = encryptToken(newTokens.accessToken);
+            let encryptedRefresh = account.token.encryptedRefreshToken;
+            let refreshExpiry = account.token.refreshTokenExpiresAt;
+
+            if (newTokens.refreshToken) {
+              const encRef = encryptToken(newTokens.refreshToken);
+              encryptedRefresh = encRef.encrypted;
+              if (newTokens.refreshTokenExpiresIn) {
+                refreshExpiry = new Date(Date.now() + newTokens.refreshTokenExpiresIn * 1000);
+              }
+            }
+
+            const expiresAt = newTokens.expiresIn
+              ? new Date(Date.now() + newTokens.expiresIn * 1000)
+              : new Date(Date.now() + 3600 * 1000);
+
+            await prisma.socialToken.update({
+              where: { id: account.token.id },
+              data: {
+                encryptedAccessToken: encryptedAccess.encrypted,
+                encryptedRefreshToken: encryptedRefresh,
+                iv: encryptedAccess.iv,
+                tag: encryptedAccess.tag,
+                expiresAt,
+                refreshTokenExpiresAt: refreshExpiry,
+              },
+            });
+
+            await prisma.socialAccount.update({
+              where: { id: account.id },
+              data: { status: "CONNECTED" },
+            });
+
+            decryptedToken = newTokens.accessToken;
+            refreshed = true;
+          }
+        }
+      } catch (refreshErr) {
+        console.error("Token refresh attempt failed:", refreshErr);
+      }
+    }
+
+    if (!refreshed) {
+      await prisma.socialAccount.update({
+        where: { id: account.id },
+        data: { status: "RECONNECT_REQUIRED" },
+      });
+      return {
+        success: false,
+        actionType,
+        code: "REAUTH_REQUIRED",
+        requiresReauth: true,
+        error: `OAuth token expired for ${account.displayName}. Reconnect account.`,
+      };
+    }
   }
 
-  let decryptedToken: string;
-  try {
-    decryptedToken = decryptToken(
-      account.token.encryptedAccessToken,
-      account.token.iv,
-      account.token.tag
-    );
-  } catch (err: unknown) {
-    return {
-      success: false,
-      actionType,
-      code: "TOKEN_DECRYPT_FAILED",
-      requiresReauth: true,
-      error: "Failed to decrypt OAuth credentials. Please re-authenticate.",
-    };
+  if (!decryptedToken) {
+    try {
+      decryptedToken = decryptToken(
+        account.token.encryptedAccessToken,
+        account.token.iv,
+        account.token.tag
+      );
+    } catch (err: unknown) {
+      return {
+        success: false,
+        actionType,
+        code: "TOKEN_DECRYPT_FAILED",
+        requiresReauth: true,
+        error: "Failed to decrypt OAuth credentials. Please re-authenticate.",
+      };
+    }
   }
 
   if (
@@ -273,6 +333,46 @@ export async function executeSocialAction(
       code: "EXTERNAL_COMMENT_ID_REQUIRED",
       error: "externalCommentId is required to moderate this comment.",
     };
+  }
+
+  // 6b. Idempotency & Deduplication Check
+  const isIdempotentAction =
+    actionType === "LIKE" ||
+    actionType === "UNLIKE" ||
+    actionType === "SAVE" ||
+    actionType === "REPOST" ||
+    actionType === "DELETE_COMMENT" ||
+    actionType === "HIDE_COMMENT";
+
+  const actionIdentifier =
+    actionType === "LIKE" || actionType === "UNLIKE" || actionType === "SAVE" || actionType === "REPOST"
+      ? `${actionType.toLowerCase()}:${externalPostId}`
+      : actionType === "DELETE_COMMENT" || actionType === "HIDE_COMMENT"
+      ? `${actionType.toLowerCase()}:${externalCommentId}`
+      : `${actionType.toLowerCase()}:${externalPostId || externalCommentId || "post"}:${
+          content ? Buffer.from(content.trim()).toString("base64").slice(0, 24) : Date.now()
+        }`;
+
+  // If idempotent action was already successfully executed for this account, return previous confirmation
+  if (isIdempotentAction) {
+    const existingAction = await prisma.socialAction.findUnique({
+      where: {
+        platform_socialAccountId_actionIdentifier: {
+          platform: normalizedPlatform,
+          socialAccountId: account.id,
+          actionIdentifier,
+        },
+      },
+    });
+
+    if (existingAction && existingAction.status === "SUCCESS") {
+      return {
+        success: true,
+        actionType,
+        externalActionId: existingAction.actionIdentifier,
+        data: existingAction.rawResponse ? JSON.parse(existingAction.rawResponse) : { idempotent: true },
+      };
+    }
   }
 
   // 7. Platform Adapter Execution
@@ -445,13 +545,16 @@ export async function executeSocialAction(
   }
 
   // 9. Persist Action Audit & Records
-  const actionIdentifier = `${actionType.toLowerCase()}:${
-    externalPostId || externalCommentId || "action"
-  }:${Date.now()}`;
-
   if (result.success) {
-    await prisma.socialAction.create({
-      data: {
+    await prisma.socialAction.upsert({
+      where: {
+        platform_socialAccountId_actionIdentifier: {
+          platform: normalizedPlatform,
+          socialAccountId: account.id,
+          actionIdentifier,
+        },
+      },
+      create: {
         organizationId: session.activeOrgId,
         socialAccountId: account.id,
         postId: postId || null,
@@ -463,6 +566,11 @@ export async function executeSocialAction(
         targetUrl: targetUrl || null,
         status: "SUCCESS",
         rawResponse: result.rawResponse ? JSON.stringify(result.rawResponse) : null,
+      },
+      update: {
+        status: "SUCCESS",
+        rawResponse: result.rawResponse ? JSON.stringify(result.rawResponse) : null,
+        updatedAt: new Date(),
       },
     });
 
@@ -522,8 +630,15 @@ export async function executeSocialAction(
     });
   } else {
     // Record failed attempt for transparency
-    await prisma.socialAction.create({
-      data: {
+    await prisma.socialAction.upsert({
+      where: {
+        platform_socialAccountId_actionIdentifier: {
+          platform: normalizedPlatform,
+          socialAccountId: account.id,
+          actionIdentifier,
+        },
+      },
+      create: {
         organizationId: session.activeOrgId,
         socialAccountId: account.id,
         postId: postId || null,
@@ -535,6 +650,12 @@ export async function executeSocialAction(
         status: "FAILED",
         errorMessage: result.error || "Action failed",
         rawResponse: result.rawResponse ? JSON.stringify(result.rawResponse) : null,
+      },
+      update: {
+        status: "FAILED",
+        errorMessage: result.error || "Action failed",
+        rawResponse: result.rawResponse ? JSON.stringify(result.rawResponse) : null,
+        updatedAt: new Date(),
       },
     });
   }

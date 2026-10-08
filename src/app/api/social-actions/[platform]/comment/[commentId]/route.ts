@@ -63,6 +63,8 @@ export async function DELETE(
           ? 401
           : result.code === "FORBIDDEN"
           ? 403
+          : result.code === "RATE_LIMITED"
+          ? 429
           : result.code === "UNSUPPORTED_ACTION"
           ? 400
           : result.requiresReauth

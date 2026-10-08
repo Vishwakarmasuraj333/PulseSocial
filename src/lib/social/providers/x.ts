@@ -128,6 +128,43 @@ export class XProvider implements SocialProvider {
     };
   }
 
+  async refreshToken(refreshToken: string): Promise<OAuthTokenResult> {
+    const clientId = process.env.X_CLIENT_ID || "";
+    const clientSecret = process.env.X_CLIENT_SECRET || "";
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/x-www-form-urlencoded",
+    };
+    if (clientSecret) {
+      headers["Authorization"] = `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`;
+    }
+
+    const body = new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+      client_id: clientId,
+    });
+
+    const res = await fetch("https://api.twitter.com/2/oauth2/token", {
+      method: "POST",
+      headers,
+      body,
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error_description || err.error || "Failed to refresh X OAuth token");
+    }
+
+    const data = await res.json();
+    return {
+      accessToken: data.access_token,
+      expiresIn: data.expires_in,
+      refreshToken: data.refresh_token || refreshToken,
+      scopes: (data.scope || "").split(" "),
+    };
+  }
+
   async getAccounts(accessToken: string): Promise<SocialAccountInfo[]> {
     const res = await fetch("https://api.twitter.com/2/users/me?user.fields=profile_image_url,description,public_metrics", {
       headers: { Authorization: `Bearer ${accessToken}` },

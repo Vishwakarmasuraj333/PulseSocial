@@ -125,6 +125,32 @@ export class MetaProvider implements SocialProvider {
     };
   }
 
+  async refreshToken(currentAccessToken: string): Promise<OAuthTokenResult> {
+    const appId = process.env.META_APP_ID || "1427242679545054";
+    const appSecret = process.env.META_APP_SECRET || "e3b5c0a667fce83937f96ac464060b97";
+
+    const exchangeParams = new URLSearchParams({
+      grant_type: "fb_exchange_token",
+      client_id: appId,
+      client_secret: appSecret,
+      fb_exchange_token: currentAccessToken,
+    });
+
+    const res = await fetch(`https://graph.facebook.com/v20.0/oauth/access_token?${exchangeParams.toString()}`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || "Failed to refresh Meta access token");
+    }
+
+    const data = await res.json();
+    return {
+      accessToken: data.access_token,
+      expiresIn: data.expires_in || 5184000,
+      scopes: ["pages_manage_posts", "instagram_content_publish", "instagram_basic"],
+      metadata: { tokenType: "Bearer" },
+    };
+  }
+
   async getAccounts(accessToken: string): Promise<SocialAccountInfo[]> {
     const res = await fetch(
       `https://graph.facebook.com/v20.0/me/accounts?fields=id,name,picture{url},access_token,instagram_business_account{id,username,profile_picture_url}&access_token=${accessToken}`

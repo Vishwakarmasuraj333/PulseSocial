@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { decryptToken } from "@/lib/security/encryption";
+import { decryptToken, encryptToken } from "@/lib/security/encryption";
 import { getSocialProvider } from "@/lib/social/registry";
 import { SupportedPlatform } from "@/lib/social/types";
 
@@ -90,38 +90,100 @@ export async function syncSocialEngagement(
       continue;
     }
 
+    let provider: any;
+    try {
+      provider = getSocialProvider(platform);
+    } catch (e: any) {
+      summary.skipped++;
+      continue;
+    }
+
+    let decryptedToken = "";
+
     if (
       socialAccount.token.expiresAt &&
       socialAccount.token.expiresAt < new Date()
     ) {
-      await prisma.socialAccount.update({
-        where: { id: socialAccount.id },
-        data: { status: "RECONNECT_REQUIRED" },
-      });
-      summary.failed++;
-      summary.errors.push({
-        targetId: target.id,
-        platform,
-        error: "OAuth token expired. Reconnect required.",
-      });
-      continue;
+      let refreshed = false;
+      if (
+        socialAccount.token.encryptedRefreshToken &&
+        typeof provider.refreshToken === "function"
+      ) {
+        try {
+          const decryptedRefresh = decryptToken(
+            socialAccount.token.encryptedRefreshToken,
+            socialAccount.token.iv,
+            socialAccount.token.tag
+          );
+          if (decryptedRefresh) {
+            const newTokens = await provider.refreshToken(decryptedRefresh);
+            if (newTokens.accessToken) {
+              const encAccess = encryptToken(newTokens.accessToken);
+              let encRefresh = socialAccount.token.encryptedRefreshToken;
+              let refreshExp = socialAccount.token.refreshTokenExpiresAt;
+              if (newTokens.refreshToken) {
+                encRefresh = encryptToken(newTokens.refreshToken).encrypted;
+                if (newTokens.refreshTokenExpiresIn) {
+                  refreshExp = new Date(Date.now() + newTokens.refreshTokenExpiresIn * 1000);
+                }
+              }
+              const expiresAt = newTokens.expiresIn
+                ? new Date(Date.now() + newTokens.expiresIn * 1000)
+                : new Date(Date.now() + 3600 * 1000);
+
+              await prisma.socialToken.update({
+                where: { id: socialAccount.token.id },
+                data: {
+                  encryptedAccessToken: encAccess.encrypted,
+                  encryptedRefreshToken: encRefresh,
+                  iv: encAccess.iv,
+                  tag: encAccess.tag,
+                  expiresAt,
+                  refreshTokenExpiresAt: refreshExp,
+                },
+              });
+              await prisma.socialAccount.update({
+                where: { id: socialAccount.id },
+                data: { status: "CONNECTED" },
+              });
+              decryptedToken = newTokens.accessToken;
+              refreshed = true;
+            }
+          }
+        } catch {}
+      }
+
+      if (!refreshed) {
+        await prisma.socialAccount.update({
+          where: { id: socialAccount.id },
+          data: { status: "RECONNECT_REQUIRED" },
+        });
+        summary.failed++;
+        summary.errors.push({
+          targetId: target.id,
+          platform,
+          error: "OAuth token expired. Reconnect required.",
+        });
+        continue;
+      }
     }
 
-    let decryptedToken: string;
-    try {
-      decryptedToken = decryptToken(
-        socialAccount.token.encryptedAccessToken,
-        socialAccount.token.iv,
-        socialAccount.token.tag
-      );
-    } catch {
-      summary.failed++;
-      summary.errors.push({
-        targetId: target.id,
-        platform,
-        error: "Failed to decrypt OAuth token",
-      });
-      continue;
+    if (!decryptedToken) {
+      try {
+        decryptedToken = decryptToken(
+          socialAccount.token.encryptedAccessToken,
+          socialAccount.token.iv,
+          socialAccount.token.tag
+        );
+      } catch {
+        summary.failed++;
+        summary.errors.push({
+          targetId: target.id,
+          platform,
+          error: "Failed to decrypt OAuth token",
+        });
+        continue;
+      }
     }
 
     if (
@@ -129,14 +191,6 @@ export async function syncSocialEngagement(
       decryptedToken.startsWith("token_") ||
       decryptedToken.startsWith("direct_token_")
     ) {
-      summary.skipped++;
-      continue;
-    }
-
-    let provider: any;
-    try {
-      provider = getSocialProvider(platform);
-    } catch (e: any) {
       summary.skipped++;
       continue;
     }

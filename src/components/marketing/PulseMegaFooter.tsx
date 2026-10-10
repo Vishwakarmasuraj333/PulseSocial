@@ -32,7 +32,7 @@ export function PulseMegaFooter() {
         { label: "Desk Integration", href: "/features#desk" },
         { label: "Canva Integration", href: "/features#canva" },
         { label: "Mobile Apps", href: "/mobile" },
-        { label: "Browser Extension", href: "/extension" },
+        { label: "Browser Extension (Coming Soon)", href: "#" },
       ],
     },
     {
@@ -234,7 +234,11 @@ export function PulseMegaFooter() {
 
           <div className="flex items-center gap-2 text-slate-300">
             <Globe className="w-4 h-4 text-slate-400" />
-            <select className="bg-slate-800 text-slate-300 text-xs px-2.5 py-1.5 rounded-lg border border-slate-700 outline-none cursor-pointer">
+            <select
+              id="footer-language-select"
+              aria-label="Select language"
+              className="bg-slate-800 text-slate-300 text-xs px-2.5 py-1.5 rounded-lg border border-slate-700 outline-none cursor-pointer"
+            >
               <option>English</option>
               <option>Español</option>
               <option>Français</option>
@@ -245,19 +249,31 @@ export function PulseMegaFooter() {
         </div>
 
         {/* Legal Disclaimer & Copyright */}
-        <div className="pt-6 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
+        <div className="pt-6 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link href="/contact" className="hover:text-slate-300">Contact Us</Link>
+            <Link href="/contact" className="hover:text-slate-200">Contact Us</Link>
             <span>•</span>
-            <Link href="/security" className="hover:text-slate-300">Security</Link>
+            <Link href="/security" className="hover:text-slate-200">Security</Link>
             <span>•</span>
-            <Link href="/compliance" className="hover:text-slate-300">Compliance</Link>
+            <Link href="/compliance" className="hover:text-slate-200">Compliance</Link>
             <span>•</span>
-            <Link href="/terms" className="hover:text-slate-300">Terms of Service</Link>
+            <Link href="/terms" className="hover:text-slate-200">Terms of Service</Link>
             <span>•</span>
-            <Link href="/privacy" className="hover:text-slate-300">Privacy Policy</Link>
+            <Link href="/privacy" className="hover:text-slate-200">Privacy Policy</Link>
             <span>•</span>
-            <Link href="/cookies" className="hover:text-slate-300">Cookie Policy</Link>
+            <Link href="/cookie-policy" className="hover:text-slate-200">Cookie Policy</Link>
+            <span>•</span>
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  window.dispatchEvent(new CustomEvent("pulsesocial_open_cookie_settings"));
+                }
+              }}
+              className="hover:text-slate-200 underline cursor-pointer"
+            >
+              Cookie settings
+            </button>
           </div>
 
           <div className="flex items-center gap-1.5">

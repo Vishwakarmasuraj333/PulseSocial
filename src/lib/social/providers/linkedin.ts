@@ -136,18 +136,18 @@ export class LinkedInProvider implements SocialProvider {
       if (res.ok) {
         const info = await res.json();
         return {
-          followersCount: 0,
-          followingCount: 0,
-          postsCount: 0,
+          followersCount: null,
+          followingCount: null,
+          postsCount: null,
           bio: info.name ? `LinkedIn profile for ${info.name}` : undefined,
           raw: info,
         };
       }
     } catch {}
     return {
-      followersCount: 0,
-      followingCount: 0,
-      postsCount: 0,
+      followersCount: null,
+      followingCount: null,
+      postsCount: null,
     };
   }
 
@@ -250,17 +250,17 @@ export class LinkedInProvider implements SocialProvider {
     return res.ok;
   }
 
-  async getAnalytics(accessToken?: string, accountId?: string): Promise<AnalyticsResult> {
+  async getAnalytics(): Promise<AnalyticsResult> {
     return {
-      followers: 0,
-      impressions: 0,
-      reach: 0,
-      engagementCount: 0,
-      engagementRate: 0,
-      clicks: 0,
-      shares: 0,
-      saves: 0,
-      isCalculated: true,
+      followers: null,
+      impressions: null,
+      reach: null,
+      engagementCount: null,
+      engagementRate: null,
+      clicks: null,
+      shares: null,
+      saves: null,
+      isCalculated: false,
     };
   }
 
@@ -616,7 +616,7 @@ export class LinkedInProvider implements SocialProvider {
       const data = await res.json().catch(() => ({}));
       const elements = data.elements || [];
       return elements.map((c: any) => ({
-        externalCommentId: c.urn || c.id || `urn:li:comment:${Math.random().toString(36).substring(2)}`,
+        externalCommentId: c.urn || c.id || String(c.$URN || ""),
         platform: "linkedin" as SupportedPlatform,
         authorName: c.created?.actor || "LinkedIn Member",
         authorUsername: c.created?.actor,

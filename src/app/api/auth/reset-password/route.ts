@@ -32,8 +32,8 @@ export async function POST(req: Request) {
 
     if (!user) {
       return NextResponse.json(
-        { error: "User account not found." },
-        { status: 404 }
+        { error: "Invalid or expired recovery code.", code: "OTP_INVALID" },
+        { status: 400 }
       );
     }
 
@@ -42,6 +42,11 @@ export async function POST(req: Request) {
 
     // Hash the new password with bcrypt salt rounds = 12
     const passwordHash = await hashPassword(newPassword);
+
+    // Invalidate all outstanding OTPs for this user
+    await prisma.emailVerificationOTP.deleteMany({
+      where: { userId: user.id },
+    });
 
     // Update user password
     await prisma.user.update({

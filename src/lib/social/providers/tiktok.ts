@@ -108,18 +108,18 @@ export class TikTokProvider implements SocialProvider {
         const json = await res.json();
         const user = json.data?.user || {};
         return {
-          followersCount: user.follower_count || 0,
-          followingCount: user.following_count || 0,
-          postsCount: user.video_count || 0,
+          followersCount: user.follower_count != null ? user.follower_count : null,
+          followingCount: user.following_count != null ? user.following_count : null,
+          postsCount: user.video_count != null ? user.video_count : null,
           bio: user.bio_description,
           raw: json,
         };
       }
     } catch {}
     return {
-      followersCount: 0,
-      followingCount: 0,
-      postsCount: 0,
+      followersCount: null,
+      followingCount: null,
+      postsCount: null,
     };
   }
 
@@ -205,14 +205,14 @@ export class TikTokProvider implements SocialProvider {
 
   async getAnalytics(): Promise<AnalyticsResult> {
     return {
-      followers: 0,
-      impressions: 0,
-      reach: 0,
-      engagementCount: 0,
-      engagementRate: 0,
-      clicks: 0,
-      shares: 0,
-      saves: 0,
+      followers: null,
+      impressions: null,
+      reach: null,
+      engagementCount: null,
+      engagementRate: null,
+      clicks: null,
+      shares: null,
+      saves: null,
       isCalculated: false,
     };
   }

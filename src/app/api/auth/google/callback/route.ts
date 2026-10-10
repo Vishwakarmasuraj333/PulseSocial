@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { createSession } from "@/lib/auth/session";
 import { logAudit } from "@/lib/audit/logger";
@@ -166,14 +167,28 @@ export async function GET(req: Request) {
 
       // If user had no organization, provision one now
       if (user.memberships.length === 0) {
-        const orgSlug = `${cleanEmail.split("@")[0].replace(/[^a-z0-9]/g, "-")}-brand-${Date.now().toString().slice(-4)}`;
-        const org = await prisma.organization.create({
-          data: {
-            name: `${displayName}'s Workspace`,
-            slug: orgSlug,
-            timezone: "UTC",
-          },
-        });
+        const baseSlug = `${cleanEmail.split("@")[0].replace(/[^a-z0-9]/g, "-")}-brand`;
+        let org: any = null;
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const nonce = crypto.randomBytes(4).toString("hex");
+          const candidateSlug = `${baseSlug}-${nonce}`;
+          try {
+            org = await prisma.organization.create({
+              data: {
+                name: `${displayName}'s Workspace`,
+                slug: candidateSlug,
+                timezone: "UTC",
+              },
+            });
+            break;
+          } catch (err: any) {
+            if (err?.code === "P2002" && attempt < 4) {
+              continue;
+            }
+            throw err;
+          }
+        }
+        if (!org) throw new Error("Failed to generate unique organization slug");
 
         await prisma.organizationMember.create({
           data: {
@@ -228,14 +243,28 @@ export async function GET(req: Request) {
       });
 
       // Create primary workspace organization for the new user
-      const orgSlug = `${cleanEmail.split("@")[0].replace(/[^a-z0-9]/g, "-")}-brand-${Date.now().toString().slice(-4)}`;
-      const org = await prisma.organization.create({
-        data: {
-          name: `${displayName}'s Workspace`,
-          slug: orgSlug,
-          timezone: "UTC",
-        },
-      });
+      const baseSlug = `${cleanEmail.split("@")[0].replace(/[^a-z0-9]/g, "-")}-brand`;
+      let org: any = null;
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const nonce = crypto.randomBytes(4).toString("hex");
+        const candidateSlug = `${baseSlug}-${nonce}`;
+        try {
+          org = await prisma.organization.create({
+            data: {
+              name: `${displayName}'s Workspace`,
+              slug: candidateSlug,
+              timezone: "UTC",
+            },
+          });
+          break;
+        } catch (err: any) {
+          if (err?.code === "P2002" && attempt < 4) {
+            continue;
+          }
+          throw err;
+        }
+      }
+      if (!org) throw new Error("Failed to generate unique organization slug");
 
       await prisma.organizationMember.create({
         data: {

@@ -56,6 +56,7 @@ export default function DashboardPage() {
   const [connectedChannels, setConnectedChannels] = useState<any[]>([]);
   const [liveAuditEvents, setLiveAuditEvents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [streamStatus, setStreamStatus] = useState<"connected" | "polling" | "offline">("polling");
 
   // Fetch real data from backend database
   const loadDashboardData = async () => {
@@ -111,7 +112,9 @@ export default function DashboardPage() {
         if (aData.accounts && aData.accounts.length > 0) {
           const mappedAccounts = aData.accounts.map((a: any) => {
             const matchedAnalytics = analyticsAccounts.find((acc) => acc.id === a.id);
-            const followers = a.followersCount || matchedAnalytics?.followersCount || 0;
+            const followers = typeof a.followersCount === "number"
+              ? a.followersCount
+              : (typeof matchedAnalytics?.followersCount === "number" ? matchedAnalytics.followersCount : null);
             const channelPostsCount = fetchedPosts.filter((p) =>
               p.targets?.some((t: any) => t.socialAccountId === a.id || t.socialAccount?.provider === a.provider)
             ).length || a.postsCount || 0;
@@ -185,6 +188,60 @@ export default function DashboardPage() {
 
     return () => window.removeEventListener("pulsesocial_post_created", handlePostCreated);
   }, []);
+
+  // Connect to live SSE realtime stream with honest status indicator and polling fallback
+  useEffect(() => {
+    let es: EventSource | null = null;
+    let pollInterval: any = null;
+
+    if (typeof window !== "undefined" && "EventSource" in window) {
+      try {
+        es = new EventSource("/api/realtime/stream");
+        es.onopen = () => {
+          setStreamStatus("connected");
+        };
+        es.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data?.type && data.type !== "ping") {
+              setLiveAuditEvents((prev) => [
+                {
+                  id: data.id || `stream-${Date.now()}`,
+                  title: data.type.replace(/_/g, " "),
+                  description: data.payload?.description || data.payload?.message || "Workspace activity",
+                  timestamp: "Just now",
+                  user: { avatarInitials: "Live" },
+                },
+                ...prev.slice(0, 5),
+              ]);
+            }
+          } catch {}
+        };
+        es.onerror = () => {
+          setStreamStatus("polling");
+        };
+      } catch {
+        setStreamStatus("polling");
+      }
+    } else {
+      setStreamStatus("polling");
+    }
+
+    // Fallback polling every 60 seconds
+    pollInterval = setInterval(() => {
+      fetch("/api/audit?limit=6")
+        .then((r) => r.json())
+        .then((d) => {
+          if (Array.isArray(d?.logs)) setLiveAuditEvents(d.logs);
+        })
+        .catch(() => {});
+    }, 60000);
+
+    return () => {
+      if (es) es.close();
+      if (pollInterval) clearInterval(pollInterval);
+    };
+  }, [activeBrand?.id]);
 
   const openConnect = (platform = "pinterest") => {
     setSelectedConnectPlatform(platform);
@@ -264,17 +321,30 @@ export default function DashboardPage() {
           <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Workspace Health</span>
-              <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-300 flex items-center justify-center">
+              <div
+                className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                  connectedChannels.length > 0
+                    ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-300"
+                    : "bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-300"
+                }`}
+              >
                 <Activity className="w-4 h-4" />
               </div>
             </div>
-            <div className="mt-3 flex items-baseline gap-2">
-              <span className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                {connectedChannels.length > 0 ? "100%" : "Standby"}
-              </span>
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                {connectedChannels.length > 0 ? "Operational" : "Setup needed"}
-              </span>
+            <div className="mt-3 flex flex-col gap-0.5">
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                  {connectedChannels.length > 0 ? "100%" : "Standby"}
+                </span>
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                  {connectedChannels.length > 0 ? "Operational" : "Setup needed"}
+                </span>
+              </div>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
+                {connectedChannels.length > 0
+                  ? "Accounts connected • AES-256 vault active • Queue ready"
+                  : "Next step: Connect your first social account to activate publishing."}
+              </p>
             </div>
           </div>
         </div>
@@ -345,7 +415,7 @@ export default function DashboardPage() {
                             </div>
                           </td>
                           <td className="py-3.5 text-right font-medium text-slate-800 dark:text-slate-200">
-                            <span>{(channel.connectedAccount?.followerCount || 0).toLocaleString()}</span>
+                            <span>{channel.connectedAccount?.followerCount != null ? channel.connectedAccount.followerCount.toLocaleString() : "—"}</span>
                             {channel.growth && (
                               <span className="text-[11px] text-emerald-600 font-semibold ml-1.5">
                                 ↑ {channel.growth}
@@ -588,10 +658,22 @@ export default function DashboardPage() {
                     Live updates across authenticated workspaces.
                   </p>
                 </div>
-                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-[#F5F3FF] dark:bg-purple-950/60 text-[#5846A8] dark:text-purple-300 border border-[#EDE9FE] dark:border-purple-900">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  REALTIME
-                </span>
+                {streamStatus === "connected" ? (
+                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    REALTIME
+                  </span>
+                ) : streamStatus === "polling" ? (
+                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                    Updates every 60s
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                    Offline
+                  </span>
+                )}
               </div>
 
               {/* Real activity records */}

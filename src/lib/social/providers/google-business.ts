@@ -105,9 +105,9 @@ export class GoogleBusinessProvider implements SocialProvider {
 
   async getProfile(): Promise<SocialProfileResult> {
     return {
-      followersCount: 0,
-      followingCount: 0,
-      postsCount: 0,
+      followersCount: null,
+      followingCount: null,
+      postsCount: null,
       bio: "Google Business Profile Listing",
     };
   }
@@ -177,14 +177,14 @@ export class GoogleBusinessProvider implements SocialProvider {
 
   async getAnalytics(): Promise<AnalyticsResult> {
     return {
-      followers: 0,
-      impressions: 0,
-      reach: 0,
-      engagementCount: 0,
-      engagementRate: 0,
-      clicks: 0,
-      shares: 0,
-      saves: 0,
+      followers: null,
+      impressions: null,
+      reach: null,
+      engagementCount: null,
+      engagementRate: null,
+      clicks: null,
+      shares: null,
+      saves: null,
       isCalculated: false,
     };
   }

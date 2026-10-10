@@ -225,46 +225,50 @@ export class MetaProvider implements SocialProvider {
   }
 
   async getProfile(accessToken: string, accountId: string): Promise<SocialProfileResult> {
-    if (this.platform === "instagram") {
-      const res = await fetch(
-        `https://graph.facebook.com/v20.0/${accountId}?fields=biography,followers_count,follows_count,media_count,website,profile_picture_url`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: "application/json",
-          },
-        }
-      );
-      if (!res.ok) throw new Error("Failed to fetch Instagram profile metrics");
-      const data = await res.json();
-      return {
-        followersCount: data.followers_count || 0,
-        followingCount: data.follows_count || 0,
-        postsCount: data.media_count || 0,
-        bio: data.biography,
-        websiteUrl: data.website,
-        raw: data,
-      };
-    } else {
-      const res = await fetch(
-        `https://graph.facebook.com/v20.0/${accountId}?fields=fan_count,followers_count,about,website`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: "application/json",
-          },
-        }
-      );
-      if (!res.ok) throw new Error("Failed to fetch Facebook Page profile");
-      const data = await res.json();
-      return {
-        followersCount: data.followers_count || data.fan_count || 0,
-        followingCount: 0,
-        postsCount: 0,
-        bio: data.about,
-        websiteUrl: data.website,
-        raw: data,
-      };
+    try {
+      if (this.platform === "instagram") {
+        const res = await fetch(
+          `https://graph.facebook.com/v20.0/${accountId}?fields=biography,followers_count,follows_count,media_count,website,profile_picture_url`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              Accept: "application/json",
+            },
+          }
+        );
+        if (!res.ok) return { followersCount: null, followingCount: null, postsCount: null };
+        const data = await res.json();
+        return {
+          followersCount: data.followers_count != null ? data.followers_count : null,
+          followingCount: data.follows_count != null ? data.follows_count : null,
+          postsCount: data.media_count != null ? data.media_count : null,
+          bio: data.biography,
+          websiteUrl: data.website,
+          raw: data,
+        };
+      } else {
+        const res = await fetch(
+          `https://graph.facebook.com/v20.0/${accountId}?fields=fan_count,followers_count,about,website`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              Accept: "application/json",
+            },
+          }
+        );
+        if (!res.ok) return { followersCount: null, followingCount: null, postsCount: null };
+        const data = await res.json();
+        return {
+          followersCount: data.followers_count != null ? data.followers_count : (data.fan_count != null ? data.fan_count : null),
+          followingCount: null, // Facebook Pages do not have a public followingCount
+          postsCount: null, // Not provided on base page fields
+          bio: data.about,
+          websiteUrl: data.website,
+          raw: data,
+        };
+      }
+    } catch {
+      return { followersCount: null, followingCount: null, postsCount: null };
     }
   }
 
@@ -405,40 +409,40 @@ export class MetaProvider implements SocialProvider {
       );
       if (!res.ok) throw new Error("Failed to fetch insights");
       const data = await res.json();
-      let impressions = 0;
-      let reach = 0;
-      let engagementCount = 0;
+      let impressions: number | null = null;
+      let reach: number | null = null;
+      let engagementCount: number | null = null;
       if (Array.isArray(data.data)) {
         for (const item of data.data) {
           const sumValues = (item.values || []).reduce((acc: number, v: any) => acc + (typeof v.value === "number" ? v.value : 0), 0);
-          if (item.name.includes("impression")) impressions += sumValues;
-          if (item.name.includes("reach")) reach += sumValues;
-          if (item.name.includes("engaged_users") || item.name.includes("engagement")) engagementCount += sumValues;
+          if (item.name.includes("impression")) impressions = (impressions ?? 0) + sumValues;
+          if (item.name.includes("reach")) reach = (reach ?? 0) + sumValues;
+          if (item.name.includes("engaged_users") || item.name.includes("engagement")) engagementCount = (engagementCount ?? 0) + sumValues;
         }
       }
       return {
-        followers: 0,
+        followers: null,
         impressions,
         reach,
         engagementCount,
-        engagementRate: reach > 0 ? Number(((engagementCount / reach) * 100).toFixed(2)) : 0,
-        clicks: 0,
-        shares: 0,
-        saves: 0,
+        engagementRate: reach != null && reach > 0 && engagementCount != null ? Number(((engagementCount / reach) * 100).toFixed(2)) : null,
+        clicks: null,
+        shares: null,
+        saves: null,
         isCalculated: false,
         rawJson: JSON.stringify(data),
       };
     } catch {
       return {
-        followers: 0,
-        impressions: 0,
-        reach: 0,
-        engagementCount: 0,
-        engagementRate: 0,
-        clicks: 0,
-        shares: 0,
-        saves: 0,
-        isCalculated: true,
+        followers: null,
+        impressions: null,
+        reach: null,
+        engagementCount: null,
+        engagementRate: null,
+        clicks: null,
+        shares: null,
+        saves: null,
+        isCalculated: false,
       };
     }
   }

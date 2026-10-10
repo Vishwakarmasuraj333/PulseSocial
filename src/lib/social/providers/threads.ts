@@ -91,18 +91,18 @@ export class ThreadsProvider implements SocialProvider {
       if (res.ok) {
         const user = await res.json();
         return {
-          followersCount: 0,
-          followingCount: 0,
-          postsCount: 0,
+          followersCount: null,
+          followingCount: null,
+          postsCount: null,
           bio: user.threads_biography || undefined,
           raw: user,
         };
       }
     } catch {}
     return {
-      followersCount: 0,
-      followingCount: 0,
-      postsCount: 0,
+      followersCount: null,
+      followingCount: null,
+      postsCount: null,
     };
   }
 
@@ -185,17 +185,17 @@ export class ThreadsProvider implements SocialProvider {
     return true;
   }
 
-  async getAnalytics(accessToken: string, accountId: string, since: Date, until: Date): Promise<AnalyticsResult> {
+  async getAnalytics(): Promise<AnalyticsResult> {
     return {
-      followers: 0,
-      impressions: 0,
-      reach: 0,
-      engagementCount: 0,
-      engagementRate: 0,
-      clicks: 0,
-      shares: 0,
-      saves: 0,
-      isCalculated: true,
+      followers: null,
+      impressions: null,
+      reach: null,
+      engagementCount: null,
+      engagementRate: null,
+      clicks: null,
+      shares: null,
+      saves: null,
+      isCalculated: false,
     };
   }
 

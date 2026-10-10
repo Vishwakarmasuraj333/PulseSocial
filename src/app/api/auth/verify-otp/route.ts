@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import crypto from "crypto";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { verifyOTP } from "@/lib/email/otp";
@@ -69,13 +71,29 @@ export async function POST(req: Request) {
     let orgId = user.memberships[0]?.organizationId;
     if (!orgId) {
       const brandName = user.name ? `${user.name}'s Brand` : "My Brand";
-      const slug = `${user.email.split("@")[0].replace(/[^a-z0-9]/gi, "-").toLowerCase()}-${Math.random().toString(36).substring(2, 6)}`;
-      const newOrg = await prisma.organization.create({
-        data: {
-          name: brandName,
-          slug,
-        },
-      });
+      const baseSlug = user.email.split("@")[0].replace(/[^a-z0-9]/gi, "-").toLowerCase();
+      let newOrg = null;
+
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const nonce = crypto.randomBytes(4).toString("hex");
+        const candidateSlug = `${baseSlug}-${nonce}`;
+        try {
+          newOrg = await prisma.organization.create({
+            data: {
+              name: brandName,
+              slug: candidateSlug,
+            },
+          });
+          break;
+        } catch (err: any) {
+          if (err?.code === "P2002" && attempt < 4) {
+            continue; // Unique constraint collision retry
+          }
+          throw err;
+        }
+      }
+
+      if (!newOrg) throw new Error("Failed to generate unique organization slug");
 
       await prisma.organizationMember.create({
         data: {
@@ -107,6 +125,25 @@ export async function POST(req: Request) {
       resourceType: "User",
       resourceId: user.id,
     });
+
+    // Link visitor's consent record to the logged in user
+    try {
+      const cookieStore = await cookies();
+      const consentRaw = cookieStore.get("pulsesocial_consent")?.value;
+      if (consentRaw) {
+        const consentData = JSON.parse(consentRaw);
+        const latestAnon = await prisma.consentRecord.findFirst({
+          where: { userId: null, policyVersion: consentData.policyVersion },
+          orderBy: { timestamp: "desc" },
+        });
+        if (latestAnon) {
+          await prisma.consentRecord.update({
+            where: { id: latestAnon.id },
+            data: { userId: user.id },
+          });
+        }
+      }
+    } catch {}
 
     const hasExistingOrg = (user.memberships?.length || 0) > 0;
     const targetDestination = requestedRedirect || (hasExistingOrg ? "/dashboard" : "/dashboard?setup=brand");

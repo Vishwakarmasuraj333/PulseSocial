@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCanvaCredentials } from "@/lib/canva/canvaClient";
+import { getSession } from "@/lib/auth/session";
 
 export async function GET(req: NextRequest) {
   try {
     const { isConfigured, redirectUri } = getCanvaCredentials();
+    const session = await getSession();
+    const orgId = session?.activeOrgId;
 
-    const org = await prisma.organization.findFirst({
-      orderBy: { createdAt: "asc" },
-    });
-
-    if (!org) {
+    if (!orgId) {
       return NextResponse.json({
         isConfigured,
         isConnected: false,
@@ -20,7 +19,7 @@ export async function GET(req: NextRequest) {
 
     const account = await prisma.socialAccount.findFirst({
       where: {
-        organizationId: org.id,
+        organizationId: orgId,
         provider: "canva",
         status: "CONNECTED",
       },

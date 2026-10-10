@@ -61,8 +61,37 @@ export async function POST(
       }
     }
 
+    if (provider === "stripe") {
+      const sigHeader = req.headers.get("stripe-signature");
+      if (sigHeader && process.env.STRIPE_WEBHOOK_SECRET) {
+        const parts = Object.fromEntries(sigHeader.split(",").map((p) => p.trim().split("=")));
+        const timestamp = parts.t;
+        const signature = parts.v1;
+        if (!timestamp || !signature) {
+          return NextResponse.json({ error: "Invalid Stripe signature format" }, { status: 401 });
+        }
+        const signedPayload = `${timestamp}.${bodyText}`;
+        const expected = crypto
+          .createHmac("sha256", process.env.STRIPE_WEBHOOK_SECRET)
+          .update(signedPayload)
+          .digest("hex");
+        if (signature !== expected) {
+          return NextResponse.json({ error: "Invalid Stripe signature" }, { status: 401 });
+        }
+      }
+    }
+
+    if (provider === "telegram") {
+      const secretToken = req.headers.get("x-telegram-bot-api-secret-token");
+      if (secretToken && process.env.TELEGRAM_WEBHOOK_SECRET) {
+        if (secretToken !== process.env.TELEGRAM_WEBHOOK_SECRET) {
+          return NextResponse.json({ error: "Invalid Telegram secret token" }, { status: 401 });
+        }
+      }
+    }
+
     const payload = JSON.parse(bodyText);
-    const eventId = payload.id || payload.event_id || `${provider}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const eventId = payload.id || payload.event_id || `${provider}_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`;
     const eventType = payload.object || payload.type || "social_event";
 
     // Deduplicate and store event

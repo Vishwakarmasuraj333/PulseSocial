@@ -88,8 +88,25 @@ export async function GET() {
 export async function PATCH(req: Request) {
   try {
     const session = await getSession();
-    if (!session?.activeOrgId) {
+    if (!session?.activeOrgId || !session?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // RBAC: caller must be OWNER or ADMIN
+    const callerMember = await prisma.organizationMember.findUnique({
+      where: {
+        organizationId_userId: {
+          organizationId: session.activeOrgId,
+          userId: session.id,
+        },
+      },
+    });
+
+    if (!callerMember || !["OWNER", "ADMIN"].includes(callerMember.role.toUpperCase())) {
+      return NextResponse.json(
+        { error: "Forbidden: Only organization Owners and Admins can update team members." },
+        { status: 403 }
+      );
     }
 
     const body = await req.json();
@@ -166,8 +183,25 @@ export async function PATCH(req: Request) {
 export async function DELETE(req: Request) {
   try {
     const session = await getSession();
-    if (!session?.activeOrgId) {
+    if (!session?.activeOrgId || !session?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // RBAC: caller must be OWNER or ADMIN
+    const callerMember = await prisma.organizationMember.findUnique({
+      where: {
+        organizationId_userId: {
+          organizationId: session.activeOrgId,
+          userId: session.id,
+        },
+      },
+    });
+
+    if (!callerMember || !["OWNER", "ADMIN"].includes(callerMember.role.toUpperCase())) {
+      return NextResponse.json(
+        { error: "Forbidden: Only organization Owners and Admins can remove team members." },
+        { status: 403 }
+      );
     }
 
     const { searchParams } = new URL(req.url);

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import crypto from "crypto";
 import { getSession } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit/logger";
@@ -70,17 +71,31 @@ export async function POST(req: Request) {
       );
     }
 
-    const slug = `${trimmedName.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-")}-${Math.random().toString(36).substring(2, 6)}`;
+    const baseSlug = trimmedName.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-");
+    let newOrg: any = null;
 
-    // Create the organization in SQLite
-    const newOrg: any = await prisma.organization.create({
-      data: {
-        name: trimmedName,
-        slug,
-        timezone: timezone || "Asia/Kolkata",
-        description: industry ? `Industry: ${industry}` : undefined,
-      } as any,
-    });
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const nonce = crypto.randomBytes(4).toString("hex");
+      const candidateSlug = `${baseSlug}-${nonce}`;
+      try {
+        newOrg = await prisma.organization.create({
+          data: {
+            name: trimmedName,
+            slug: candidateSlug,
+            timezone: timezone || "Asia/Kolkata",
+            description: industry ? `Industry: ${industry}` : undefined,
+          } as any,
+        });
+        break;
+      } catch (err: any) {
+        if (err?.code === "P2002" && attempt < 4) {
+          continue; // Unique constraint collision retry
+        }
+        throw err;
+      }
+    }
+
+    if (!newOrg) throw new Error("Failed to generate unique organization slug");
 
     // Add user as OWNER
     await prisma.organizationMember.create({
@@ -136,8 +151,25 @@ export async function POST(req: Request) {
 export async function PATCH(req: Request) {
   try {
     const session = await getSession();
-    if (!session?.activeOrgId) {
+    if (!session?.activeOrgId || !session?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // RBAC: only OWNER or ADMIN can update brand settings
+    const callerMember = await prisma.organizationMember.findUnique({
+      where: {
+        organizationId_userId: {
+          organizationId: session.activeOrgId,
+          userId: session.id,
+        },
+      },
+    });
+
+    if (!callerMember || !["OWNER", "ADMIN"].includes(callerMember.role.toUpperCase())) {
+      return NextResponse.json(
+        { error: "Forbidden: Only organization Owners and Admins can update brand settings." },
+        { status: 403 }
+      );
     }
 
     const body = await req.json();
@@ -232,15 +264,7 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Brand not found" }, { status: 404 });
     }
 
-    // Safety verification: confirm name must match
-    if (confirmName?.trim().toLowerCase() !== org.name.trim().toLowerCase()) {
-      return NextResponse.json(
-        { error: "Confirmation name does not match the brand name." },
-        { status: 400 }
-      );
-    }
-
-    // Check member role
+    // Check member role first: strictly Workspace Owner only
     const member = await prisma.organizationMember.findUnique({
       where: {
         organizationId_userId: {
@@ -250,12 +274,32 @@ export async function DELETE(req: Request) {
       },
     });
 
-    if (member && member.role !== "OWNER" && member.role !== "ADMIN") {
+    if (!member || member.role.toUpperCase() !== "OWNER") {
       return NextResponse.json(
-        { error: "Only an Owner or Admin can delete a brand workspace." },
+        { error: "Forbidden: Only the workspace Owner can delete this brand." },
         { status: 403 }
       );
     }
+
+    // Safety verification: confirm name must match
+    if (confirmName?.trim().toLowerCase() !== org.name.trim().toLowerCase()) {
+      return NextResponse.json(
+        { error: "Confirmation name does not match the brand name." },
+        { status: 400 }
+      );
+    }
+
+    // Write audit event before deleting
+    try {
+      await logAudit({
+        organizationId: org.id,
+        userId: session.id,
+        action: "ORGANIZATION_DELETED",
+        resourceType: "ORGANIZATION",
+        resourceId: org.id,
+        details: { name: org.name, slug: org.slug },
+      });
+    } catch {}
 
     // Delete organization cascading relations
     await prisma.organization.delete({

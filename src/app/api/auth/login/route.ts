@@ -30,24 +30,24 @@ export async function POST(req: Request) {
       where: { email: normalizedEmail },
     });
 
-    if (!user) {
+    if (!user || !user.passwordHash) {
       return NextResponse.json(
-        { error: "No account found with this email. Please check your email or sign up." },
-        { status: 404 }
+        { error: "Invalid email or password. Please try again.", code: "AUTH_INVALID_CREDENTIALS" },
+        { status: 401 }
       );
     }
 
-    if (!user.passwordHash) {
+    if (user.status === "SUSPENDED") {
       return NextResponse.json(
-        { error: "Password not set for this account. Please sign in with Google or reset password." },
-        { status: 400 }
+        { error: "This account has been suspended. Please contact support.", code: "FORBIDDEN" },
+        { status: 403 }
       );
     }
 
     const isValid = await verifyPassword(password, user.passwordHash);
     if (!isValid) {
       return NextResponse.json(
-        { error: "Invalid email or password. Please try again." },
+        { error: "Invalid email or password. Please try again.", code: "AUTH_INVALID_CREDENTIALS" },
         { status: 401 }
       );
     }

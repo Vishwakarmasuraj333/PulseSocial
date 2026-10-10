@@ -995,7 +995,10 @@ export function PostComposerModal({
                       className="w-full flex items-center gap-3 px-3.5 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium text-left transition cursor-pointer"
                     >
                       <Folder className="w-4 h-4 text-amber-500 shrink-0" />
-                      <span>Desktop (Image / Video)</span>
+                      <div>
+                        <div>Desktop (Image / Video)</div>
+                        <div className="text-[10px] text-slate-400 font-normal">FFmpeg transcoding (Coming Soon)</div>
+                      </div>
                     </button>
 
                     {/* 2. Media Library */}
@@ -1571,7 +1574,7 @@ export function PostComposerModal({
                   className="accent-blue-600 w-4 h-4"
                 />
                 <span className="flex items-center gap-1">
-                  Add to Queue <Info className="w-3 h-3 text-slate-400" />
+                  Add to Queue (your queue slot) <Info className="w-3 h-3 text-slate-400" />
                 </span>
               </label>
 
@@ -1584,9 +1587,14 @@ export function PostComposerModal({
                   className="accent-blue-600 w-4 h-4"
                 />
                 <span className="flex items-center gap-1">
-                  Choose a SmartQ Slot <Info className="w-3 h-3 text-slate-400" />
+                  Choose a Slot (next available queue slot) <Info className="w-3 h-3 text-slate-400" />
                 </span>
               </label>
+              {publishingOption === "smartq" && (
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 pl-6 leading-relaxed">
+                  Assigns next user-defined weekly slot. Recommended peak times require historical analytics data from connected channels.
+                </p>
+              )}
             </div>
 
             {/* Platform-Specific Publishing Options if YouTube is selected */}

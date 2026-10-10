@@ -38,15 +38,18 @@ export async function middleware(req: any) {
 
   const sessionCookie = req.cookies.get("pulsesocial_auth_session")?.value;
   let isAuthenticated = false;
+  let isEmailVerified = false;
 
   if (sessionCookie) {
     try {
       const { payload } = await jwtVerify(sessionCookie, JWT_SECRET);
       if (payload && payload.sub) {
         isAuthenticated = true;
+        isEmailVerified = Boolean(payload.emailVerified);
       }
     } catch {
       isAuthenticated = false;
+      isEmailVerified = false;
     }
   }
 
@@ -79,11 +82,16 @@ export async function middleware(req: any) {
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
   );
 
-  if (isProtected && !isAuthenticated) {
+  if (isProtected && (!isAuthenticated || !isEmailVerified)) {
     const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("redirectTo", pathname);
+    if (isAuthenticated && !isEmailVerified) {
+      loginUrl.searchParams.set("error", "email_not_verified");
+      loginUrl.searchParams.set("message", "Please verify your email address to access workspace features.");
+    } else {
+      loginUrl.searchParams.set("redirectTo", pathname);
+    }
     const res = NextResponse.redirect(loginUrl);
-    if (sessionCookie) {
+    if (!isAuthenticated && sessionCookie) {
       const isProd = process.env.NODE_ENV === "production" || req.url.startsWith("https:");
       const cookieOpts = {
         httpOnly: true,

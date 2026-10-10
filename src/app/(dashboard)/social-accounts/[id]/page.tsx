@@ -300,7 +300,7 @@ export default function SocialAccountDetailsPage() {
               Audience Reach
             </span>
             <div className="text-2xl font-black text-slate-900 dark:text-white">
-              {account.profile?.followersCount !== undefined
+              {typeof account.profile?.followersCount === "number"
                 ? account.profile.followersCount.toLocaleString()
                 : "—"}
             </div>
@@ -314,7 +314,7 @@ export default function SocialAccountDetailsPage() {
               Published Posts
             </span>
             <div className="text-2xl font-black text-slate-900 dark:text-white">
-              {account.profile?.postsCount !== undefined
+              {typeof account.profile?.postsCount === "number"
                 ? account.profile.postsCount.toLocaleString()
                 : "—"}
             </div>

@@ -67,10 +67,26 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    // 1. Session verification
+    // 1. Session & RBAC verification
     const session = await getSession();
-    if (!session?.activeOrgId) {
+    if (!session?.activeOrgId || !session?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const callerMember = await prisma.organizationMember.findUnique({
+      where: {
+        organizationId_userId: {
+          organizationId: session.activeOrgId,
+          userId: session.id,
+        },
+      },
+    });
+
+    if (callerMember && ["VIEWER", "ANALYST"].includes(callerMember.role.toUpperCase())) {
+      return NextResponse.json(
+        { error: "Forbidden: Viewer and Analyst roles cannot create or publish posts." },
+        { status: 403 }
+      );
     }
 
     const body = await req.json();

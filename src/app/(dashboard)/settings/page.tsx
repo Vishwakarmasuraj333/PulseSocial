@@ -58,7 +58,7 @@ export type SettingsTab =
   | "audit_log";
 
 const TIMEZONES = [
-  { value: "Asia/Kolkata", label: "vashi, India - IST", fullLabel: "Asia/Kolkata / IST (UTC+05:30) - Mumbai, Delhi, Vashi" },
+  { value: "Asia/Kolkata", label: "Asia/Kolkata (IST, UTC+05:30)", fullLabel: "Asia/Kolkata / IST (UTC+05:30) - Mumbai, Delhi, Kolkata" },
   { value: "America/New_York", label: "New York, USA - EST", fullLabel: "America/New_York / EST (UTC-05:00) - Eastern Time" },
   { value: "America/Chicago", label: "Chicago, USA - CST", fullLabel: "America/Chicago / CST (UTC-06:00) - Central Time" },
   { value: "America/Denver", label: "Denver, USA - MST", fullLabel: "America/Denver / MST (UTC-07:00) - Mountain Time" },
@@ -708,7 +708,7 @@ function SettingsContent() {
   // Get friendly timezone label for read view
   const currentTzLabel = useMemo(() => {
     const found = TIMEZONES.find((t) => t.value === selectedTimezone);
-    return found ? found.label : "vashi, India - IST";
+    return found ? found.label : "Asia/Kolkata (IST, UTC+05:30)";
   }, [selectedTimezone]);
 
   return (
@@ -784,7 +784,7 @@ function SettingsContent() {
               {[
                 { id: "general_pref", label: "Preference", icon: SlidersHorizontal },
                 { id: "all_members", label: "All Members", icon: Users },
-                { id: "portal_settings", label: "Portal Settings", icon: Settings, hasDot: true },
+                { id: "portal_settings", label: "Portal Settings", icon: Settings },
                 { id: "audit_log", label: "Audit Log", icon: FileSpreadsheet },
               ].map((item) => {
                 const Icon = item.icon;
@@ -804,7 +804,7 @@ function SettingsContent() {
                       <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-[#1877F2]" : "text-slate-400"}`} />
                       <span className="truncate">{item.label}</span>
                     </div>
-                    {item.hasDot && (
+                    {(item as any).hasDot && (
                       <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0 ml-1" />
                     )}
                   </button>
@@ -1394,7 +1394,8 @@ function SettingsContent() {
                 </div>
               ) : (
                 <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-2xs">
-                  <table className="w-full text-left text-xs">
+                  {/* Desktop Table View (>= 768px) */}
+                  <table className="hidden md:table w-full text-left text-xs">
                     <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                       <tr>
                         <th className="py-3 px-4">Member</th>
@@ -1444,6 +1445,47 @@ function SettingsContent() {
                       ))}
                     </tbody>
                   </table>
+
+                  {/* Mobile Cards View (< 768px) */}
+                  <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
+                    {members.map((m) => (
+                      <div key={m.id} className="p-4 space-y-3 bg-white dark:bg-slate-900">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden">
+                              {m.avatar ? (
+                                <Image src={m.avatar} alt={m.name} width={32} height={32} className="object-cover" />
+                              ) : (
+                                <span>{m.initial}</span>
+                              )}
+                            </div>
+                            <div>
+                              <div className="font-semibold text-xs text-slate-900 dark:text-white">{m.name}</div>
+                              <div className="text-[11px] text-slate-500">{m.email}</div>
+                            </div>
+                          </div>
+                          {m.role !== "OWNER" && m.role !== "Owner" && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveMember(m.id, m.name)}
+                              className="text-slate-400 hover:text-rose-600 transition p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer"
+                              title="Remove member"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+                        <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-50 dark:border-slate-800">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                            {m.role}
+                          </span>
+                          <span className={`text-[11px] font-semibold ${m.status === "Active" ? "text-emerald-600" : "text-amber-600"}`}>
+                            ● {m.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -1638,22 +1680,32 @@ function SettingsContent() {
                   { key: "commentsMentions", title: "New Comments & Mentions", desc: "Alert when followers engage with your Facebook reels or videos." },
                   { key: "directMessages", title: "Direct Messages", desc: "Notify when customer messages arrive in unified inbox." },
                   { key: "weeklyDigest", title: "Weekly Analytics Digest", desc: "Summarize reach, top content, and follower growth every Monday." },
+                  { key: "pushNotifications", title: "Push Notifications (Web & Mobile)", desc: "Real-time browser and mobile push alerts.", comingSoon: true },
                 ].map((item) => (
-                  <div key={item.key} className="p-3.5 rounded-xl border border-slate-200 flex items-center justify-between">
+                  <div key={item.key} className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
                     <div>
-                      <h4 className="font-semibold text-slate-900 dark:text-white">{item.title}</h4>
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-semibold text-slate-900 dark:text-white">{item.title}</h4>
+                        {item.comingSoon && (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 dark:border-amber-900/60">
+                            Coming Soon
+                          </span>
+                        )}
+                      </div>
                       <p className="text-[11px] text-slate-500">{item.desc}</p>
                     </div>
                     <input
                       type="checkbox"
-                      checked={(notificationToggles as any)[item.key]}
+                      disabled={item.comingSoon}
+                      checked={item.comingSoon ? false : (notificationToggles as any)[item.key]}
                       onChange={(e) =>
+                        !item.comingSoon &&
                         setNotificationToggles((prev) => ({
                           ...prev,
                           [item.key]: e.target.checked,
                         }))
                       }
-                      className="accent-blue-600 w-4 h-4 rounded cursor-pointer"
+                      className="accent-blue-600 w-4 h-4 rounded cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                     />
                   </div>
                 ))}
@@ -1690,8 +1742,10 @@ function SettingsContent() {
               <div className="space-y-4 text-xs">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="font-semibold text-slate-700 block mb-1">Language</label>
+                    <label htmlFor="portal-language-select" className="font-semibold text-slate-700 block mb-1">Language</label>
                     <select
+                      id="portal-language-select"
+                      aria-label="Language"
                       value={portalConfig.language}
                       onChange={(e) => setPortalConfig((c) => ({ ...c, language: e.target.value }))}
                       className="w-full p-2 rounded-lg border border-slate-200 text-xs"
@@ -1702,8 +1756,10 @@ function SettingsContent() {
                     </select>
                   </div>
                   <div>
-                    <label className="font-semibold text-slate-700 block mb-1">Date Format</label>
+                    <label htmlFor="portal-date-format-select" className="font-semibold text-slate-700 block mb-1">Date Format</label>
                     <select
+                      id="portal-date-format-select"
+                      aria-label="Date Format"
                       value={portalConfig.dateFormat}
                       onChange={(e) => setPortalConfig((c) => ({ ...c, dateFormat: e.target.value }))}
                       className="w-full p-2 rounded-lg border border-slate-200 text-xs"
@@ -1725,6 +1781,62 @@ function SettingsContent() {
                       onChange={(e) => setPortalConfig((c) => ({ ...c, workspaceSlug: e.target.value }))}
                       className="p-2 flex-1 outline-none text-slate-800"
                     />
+                  </div>
+                </div>
+
+                {/* Cookie & Privacy Preferences */}
+                <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
+                  <div>
+                    <h3 className="font-bold text-slate-800 dark:text-slate-200 text-xs">
+                      Cookie Privacy & Telemetry Choices
+                    </h3>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      PulseSocial honors your privacy choices. Manage optional cookies or withdraw consent anytime.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-3 pt-1">
+                    <button
+                      type="button"
+                      id="settings-open-cookie-preferences"
+                      onClick={() => {
+                        if (typeof window !== "undefined") {
+                          window.dispatchEvent(
+                            new CustomEvent("pulsesocial_open_cookie_settings")
+                          );
+                        }
+                      }}
+                      className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 font-semibold text-xs transition cursor-pointer flex items-center gap-1.5"
+                    >
+                      <SlidersHorizontal className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                      <span>Cookie settings</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      id="settings-withdraw-consent-btn"
+                      onClick={async () => {
+                        try {
+                          const res = await fetch("/api/consent", { method: "DELETE" });
+                          if (res.ok) {
+                            toast({
+                              title: "Consent Withdrawn",
+                              message: "All optional cookies deleted and consent reset to strict essential only.",
+                              type: "success",
+                            });
+                          }
+                        } catch {
+                          toast({
+                            title: "Withdrawal Failed",
+                            message: "Could not reach server to withdraw consent.",
+                            type: "error",
+                          });
+                        }
+                      }}
+                      className="px-4 py-2 rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 hover:bg-red-100 font-semibold text-xs transition cursor-pointer"
+                    >
+                      Withdraw Optional Consent
+                    </button>
                   </div>
                 </div>
 

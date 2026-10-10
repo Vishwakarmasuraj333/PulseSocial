@@ -204,17 +204,20 @@ export default function InboxPage() {
 
     try {
       await inboxService.sendReply(currentConv.id, messageText);
-    } catch {
-      // Offline / demo fallback succeeds
+      toast({
+        title: "Reply Dispatched",
+        message: `Sent to ${currentConv.senderName} on ${currentConv.platform.toUpperCase()}.`,
+        type: "success",
+      });
+    } catch (err: any) {
+      toast({
+        title: "Reply Failed",
+        message: err.message || "Failed to dispatch reply through social provider API.",
+        type: "error",
+      });
     } finally {
       setIsSending(false);
     }
-
-    toast({
-      title: "Reply Dispatched",
-      message: `Sent to ${currentConv.senderName} on ${currentConv.platform.toUpperCase()}.`,
-      type: "success",
-    });
   };
 
   const attachmentInputRef = useRef<HTMLInputElement>(null);

@@ -16,14 +16,28 @@ const InviteSchema = z.object({
 export async function POST(req: Request) {
   try {
     const session = await getSession();
-    let orgId = session?.activeOrgId;
-    let userId = session?.id;
+    if (!session?.activeOrgId || !session?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    if (!orgId) {
-      const defaultOrg = await prisma.organization.findFirst();
-      if (defaultOrg) {
-        orgId = defaultOrg.id;
-      }
+    const orgId = session.activeOrgId;
+    const userId = session.id;
+
+    // Check caller's role in this organization: only OWNER or ADMIN may invite
+    const callerMember = await prisma.organizationMember.findUnique({
+      where: {
+        organizationId_userId: {
+          organizationId: orgId,
+          userId: userId,
+        },
+      },
+    });
+
+    if (!callerMember || !["OWNER", "ADMIN"].includes(callerMember.role.toUpperCase())) {
+      return NextResponse.json(
+        { error: "Forbidden: Only organization Owners and Admins can invite team members." },
+        { status: 403 }
+      );
     }
 
     const body = await req.json();

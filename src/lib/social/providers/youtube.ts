@@ -156,16 +156,23 @@ export class YouTubeProvider implements SocialProvider {
     });
 
     if (!res.ok) {
-      return { followersCount: 0, followingCount: 0, postsCount: 0 };
+      return { followersCount: null, followingCount: null, postsCount: null };
     }
     const json = await res.json();
-    const stats = json.items?.[0]?.statistics || {};
+    const item = json.items?.[0];
+    const stats = item?.statistics || {};
+    const isHiddenSubscribers = Boolean(stats.hiddenSubscriberCount);
+
+    const rawSubCount = stats.subscriberCount != null ? parseInt(stats.subscriberCount, 10) : null;
+    const parsedSubCount = typeof rawSubCount === "number" && !Number.isNaN(rawSubCount) ? rawSubCount : null;
+    const rawPostCount = stats.videoCount != null ? parseInt(stats.videoCount, 10) : null;
+    const parsedPostCount = typeof rawPostCount === "number" && !Number.isNaN(rawPostCount) ? rawPostCount : null;
 
     return {
-      followersCount: stats.subscriberCount ? parseInt(stats.subscriberCount, 10) : 0,
-      followingCount: 0,
-      postsCount: stats.videoCount ? parseInt(stats.videoCount, 10) : 0,
-      bio: json.items?.[0]?.snippet?.description,
+      followersCount: isHiddenSubscribers ? null : parsedSubCount,
+      followingCount: null, // YouTube does not have followingCount on channels
+      postsCount: parsedPostCount,
+      bio: item?.snippet?.description || undefined,
     };
   }
 
@@ -276,17 +283,23 @@ export class YouTubeProvider implements SocialProvider {
           const data = await res.json();
           const stats = data.items?.[0]?.statistics;
           if (stats) {
-            const subscribers = parseInt(stats.subscriberCount || "0", 10);
-            const views = parseInt(stats.viewCount || "0", 10);
+            const isHiddenSubscribers = Boolean(stats.hiddenSubscriberCount);
+            const subscribers = isHiddenSubscribers
+              ? null
+              : stats.subscriberCount != null
+              ? parseInt(stats.subscriberCount, 10)
+              : null;
+            const views = stats.viewCount != null ? parseInt(stats.viewCount, 10) : null;
+            const comments = stats.commentCount != null ? parseInt(stats.commentCount, 10) : null;
             return {
               followers: subscribers,
               impressions: views,
               reach: views,
-              engagementCount: parseInt(stats.commentCount || "0", 10),
-              engagementRate: 0,
-              clicks: 0,
-              shares: 0,
-              saves: 0,
+              engagementCount: comments,
+              engagementRate: null,
+              clicks: null,
+              shares: null,
+              saves: null,
               isCalculated: false,
               rawJson: JSON.stringify(stats),
             };
@@ -297,15 +310,15 @@ export class YouTubeProvider implements SocialProvider {
       }
     }
     return {
-      followers: 0,
-      impressions: 0,
-      reach: 0,
-      engagementCount: 0,
-      engagementRate: 0,
-      clicks: 0,
-      shares: 0,
-      saves: 0,
-      isCalculated: true,
+      followers: null,
+      impressions: null,
+      reach: null,
+      engagementCount: null,
+      engagementRate: null,
+      clicks: null,
+      shares: null,
+      saves: null,
+      isCalculated: false,
     };
   }
 
@@ -570,9 +583,10 @@ export class YouTubeProvider implements SocialProvider {
       }
 
       const stats = data.items?.[0]?.statistics || {};
-      const views = stats.viewCount ? parseInt(stats.viewCount, 10) : null;
-      const likes = stats.likeCount ? parseInt(stats.likeCount, 10) : null;
-      const comments = stats.commentCount ? parseInt(stats.commentCount, 10) : null;
+      const parseMetric = (v: any) => (v != null && v !== "" && !isNaN(parseInt(v, 10)) ? parseInt(v, 10) : null);
+      const views = parseMetric(stats.viewCount);
+      const likes = parseMetric(stats.likeCount);
+      const comments = parseMetric(stats.commentCount);
 
       return {
         success: true,

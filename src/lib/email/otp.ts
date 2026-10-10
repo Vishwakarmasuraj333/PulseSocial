@@ -80,7 +80,7 @@ export async function verifyOTP(userId: string, enteredCode: string): Promise<bo
     throw new Error("Invalid verification code");
   }
 
-  // Delete used OTP
+  // Securely invalidate and remove consumed OTP to prevent replay attacks
   await prisma.emailVerificationOTP.delete({
     where: { id: latest.id },
   });
@@ -91,15 +91,23 @@ export async function verifyOTP(userId: string, enteredCode: string): Promise<bo
 export async function sendVerificationEmail(toEmail: string, otp: string) {
   const host = process.env.SMTP_HOST;
   const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASSWORD;
+  const pass = process.env.SMTP_PASS || process.env.SMTP_PASSWORD;
   const port = parseInt(process.env.SMTP_PORT || "587", 10);
-  const from = process.env.EMAIL_FROM || "PulseSocial <noreply@pulsesocial.io>";
+  const from = process.env.SMTP_FROM || process.env.EMAIL_FROM || "PulseSocial <noreply@pulsesocial.io>";
 
-  if (process.env.NODE_ENV !== "production") {
-    console.log(`[PULSESOCIAL OTP DISPATCH] To: ${toEmail} | Code: ${otp}`);
-  }
+  // Log dispatch event safely with zero secret or OTP code leakage
+  console.log(`[SMTP] Verification email dispatched for recipient.`);
 
+  // In production mode without SMTP credentials, throw an explicit error rather than silently failing
   if (!host || !user || !pass) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(
+        "SMTP configuration missing in production: SMTP_HOST, SMTP_USER, and SMTP_PASS/SMTP_PASSWORD are required. Email dispatch aborted."
+      );
+    }
+    console.warn(
+      "[SMTP Notice] In non-production mode without SMTP credentials. Email dispatch bypassed."
+    );
     return;
   }
 

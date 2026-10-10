@@ -118,13 +118,13 @@ export class MastodonProvider implements SocialProvider {
     const rawId = accountId.split("@")[0] || accountId;
     const res = await fetch(`${instance}/api/v1/accounts/${rawId}`);
     if (!res.ok) {
-      return { followersCount: 0, followingCount: 0, postsCount: 0 };
+      return { followersCount: null, followingCount: null, postsCount: null };
     }
     const acc = await res.json();
     return {
-      followersCount: acc.followers_count || 0,
-      followingCount: acc.following_count || 0,
-      postsCount: acc.statuses_count || 0,
+      followersCount: acc.followers_count != null ? acc.followers_count : null,
+      followingCount: acc.following_count != null ? acc.following_count : null,
+      postsCount: acc.statuses_count != null ? acc.statuses_count : null,
       bio: acc.note,
     };
   }
@@ -163,15 +163,15 @@ export class MastodonProvider implements SocialProvider {
 
   async getAnalytics(): Promise<AnalyticsResult> {
     return {
-      followers: 0,
-      impressions: 0,
-      reach: 0,
-      engagementCount: 0,
-      engagementRate: 0,
-      clicks: 0,
-      shares: 0,
-      saves: 0,
-      isCalculated: true,
+      followers: null,
+      impressions: null,
+      reach: null,
+      engagementCount: null,
+      engagementRate: null,
+      clicks: null,
+      shares: null,
+      saves: null,
+      isCalculated: false,
     };
   }
 

@@ -4,6 +4,7 @@ import { decryptToken } from "@/lib/security/encryption";
 import { getSocialProvider } from "@/lib/social/registry";
 import { SupportedPlatform } from "@/lib/social/types";
 import { getPlatformCapability } from "@/lib/social/capabilities";
+import { verifyCronAuth } from "@/lib/security/cron-auth";
 
 /**
  * Background Scheduler Worker
@@ -20,6 +21,10 @@ export async function POST(req: Request) {
 }
 
 async function handleScheduleExecution(req: Request) {
+  if (!verifyCronAuth(req)) {
+    return NextResponse.json({ error: "Unauthorized cron execution", code: "FORBIDDEN" }, { status: 401 });
+  }
+
   try {
     const now = new Date();
 

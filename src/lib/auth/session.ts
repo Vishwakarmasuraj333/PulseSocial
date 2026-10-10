@@ -71,6 +71,7 @@ export async function ensureSession(): Promise<SessionUser> {
   return existing;
 }
 
+
 export async function getCurrentUser() {
   const session = await getSession();
   if (!session?.id) return null;

@@ -48,7 +48,8 @@ export function MarketingFooter() {
         { label: "Privacy Policy", href: "/privacy" },
         { label: "Terms of Service", href: "/terms" },
         { label: "Security & Governance", href: "/security" },
-        { label: "Cookie Preferences", href: "/cookies" },
+        { label: "Cookie Policy", href: "/cookie-policy" },
+        { label: "Cookie settings", href: "#", isCookieSettings: true },
       ],
     },
   ];
@@ -89,14 +90,31 @@ export function MarketingFooter() {
                 {section.title}
               </p>
               <ul className="space-y-2 text-xs">
-                {section.links.map((link) => (
+                {section.links.map((link: any) => (
                   <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="hover:text-white transition-colors"
-                    >
-                      {link.label}
-                    </Link>
+                    {link.isCookieSettings ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (typeof window !== "undefined") {
+                            window.dispatchEvent(
+                              new CustomEvent("pulsesocial_open_cookie_settings")
+                            );
+                          }
+                        }}
+                        className="hover:text-white transition-colors cursor-pointer text-left"
+                      >
+                        {link.label}
+                      </button>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className="hover:text-white transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

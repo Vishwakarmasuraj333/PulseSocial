@@ -202,6 +202,7 @@ export function InviteTeamModal({ isOpen, onClose, onComplete }: InviteTeamModal
                 {/* Role Select */}
                 <div className="col-span-3 relative">
                   <select
+                    aria-label="Member role"
                     value={row.role}
                     onChange={(e) => handleRowChange(idx, "role", e.target.value)}
                     className="w-full appearance-none px-3.5 py-2.5 text-[13px] border border-slate-300 rounded-md bg-white pr-8 focus:outline-none focus:border-blue-500 cursor-pointer text-slate-800 font-normal"
@@ -216,6 +217,7 @@ export function InviteTeamModal({ isOpen, onClose, onComplete }: InviteTeamModal
                 {/* Channels Select */}
                 <div className="col-span-3 relative">
                   <select
+                    aria-label="Channels access"
                     value={row.channels}
                     onChange={(e) => handleRowChange(idx, "channels", e.target.value)}
                     className="w-full appearance-none px-3.5 py-2.5 text-[13px] border border-slate-300 rounded-md bg-white pr-8 focus:outline-none focus:border-blue-500 cursor-pointer text-slate-800 font-normal"

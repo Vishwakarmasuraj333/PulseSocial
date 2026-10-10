@@ -53,9 +53,9 @@ export const PLATFORM_CAPABILITIES: Record<string, PlatformCapability> = {
     displayName: "Instagram",
     apiVersion: `Graph API ${SOCIAL_API_VERSIONS.META_GRAPH}`,
     status: "APPROVAL REQUIRED",
-    CONNECTED: true,
-    TOKEN_VALID: true,
-    ACCOUNT_SYNCED: true,
+    CONNECTED: false,
+    TOKEN_VALID: false,
+    ACCOUNT_SYNCED: false,
     PUBLISHING_SUPPORTED: true,
     APPROVAL_REQUIRED: true, // Requires Meta App Review for instagram_content_publish
     PUBLISHING_APPROVED: false,
@@ -78,9 +78,9 @@ export const PLATFORM_CAPABILITIES: Record<string, PlatformCapability> = {
     displayName: "Facebook",
     apiVersion: `Graph API ${SOCIAL_API_VERSIONS.META_GRAPH}`,
     status: "APPROVAL REQUIRED",
-    CONNECTED: true,
-    TOKEN_VALID: true,
-    ACCOUNT_SYNCED: true,
+    CONNECTED: false,
+    TOKEN_VALID: false,
+    ACCOUNT_SYNCED: false,
     PUBLISHING_SUPPORTED: true,
     APPROVAL_REQUIRED: true, // Requires Meta App Review for pages_manage_posts
     PUBLISHING_APPROVED: false,
@@ -103,9 +103,9 @@ export const PLATFORM_CAPABILITIES: Record<string, PlatformCapability> = {
     displayName: "LinkedIn",
     apiVersion: `REST Posts API (${SOCIAL_API_VERSIONS.LINKEDIN_REST})`,
     status: "REAL API CONNECTED",
-    CONNECTED: true,
-    TOKEN_VALID: true,
-    ACCOUNT_SYNCED: true,
+    CONNECTED: false,
+    TOKEN_VALID: false,
+    ACCOUNT_SYNCED: false,
     PUBLISHING_SUPPORTED: true,
     APPROVAL_REQUIRED: false, // Member personal publishing with w_member_social does not require partner review
     PUBLISHING_APPROVED: true,
@@ -127,9 +127,9 @@ export const PLATFORM_CAPABILITIES: Record<string, PlatformCapability> = {
     displayName: "X (Twitter)",
     apiVersion: `Twitter API v${SOCIAL_API_VERSIONS.X_API}`,
     status: "REAL API CONNECTED",
-    CONNECTED: true,
-    TOKEN_VALID: true,
-    ACCOUNT_SYNCED: true,
+    CONNECTED: false,
+    TOKEN_VALID: false,
+    ACCOUNT_SYNCED: false,
     PUBLISHING_SUPPORTED: true,
     APPROVAL_REQUIRED: false,
     PUBLISHING_APPROVED: true,
@@ -151,9 +151,9 @@ export const PLATFORM_CAPABILITIES: Record<string, PlatformCapability> = {
     displayName: "TikTok",
     apiVersion: `Content Posting API ${SOCIAL_API_VERSIONS.TIKTOK_API}`,
     status: "APPROVAL REQUIRED",
-    CONNECTED: true,
-    TOKEN_VALID: true,
-    ACCOUNT_SYNCED: true,
+    CONNECTED: false,
+    TOKEN_VALID: false,
+    ACCOUNT_SYNCED: false,
     PUBLISHING_SUPPORTED: true,
     APPROVAL_REQUIRED: true,
     PUBLISHING_APPROVED: false,
@@ -176,9 +176,9 @@ export const PLATFORM_CAPABILITIES: Record<string, PlatformCapability> = {
     displayName: "YouTube",
     apiVersion: `YouTube Data API ${SOCIAL_API_VERSIONS.YOUTUBE_API}`,
     status: "APPROVAL REQUIRED",
-    CONNECTED: true,
-    TOKEN_VALID: true,
-    ACCOUNT_SYNCED: true,
+    CONNECTED: false,
+    TOKEN_VALID: false,
+    ACCOUNT_SYNCED: false,
     PUBLISHING_SUPPORTED: true,
     APPROVAL_REQUIRED: true,
     PUBLISHING_APPROVED: false,
@@ -201,9 +201,9 @@ export const PLATFORM_CAPABILITIES: Record<string, PlatformCapability> = {
     displayName: "Pinterest",
     apiVersion: `Pinterest API ${SOCIAL_API_VERSIONS.PINTEREST_API}`,
     status: "APPROVAL REQUIRED",
-    CONNECTED: true,
-    TOKEN_VALID: true,
-    ACCOUNT_SYNCED: true,
+    CONNECTED: false,
+    TOKEN_VALID: false,
+    ACCOUNT_SYNCED: false,
     PUBLISHING_SUPPORTED: true,
     APPROVAL_REQUIRED: true, // Pinterest standard access requires app review
     PUBLISHING_APPROVED: false,
@@ -225,9 +225,9 @@ export const PLATFORM_CAPABILITIES: Record<string, PlatformCapability> = {
     displayName: "Threads",
     apiVersion: `Threads API ${SOCIAL_API_VERSIONS.THREADS_API}`,
     status: "APPROVAL REQUIRED",
-    CONNECTED: true,
-    TOKEN_VALID: true,
-    ACCOUNT_SYNCED: true,
+    CONNECTED: false,
+    TOKEN_VALID: false,
+    ACCOUNT_SYNCED: false,
     PUBLISHING_SUPPORTED: true,
     APPROVAL_REQUIRED: true, // Meta App Review for Threads API
     PUBLISHING_APPROVED: false,
@@ -250,9 +250,9 @@ export const PLATFORM_CAPABILITIES: Record<string, PlatformCapability> = {
     displayName: "Google Business Profile",
     apiVersion: `Business Profile API ${SOCIAL_API_VERSIONS.GOOGLE_BUSINESS_API}`,
     status: "APPROVAL REQUIRED",
-    CONNECTED: true,
-    TOKEN_VALID: true,
-    ACCOUNT_SYNCED: true,
+    CONNECTED: false,
+    TOKEN_VALID: false,
+    ACCOUNT_SYNCED: false,
     PUBLISHING_SUPPORTED: true,
     APPROVAL_REQUIRED: true, // Google My Business API access approval
     PUBLISHING_APPROVED: false,
@@ -274,9 +274,9 @@ export const PLATFORM_CAPABILITIES: Record<string, PlatformCapability> = {
     displayName: "Mastodon",
     apiVersion: `Mastodon REST API ${SOCIAL_API_VERSIONS.MASTODON_API}`,
     status: "REAL API CONNECTED",
-    CONNECTED: true,
-    TOKEN_VALID: true,
-    ACCOUNT_SYNCED: true,
+    CONNECTED: false,
+    TOKEN_VALID: false,
+    ACCOUNT_SYNCED: false,
     PUBLISHING_SUPPORTED: true,
     APPROVAL_REQUIRED: false, // Decentralized: no corporate approval required
     PUBLISHING_APPROVED: true,
@@ -297,9 +297,9 @@ export const PLATFORM_CAPABILITIES: Record<string, PlatformCapability> = {
     displayName: "Telegram",
     apiVersion: "Telegram Bot API",
     status: "REAL API CONNECTED",
-    CONNECTED: true,
-    TOKEN_VALID: true,
-    ACCOUNT_SYNCED: true,
+    CONNECTED: false,
+    TOKEN_VALID: false,
+    ACCOUNT_SYNCED: false,
     PUBLISHING_SUPPORTED: true,
     APPROVAL_REQUIRED: false,
     PUBLISHING_APPROVED: true,
@@ -320,9 +320,9 @@ export const PLATFORM_CAPABILITIES: Record<string, PlatformCapability> = {
     displayName: "Reddit",
     apiVersion: "Reddit OAuth API",
     status: "REAL API CONNECTED",
-    CONNECTED: true,
-    TOKEN_VALID: true,
-    ACCOUNT_SYNCED: true,
+    CONNECTED: false,
+    TOKEN_VALID: false,
+    ACCOUNT_SYNCED: false,
     PUBLISHING_SUPPORTED: true,
     APPROVAL_REQUIRED: false,
     PUBLISHING_APPROVED: true,
@@ -343,9 +343,9 @@ export const PLATFORM_CAPABILITIES: Record<string, PlatformCapability> = {
     displayName: "Bluesky",
     apiVersion: "AT Protocol XRPC",
     status: "REAL API CONNECTED",
-    CONNECTED: true,
-    TOKEN_VALID: true,
-    ACCOUNT_SYNCED: true,
+    CONNECTED: false,
+    TOKEN_VALID: false,
+    ACCOUNT_SYNCED: false,
     PUBLISHING_SUPPORTED: true,
     APPROVAL_REQUIRED: false,
     PUBLISHING_APPROVED: true,
@@ -388,44 +388,66 @@ export const PLATFORM_CAPABILITIES: Record<string, PlatformCapability> = {
   },
 };
 
-export function getPlatformCapability(platform: string): PlatformCapability {
+export function getPlatformCapability(
+  platform: string,
+  account?: {
+    status?: string;
+    tokenExpiresAt?: Date | string | null;
+    lastSyncedAt?: Date | string | null;
+  } | null
+): PlatformCapability {
   const norm = platform.toLowerCase().replace(/[^a-z]/g, "");
-  if (norm.includes("facebook")) return PLATFORM_CAPABILITIES.facebook;
-  if (norm.includes("instagram")) return PLATFORM_CAPABILITIES.instagram;
-  if (norm.includes("linkedin")) return PLATFORM_CAPABILITIES.linkedin;
-  if (norm.includes("x") || norm.includes("twitter")) return PLATFORM_CAPABILITIES.x;
-  if (norm.includes("tiktok")) return PLATFORM_CAPABILITIES.tiktok;
-  if (norm.includes("youtube")) return PLATFORM_CAPABILITIES.youtube;
-  if (norm.includes("pinterest")) return PLATFORM_CAPABILITIES.pinterest;
-  if (norm.includes("thread")) return PLATFORM_CAPABILITIES.threads;
-  if (norm.includes("google")) return PLATFORM_CAPABILITIES.googlebusiness;
-  if (norm.includes("mastodon")) return PLATFORM_CAPABILITIES.mastodon;
-  if (norm.includes("telegram")) return PLATFORM_CAPABILITIES.telegram;
-  if (norm.includes("reddit")) return PLATFORM_CAPABILITIES.reddit;
-  if (norm.includes("bluesky")) return PLATFORM_CAPABILITIES.bluesky;
-  if (norm.includes("snapchat")) return PLATFORM_CAPABILITIES.snapchat;
+  let base: PlatformCapability | null = null;
+  if (norm.includes("facebook")) base = { ...PLATFORM_CAPABILITIES.facebook };
+  else if (norm.includes("instagram")) base = { ...PLATFORM_CAPABILITIES.instagram };
+  else if (norm.includes("linkedin")) base = { ...PLATFORM_CAPABILITIES.linkedin };
+  else if (norm.includes("x") || norm.includes("twitter")) base = { ...PLATFORM_CAPABILITIES.x };
+  else if (norm.includes("tiktok")) base = { ...PLATFORM_CAPABILITIES.tiktok };
+  else if (norm.includes("youtube")) base = { ...PLATFORM_CAPABILITIES.youtube };
+  else if (norm.includes("pinterest")) base = { ...PLATFORM_CAPABILITIES.pinterest };
+  else if (norm.includes("thread")) base = { ...PLATFORM_CAPABILITIES.threads };
+  else if (norm.includes("google")) base = { ...PLATFORM_CAPABILITIES.googlebusiness };
+  else if (norm.includes("mastodon")) base = { ...PLATFORM_CAPABILITIES.mastodon };
+  else if (norm.includes("telegram")) base = { ...PLATFORM_CAPABILITIES.telegram };
+  else if (norm.includes("reddit")) base = { ...PLATFORM_CAPABILITIES.reddit };
+  else if (norm.includes("bluesky")) base = { ...PLATFORM_CAPABILITIES.bluesky };
+  else if (norm.includes("snapchat")) base = { ...PLATFORM_CAPABILITIES.snapchat };
+  else {
+    base = {
+      platform: norm,
+      displayName: platform,
+      apiVersion: "REST API",
+      status: "CONFIGURATION REQUIRED",
+      CONNECTED: false,
+      TOKEN_VALID: false,
+      ACCOUNT_SYNCED: false,
+      PUBLISHING_SUPPORTED: false,
+      APPROVAL_REQUIRED: false,
+      PUBLISHING_APPROVED: false,
+      PUBLIC_PUBLISHING_ALLOWED: false,
+      MEDIA_UPLOAD_SUPPORTED: false,
+      REAL_API_VERIFIED: false,
+      canPublish: false,
+      canLike: false,
+      canComment: false,
+      canShare: false,
+      canSave: false,
+      canSchedule: false,
+      supportedMedia: ["IMAGE", "VIDEO"],
+      maxCharacterLimit: 2000,
+    };
+  }
 
-  return {
-    platform: norm,
-    displayName: platform,
-    apiVersion: "REST API",
-    status: "CONFIGURATION REQUIRED",
-    CONNECTED: false,
-    TOKEN_VALID: false,
-    ACCOUNT_SYNCED: false,
-    PUBLISHING_SUPPORTED: false,
-    APPROVAL_REQUIRED: false,
-    PUBLISHING_APPROVED: false,
-    PUBLIC_PUBLISHING_ALLOWED: false,
-    MEDIA_UPLOAD_SUPPORTED: false,
-    REAL_API_VERIFIED: false,
-    canPublish: false,
-    canLike: false,
-    canComment: false,
-    canShare: false,
-    canSave: false,
-    canSchedule: false,
-    supportedMedia: ["IMAGE", "VIDEO"],
-    maxCharacterLimit: 2000,
-  };
+  if (account) {
+    const isConnected = account.status === "CONNECTED";
+    const isExpired = account.status === "EXPIRED" || (account.tokenExpiresAt ? new Date(account.tokenExpiresAt) < new Date() : false);
+    base.CONNECTED = isConnected;
+    base.TOKEN_VALID = isConnected && !isExpired;
+    base.ACCOUNT_SYNCED = Boolean(account.lastSyncedAt);
+    if (!isConnected) {
+      base.status = account.status === "DISCONNECTED" ? "CONFIGURATION REQUIRED" : (account.status as any) || "CONFIGURATION REQUIRED";
+    }
+  }
+
+  return base;
 }

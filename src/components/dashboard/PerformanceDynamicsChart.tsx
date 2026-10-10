@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -18,6 +19,7 @@ import {
   Activity,
   Layers,
   Sparkles,
+  Plus,
 } from "lucide-react";
 import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
 
@@ -60,72 +62,75 @@ export function PerformanceDynamicsChart({ dateRange }: PerformanceDynamicsChart
     inbound: 0,
     commentsCount: 0,
     messagesCount: 0,
+    isDataAvailable: false,
   };
 
+  const hasAccounts = Array.isArray(analyticsData?.accounts) && analyticsData.accounts.length > 0;
+  const hasRealData = Boolean(summary.isDataAvailable);
+
+  // Truth contract metrics: display honest reasons when data is unavailable
   const metrics = [
     {
       id: "reach",
       label: "Reach & Impressions",
-      badge: summary.totalReach > 0 ? `${summary.totalReach.toLocaleString()} total` : "0 reach",
+      badge: !hasAccounts
+        ? "No connected account"
+        : summary.totalReach > 0
+        ? `${summary.totalReach.toLocaleString()} total`
+        : "Provider has not returned data",
     },
     {
       id: "followers",
       label: "Audience Growth",
-      badge: `${(summary.totalFollowers || 0).toLocaleString()} audience`,
+      badge: !hasAccounts
+        ? "No connected account"
+        : summary.totalFollowers > 0
+        ? `${summary.totalFollowers.toLocaleString()} total`
+        : "0 audience",
     },
     {
       id: "engagement",
       label: "Interactions & Clicks",
-      badge: `${summary.engagementRate || 0}% rate`,
+      badge: !hasAccounts
+        ? "No connected account"
+        : summary.totalReach > 0 || summary.totalFollowers > 0
+        ? `${summary.engagementRate || 0}% rate`
+        : "No denominator available",
     },
     {
       id: "inbound",
       label: "Inbound Inquiries",
-      badge: `${(summary.commentsCount || 0) + (summary.messagesCount || 0)} inquiries`,
+      badge: !hasAccounts
+        ? "No connected account"
+        : `${(summary.commentsCount || 0) + (summary.messagesCount || 0)} inquiries`,
     },
   ];
 
-  const platforms = [
+  // Dynamically build filter chips only for connected providers
+  const connectedProviders: string[] = hasAccounts
+    ? Array.from(new Set<string>(analyticsData.accounts.map((a: any) => String(a.provider))))
+    : [];
+
+  const platforms: { id: string; label: string }[] = [
     { id: "all", label: "All Networks" },
-    { id: "instagram", label: "Instagram" },
-    { id: "linkedin", label: "LinkedIn" },
-    { id: "x", label: "X" },
-    { id: "facebook", label: "Facebook" },
+    ...connectedProviders.map((p: string) => ({
+      id: p,
+      label: p.charAt(0).toUpperCase() + p.slice(1).replace(/_/g, " "),
+    })),
   ];
 
-  // Derive chart points from real trends or week baseline
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  // Derive chart points strictly from real trends
   const trends = analyticsData?.trends;
-  let data: any[] = [];
+  let chartData: any[] = [];
 
-  if (Array.isArray(trends) && trends.length > 0) {
-    data = trends.map((t: any) => ({
+  if (hasAccounts && Array.isArray(trends) && trends.length > 0 && hasRealData) {
+    chartData = trends.map((t: any) => ({
       date: t.date.slice(5),
       total: activeMetric === "reach" ? t.reach : activeMetric === "engagement" ? t.engagement : t.impressions,
-      instagram: Math.floor(t.reach * 0.4),
-      facebook: Math.floor(t.reach * 0.3),
-      linkedin: Math.floor(t.reach * 0.2),
-      x: Math.floor(t.reach * 0.1),
       rate: summary.engagementRate,
       interactions: t.engagement,
       growth: 0,
       received: 0,
-      resolved: 0,
-    }));
-  } else {
-    // Clean authentic baseline when no historical metric entries exist yet
-    data = days.map((day) => ({
-      date: day,
-      total: summary.totalReach > 0 ? Math.round(summary.totalReach / 7) : 0,
-      instagram: 0,
-      facebook: 0,
-      linkedin: 0,
-      x: 0,
-      rate: summary.engagementRate,
-      interactions: 0,
-      growth: 0,
-      received: 0,
-      resolved: 0,
     }));
   }
 
@@ -138,8 +143,8 @@ export function PerformanceDynamicsChart({ dateRange }: PerformanceDynamicsChart
             <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
               Performance Dynamics
             </h2>
-            <span className="text-[11px] font-semibold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
-              SE Ranking Visualizer
+            <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+              Performance Overview
             </span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -200,7 +205,13 @@ export function PerformanceDynamicsChart({ dateRange }: PerformanceDynamicsChart
             >
               {m.label}
             </span>
-            <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5 inline-block">
+            <span
+              className={`text-[11px] font-semibold mt-0.5 inline-block ${
+                m.badge.includes("No") || m.badge.includes("Provider")
+                  ? "text-slate-400 dark:text-slate-500"
+                  : "text-emerald-600 dark:text-emerald-400"
+              }`}
+            >
               {m.badge}
             </span>
           </button>
@@ -227,65 +238,78 @@ export function PerformanceDynamicsChart({ dateRange }: PerformanceDynamicsChart
         ))}
       </div>
 
-      {/* Main Recharts Area */}
+      {/* Main Recharts Area / Honest Empty State */}
       <div className="w-full h-72 sm:h-80 pt-2">
-        <ResponsiveContainer width="100%" height="100%">
-          {chartType === "area" ? (
-            <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="primaryGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#6366F1" stopOpacity={0.4} />
-                  <stop offset="95%" stopColor="#6366F1" stopOpacity={0.0} />
-                </linearGradient>
-                <linearGradient id="secondaryGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#0EA5E9" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#0EA5E9" stopOpacity={0.0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-slate-100 dark:text-slate-800" />
-              <XAxis dataKey="date" stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} />
-              <YAxis stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => (v >= 1000 ? `${v / 1000}k` : v)} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#0F172A",
-                  borderColor: "#334155",
-                  borderRadius: "12px",
-                  color: "#fff",
-                  fontSize: "12px",
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey={activeMetric === "reach" ? "total" : activeMetric === "followers" ? "total" : activeMetric === "engagement" ? "interactions" : "received"}
-                name={activeMetric.toUpperCase()}
-                stroke="#6366F1"
-                strokeWidth={3}
-                fillOpacity={1}
-                fill="url(#primaryGrad)"
-              />
-            </AreaChart>
-          ) : (
-            <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-slate-100 dark:text-slate-800" />
-              <XAxis dataKey="date" stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} />
-              <YAxis stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => (v >= 1000 ? `${v / 1000}k` : v)} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#0F172A",
-                  borderColor: "#334155",
-                  borderRadius: "12px",
-                  color: "#fff",
-                  fontSize: "12px",
-                }}
-              />
-              <Bar
-                dataKey={activeMetric === "reach" ? "total" : activeMetric === "followers" ? "growth" : activeMetric === "engagement" ? "interactions" : "received"}
-                fill="#6366F1"
-                radius={[6, 6, 0, 0]}
-              />
-            </BarChart>
-          )}
-        </ResponsiveContainer>
+        {chartData.length > 0 ? (
+          <ResponsiveContainer width="100%" height="100%">
+            {chartType === "area" ? (
+              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="primaryGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#6366F1" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#6366F1" stopOpacity={0.0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-slate-100 dark:text-slate-800" />
+                <XAxis dataKey="date" stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => (v >= 1000 ? `${v / 1000}k` : v)} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#0F172A",
+                    borderColor: "#334155",
+                    borderRadius: "12px",
+                    color: "#fff",
+                    fontSize: "12px",
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="total"
+                  name={activeMetric.toUpperCase()}
+                  stroke="#6366F1"
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#primaryGrad)"
+                />
+              </AreaChart>
+            ) : (
+              <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-slate-100 dark:text-slate-800" />
+                <XAxis dataKey="date" stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => (v >= 1000 ? `${v / 1000}k` : v)} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#0F172A",
+                    borderColor: "#334155",
+                    borderRadius: "12px",
+                    color: "#fff",
+                    fontSize: "12px",
+                  }}
+                />
+                <Bar dataKey="total" fill="#6366F1" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            )}
+          </ResponsiveContainer>
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/30">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3 shadow-2xs">
+              <BarChart2 className="w-6 h-6" />
+            </div>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+              Connect an account to see data
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mt-1 mb-4 leading-relaxed">
+              No analytics stream is active. Link your Facebook, Instagram, LinkedIn, or other channels to synchronize authentic performance metrics.
+            </p>
+            <Link
+              href="/social-accounts"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white text-xs font-bold transition shadow-xs cursor-pointer active:scale-95"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Connect Channel</span>
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

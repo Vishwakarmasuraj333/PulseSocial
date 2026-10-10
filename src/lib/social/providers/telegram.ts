@@ -66,11 +66,11 @@ export class TelegramProvider implements SocialProvider {
     ];
   }
 
-  async getProfile(accessToken: string, accountId: string): Promise<SocialProfileResult> {
+  async getProfile(): Promise<SocialProfileResult> {
     return {
-      followersCount: 0,
-      followingCount: 0,
-      postsCount: 0,
+      followersCount: null,
+      followingCount: null,
+      postsCount: null,
       bio: "Telegram Channel",
     };
   }
@@ -145,17 +145,17 @@ export class TelegramProvider implements SocialProvider {
     return true;
   }
 
-  async getAnalytics(accessToken: string, accountId: string, since: Date, until: Date): Promise<AnalyticsResult> {
+  async getAnalytics(): Promise<AnalyticsResult> {
     return {
-      followers: 0,
-      impressions: 0,
-      reach: 0,
-      engagementCount: 0,
-      engagementRate: 0,
-      clicks: 0,
-      shares: 0,
-      saves: 0,
-      isCalculated: true,
+      followers: null,
+      impressions: null,
+      reach: null,
+      engagementCount: null,
+      engagementRate: null,
+      clicks: null,
+      shares: null,
+      saves: null,
+      isCalculated: false,
     };
   }
 

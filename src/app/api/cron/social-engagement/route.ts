@@ -1,20 +1,10 @@
 import { NextResponse } from "next/server";
 import { syncSocialEngagement } from "@/lib/social/engagement-sync";
+import { verifyCronAuth } from "@/lib/security/cron-auth";
 
 /**
  * Background Engagement Sync Job
  * GET /api/cron/social-engagement
- *
- * Flow:
- * 1. Authenticate cron (Bearer token or CRON_SECRET)
- * 2. Find published posts requiring sync
- * 3. Load platform adapter
- * 4. Validate token
- * 5. Fetch supported metrics/comments
- * 6. Upsert external records
- * 7. Update lastSyncedAt
- * 8. Handle token/API errors & mark reauthorization when required
- * 9. Prevent duplicate records via external unique keys
  */
 export async function GET(req: Request) {
   return handleSync(req);
@@ -25,19 +15,12 @@ export async function POST(req: Request) {
 }
 
 async function handleSync(req: Request) {
-  try {
-    const authHeader = req.headers.get("authorization");
-    const { searchParams } = new URL(req.url);
-    const cronKey = searchParams.get("key") || searchParams.get("token");
+  if (!verifyCronAuth(req)) {
+    return NextResponse.json({ error: "Unauthorized cron execution", code: "FORBIDDEN" }, { status: 401 });
+  }
 
-    const expectedSecret = process.env.CRON_SECRET;
-    if (expectedSecret) {
-      const isAuthValid =
-        authHeader === `Bearer ${expectedSecret}` || cronKey === expectedSecret;
-      if (!isAuthValid) {
-        return NextResponse.json({ error: "Unauthorized cron execution" }, { status: 401 });
-      }
-    }
+  try {
+    const { searchParams } = new URL(req.url);
 
     const limitParam = searchParams.get("limit");
     const limit = limitParam ? parseInt(limitParam, 10) : 50;

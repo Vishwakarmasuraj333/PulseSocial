@@ -112,8 +112,9 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Notifications
+  // Notifications & Real Inbox Counts
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [inboxUnreadCount, setInboxUnreadCount] = useState<number>(0);
 
   // Global modals & drawers
   const [isCreateBrandOpen, setIsCreateBrandOpen] = useState(false);
@@ -186,25 +187,46 @@ export function AppLayout({ children }: AppLayoutProps) {
     };
   }, []);
 
-  // Load real activity notifications
-  useEffect(() => {
-    fetch("/api/audit?limit=10")
+  // Load real unread inbox items count
+  const loadInboxUnread = () => {
+    fetch("/api/inbox/unread")
       .then((r) => r.json())
       .then((d) => {
-        if (Array.isArray(d.logs)) {
-          const mapped: NotificationItem[] = d.logs.map((log: any) => ({
-            id: log.id,
-            title: log.title || log.action?.replace(/_/g, " "),
-            description: log.description || "Activity recorded in brand workspace.",
-            time: log.timestamp || "Recently",
-            read: false,
-            type: log.action?.includes("PUBLISH") ? "post_published" : "system",
-          }));
-          setNotifications(mapped);
+        if (typeof d?.unreadCount === "number") {
+          setInboxUnreadCount(d.unreadCount);
         }
       })
       .catch(() => {});
-  }, []);
+  };
+
+  // Load real notifications from database
+  const loadNotifications = () => {
+    fetch("/api/notifications")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d?.notifications)) {
+          setNotifications(d.notifications);
+        }
+      })
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    loadInboxUnread();
+    loadNotifications();
+
+    const handleUpdate = () => {
+      loadInboxUnread();
+      loadNotifications();
+    };
+
+    window.addEventListener("pulsesocial_active_brand_changed", handleUpdate);
+    window.addEventListener("pulsesocial_post_created", handleUpdate);
+    return () => {
+      window.removeEventListener("pulsesocial_active_brand_changed", handleUpdate);
+      window.removeEventListener("pulsesocial_post_created", handleUpdate);
+    };
+  }, [activeBrand?.id]);
 
   // Close mobile drawer on route change
   useEffect(() => {
@@ -243,8 +265,15 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   const unreadNotificationsCount = notifications.filter((n) => !n.read).length;
 
-  const handleMarkAllNotificationsRead = () => {
+  const handleMarkAllNotificationsRead = async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    try {
+      await fetch("/api/notifications", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ markAllRead: true }),
+      });
+    } catch {}
   };
 
   const handleToggleDarkMode = () => {
@@ -329,7 +358,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           href: "/inbox",
           icon: MessageSquare,
           match: (p: string) => p === "/inbox" || (p.startsWith("/inbox") && !p.includes("tab=")),
-          badge: unreadNotificationsCount > 0 ? unreadNotificationsCount.toString() : undefined,
+          badge: inboxUnreadCount > 0 ? inboxUnreadCount.toString() : undefined,
         },
         {
           label: "Comments",
@@ -368,9 +397,9 @@ export function AppLayout({ children }: AppLayoutProps) {
         },
         {
           label: "Audience",
-          href: "/connections",
+          href: "/analytics?tab=audience",
           icon: Users,
-          match: (p: string) => p.startsWith("/connections"),
+          match: (p: string) => p.includes("tab=audience"),
         },
         {
           label: "Engagement",
@@ -444,9 +473,9 @@ export function AppLayout({ children }: AppLayoutProps) {
         },
         {
           label: "Billing",
-          href: "/settings?tab=portal_settings",
+          href: "/billing",
           icon: CreditCard,
-          match: (p: string) => p.includes("portal_settings") || p.includes("billing"),
+          match: (p: string) => p.startsWith("/billing"),
         },
       ],
     },
@@ -910,11 +939,35 @@ export function AppLayout({ children }: AppLayoutProps) {
           </div>
         </header>
 
-        {/* ============================================================ */}
-        {/* MAIN BODY: Lavender Surface Canvas with Rounded Layout      */}
-        {/* ============================================================ */}
-        <main className="flex-1 overflow-y-auto pb-16">
-          {children}
+        <main className="flex-1 overflow-y-auto pb-16 flex flex-col justify-between">
+          <div>{children}</div>
+          <footer className="mt-auto px-6 py-4 border-t border-slate-200/60 dark:border-slate-800/60 text-[11px] text-slate-500 dark:text-slate-400 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span>PulseSocial Platform</span>
+              <span>•</span>
+              <Link href="/cookie-policy" className="hover:text-slate-800 dark:hover:text-slate-200 underline">
+                Cookie Policy
+              </Link>
+              <span>•</span>
+              <Link href="/privacy" className="hover:text-slate-800 dark:hover:text-slate-200 underline">
+                Privacy Policy
+              </Link>
+              <span>•</span>
+              <button
+                type="button"
+                id="app-footer-cookie-settings"
+                onClick={() => {
+                  if (typeof window !== "undefined") {
+                    window.dispatchEvent(new CustomEvent("pulsesocial_open_cookie_settings"));
+                  }
+                }}
+                className="hover:text-slate-800 dark:hover:text-slate-200 underline cursor-pointer"
+              >
+                Cookie settings
+              </button>
+            </div>
+            <span>SOC2 Type II • Hardware-Grade AES-256 Vault</span>
+          </footer>
         </main>
       </div>
 

@@ -1,3 +1,5 @@
-import SocialConnectionsPage from "../social-accounts/page";
+import { redirect } from "next/navigation";
 
-export default SocialConnectionsPage;
+export default function ConnectionsRedirectPage() {
+  redirect("/analytics?tab=audience");
+}

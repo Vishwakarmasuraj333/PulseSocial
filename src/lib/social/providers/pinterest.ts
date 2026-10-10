@@ -120,9 +120,9 @@ export class PinterestProvider implements SocialProvider {
       if (res.ok) {
         const user = await res.json();
         return {
-          followersCount: user.follower_count || 0,
-          followingCount: user.following_count || 0,
-          postsCount: user.pin_count || 0,
+          followersCount: user.follower_count != null ? user.follower_count : null,
+          followingCount: user.following_count != null ? user.following_count : null,
+          postsCount: user.pin_count != null ? user.pin_count : null,
           bio: user.about,
           websiteUrl: user.website_url,
           raw: user,
@@ -130,9 +130,9 @@ export class PinterestProvider implements SocialProvider {
       }
     } catch {}
     return {
-      followersCount: 0,
-      followingCount: 0,
-      postsCount: 0,
+      followersCount: null,
+      followingCount: null,
+      postsCount: null,
     };
   }
 
@@ -221,14 +221,14 @@ export class PinterestProvider implements SocialProvider {
 
   async getAnalytics(): Promise<AnalyticsResult> {
     return {
-      followers: 0,
-      impressions: 0,
-      reach: 0,
-      engagementCount: 0,
-      engagementRate: 0,
-      clicks: 0,
-      shares: 0,
-      saves: 0,
+      followers: null,
+      impressions: null,
+      reach: null,
+      engagementCount: null,
+      engagementRate: null,
+      clicks: null,
+      shares: null,
+      saves: null,
       isCalculated: false,
     };
   }

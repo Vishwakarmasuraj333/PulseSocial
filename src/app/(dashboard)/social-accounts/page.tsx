@@ -298,27 +298,27 @@ export default function SocialAccountsPage() {
                   >
                     Social Planner
                   </Link>
-                  <Link href="/marketing/emails" className="hover:text-slate-900 dark:hover:text-white transition">
-                    Emails
-                  </Link>
                   <Link href="/snippets" className="hover:text-slate-900 dark:hover:text-white transition">
                     Snippets
-                  </Link>
-                  <Link href="/timers" className="hover:text-slate-900 dark:hover:text-white transition">
-                    Countdown Timers
-                  </Link>
-                  <Link href="/links" className="hover:text-slate-900 dark:hover:text-white transition">
-                    Trigger Links
-                  </Link>
-                  <Link href="/affiliates" className="hover:text-slate-900 dark:hover:text-white transition">
-                    Affiliate Manager
                   </Link>
                   <Link href="/brand-boards" className="hover:text-slate-900 dark:hover:text-white transition">
                     Brand Boards
                   </Link>
-                  <Link href="/ad-manager" className="hover:text-slate-900 dark:hover:text-white transition">
-                    Ad Manager
+                  <Link href="/links" className="hover:text-slate-900 dark:hover:text-white transition">
+                    Trigger Links
                   </Link>
+                  <span className="text-slate-400 dark:text-slate-500 cursor-default flex items-center gap-1">
+                    Emails <span className="text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">Coming soon</span>
+                  </span>
+                  <span className="text-slate-400 dark:text-slate-500 cursor-default flex items-center gap-1">
+                    Countdown Timers <span className="text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">Coming soon</span>
+                  </span>
+                  <span className="text-slate-400 dark:text-slate-500 cursor-default flex items-center gap-1">
+                    Affiliate Manager <span className="text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">Coming soon</span>
+                  </span>
+                  <span className="text-slate-400 dark:text-slate-500 cursor-default flex items-center gap-1">
+                    Ad Manager <span className="text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">Coming soon</span>
+                  </span>
                 </div>
               </div>
             </div>

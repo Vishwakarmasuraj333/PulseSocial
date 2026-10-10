@@ -109,8 +109,52 @@ export default function TeamPage() {
           </Button>
         </div>
 
-        {/* Team Table Card */}
-        <Card className="overflow-hidden border-slate-200/80">
+        {/* Mobile Cards View (<md) */}
+        <div className="md:hidden space-y-3">
+          {members.map((m) => (
+            <Card key={m.id} className="p-4 border border-slate-200/80 dark:border-slate-800 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-200 shrink-0">
+                    {m.avatar ? (
+                      <Image
+                        src={m.avatar}
+                        alt={m.name}
+                        width={36}
+                        height={36}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center font-bold text-slate-600">
+                        {m.name.charAt(0)}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-900 dark:text-white text-xs">{m.name}</p>
+                    <p className="text-[11px] text-slate-400">{m.email}</p>
+                  </div>
+                </div>
+                <Badge variant={m.role === "OWNER" ? "default" : "secondary"} className="text-[10px]">
+                  {m.role}
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
+                <span className="text-slate-500 dark:text-slate-400 text-[11px] font-medium">{m.channels}</span>
+                {m.isApprover ? (
+                  <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold text-[11px]">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Approver
+                  </span>
+                ) : (
+                  <span className="text-slate-400 text-[11px]">Standard</span>
+                )}
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        {/* Desktop Team Table Card (>=md) */}
+        <Card className="hidden md:block overflow-hidden border-slate-200/80">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
@@ -189,10 +233,12 @@ export default function TeamPage() {
         >
           <form onSubmit={handleSendInvite} className="space-y-4 pt-2">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              <label htmlFor="invite-email-input" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Type their email address *
               </label>
               <Input
+                id="invite-email-input"
+                aria-label="Email address"
                 type="email"
                 required
                 placeholder="colleague@company.com"
@@ -203,10 +249,12 @@ export default function TeamPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                <label htmlFor="invite-role-select" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                   Role
                 </label>
                 <select
+                  id="invite-role-select"
+                  aria-label="Select role"
                   value={inviteRole}
                   onChange={(e) => setInviteRole(e.target.value)}
                   className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm shadow-sm dark:border-slate-800 dark:bg-slate-950"
@@ -219,10 +267,14 @@ export default function TeamPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                <label htmlFor="invite-channels-select" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                   Channels
                 </label>
-                <select className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm shadow-sm dark:border-slate-800 dark:bg-slate-950">
+                <select
+                  id="invite-channels-select"
+                  aria-label="Select channels"
+                  className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm shadow-sm dark:border-slate-800 dark:bg-slate-950"
+                >
                   <option value="ALL">All Channels</option>
                   <option value="INSTAGRAM">Instagram Profile</option>
                 </select>

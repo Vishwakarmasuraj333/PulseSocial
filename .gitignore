@@ -25,3 +25,8 @@ prisma/*.db-journal
 # Local scratch files
 scratch_*.js
 crop_*.js
+
+# Test artifacts
+test-results/
+playwright-report/
+blob-report/

@@ -191,15 +191,15 @@ export class XProvider implements SocialProvider {
     });
 
     if (!res.ok) {
-      return { followersCount: 0, followingCount: 0, postsCount: 0 };
+      return { followersCount: null, followingCount: null, postsCount: null };
     }
     const json = await res.json();
     const metrics = json.data?.public_metrics || {};
 
     return {
-      followersCount: metrics.followers_count || 0,
-      followingCount: metrics.following_count || 0,
-      postsCount: metrics.tweet_count || 0,
+      followersCount: metrics.followers_count != null ? metrics.followers_count : null,
+      followingCount: metrics.following_count != null ? metrics.following_count : null,
+      postsCount: metrics.tweet_count != null ? metrics.tweet_count : null,
       bio: json.data?.description,
     };
   }
@@ -292,14 +292,14 @@ export class XProvider implements SocialProvider {
           const metrics = data.data?.public_metrics;
           if (metrics) {
             return {
-              followers: metrics.followers_count || 0,
-              impressions: 0,
-              reach: metrics.followers_count || 0,
-              engagementCount: 0,
-              engagementRate: 0,
-              clicks: 0,
-              shares: 0,
-              saves: 0,
+              followers: metrics.followers_count != null ? metrics.followers_count : null,
+              impressions: null,
+              reach: null,
+              engagementCount: null,
+              engagementRate: null,
+              clicks: null,
+              shares: null,
+              saves: null,
               isCalculated: false,
               rawJson: JSON.stringify(metrics),
             };
@@ -310,15 +310,15 @@ export class XProvider implements SocialProvider {
       }
     }
     return {
-      followers: 0,
-      impressions: 0,
-      reach: 0,
-      engagementCount: 0,
-      engagementRate: 0,
-      clicks: 0,
-      shares: 0,
-      saves: 0,
-      isCalculated: true,
+      followers: null,
+      impressions: null,
+      reach: null,
+      engagementCount: null,
+      engagementRate: null,
+      clicks: null,
+      shares: null,
+      saves: null,
+      isCalculated: false,
     };
   }
 

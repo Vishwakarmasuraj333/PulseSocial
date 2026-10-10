@@ -127,9 +127,9 @@ export class WhatsAppProvider implements SocialProvider {
         if (res.ok) {
           const data = await res.json();
           return {
-            followersCount: 0,
-            followingCount: 0,
-            postsCount: 0,
+            followersCount: null,
+            followingCount: null,
+            postsCount: null,
             bio: data.verified_name ? `Verified WhatsApp Account: ${data.verified_name} (Quality: ${data.quality_rating || "UNKNOWN"})` : "WhatsApp Cloud API Account",
           };
         }
@@ -137,9 +137,9 @@ export class WhatsAppProvider implements SocialProvider {
     }
 
     return {
-      followersCount: 0,
-      followingCount: 0,
-      postsCount: 0,
+      followersCount: null,
+      followingCount: null,
+      postsCount: null,
       bio: "WhatsApp Business Cloud API",
     };
   }
@@ -212,15 +212,15 @@ export class WhatsAppProvider implements SocialProvider {
 
   async getAnalytics(): Promise<AnalyticsResult> {
     return {
-      followers: 0,
-      impressions: 0,
-      reach: 0,
-      engagementCount: 0,
-      engagementRate: 0,
-      clicks: 0,
-      shares: 0,
-      saves: 0,
-      isCalculated: true,
+      followers: null,
+      impressions: null,
+      reach: null,
+      engagementCount: null,
+      engagementRate: null,
+      clicks: null,
+      shares: null,
+      saves: null,
+      isCalculated: false,
     };
   }
 

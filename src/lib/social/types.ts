@@ -231,9 +231,9 @@ export interface SocialAccountInfo {
 }
 
 export interface SocialProfileResult {
-  followersCount: number;
-  followingCount: number;
-  postsCount: number;
+  followersCount: number | null;
+  followingCount: number | null;
+  postsCount: number | null;
   bio?: string;
   websiteUrl?: string;
   raw?: Record<string, unknown>;
@@ -494,14 +494,14 @@ export interface ExternalCommentData {
 }
 
 export interface AnalyticsResult {
-  followers: number;
-  impressions: number;
-  reach: number;
-  engagementCount: number;
-  engagementRate: number;
-  clicks: number;
-  shares: number;
-  saves: number;
+  followers: number | null;
+  impressions: number | null;
+  reach: number | null;
+  engagementCount: number | null;
+  engagementRate: number | null;
+  clicks: number | null;
+  shares: number | null;
+  saves: number | null;
   isCalculated: boolean;
   rawJson?: string;
 }

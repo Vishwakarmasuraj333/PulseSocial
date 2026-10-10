@@ -39,25 +39,6 @@ interface NoteItem {
   pinned: boolean;
 }
 
-const DEFAULT_NOTES: NoteItem[] = [
-  {
-    id: "note-1",
-    title: "Weekly Social Campaign Plan",
-    content:
-      "1. Finalize feature launch announcements across LinkedIn & X\n2. Schedule brand awareness reel for peak engagement hours\n3. Review analytics dashboard for quarterly reach goals\n4. Monitor inbox conversations & engage with audience questions",
-    updatedAt: "Just now",
-    pinned: true,
-  },
-  {
-    id: "note-2",
-    title: "Brand Campaign Keywords",
-    content:
-      "#DigitalMarketing #GrowthStrategy #SocialMediaManagement #PulseSocial #BrandAwareness #TechInnovation",
-    updatedAt: "Yesterday",
-    pinned: false,
-  },
-];
-
 interface PinItem {
   id: string;
   title: string;
@@ -118,55 +99,15 @@ export function BottomDockBar() {
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  // Dynamic Notes state
-  const [notes, setNotes] = useState<NoteItem[]>(DEFAULT_NOTES);
-  const [selectedNoteId, setSelectedNoteId] = useState<string>("note-1");
+  // Dynamic Notes state (workspace isolated)
+  const [notes, setNotes] = useState<NoteItem[]>([]);
+  const [selectedNoteId, setSelectedNoteId] = useState<string>("");
 
-  // Dynamic Pins state
-  const [pins, setPins] = useState<PinItem[]>([
-    {
-      id: "pin-1",
-      title: "Latest Post Performance",
-      subtitle: "Facebook Page Reach & Engagement",
-      type: "post",
-      url: "/posts",
-    },
-    {
-      id: "pin-2",
-      title: activeBrand?.name || "Active Brand",
-      subtitle: "Brand Health & Analytics Overview",
-      type: "channel",
-      url: "/dashboard",
-    },
-    {
-      id: "pin-3",
-      title: "Social Accounts & Connections",
-      subtitle: "Official Channel Connections",
-      type: "channel",
-      url: "/social-accounts",
-    },
-  ]);
+  // Dynamic Pins state (workspace isolated)
+  const [pins, setPins] = useState<PinItem[]>([]);
 
-  // Dynamic Interactive Team Chats
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    {
-      id: "c-1",
-      sender: activeBrand?.name || "Marketing Team",
-      avatarText: (activeBrand?.name || "MT").substring(0, 2).toUpperCase(),
-      avatarBg: "bg-blue-600",
-      message: "Quarterly campaign visual assets approved and scheduled for Facebook & Instagram!",
-      time: "10m ago",
-    },
-    {
-      id: "c-2",
-      sender: "Suraj",
-      avatarText: "SU",
-      avatarBg: "bg-[#795BC2]",
-      message: "All social channels connected. Post approvals active.",
-      time: "Just now",
-      isSelf: true,
-    },
-  ]);
+  // Dynamic Interactive Team Chats (workspace isolated)
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInputText, setChatInputText] = useState("");
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
@@ -236,7 +177,10 @@ export function BottomDockBar() {
       const savedNotes = localStorage.getItem("pulsesocial_notes");
       if (savedNotes) {
         const parsed = JSON.parse(savedNotes);
-        if (parsed.length > 0) setNotes(parsed);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setNotes(parsed);
+          setSelectedNoteId(parsed[0].id);
+        }
       }
       const savedChats = localStorage.getItem("pulsesocial_dock_chats");
       if (savedChats) {
@@ -293,17 +237,13 @@ export function BottomDockBar() {
   };
 
   const handleDeleteNote = (id: string) => {
-    if (notes.length <= 1) {
-      toast({
-        title: "Cannot Delete",
-        message: "You must keep at least one note in your notebook.",
-        type: "info",
-      });
-      return;
-    }
     const filtered = notes.filter((n) => n.id !== id);
     saveNotes(filtered);
-    setSelectedNoteId(filtered[0].id);
+    if (filtered.length > 0) {
+      setSelectedNoteId(filtered[0].id);
+    } else {
+      setSelectedNoteId("");
+    }
   };
 
   const handlePinCurrentPage = () => {
@@ -470,9 +410,11 @@ export function BottomDockBar() {
               }`}
             />
             <span className="font-semibold text-slate-800 dark:text-slate-200">My Pins</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:bg-blue-100 group-hover:text-blue-700 transition">
-              {pins.length}
-            </span>
+            {pins.length > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:bg-blue-100 group-hover:text-blue-700 transition">
+                {pins.length}
+              </span>
+            )}
           </button>
 
           {/* 2. Chats */}
@@ -487,12 +429,16 @@ export function BottomDockBar() {
           >
             <div className="relative">
               <MessageCircle className="w-4 h-4 transition-transform duration-200 group-hover:scale-120" />
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white" />
+              {chatMessages.length > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white" />
+              )}
             </div>
             <span className="font-semibold text-slate-800 dark:text-slate-200">Chats</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400">
-              {chatMessages.length}
-            </span>
+            {chatMessages.length > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400">
+                {chatMessages.length}
+              </span>
+            )}
           </button>
 
           {/* 3. Contacts */}
@@ -1153,7 +1099,21 @@ export function BottomDockBar() {
                   </span>
                 </div>
               </div>
-            ) : null}
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center p-6 text-center text-slate-400">
+                <BookOpen className="w-8 h-8 text-slate-300 dark:text-slate-600 mb-2" />
+                <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">No notes in notebook</p>
+                <p className="text-[11px] text-slate-400 mt-0.5 mb-3">Click Write above to create your first workspace note.</p>
+                <button
+                  type="button"
+                  onClick={handleAddNote}
+                  className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs inline-flex items-center gap-1 cursor-pointer transition shadow-2xs"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Create Note</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

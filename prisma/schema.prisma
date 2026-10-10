@@ -33,6 +33,8 @@ model User {
   assignedComments      SocialComment[]
   assignedMessages      SocialMessage[]
   aiGenerations         AiGeneration[]
+  authSessions          AuthSession[]
+  consentRecords        ConsentRecord[]
 }
 
 model Organization {
@@ -93,24 +95,27 @@ model Permission {
 }
 
 model EmailVerificationOTP {
-  id        String   @id @default(cuid())
-  userId    String
-  codeHash  String
-  expiresAt DateTime
-  attempts  Int      @default(0)
-  createdAt DateTime @default(now())
+  id         String    @id @default(cuid())
+  userId     String
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model PasswordResetToken {
-  id        String   @id @default(cuid())
-  userId    String
-  tokenHash String   @unique
-  expiresAt DateTime
-  createdAt DateTime @default(now())
+  id         String    @id @default(cuid())
+  userId     String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model SocialAccount {
@@ -141,6 +146,7 @@ model SocialAccount {
   snapshots         AnalyticsSnapshot[]
   actions           SocialAction[]
   engagementSnapshots SocialEngagementSnapshot[]
+  capabilitySnapshots ProviderCapabilitySnapshot[]
 
   @@unique([organizationId, provider, providerAccountId])
 }
@@ -149,9 +155,9 @@ model SocialProfile {
   id              String        @id @default(cuid())
   socialAccountId String        @unique
   bio             String?
-  followersCount  Int           @default(0)
-  followingCount  Int           @default(0)
-  postsCount      Int           @default(0)
+  followersCount  Int?
+  followingCount  Int?
+  postsCount      Int?
   websiteUrl      String?
   rawProfileJson  String?
   updatedAt       DateTime      @updatedAt
@@ -164,6 +170,8 @@ model SocialToken {
   socialAccountId    String        @unique
   encryptedAccessToken String
   encryptedRefreshToken String?
+  keyVersion         String        @default("v1")
+  scopes             String?
   iv                 String
   tag                String
   expiresAt          DateTime?
@@ -656,5 +664,92 @@ model AiGeneration {
   @@index([workspaceId])
   @@index([taskType])
   @@index([createdAt])
+}
+
+model ProviderCapabilitySnapshot {
+  id                  String        @id @default(cuid())
+  socialAccountId     String?
+  provider            String
+  capability          String
+  status              String        // SUPPORTED, UNSUPPORTED, APPROVAL_REQUIRED, PERMISSION_MISSING
+  reason              String?
+  apiVersion          String?
+  appReviewStatus     String?
+  lastVerifiedSuccess DateTime?
+  checkedAt           DateTime      @default(now())
+
+  socialAccount       SocialAccount? @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+
+  @@index([provider])
+  @@index([socialAccountId])
+}
+
+model OAuthState {
+  id             String    @id @default(cuid())
+  state          String    @unique
+  provider       String
+  organizationId String?
+  userId         String?
+  codeVerifier   String?
+  nonce          String?
+  redirectUri    String?
+  expiresAt      DateTime
+  consumedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([state])
+  @@index([provider])
+}
+
+model IdempotencyRecord {
+  id              String    @id @default(cuid())
+  organizationId  String
+  action          String
+  idempotencyKey  String
+  requestHash     String?
+  responsePayload String?
+  expiresAt       DateTime
+  createdAt       DateTime  @default(now())
+
+  @@unique([organizationId, action, idempotencyKey])
+  @@index([idempotencyKey])
+}
+
+model AuthSession {
+  id          String    @id @default(cuid())
+  userId      String
+  tokenHash   String    @unique
+  userAgent   String?
+  ipHash      String?   // Hashed / truncated, privacy-preserving
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+model ConsentRecord {
+  id            String   @id @default(cuid())
+  userId        String?
+  visitorId     String   // Random, hashed visitor ID
+  policyVersion String   @default("2026-10")
+  necessary     Boolean  @default(true)
+  preferences   Boolean  @default(false)
+  analytics     Boolean  @default(false)
+  marketing     Boolean  @default(false)
+  decision      String   // ACCEPT_ALL, REJECT_ALL, CUSTOM, WITHDRAWN
+  source        String   @default("web_banner") // web_banner, settings_modal, api
+  timestamp     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([visitorId])
+  @@index([userId])
+  @@index([policyVersion])
 }
 

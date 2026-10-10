@@ -1,4 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
+import crypto from "crypto";
 import { aiDb } from "./ai-db";
 import {
   SocialCopyRequest,
@@ -658,7 +659,7 @@ async function generateFallbackAiImage(
   width: number = 1080,
   height: number = 1080
 ): Promise<string> {
-  const seed = Math.floor(Math.random() * 1000000);
+  const seed = crypto.randomInt(1, 1000000);
   const refinedPrompt = `${prompt}, ${style} style, professional commercial visual, stunning studio lighting, photorealistic masterpiece, 8k quality`;
   const encodedPrompt = encodeURIComponent(refinedPrompt);
   const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true`;

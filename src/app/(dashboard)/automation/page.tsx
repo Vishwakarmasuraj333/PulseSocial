@@ -832,10 +832,12 @@ export default function AutomationPage() {
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="queue-category-select" className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Category Type
                 </label>
                 <select
+                  id="queue-category-select"
+                  aria-label="Category Type"
                   value={newQueueCategory}
                   onChange={(e) => setNewQueueCategory(e.target.value as any)}
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs focus:outline-none focus:border-indigo-500"

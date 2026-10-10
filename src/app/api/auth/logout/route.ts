@@ -4,36 +4,28 @@ import { logAudit } from "@/lib/audit/logger";
 
 function applyExhaustiveCookiePurge(res: NextResponse) {
   const cookieNames = ["pulsesocial_auth_session", "pulsesocial_session", "next-auth.session-token"];
+  const isProd = process.env.NODE_ENV === "production";
   
   for (const name of cookieNames) {
     try {
       res.cookies.delete(name);
     } catch {}
 
-    // 1. Purge with Secure=true
+    // Purge with environment-aware flags
     res.cookies.set(name, "", {
       httpOnly: true,
-      secure: true,
+      secure: isProd,
       sameSite: "lax",
       path: "/",
       maxAge: 0,
       expires: new Date(0),
     });
 
-    // 2. Purge without Secure (for localhost / non-https testing)
-    res.cookies.set(name, "", {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 0,
-      expires: new Date(0),
-    });
-
-    // 3. Fallback explicit Raw Set-Cookie header
+    // Fallback explicit raw Set-Cookie header with proper flags
+    const secureFlag = isProd ? "; Secure" : "";
     res.headers.append(
       "Set-Cookie",
-      `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; HttpOnly; SameSite=Lax`
+      `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; HttpOnly; SameSite=Lax${secureFlag}`
     );
   }
 }

@@ -15,7 +15,6 @@ import {
   ShieldCheck,
   X,
   AlertTriangle,
-  Zap,
   Copy,
   Check,
 } from "lucide-react";
@@ -246,16 +245,9 @@ function SocialConnectInner() {
                     {errorParam}
                   </p>
                   <p className="text-[11px] text-slate-400 leading-relaxed">
-                    Meta requires App Domains (<code className="text-amber-200 font-mono">pulsesocial1.vercel.app</code>) and permissions to be enabled in your Meta Developer Console. You can also connect right now using Standard Permissions below.
+                    Meta requires App Domains (<code className="text-amber-200 font-mono">pulsesocial1.vercel.app</code>) and permissions to be enabled in your Meta Developer Console.
                   </p>
                   <div className="flex flex-wrap items-center gap-2.5 pt-2">
-                    <a
-                      href="/api/social/facebook/connect?tier=standard"
-                      className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition inline-flex items-center gap-1.5"
-                    >
-                      <Zap className="w-3.5 h-3.5" />
-                      <span>Instant Connect with Standard Permissions</span>
-                    </a>
                     <button
                       type="button"
                       onClick={() => setIsGuideModalOpen(true)}
@@ -534,12 +526,12 @@ function SocialConnectInner() {
 
               {/* Step 4: Permissions Note */}
               <div className="p-3.5 rounded-2xl bg-indigo-950/40 border border-indigo-900/60 text-indigo-300 leading-relaxed text-xs">
-                💡 <strong>Why "Permission scope is not valid" appeared:</strong> Under <strong>App Review &gt; Permissions and Features</strong>, search for <code>pages_show_list</code>, <code>pages_read_engagement</code>, and <code>pages_manage_posts</code> and add them. If you haven't added them yet, click the Instant Connect button below to connect with Standard Permissions immediately.
+                💡 <strong>Why &quot;Permission scope is not valid&quot; appeared:</strong> Under <strong>App Review &gt; Permissions and Features</strong>, search for <code>pages_show_list</code>, <code>pages_read_engagement</code>, and <code>pages_manage_posts</code> and add them to your app.
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-800">
+            <div className="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-slate-800">
               <a
                 href="https://developers.facebook.com/apps/1427242679545054/settings/basic/"
                 target="_blank"
@@ -548,14 +540,6 @@ function SocialConnectInner() {
               >
                 <span>Open Meta Developer Dashboard</span>
                 <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-
-              <a
-                href="/api/social/facebook/connect?tier=standard"
-                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold text-xs shadow-md transition inline-flex items-center gap-1.5 cursor-pointer"
-              >
-                <Zap className="w-3.5 h-3.5" />
-                <span>Instant Connect with Standard Permissions</span>
               </a>
             </div>
           </div>

@@ -30,7 +30,7 @@ export function PulseFaqSection() {
               Why do I need it?
             </h5>
             <p>
-              Many businesses lack the time or resources to handle their social media accounts individually. However, this does not negate the need for social media management. People expect to be able to communicate with companies through social media. Social media can help your business reach your customers, gain valuable insights, and grow your brand exponentially. With each passing year, social media is only gaining prominence, becoming the most preferred channel of communication. Your business may be forgotten, lose consumers to competitors, or even miss out on new customers if you don't have a strong social media presence.
+              Many businesses lack the time or resources to handle their social media accounts individually. However, this does not negate the need for social media management. People expect to be able to communicate with companies through social media. Social media can help your business reach your customers, gain valuable insights, and grow your brand exponentially. With each passing year, social media is only gaining prominence, becoming the most preferred channel of communication. Your business may be forgotten, lose consumers to competitors, or even miss out on new customers if you don&apos;t have a strong social media presence.
             </p>
           </div>
 
@@ -110,7 +110,7 @@ export function PulseFaqSection() {
       answer: (
         <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed pt-2 space-y-2">
           <p>
-            Getting started takes less than 60 seconds! Click "Sign Up for Free", create your account with no credit card required, connect your social channels with secure OAuth authorization, and begin scheduling your first post right away.
+            Getting started takes less than 60 seconds! Click &quot;Sign Up for Free&quot;, create your account with no credit card required, connect your social channels with secure OAuth authorization, and begin scheduling your first post right away.
           </p>
         </div>
       ),

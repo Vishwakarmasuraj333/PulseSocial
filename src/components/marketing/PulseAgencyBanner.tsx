@@ -15,7 +15,7 @@ export function PulseAgencyBanner() {
               PulseSocial for Agencies
             </h2>
             <p className="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
-              Manage social media for all your clients with a single platform that's perfect for agencies. Set up your agency-branded social media dashboard and invite your clients to be a part of it.
+              Manage social media for all your clients with a single platform that&apos;s perfect for agencies. Set up your agency-branded social media dashboard and invite your clients to be a part of it.
             </p>
             <div className="pt-2">
               <Link

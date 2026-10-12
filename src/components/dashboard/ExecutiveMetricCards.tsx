@@ -45,7 +45,7 @@ export function ExecutiveMetricCards({
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-      {/* 1. SE Ranking Core: Social Visibility & Health Score Card */}
+      {/* 1. PulseSocial Core: Social Visibility & Health Score Card */}
       <div
         onClick={onOpenAudit}
         className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs hover:border-indigo-400 dark:hover:border-indigo-600 transition-all cursor-pointer group relative overflow-hidden"

@@ -18,7 +18,7 @@ export function PulseWebinarBanner() {
               Live Interactive Workshop
             </div>
             <h3 className="text-xl sm:text-2xl font-extrabold tracking-tight">
-              Don't miss our live webinar on PulseSocial
+              Don&apos;t miss our live webinar on PulseSocial
             </h3>
             <p className="text-xs sm:text-sm text-blue-100 font-normal">
               Learn advanced AI multi-channel publishing workflows, automated CRM lead routing, and ROI reporting.

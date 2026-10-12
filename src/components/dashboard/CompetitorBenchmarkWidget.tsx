@@ -93,7 +93,7 @@ export function CompetitorBenchmarkWidget() {
             </span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            SE Ranking market intelligence comparing audience, engagement velocity, and visibility
+            PulseSocial market intelligence comparing audience, engagement velocity, and visibility
           </p>
         </div>
 

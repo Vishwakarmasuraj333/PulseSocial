@@ -530,7 +530,7 @@ export function UniversalSocialConnectModal({
                       disabled={isOpeningOAuth}
                       className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
                     >
-                      ⚡ Getting "permission scope not valid"? Click here to connect with Standard Permissions
+                      ⚡ Getting &quot;permission scope not valid&quot;? Click here to connect with Standard Permissions
                     </button>
                   </div>
                 )}

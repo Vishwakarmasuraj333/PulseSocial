@@ -39,10 +39,10 @@ export function PulseConciergeModal({ isOpen, onClose }: PulseConciergeModalProp
             <div className="space-y-4 text-center sm:text-left flex-1">
               <div>
                 <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white">
-                  Can't find what you're looking for?
+                  Can&apos;t find what you&apos;re looking for?
                 </h3>
                 <p className="text-xs sm:text-sm text-emerald-100 mt-1 font-medium">
-                  We're here to help you.
+                  We&apos;re here to help you.
                 </p>
               </div>
 

@@ -89,7 +89,7 @@ export function TaskPipelineWidget() {
               Task Pipeline & Approvals
             </h3>
             <p className="text-[11px] text-slate-400">
-              SE Ranking-style workflow checklist
+              PulseSocial workflow checklist
             </p>
           </div>
         </div>

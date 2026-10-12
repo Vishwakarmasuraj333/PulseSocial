@@ -7,12 +7,13 @@ import { useToast } from "@/components/ui/toast";
 import { useBrand } from "@/context/BrandContext";
 import { UniversalSocialConnectModal } from "@/components/social/UniversalSocialConnectModal";
 import { CanvaConnectModal } from "@/components/composer/CanvaConnectModal";
-import { GeminiAiModal } from "@/components/composer/GeminiAiModal";
 import { renderPlatformIcon, CanvaIcon, GeminiIcon } from "@/components/icons/PlatformIcons";
 import {
   X,
   Plus,
   Sparkles,
+  Wand2,
+  RefreshCw,
   Image as ImageIcon,
   MapPin,
   Target,
@@ -207,8 +208,16 @@ export function PostComposerModal({
   const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([]);
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const [isCanvaModalOpen, setIsCanvaModalOpen] = useState(false);
-  const [isGeminiModalOpen, setIsGeminiModalOpen] = useState(false);
   const [isCanvaConnected, setIsCanvaConnected] = useState(false);
+  
+  // Inline Gemini AI Copilot state (Modal removed, seamless inline experience)
+  const [isGeminiInlineOpen, setIsGeminiInlineOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiTone, setAiTone] = useState("Engaging & Viral");
+  const [aiIncludeHashtags, setAiIncludeHashtags] = useState(true);
+  const [aiIncludeFirstComment, setAiIncludeFirstComment] = useState(true);
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
+  const [aiGeneratedAlternatives, setAiGeneratedAlternatives] = useState<string[]>([]);
 
   // Dynamic Media Library and Cloud Picker states
   const [isMediaLibraryOpen, setIsMediaLibraryOpen] = useState(false);
@@ -680,42 +689,124 @@ export function PostComposerModal({
     });
   };
 
-  const handleApplyGeminiContent = (data: {
-    caption: string;
-    firstComment?: string;
-    hashtags?: string[];
-    location?: string;
-    imageUrl?: string;
-  }) => {
-    let finalCaption = data.caption || "";
-    if (data.hashtags && data.hashtags.length > 0) {
-      finalCaption = `${finalCaption}\n\n${data.hashtags.join(" ")}`;
-    }
-    setContent(finalCaption);
-
-    if (data.firstComment) {
-      setAttachedComment(data.firstComment);
-    }
-    if (data.location && !selectedLocation) {
-      setSelectedLocation(data.location);
-    }
-    if (data.imageUrl) {
-      setMedia((prev) => [
-        ...prev,
-        {
-          id: `gemini-${Date.now()}`,
-          url: data.imageUrl!,
-          type: "image",
-          name: "Gemini Asset",
-        },
-      ]);
+  // Inline Gemini AI Copilot generator
+  const handleGenerateAiCopy = async () => {
+    if (!aiPrompt.trim()) {
       toast({
-        title: "AI Media Attached!",
-        message: "High-resolution visual added to post preview.",
+        title: "Prompt Needed",
+        message: "Please enter a topic or announcement for Gemini to write about.",
+        type: "warning",
+      });
+      return;
+    }
+
+    setIsGeneratingAi(true);
+    try {
+      const res = await fetch("/api/ai/gemini/social-copy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: aiPrompt.trim(),
+          brandName: activeBrand.name || "PulseSocial",
+          industry: activeBrand.industry || "Social Media",
+          tone: aiTone,
+          platform: activePreviewChannel.provider || "Instagram",
+          model: "gemini-3.1-flash-lite",
+          includeHashtags: aiIncludeHashtags,
+          includeFirstComment: aiIncludeFirstComment,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || data.error || "Gemini generation failed.");
+      }
+
+      let fullCaption = data.primaryCaption || "";
+      if (aiIncludeHashtags && Array.isArray(data.hashtags) && data.hashtags.length > 0) {
+        const tagsStr = data.hashtags.join(" ");
+        if (!fullCaption.includes(data.hashtags[0])) {
+          fullCaption = `${fullCaption.trim()}\n\n${tagsStr}`;
+        }
+      }
+
+      setContent(fullCaption);
+
+      if (aiIncludeFirstComment && data.firstComment) {
+        setAttachedComment(data.firstComment);
+        setCommentText(data.firstComment);
+      }
+
+      if (Array.isArray(data.alternatives) && data.alternatives.length > 0) {
+        setAiGeneratedAlternatives(data.alternatives);
+      }
+
+      toast({
+        title: "✨ Content Generated!",
+        message: "Gemini successfully created your publication-ready post.",
         type: "success",
       });
+    } catch (err: any) {
+      toast({
+        title: "AI Generation Error",
+        message: err.message || "Failed to generate copy. Please try again.",
+        type: "error",
+      });
+    } finally {
+      setIsGeneratingAi(false);
     }
-    setIsGeminiModalOpen(false);
+  };
+
+  // Polish existing drafted text with Gemini
+  const handlePolishContentWithAi = async () => {
+    if (!content.trim()) {
+      toast({
+        title: "Content Needed",
+        message: "Write some text in the post caption first to polish it.",
+        type: "warning",
+      });
+      return;
+    }
+
+    setIsGeneratingAi(true);
+    try {
+      const res = await fetch("/api/ai/gemini/social-copy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: `Rewrite, polish and optimize this caption for maximum viral social reach: "${content.trim()}"`,
+          brandName: activeBrand.name || "PulseSocial",
+          industry: activeBrand.industry || "Social Media",
+          tone: aiTone,
+          platform: activePreviewChannel.provider || "Instagram",
+          model: "gemini-3.1-flash-lite",
+          includeHashtags: false,
+          includeFirstComment: false,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || data.error || "Polishing failed.");
+      }
+
+      if (data.primaryCaption) {
+        setContent(data.primaryCaption);
+        toast({
+          title: "💎 Content Polished!",
+          message: "Gemini refined your caption for maximum engagement.",
+          type: "success",
+        });
+      }
+    } catch (err: any) {
+      toast({
+        title: "Polishing Error",
+        message: err.message || "Could not polish content.",
+        type: "error",
+      });
+    } finally {
+      setIsGeneratingAi(false);
+    }
   };
 
   // Filter emojis based on search
@@ -846,16 +937,189 @@ export function PostComposerModal({
                 )}
               </div>
 
-              {/* Create with Gemini AI */}
-              <button
-                type="button"
-                onClick={() => setIsGeminiModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-blue-400 text-blue-600 hover:bg-blue-50 text-xs font-medium mb-3 transition active:scale-95 cursor-pointer bg-blue-50/40 group"
-                title="Generate real AI content, hooks, and hashtags with Google Gemini"
-              >
-                <GeminiIcon size={14} className="shrink-0 group-hover:rotate-12 transition" />
-                <span>Create with Gemini AI</span>
-              </button>
+              {/* Gemini AI Inline Copilot Trigger Bar */}
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <button
+                  type="button"
+                  onClick={() => setIsGeminiInlineOpen(!isGeminiInlineOpen)}
+                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition active:scale-95 cursor-pointer shadow-xs ${
+                    isGeminiInlineOpen
+                      ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-blue-500/20"
+                      : "bg-blue-50/60 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 hover:bg-blue-100/70"
+                  }`}
+                  title="Generate viral hooks, captions, and hashtags directly with Google Gemini"
+                >
+                  <GeminiIcon size={14} className={`shrink-0 ${isGeneratingAi ? "animate-spin" : ""}`} />
+                  <span>{isGeminiInlineOpen ? "Hide Gemini AI Copilot" : "Gemini AI Copilot"}</span>
+                  <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-white/20 text-current border border-white/30">
+                    Flash 3.1
+                  </span>
+                </button>
+
+                {content.trim() && (
+                  <button
+                    type="button"
+                    onClick={handlePolishContentWithAi}
+                    disabled={isGeneratingAi}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 hover:bg-purple-100/70 transition cursor-pointer disabled:opacity-50"
+                    title="Let Gemini refine and polish your drafted text"
+                  >
+                    <Wand2 className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+                    <span>{isGeneratingAi ? "Refining..." : "Polish Draft"}</span>
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const sampleTags = ["#Growth", "#Trending", "#Innovation", `#${(activeBrand.name || "PulseSocial").replace(/\s+/g, "")}`];
+                    const existing = content.trim();
+                    const newContent = existing ? `${existing}\n\n${sampleTags.join(" ")}` : sampleTags.join(" ");
+                    setContent(newContent);
+                    toast({
+                      title: "Hashtags Appended",
+                      message: "Added trending hashtags to caption.",
+                      type: "success",
+                    });
+                  }}
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition cursor-pointer"
+                >
+                  <Hash className="w-3 h-3 text-slate-500" />
+                  <span>+ Hashtags</span>
+                </button>
+              </div>
+
+              {/* Seamless Inline Gemini Copilot Panel */}
+              {isGeminiInlineOpen && (
+                <div className="mb-4 p-4 rounded-2xl bg-gradient-to-br from-blue-50/90 via-indigo-50/50 to-purple-50/60 dark:from-slate-900/90 dark:via-blue-950/30 dark:to-purple-950/30 border border-blue-200/90 dark:border-blue-900/60 shadow-md space-y-3 animate-in fade-in zoom-in-98 duration-150">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-xs">
+                        <Sparkles className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                        Gemini AI Copilot
+                      </span>
+                      <span className="text-[10px] text-blue-600 dark:text-blue-400 font-mono font-medium">
+                        gemini-3.1-flash-lite · active
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setIsGeminiInlineOpen(false)}
+                      className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs p-1"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Prompt Input */}
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={aiPrompt}
+                      onChange={(e) => setAiPrompt(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !isGeneratingAi) {
+                          e.preventDefault();
+                          handleGenerateAiCopy();
+                        }
+                      }}
+                      placeholder="What should Gemini write about? e.g. Launching 30% discount on summer collection..."
+                      className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-slate-800 dark:text-white placeholder:text-slate-400 shadow-xs"
+                    />
+                  </div>
+
+                  {/* Controls Row */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <label className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 text-[11px] font-medium cursor-pointer">
+                        <span>Tone:</span>
+                        <select
+                          value={aiTone}
+                          onChange={(e) => setAiTone(e.target.value)}
+                          className="px-2 py-1 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer"
+                        >
+                          <option value="Engaging & Viral">Engaging & Viral</option>
+                          <option value="Professional">Professional</option>
+                          <option value="Casual & Fun">Casual & Fun</option>
+                          <option value="Inspirational">Inspirational</option>
+                          <option value="Promotional">Promotional</option>
+                          <option value="Thought Leadership">Thought Leadership</option>
+                        </select>
+                      </label>
+
+                      <label className="flex items-center gap-1.5 text-[11px] text-slate-600 dark:text-slate-300 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={aiIncludeHashtags}
+                          onChange={(e) => setAiIncludeHashtags(e.target.checked)}
+                          className="rounded text-blue-600 focus:ring-blue-500 w-3.5 h-3.5 cursor-pointer"
+                        />
+                        <span>Include Hashtags</span>
+                      </label>
+
+                      <label className="flex items-center gap-1.5 text-[11px] text-slate-600 dark:text-slate-300 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={aiIncludeFirstComment}
+                          onChange={(e) => setAiIncludeFirstComment(e.target.checked)}
+                          className="rounded text-blue-600 focus:ring-blue-500 w-3.5 h-3.5 cursor-pointer"
+                        />
+                        <span>Auto First Comment</span>
+                      </label>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleGenerateAiCopy}
+                      disabled={isGeneratingAi || !aiPrompt.trim()}
+                      className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-blue-500/20 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5"
+                    >
+                      {isGeneratingAi ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          <span>Generating...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-3.5 h-3.5" />
+                          <span>Generate Copy</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Alternative variations if returned */}
+                  {aiGeneratedAlternatives.length > 0 && (
+                    <div className="pt-2 border-t border-blue-200/50 dark:border-slate-800/80">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1.5">
+                        Alternative Hooks (Click to use):
+                      </span>
+                      <div className="flex flex-col gap-1.5 max-h-32 overflow-y-auto pr-1">
+                        {aiGeneratedAlternatives.map((alt, altIdx) => (
+                          <button
+                            key={altIdx}
+                            type="button"
+                            onClick={() => {
+                              setContent(alt);
+                              toast({
+                                title: "Alternative Applied",
+                                message: `Swapped caption with hook #${altIdx + 1}.`,
+                                type: "success",
+                              });
+                            }}
+                            className="text-left text-[11px] p-2 rounded-lg bg-white/80 dark:bg-slate-950/80 hover:bg-white dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 line-clamp-2 transition cursor-pointer hover:border-blue-400"
+                          >
+                            &ldquo;{alt}&rdquo;
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Tagged Location Badge */}
               {selectedLocation && (
@@ -1669,20 +1933,6 @@ export function PostComposerModal({
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Validation indicator matching screenshot */}
-            <div
-              className="flex items-center justify-center w-7 h-7 rounded-full bg-amber-50 text-amber-600 border border-amber-200 cursor-pointer hover:bg-amber-100 transition"
-              title={`Post readiness check: ${selectedAccountIds.length} channel(s) selected.`}
-              onClick={() => {
-                toast({
-                  title: "Post Readiness Check",
-                  message: `Configured for ${selectedAccountIds.length} connected channel(s). Character count: ${content.length}.`,
-                  type: "info",
-                });
-              }}
-            >
-              <AlertTriangle className="w-3.5 h-3.5" />
-            </div>
 
             <button
               type="button"
@@ -1735,16 +1985,6 @@ export function PostComposerModal({
         isOpen={isCanvaModalOpen}
         onClose={() => setIsCanvaModalOpen(false)}
         onSelectMedia={handleCanvaMediaSelected}
-      />
-    )}
-
-    {isGeminiModalOpen && (
-      <GeminiAiModal
-        isOpen={isGeminiModalOpen}
-        onClose={() => setIsGeminiModalOpen(false)}
-        brandName={activeBrand.name || "Brand"}
-        industry={activeBrand.industry || "Digital Content"}
-        onApply={handleApplyGeminiContent}
       />
     )}
 

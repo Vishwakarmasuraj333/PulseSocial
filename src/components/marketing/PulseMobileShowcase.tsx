@@ -109,7 +109,7 @@ export function PulseMobileShowcase() {
               the go
             </h2>
             <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-              Create compelling posts, add them to a publishing queue, monitor your brand, and better manage your content pipeline — all while you're on the move.{" "}
+              Create compelling posts, add them to a publishing queue, monitor your brand, and better manage your content pipeline — all while you&apos;re on the move.{" "}
               <Link href="/mobile" className="text-sky-400 hover:underline font-semibold">
                 Learn more
               </Link>

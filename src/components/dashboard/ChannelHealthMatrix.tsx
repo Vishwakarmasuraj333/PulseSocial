@@ -182,7 +182,7 @@ export function ChannelHealthMatrix({
                     </div>
                     <p className="font-bold text-slate-800 dark:text-slate-200">No channels linked to this brand</p>
                     <p className="text-slate-400 text-[11px] leading-relaxed">
-                      Connect your social accounts below to unlock real-time SE Ranking metrics, publishing, and cross-channel intelligence.
+                      Connect your social accounts below to unlock real-time PulseSocial metrics, publishing, and cross-channel intelligence.
                     </p>
                     <button
                       type="button"

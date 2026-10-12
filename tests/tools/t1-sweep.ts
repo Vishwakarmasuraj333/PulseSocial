@@ -7,7 +7,7 @@ const IGNORE_DIRS = ["node_modules", ".next", ".git", "dist", "fixtures"];
 const PATTERNS: { name: string; regex: RegExp }[] = [
   { name: "fake_or_demo_keywords", regex: /\b(mock|demo|fake|dummy|lorem|faker|placeholder)\b/i },
   { name: "math_random", regex: /Math\.random\s*\(/ },
-  { name: "realtime_or_se_ranking", regex: /(REALTIME|SE Ranking Visualizer)/ },
+  { name: "se_ranking_leak", regex: /\b(SE Ranking|seranking)\b/i },
   { name: "fake_provider_ids", regex: /(demo-account|test-account-1|provider_id_[0-9])/ },
   { name: "hardcoded_10_badge", regex: /(badge|unread|count).*[^a-zA-Z0-9]10[^0-9]/i },
 ];

@@ -157,7 +157,7 @@ export function ProjectHeaderBar({
           </div>
         </div>
 
-        {/* Right: Date Range Selector + SE Ranking Action Toolbar */}
+        {/* Right: Date Range Selector + PulseSocial Action Toolbar */}
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           {/* Time Filter Pills */}
           <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-slate-700">

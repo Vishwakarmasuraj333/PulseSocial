@@ -293,7 +293,7 @@ export default function SocialAccountsPage() {
                 </span>
                 <div className="flex items-center gap-5 text-slate-600 dark:text-slate-400 font-semibold shrink-0">
                   <Link
-                    href="/posts"
+                    href="/social-accounts"
                     className="text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 py-3.5"
                   >
                     Social Planner

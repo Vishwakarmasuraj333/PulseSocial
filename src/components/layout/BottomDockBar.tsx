@@ -116,56 +116,7 @@ export function BottomDockBar() {
   const [contactSearchQuery, setContactSearchQuery] = useState("");
   const [contactFilter, setContactFilter] = useState("all");
 
-  // Live Zoho Social Style Working Session Tracker matching screenshot
-  const [timerSeconds, setTimerSeconds] = useState<number>(19374); // 05:22:54 initial default
-  const [isTimerRunning, setIsTimerRunning] = useState<boolean>(true);
 
-  useEffect(() => {
-    try {
-      const savedTimer = localStorage.getItem("pulsesocial_session_timer");
-      if (savedTimer) {
-        setTimerSeconds(Number(savedTimer) || 19374);
-      }
-    } catch {}
-  }, []);
-
-  useEffect(() => {
-    let interval: any = null;
-    if (isTimerRunning) {
-      interval = setInterval(() => {
-        setTimerSeconds((prev) => {
-          const next = prev + 1;
-          try {
-            localStorage.setItem("pulsesocial_session_timer", String(next));
-          } catch {}
-          return next;
-        });
-      }, 1000);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isTimerRunning]);
-
-  const formatTimerTime = (totalSecs: number) => {
-    const hours = Math.floor(totalSecs / 3600);
-    const minutes = Math.floor((totalSecs % 3600) / 60);
-    const seconds = totalSecs % 60;
-    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-  };
-
-  const handleResetTimer = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setTimerSeconds(0);
-    try {
-      localStorage.setItem("pulsesocial_session_timer", "0");
-    } catch {}
-    toast({
-      title: "Session Timer Reset",
-      message: "Working session tracker reset to 00:00:00",
-      type: "info",
-    });
-  };
 
   // Load saved pins & notes from localStorage
   useEffect(() => {
@@ -362,37 +313,8 @@ export function BottomDockBar() {
       {/* ============================================================ */}
       <footer className="fixed bottom-0 lg:left-64 left-0 right-0 z-40 h-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/90 dark:border-slate-800 flex items-center justify-between px-4 text-xs select-none shadow-[0_-2px_12px_rgba(0,0,0,0.04)] font-sans transition-all duration-300">
         
-        {/* Left Action Items: Session Tracker, Pins, Chats, Contacts */}
+        {/* Left Action Items: Pins, Chats, Contacts */}
         <div className="flex items-center gap-1.5 sm:gap-2.5">
-          {/* Live Zoho Social Style Working Session Tracker */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900 text-white dark:bg-slate-800 text-[11px] font-mono shadow-xs border border-slate-700/60">
-            <button
-              type="button"
-              onClick={() => setIsTimerRunning(!isTimerRunning)}
-              className="flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 transition cursor-pointer"
-              title={isTimerRunning ? "Pause session timer" : "Resume session timer"}
-            >
-              {isTimerRunning ? (
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block" />
-              ) : (
-                <Play className="w-3 h-3 text-emerald-400" />
-              )}
-              <span className="font-semibold text-slate-100">{formatTimerTime(timerSeconds)}</span>
-              <span className="text-[10px] text-slate-400 font-sans hidden sm:inline">
-                {isTimerRunning ? "Working" : "Paused"}
-              </span>
-            </button>
-            <div className="flex items-center gap-1 border-l border-slate-700 pl-1.5 text-slate-400">
-              <button
-                type="button"
-                onClick={handleResetTimer}
-                title="Reset session timer"
-                className="hover:text-rose-400 transition cursor-pointer p-0.5"
-              >
-                <Square className="w-2.5 h-2.5 fill-current" />
-              </button>
-            </div>
-          </div>
 
           {/* 1. My Pins */}
           <button

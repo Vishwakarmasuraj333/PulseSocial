@@ -5,6 +5,7 @@ async function main() {
   const targetOrgIds = [
     "cmus5m58j0001512oh5v7ywtm", // Pulse Media Global
     "cmus9c8t50001l204n3pekjdd", // Suraj Vishwakarma's Workspace
+    "cmuv9glnj0000js04ljx9n5ha", // itxsurajofficial's Brand
   ];
 
   const channelsToConnect = [

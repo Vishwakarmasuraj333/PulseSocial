@@ -48,6 +48,11 @@ import {
   Wand2,
   Palette,
   CreditCard,
+  Sliders,
+  LayoutGrid,
+  Link2,
+  FileCode,
+  Zap,
 } from "lucide-react";
 import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
 import { PostComposerModal } from "@/components/composer/PostComposerModal";
@@ -377,6 +382,42 @@ export function AppLayout({ children }: AppLayoutProps) {
           href: "/inbox?tab=all",
           icon: Bell,
           match: (p: string) => p.includes("tab=all"),
+        },
+      ],
+    },
+    {
+      title: "Marketing",
+      items: [
+        {
+          label: "Social Planner",
+          href: "/social-accounts",
+          icon: Sliders,
+          match: (p: string) => p.startsWith("/social-accounts") || p.startsWith("/social-planner"),
+          badge: connectedAccounts.length > 0 ? connectedAccounts.length.toString() : undefined,
+        },
+        {
+          label: "Brand Boards",
+          href: "/brand-boards",
+          icon: LayoutGrid,
+          match: (p: string) => p.startsWith("/brand-boards"),
+        },
+        {
+          label: "Trigger Links",
+          href: "/links",
+          icon: Link2,
+          match: (p: string) => p.startsWith("/links"),
+        },
+        {
+          label: "Snippets",
+          href: "/snippets",
+          icon: FileCode,
+          match: (p: string) => p.startsWith("/snippets"),
+        },
+        {
+          label: "Automation",
+          href: "/automation",
+          icon: Zap,
+          match: (p: string) => p.startsWith("/automation"),
         },
       ],
     },

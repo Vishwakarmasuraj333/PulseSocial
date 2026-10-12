@@ -210,23 +210,37 @@ export function CommandPalette({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-start justify-center pt-20 p-4">
-        <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-          {/* Search Input Bar */}
-          <div className="flex items-center px-4 py-3 border-b border-slate-100 gap-3">
-            <Search className="w-4 h-4 text-slate-400 shrink-0" />
-            <input
-              type="text"
-              placeholder="Type a command or search tabs, pages, actions..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="flex-1 text-sm bg-transparent outline-none placeholder:text-slate-400 text-slate-800"
-              autoFocus
-            />
-            <kbd className="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-500 border border-slate-200">
-              ESC
-            </kbd>
-          </div>
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-start justify-center pt-20 p-4"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+      >
+        {/* Search Input Bar */}
+        <div className="flex items-center px-4 py-3 border-b border-slate-100 dark:border-slate-800 gap-3">
+          <Search className="w-4 h-4 text-slate-400 shrink-0" />
+          <input
+            type="text"
+            placeholder="Type a command or search tabs, pages, actions..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="flex-1 text-sm bg-transparent outline-none placeholder:text-slate-400 text-slate-800 dark:text-slate-100"
+            autoFocus
+          />
+          <kbd className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-mono text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+            ESC
+          </kbd>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            title="Close command bar (Esc)"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
 
           {/* Results List */}
           <div className="max-h-80 overflow-y-auto p-2 divide-y divide-slate-50">

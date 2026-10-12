@@ -344,7 +344,7 @@ export function UniversalSocialConnectModal({
     : `http://localhost:3000/api/social/${activeTab}/callback`;
 
   // Launch official OAuth authorization directly in new window
-  const handleLaunchOfficialOAuth = async (tier: "full" | "standard" = "full") => {
+  const handleLaunchOfficialOAuth = async (tier: "full" | "standard" | "basic" = "full") => {
     setOauthError(null);
     setIsOpeningOAuth(true);
 
@@ -521,17 +521,28 @@ export function UniversalSocialConnectModal({
                   )}
                 </button>
 
-                {/* Standard Permissions Fallback for Facebook */}
+                {/* Standard Permissions & Basic Profile Fallbacks for Facebook */}
                 {activeTab === "facebook" && (
-                  <div className="text-center pt-1">
+                  <div className="pt-2 space-y-2 border-t border-slate-200/60 dark:border-slate-800">
                     <button
                       type="button"
-                      onClick={() => handleLaunchOfficialOAuth("standard")}
+                      onClick={() => handleLaunchOfficialOAuth("basic")}
                       disabled={isOpeningOAuth}
-                      className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+                      className="w-full py-2 px-3 rounded-xl border border-blue-300 dark:border-blue-800 bg-blue-50/80 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-1.5"
                     >
-                      ⚡ Getting &quot;permission scope not valid&quot;? Click here to connect with Standard Permissions
+                      <span>🚀 Connect with Basic Profile (Instant · Zero Scope Errors)</span>
                     </button>
+
+                    <div className="p-2.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/40 text-[11px] text-amber-900 dark:text-amber-200 text-left space-y-1">
+                      <p className="font-bold flex items-center gap-1">
+                        <span>ℹ️ Why Meta shows &quot;Invalid Scopes&quot;:</span>
+                      </p>
+                      <p className="text-[10px] leading-relaxed text-amber-800 dark:text-amber-300">
+                        In Meta Developer Portal, search for and click <strong>Add</strong> on:
+                        <br />
+                        <code className="bg-amber-100/80 dark:bg-amber-900/50 px-1 py-0.5 rounded font-mono text-[9px]">pages_show_list</code>, <code className="bg-amber-100/80 dark:bg-amber-900/50 px-1 py-0.5 rounded font-mono text-[9px]">pages_read_engagement</code>, and <code className="bg-amber-100/80 dark:bg-amber-900/50 px-1 py-0.5 rounded font-mono text-[9px]">pages_manage_posts</code>.
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>

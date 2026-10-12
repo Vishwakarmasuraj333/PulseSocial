@@ -64,13 +64,14 @@ export class MetaProvider implements SocialProvider {
     } else {
       // Facebook
       if (tier === "basic") {
-        scopes = "public_profile,email";
+        // Guaranteed valid: public_profile requires zero Meta app review or special use-cases
+        scopes = "public_profile";
       } else if (tier === "standard") {
         // Standard Page read without requiring pages_manage_posts permission approval
-        scopes = "public_profile,email,pages_show_list,pages_read_engagement";
+        scopes = "public_profile,pages_show_list,pages_read_engagement";
       } else {
         // Full Page publishing
-        scopes = "public_profile,email,pages_show_list,pages_read_engagement,pages_manage_posts";
+        scopes = "public_profile,pages_show_list,pages_read_engagement,pages_manage_posts";
       }
     }
 

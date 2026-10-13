@@ -2,7 +2,7 @@ import assert from "assert";
 import crypto from "crypto";
 import { prisma } from "../../src/lib/prisma";
 
-const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
+const getBaseUrl = () => process.env.BASE_URL || "http://localhost:3000";
 
 function resolveOtpFromHash(targetHash: string): string | null {
   for (let i = 100000; i <= 999999; i++) {
@@ -17,12 +17,13 @@ function resolveOtpFromHash(targetHash: string): string | null {
 export async function runAuthEndToEndTests() {
   console.log("\n--- [INTEGRATION TEST SUITE 6: AUTH & OTP END-TO-END FLOW] ---");
 
+  const baseUrl = getBaseUrl();
   const testEmail = `integration_user_${Date.now()}@example.com`;
   const testPassword = "ValidPassword123!";
   const testName = "Antigravity Automated Tester";
 
   // 1. Signup / Register via canonical /api/auth/register
-  const signupRes = await fetch(`${BASE_URL}/api/auth/register`, {
+  const signupRes = await fetch(`${baseUrl}/api/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -38,7 +39,7 @@ export async function runAuthEndToEndTests() {
   console.log("✓ User created in unverified state via /api/auth/register.");
 
   // 2. Reject Bad OTP
-  const badOtpRes = await fetch(`${BASE_URL}/api/auth/verify-email/confirm`, {
+  const badOtpRes = await fetch(`${baseUrl}/api/auth/verify-email/confirm`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -60,7 +61,7 @@ export async function runAuthEndToEndTests() {
   const validOtpCode = resolveOtpFromHash(otpRecord.codeHash);
   assert.ok(validOtpCode, "Must resolve valid 6-digit OTP code");
 
-  const verifyRes = await fetch(`${BASE_URL}/api/auth/verify-email/confirm`, {
+  const verifyRes = await fetch(`${baseUrl}/api/auth/verify-email/confirm`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -76,7 +77,7 @@ export async function runAuthEndToEndTests() {
   console.log("✓ 6-Digit OTP verified, single-use consumed, and session cookie issued.");
 
   // 4. Session Validation via /api/auth/me
-  const meRes = await fetch(`${BASE_URL}/api/auth/me`, {
+  const meRes = await fetch(`${baseUrl}/api/auth/me`, {
     headers: {
       Cookie: sessionCookieHeader,
     },

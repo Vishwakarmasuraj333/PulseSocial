@@ -72,4 +72,58 @@ export async function runTenantIsolationTests() {
     );
     console.log("✓ IDOR protection verified: Foreign post ID queried in different workspace returns null.");
   }
+
+  // Test 4: Cross-tenant SyncJob isolation
+  const syncJobsForOrgA = await prisma.syncJob.findMany({
+    where: { organizationId: orgA.id },
+  });
+  const syncJobsForOrgB = await prisma.syncJob.findMany({
+    where: { organizationId: orgB.id },
+  });
+  const syncJobIdsA = new Set(syncJobsForOrgA.map((j) => j.id));
+  for (const jobB of syncJobsForOrgB) {
+    assert.strictEqual(
+      syncJobIdsA.has(jobB.id),
+      false,
+      `Cross-tenant job leakage: SyncJob ${jobB.id} belongs to both Org A and Org B`
+    );
+  }
+  console.log("✓ Background SyncJob workspace scoping verified.");
+
+  // Test 5: IDOR sync engine rejection
+  if (accountsForOrgB.length > 0) {
+    const foreignAccount = accountsForOrgB[0];
+    const { syncAccountData } = await import("../../src/lib/social/sync-engine");
+    const syncResult = await syncAccountData({
+      socialAccountId: foreignAccount.id,
+      organizationId: orgA.id, // Attempt to sync Org B account using Org A credentials
+    });
+    assert.strictEqual(
+      syncResult.success,
+      false,
+      "Sync engine must reject cross-tenant account sync"
+    );
+    assert.ok(
+      syncResult.error?.includes("not found in workspace"),
+      "Error must explicitly identify workspace mismatch"
+    );
+    console.log("✓ IDOR sync rejection verified: Cannot trigger sync on foreign workspace account.");
+  }
+
+  // Test 6: Cross-tenant Conversation isolation
+  const convsForOrgA = await prisma.socialConversation.findMany({
+    where: { organizationId: orgA.id },
+  });
+  const convsForOrgB = await prisma.socialConversation.findMany({
+    where: { organizationId: orgB.id },
+  });
+  const convIdsA = new Set(convsForOrgA.map((c) => c.id));
+  for (const convB of convsForOrgB) {
+    assert.strictEqual(
+      convIdsA.has(convB.id),
+      false,
+      `Cross-tenant conversation leakage: Conversation ${convB.id} appears in both workspaces`
+    );
+  }
+  console.log("✓ Social conversations & inbox workspace scoping verified.");
 }

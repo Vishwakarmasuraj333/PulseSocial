@@ -20,9 +20,10 @@ async function main() {
   const totalSuites = 10;
 
   const baseUrl = process.env.BASE_URL || (process.env.APP_URL || "https://pulsesocial1.vercel.app");
+  process.env.BASE_URL = baseUrl;
   let isServerRunning = false;
   try {
-    const ping = await fetch(`${baseUrl}/api/health`, { signal: AbortSignal.timeout(3000) });
+    const ping = await fetch(`${baseUrl}/api/health/live`, { signal: AbortSignal.timeout(4000) });
     isServerRunning = ping.ok;
   } catch {}
 

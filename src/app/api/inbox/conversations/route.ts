@@ -12,8 +12,23 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type") || "all";
 
+    const dbConversations = await prisma.socialConversation.findMany({
+      where: { organizationId: session.activeOrgId },
+      include: {
+        socialAccount: true,
+        messages: {
+          orderBy: { sentAt: "asc" },
+        },
+      },
+      orderBy: { lastMessageAt: "desc" },
+      take: 50,
+    });
+
     const dbMessages = await prisma.socialMessage.findMany({
-      where: { socialAccount: { organizationId: session.activeOrgId } },
+      where: {
+        conversationId: null,
+        socialAccount: { organizationId: session.activeOrgId },
+      },
       include: { socialAccount: true },
       orderBy: { sentAt: "desc" },
       take: 50,
@@ -26,14 +41,44 @@ export async function GET(req: Request) {
       take: 50,
     });
 
-    let conversations = [
+    const conversations = [
+      ...dbConversations.map((conv) => ({
+        id: `conv-${conv.id}`,
+        senderName: conv.participantName,
+        senderAvatar: conv.participantAvatarUrl || undefined,
+        platform: conv.platform || conv.socialAccount?.provider || "social",
+        lastMessage:
+          conv.lastMessageSnippet ||
+          conv.messages[conv.messages.length - 1]?.content ||
+          "Direct Message",
+        lastMessageAt: new Date(conv.lastMessageAt).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        unreadCount: conv.unreadCount,
+        type: "MESSAGE" as const,
+        messages: conv.messages.map((m) => ({
+          id: m.id,
+          sender: m.senderName,
+          avatar: m.senderAvatarUrl || undefined,
+          text: m.content,
+          timestamp: new Date(m.sentAt).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          isMe: m.direction === "OUTBOUND",
+        })),
+      })),
       ...dbMessages.map((m) => ({
         id: `msg-${m.id}`,
         senderName: m.senderName,
         senderAvatar: m.senderAvatarUrl || undefined,
-        platform: m.socialAccount.provider,
+        platform: m.socialAccount?.provider || m.platform,
         lastMessage: m.content,
-        lastMessageAt: new Date(m.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        lastMessageAt: new Date(m.sentAt).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
         unreadCount: m.isRead ? 0 : 1,
         type: "MESSAGE" as const,
         messages: [
@@ -42,8 +87,11 @@ export async function GET(req: Request) {
             sender: m.senderName,
             avatar: m.senderAvatarUrl || undefined,
             text: m.content,
-            timestamp: new Date(m.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-            isMe: false,
+            timestamp: new Date(m.sentAt).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            isMe: m.direction === "OUTBOUND",
           },
         ],
       })),
@@ -51,9 +99,12 @@ export async function GET(req: Request) {
         id: `cmt-${c.id}`,
         senderName: c.authorName,
         senderAvatar: c.authorAvatarUrl || undefined,
-        platform: c.socialAccount.provider,
+        platform: c.socialAccount?.provider || c.platform,
         lastMessage: c.content,
-        lastMessageAt: new Date(c.postedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        lastMessageAt: new Date(c.postedAt).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
         unreadCount: c.isRead ? 0 : 1,
         type: "COMMENT" as const,
         messages: [
@@ -62,7 +113,10 @@ export async function GET(req: Request) {
             sender: c.authorName,
             avatar: c.authorAvatarUrl || undefined,
             text: c.content,
-            timestamp: new Date(c.postedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            timestamp: new Date(c.postedAt).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
             isMe: false,
           },
         ],

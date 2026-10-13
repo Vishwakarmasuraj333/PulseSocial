@@ -36,7 +36,10 @@ export async function GET(
     if (host.endsWith(":80")) host = host.slice(0, -3);
 
     let proto = req.headers.get("x-forwarded-proto") || (host.includes("localhost") ? "http" : "https");
-    if (host.includes("vercel.app")) proto = "https";
+    if (host.includes("vercel.app")) {
+      proto = "https";
+      host = "pulsesocial1.vercel.app";
+    }
 
     const appUrl = host ? `${proto}://${host}` : (process.env.NEXT_PUBLIC_APP_URL || url.origin);
     const cleanAppUrl = appUrl.replace(/\/+$/, "");

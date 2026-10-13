@@ -26,7 +26,7 @@ export async function POST(
       );
     }
 
-    const cleanId = id.replace(/^(cmt-|msg-)/, "");
+    const cleanId = id.replace(/^(cmt-|msg-|conv-)/, "");
 
     // 1. Try finding as a Social Comment
     const comment = await prisma.socialComment.findFirst({
@@ -97,7 +97,119 @@ export async function POST(
       });
     }
 
-    // 2. Try finding as a Social Message (DM)
+    // 2. Try finding as a Social Conversation (Thread)
+    const conversation = await prisma.socialConversation.findFirst({
+      where: {
+        id: { in: [id, cleanId] },
+        organizationId: session.activeOrgId,
+      },
+      include: {
+        socialAccount: {
+          include: { token: true },
+        },
+      },
+    });
+
+    if (conversation) {
+      if (!conversation.socialAccount?.token) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Social account is not connected or OAuth token is missing.",
+            code: "AUTH_REQUIRED",
+          },
+          { status: 400 }
+        );
+      }
+
+      try {
+        const { getSocialProvider } = await import("@/lib/social/registry");
+        const { decryptToken } = await import("@/lib/security/encryption");
+        const provider = getSocialProvider(conversation.platform as any);
+
+        if (typeof (provider as any).sendMessageOrReply === "function") {
+          const decryptedToken = decryptToken(
+            conversation.socialAccount.token.encryptedAccessToken,
+            conversation.socialAccount.token.iv,
+            conversation.socialAccount.token.tag
+          );
+
+          const result = await (provider as any).sendMessageOrReply(
+            decryptedToken,
+            conversation.platformConversationId,
+            message.trim(),
+            conversation.socialAccount.providerAccountId
+          );
+
+          if (!result.success) {
+            return NextResponse.json(
+              {
+                success: false,
+                error: result.error || "Failed to dispatch message to social provider.",
+                code: "PROVIDER_DISPATCH_FAILED",
+              },
+              { status: 400 }
+            );
+          }
+
+          const savedMsg = await prisma.socialMessage.create({
+            data: {
+              socialAccountId: conversation.socialAccountId,
+              conversationId: conversation.id,
+              platformMessageId: result.messageId || `out_${Date.now()}`,
+              platform: conversation.platform,
+              senderName: session.name || "Me",
+              content: message.trim(),
+              direction: "OUTBOUND",
+              sentAt: new Date(),
+            },
+          });
+
+          await prisma.socialConversation.update({
+            where: { id: conversation.id },
+            data: {
+              lastMessageSnippet: message.trim(),
+              lastMessageAt: new Date(),
+            },
+          });
+
+          await logAudit({
+            organizationId: session.activeOrgId,
+            userId: session.id,
+            action: "MESSAGE_REPLY_SENT",
+            resourceType: "SocialConversation",
+            resourceId: conversation.id,
+            details: { platform: conversation.platform, messageId: savedMsg.id },
+          });
+
+          return NextResponse.json({
+            success: true,
+            message: "Reply sent successfully via official provider API.",
+            data: savedMsg,
+          });
+        }
+      } catch (err: any) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: err.message || "Failed to dispatch reply.",
+            code: "DISPATCH_ERROR",
+          },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Direct message reply via ${conversation.socialAccount.displayName} requires approved provider messaging permissions (app review pending).`,
+          code: "PROVIDER_APPROVAL_REQUIRED",
+        },
+        { status: 400 }
+      );
+    }
+
+    // 3. Try finding as a Social Message (DM)
     const socialMessage = await prisma.socialMessage.findFirst({
       where: {
         id: { in: [id, cleanId] },
@@ -109,8 +221,6 @@ export async function POST(
     });
 
     if (socialMessage) {
-      // Direct messaging API requires approved advanced access (e.g. Meta Messenger / WhatsApp / X DM)
-      // Check if provider account has message sending capability
       return NextResponse.json(
         {
           success: false,

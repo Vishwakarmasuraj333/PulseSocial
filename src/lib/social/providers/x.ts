@@ -14,6 +14,7 @@ import {
   SocialActionResult,
   SocialMetricsResult,
   ExternalCommentData,
+  ExternalPostData,
 } from "../types";
 
 import crypto from "crypto";
@@ -340,16 +341,17 @@ export class XProvider implements SocialProvider {
 
   private async resolveUserId(accessToken: string, accountId?: string): Promise<string> {
     if (accountId && /^\d+$/.test(accountId)) return accountId;
+    if (accountId && !accountId.includes("auto") && accountId.length > 3) return accountId;
     try {
       const res = await fetch("https://api.twitter.com/2/users/me", {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       if (res.ok) {
         const json = await res.json();
-        return json.data?.id || accountId || "";
+        return json.data?.id || accountId || "me";
       }
     } catch {}
-    return accountId || "";
+    return accountId || "me";
   }
 
   async likePost(accessToken: string, target: { externalPostId: string; accountId?: string }): Promise<SocialActionResult> {
@@ -785,6 +787,54 @@ export class XProvider implements SocialProvider {
           postedAt: t.created_at ? new Date(t.created_at) : new Date(),
           externalPostId,
           likeCount: typeof t.public_metrics?.like_count === "number" ? t.public_metrics.like_count : null,
+        };
+      });
+    } catch {
+      return [];
+    }
+  }
+
+  async fetchPosts(accessToken: string, accountId: string, limit: number = 25): Promise<ExternalPostData[]> {
+    try {
+      const userId = await this.resolveUserId(accessToken, accountId);
+      const url = `https://api.twitter.com/2/users/${userId}/tweets?max_results=${Math.min(limit, 100)}&tweet.fields=created_at,public_metrics,attachments&expansions=attachments.media_keys&media.fields=url,preview_image_url,type`;
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (!res.ok) return [];
+      const data = await res.json().catch(() => ({}));
+      const mediaMap = new Map<string, { url: string; type: "IMAGE" | "VIDEO" }>();
+      (data.includes?.media || []).forEach((m: any) => {
+        const mediaUrl = m.url || m.preview_image_url;
+        if (mediaUrl) {
+          mediaMap.set(m.media_key, {
+            url: mediaUrl,
+            type: m.type === "video" ? "VIDEO" : "IMAGE",
+          });
+        }
+      });
+
+      return (data.data || []).map((t: any) => {
+        const mediaList: { url: string; type: "IMAGE" | "VIDEO" }[] = [];
+        (t.attachments?.media_keys || []).forEach((k: string) => {
+          const found = mediaMap.get(k);
+          if (found) mediaList.push(found);
+        });
+
+        const metrics = t.public_metrics || {};
+        return {
+          platformPostId: t.id,
+          platform: "x" as SupportedPlatform,
+          content: t.text || "",
+          permalink: `https://x.com/i/status/${t.id}`,
+          media: mediaList,
+          publishedAt: t.created_at ? new Date(t.created_at) : new Date(),
+          likes: typeof metrics.like_count === "number" ? metrics.like_count : null,
+          comments: typeof metrics.reply_count === "number" ? metrics.reply_count : null,
+          shares: typeof metrics.retweet_count === "number" ? metrics.retweet_count : null,
+          views: typeof metrics.impression_count === "number" ? metrics.impression_count : null,
+          rawJson: JSON.stringify(t),
         };
       });
     } catch {

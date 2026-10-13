@@ -14,6 +14,7 @@ import {
   SocialActionResult,
   SocialMetricsResult,
   ExternalCommentData,
+  ExternalPostData,
 } from "../types";
 
 export class YouTubeProvider implements SocialProvider {
@@ -670,6 +671,48 @@ export class YouTubeProvider implements SocialProvider {
       }
 
       return results;
+    } catch {
+      return [];
+    }
+  }
+
+  async fetchPosts(accessToken: string, accountId: string, limit: number = 25): Promise<ExternalPostData[]> {
+    try {
+      let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&forMine=true&type=video&order=date&maxResults=${Math.min(limit, 50)}`;
+      let res = await fetch(url, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (!res.ok && accountId) {
+        url = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${encodeURIComponent(accountId)}&type=video&order=date&maxResults=${Math.min(limit, 50)}`;
+        res = await fetch(url, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+      }
+
+      if (!res.ok) return [];
+      const data = await res.json().catch(() => ({}));
+      const items = data.items || [];
+
+      return items.map((item: any) => {
+        const videoId = item.id?.videoId || item.id;
+        const snip = item.snippet || {};
+        const thumbnail = snip.thumbnails?.high?.url || snip.thumbnails?.medium?.url || snip.thumbnails?.default?.url;
+
+        return {
+          platformPostId: String(videoId),
+          platform: "youtube" as SupportedPlatform,
+          content: `${snip.title || ""}\n\n${snip.description || ""}`.trim(),
+          permalink: videoId ? `https://www.youtube.com/watch?v=${videoId}` : undefined,
+          media: thumbnail ? [{ url: thumbnail, type: "VIDEO" as const }] : [],
+          publishedAt: snip.publishedAt ? new Date(snip.publishedAt) : new Date(),
+          likes: null,
+          comments: null,
+          shares: null,
+          views: null,
+          rawJson: JSON.stringify(item),
+        };
+      });
     } catch {
       return [];
     }

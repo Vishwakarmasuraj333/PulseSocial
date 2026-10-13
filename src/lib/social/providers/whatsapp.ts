@@ -235,4 +235,73 @@ export class WhatsAppProvider implements SocialProvider {
   async disconnect(): Promise<boolean> {
     return true;
   }
+
+  async sendMessageOrReply(
+    accessToken: string,
+    conversationId: string,
+    content: string,
+    accountId?: string
+  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    const phoneNumberId = accountId || process.env.WHATSAPP_PHONE_NUMBER_ID;
+    const token = accessToken || process.env.WHATSAPP_ACCESS_TOKEN;
+
+    if (!phoneNumberId || !token) {
+      return {
+        success: false,
+        error: "WhatsApp Cloud API credentials (PHONE_NUMBER_ID / ACCESS_TOKEN) not configured.",
+      };
+    }
+
+    let recipient = conversationId.replace(/^(wa-|conv-|thread-)/, "");
+    if (!recipient.startsWith("+") && !recipient.match(/^\d+$/)) {
+      return {
+        success: false,
+        error: "Invalid recipient phone number for WhatsApp message dispatch.",
+      };
+    }
+
+    try {
+      const body = {
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: recipient,
+        type: "text",
+        text: {
+          preview_url: false,
+          body: content,
+        },
+      };
+
+      const res = await fetch(
+        `https://graph.facebook.com/v19.0/${encodeURIComponent(phoneNumberId)}/messages`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(body),
+        }
+      );
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.error) {
+        return {
+          success: false,
+          error: data.error?.message || "Failed to dispatch message to WhatsApp Cloud API.",
+        };
+      }
+
+      const messageId = data.messages?.[0]?.id;
+      return {
+        success: true,
+        messageId,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        error: e.message || "Failed to dispatch message to WhatsApp Cloud API.",
+      };
+    }
+  }
 }

@@ -108,125 +108,143 @@ export async function GET(
     }
 
     const primaryAccount = accounts[0];
+    const connectedSocialAccounts: any[] = [];
 
-    // 2. Encrypt tokens at rest using AES-256-GCM
-    const encAccess = encryptToken(tokenResult.accessToken);
-    const encRefresh = tokenResult.refreshToken ? encryptToken(tokenResult.refreshToken) : null;
+    // Persist and sync every authorized page, organization, or account
+    for (const accountInfo of accounts) {
+      const specificAccessToken: string =
+        (typeof accountInfo.metadata?.pageAccessToken === "string"
+          ? accountInfo.metadata.pageAccessToken
+          : undefined) || tokenResult.accessToken;
+      const encAccess = encryptToken(specificAccessToken);
+      const encRefresh = tokenResult.refreshToken ? encryptToken(tokenResult.refreshToken) : null;
 
-    // 4. Save SocialAccount record
-    const socialAccount = await prisma.socialAccount.upsert({
-      where: {
-        organizationId_provider_providerAccountId: {
+      // 4. Save SocialAccount record
+      const socialAccount = await prisma.socialAccount.upsert({
+        where: {
+          organizationId_provider_providerAccountId: {
+            organizationId: orgId,
+            provider: platformKey,
+            providerAccountId: accountInfo.providerAccountId,
+          },
+        },
+        update: {
+          displayName: accountInfo.displayName,
+          username: accountInfo.username,
+          profileImageUrl: accountInfo.profileImageUrl,
+          accountType: accountInfo.accountType,
+          status: "CONNECTED",
+          scopes: JSON.stringify(tokenResult.scopes),
+          metadata: JSON.stringify(accountInfo.metadata || {}),
+          lastSyncedAt: new Date(),
+          tokenExpiresAt: tokenResult.expiresIn
+            ? new Date(Date.now() + tokenResult.expiresIn * 1000)
+            : null,
+        },
+        create: {
           organizationId: orgId,
           provider: platformKey,
-          providerAccountId: primaryAccount.providerAccountId,
+          providerAccountId: accountInfo.providerAccountId,
+          displayName: accountInfo.displayName,
+          username: accountInfo.username,
+          profileImageUrl: accountInfo.profileImageUrl,
+          accountType: accountInfo.accountType,
+          status: "CONNECTED",
+          scopes: JSON.stringify(tokenResult.scopes),
+          metadata: JSON.stringify(accountInfo.metadata || {}),
+          lastSyncedAt: new Date(),
+          tokenExpiresAt: tokenResult.expiresIn
+            ? new Date(Date.now() + tokenResult.expiresIn * 1000)
+            : null,
         },
-      },
-      update: {
-        displayName: primaryAccount.displayName,
-        username: primaryAccount.username,
-        profileImageUrl: primaryAccount.profileImageUrl,
-        accountType: primaryAccount.accountType,
-        status: "CONNECTED",
-        scopes: JSON.stringify(tokenResult.scopes),
-        metadata: JSON.stringify(primaryAccount.metadata || {}),
-        lastSyncedAt: new Date(),
-        tokenExpiresAt: tokenResult.expiresIn
-          ? new Date(Date.now() + tokenResult.expiresIn * 1000)
-          : null,
-      },
-      create: {
-        organizationId: orgId,
-        provider: platformKey,
-        providerAccountId: primaryAccount.providerAccountId,
-        displayName: primaryAccount.displayName,
-        username: primaryAccount.username,
-        profileImageUrl: primaryAccount.profileImageUrl,
-        accountType: primaryAccount.accountType,
-        status: "CONNECTED",
-        scopes: JSON.stringify(tokenResult.scopes),
-        metadata: JSON.stringify(primaryAccount.metadata || {}),
-        lastSyncedAt: new Date(),
-        tokenExpiresAt: tokenResult.expiresIn
-          ? new Date(Date.now() + tokenResult.expiresIn * 1000)
-          : null,
-      },
-    });
+      });
 
-    // 5. Save encrypted tokens
-    await prisma.socialToken.upsert({
-      where: { socialAccountId: socialAccount.id },
-      update: {
-        encryptedAccessToken: encAccess.encrypted,
-        encryptedRefreshToken: encRefresh?.encrypted,
-        iv: encAccess.iv,
-        tag: encAccess.tag,
-        expiresAt: tokenResult.expiresIn
-          ? new Date(Date.now() + tokenResult.expiresIn * 1000)
-          : null,
-      },
-      create: {
-        socialAccountId: socialAccount.id,
-        encryptedAccessToken: encAccess.encrypted,
-        encryptedRefreshToken: encRefresh?.encrypted,
-        iv: encAccess.iv,
-        tag: encAccess.tag,
-        expiresAt: tokenResult.expiresIn
-          ? new Date(Date.now() + tokenResult.expiresIn * 1000)
-          : null,
-      },
-    });
-
-    // 6. Sync profile
-    try {
-      const profile = await socialProvider.getProfile(
-        tokenResult.accessToken,
-        primaryAccount.providerAccountId
-      );
-      await prisma.socialProfile.upsert({
+      // 5. Save encrypted tokens
+      await prisma.socialToken.upsert({
         where: { socialAccountId: socialAccount.id },
         update: {
-          bio: profile.bio,
-          followersCount: profile.followersCount,
-          followingCount: profile.followingCount,
-          postsCount: profile.postsCount,
-          websiteUrl: profile.websiteUrl,
+          encryptedAccessToken: encAccess.encrypted,
+          encryptedRefreshToken: encRefresh?.encrypted,
+          iv: encAccess.iv,
+          tag: encAccess.tag,
+          expiresAt: tokenResult.expiresIn
+            ? new Date(Date.now() + tokenResult.expiresIn * 1000)
+            : null,
         },
         create: {
           socialAccountId: socialAccount.id,
-          bio: profile.bio,
-          followersCount: profile.followersCount,
-          followingCount: profile.followingCount,
-          postsCount: profile.postsCount,
-          websiteUrl: profile.websiteUrl,
+          encryptedAccessToken: encAccess.encrypted,
+          encryptedRefreshToken: encRefresh?.encrypted,
+          iv: encAccess.iv,
+          tag: encAccess.tag,
+          expiresAt: tokenResult.expiresIn
+            ? new Date(Date.now() + tokenResult.expiresIn * 1000)
+            : null,
         },
       });
-    } catch (e) {
-      console.warn("Could not sync profile metrics immediately:", e);
-    }
 
-    // 7. Full authorized data sync (posts, media, comments, inbox, analytics)
-    try {
-      await syncAccountData({
-        socialAccountId: socialAccount.id,
+      // 6. Sync profile
+      try {
+        const profile = await socialProvider.getProfile(
+          specificAccessToken,
+          accountInfo.providerAccountId
+        );
+        await prisma.socialProfile.upsert({
+          where: { socialAccountId: socialAccount.id },
+          update: {
+            bio: profile.bio,
+            followersCount: profile.followersCount,
+            followingCount: profile.followingCount,
+            postsCount: profile.postsCount,
+            websiteUrl: profile.websiteUrl,
+          },
+          create: {
+            socialAccountId: socialAccount.id,
+            bio: profile.bio,
+            followersCount: profile.followersCount,
+            followingCount: profile.followingCount,
+            postsCount: profile.postsCount,
+            websiteUrl: profile.websiteUrl,
+          },
+        });
+      } catch (e) {
+        console.warn(`Could not sync profile metrics immediately for ${accountInfo.displayName}:`, e);
+      }
+
+      // 7. Full authorized data sync (posts, media, comments, inbox, analytics)
+      try {
+        await syncAccountData({
+          socialAccountId: socialAccount.id,
+          organizationId: orgId,
+        });
+      } catch (syncErr) {
+        console.warn(`Initial full sync warning for ${accountInfo.displayName}:`, syncErr);
+      }
+
+      await logAudit({
         organizationId: orgId,
+        userId: session.id,
+        action: "OAUTH_CONNECTED",
+        resourceType: "SocialAccount",
+        resourceId: socialAccount.id,
+        details: {
+          provider: platformKey,
+          providerAccountId: accountInfo.providerAccountId,
+          accountType: accountInfo.accountType,
+        },
       });
-    } catch (syncErr) {
-      console.warn("Initial full sync warning:", syncErr);
-    }
 
-    await logAudit({
-      organizationId: orgId,
-      userId: session.id,
-      action: "OAUTH_CONNECTED",
-      resourceType: "SocialAccount",
-      resourceId: socialAccount.id,
-      details: {
-        provider: platformKey,
-        providerAccountId: primaryAccount.providerAccountId,
-        accountType: primaryAccount.accountType,
-      },
-    });
+      connectedSocialAccounts.push({
+        id: socialAccount.id,
+        platform: platformKey,
+        displayName: accountInfo.displayName,
+        username: accountInfo.username || "",
+        avatarUrl: accountInfo.profileImageUrl || "",
+        providerAccountId: accountInfo.providerAccountId,
+        scopes: tokenResult.scopes || [],
+        metadata: accountInfo.metadata || {},
+      });
+    }
 
     const redirectTarget = `/dashboard?connected=${platformKey}&accountName=${encodeURIComponent(
       primaryAccount.displayName
@@ -256,8 +274,8 @@ export async function GET(
       if (window.opener && !window.opener.closed) {
         window.opener.postMessage({
           type: "PULSESOCIAL_CHANNEL_CONNECTED",
-          account: {
-            id: "${socialAccount.id}",
+          account: connectedSocialAccounts[0] || {
+            id: "",
             platform: "${platformKey}",
             displayName: ${JSON.stringify(primaryAccount.displayName)},
             username: ${JSON.stringify(primaryAccount.username || "")},
@@ -265,7 +283,8 @@ export async function GET(
             providerAccountId: ${JSON.stringify(primaryAccount.providerAccountId)},
             scopes: ${JSON.stringify(tokenResult.scopes || [])},
             metadata: ${JSON.stringify(primaryAccount.metadata || {})}
-          }
+          },
+          accounts: ${JSON.stringify(connectedSocialAccounts)}
         }, "*");
         setTimeout(function() { window.close(); }, 800);
       } else {

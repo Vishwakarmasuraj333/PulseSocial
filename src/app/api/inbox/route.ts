@@ -168,22 +168,30 @@ export async function POST(req: Request) {
     const provider = getSocialProvider(normalizedPlatform);
     let remoteMessageId = `outbound_${Date.now()}`;
 
-    // If provider supports sendMessageOrReply, dispatch real message
-    if (conversation && typeof provider.sendMessageOrReply === "function") {
-      const res = await provider.sendMessageOrReply(
-        decryptedToken,
-        conversation.platformConversationId,
-        content.trim(),
-        account.providerAccountId
+    // Enforce real-world provider messaging capability
+    if (!conversation || typeof provider.sendMessageOrReply !== "function") {
+      return NextResponse.json(
+        {
+          error: `Direct messaging and inbox replies are not supported by the ${provider.displayName} API or permissions.`,
+          code: "PROVIDER_UNSUPPORTED_CAPABILITY",
+        },
+        { status: 400 }
       );
-      if (!res.success) {
-        return NextResponse.json(
-          { error: res.error || "Failed to deliver message through social platform API." },
-          { status: 400 }
-        );
-      }
-      if (res.messageId) remoteMessageId = res.messageId;
     }
+
+    const res = await provider.sendMessageOrReply(
+      decryptedToken,
+      conversation.platformConversationId,
+      content.trim(),
+      account.providerAccountId
+    );
+    if (!res.success) {
+      return NextResponse.json(
+        { error: res.error || "Failed to deliver message through social platform API." },
+        { status: 400 }
+      );
+    }
+    if (res.messageId) remoteMessageId = res.messageId;
 
     // Persist outbound message in database
     const newMsg = await prisma.socialMessage.create({

@@ -36,23 +36,44 @@ export async function runProductionAuditMasterTests() {
   assert.strictEqual(demoComments, 0, "No demo comments should exist in the database");
   console.log("  ✔ Zero demo accounts and zero demo comments in database verified");
 
-  // 3. Facebook OAuth Implementation & Scope Integrity
-  const metaProvider = new MetaProvider("facebook");
-  assert.strictEqual(metaProvider.platform, "facebook");
-  assert.strictEqual(metaProvider.displayName, "Facebook");
+  // 3. Facebook & Instagram OAuth Implementation & Scope Integrity
+  const fbProvider = new MetaProvider("facebook");
+  assert.strictEqual(fbProvider.platform, "facebook");
+  assert.strictEqual(fbProvider.displayName, "Facebook");
+
+  const igProvider = new MetaProvider("instagram");
+  assert.strictEqual(igProvider.platform, "instagram");
+  assert.strictEqual(igProvider.displayName, "Instagram");
 
   const testState = "test-oauth-state-1234567890abcdef";
-  const testRedirectUri = "https://pulsesocial1.vercel.app/api/social/facebook/callback";
-  const authUrl = metaProvider.getAuthorizationUrl(testState, testRedirectUri);
+  const fbRedirectUri = "https://pulsesocial1.vercel.app/api/social/facebook/callback";
+  const igRedirectUri = "https://pulsesocial1.vercel.app/api/social/instagram/callback";
 
-  assert.ok(authUrl.startsWith("https://www.facebook.com/v20.0/dialog/oauth?"));
-  assert.ok(authUrl.includes(`redirect_uri=${encodeURIComponent(testRedirectUri)}`));
-  assert.ok(authUrl.includes(`state=${testState}`));
-  assert.ok(authUrl.includes("pages_manage_posts"));
-  assert.ok(authUrl.includes("pages_read_engagement"));
-  console.log("  ✔ Facebook OAuth URL generation, state, and scopes verified");
+  const fbAuthUrl = fbProvider.getAuthorizationUrl(testState, fbRedirectUri);
+  assert.ok(fbAuthUrl.startsWith("https://www.facebook.com/v20.0/dialog/oauth?"));
+  assert.ok(fbAuthUrl.includes(`redirect_uri=${encodeURIComponent(fbRedirectUri)}`));
+  assert.ok(fbAuthUrl.includes(`state=${testState}`));
+  assert.ok(fbAuthUrl.includes("pages_manage_posts"));
+  assert.ok(fbAuthUrl.includes("pages_read_engagement"));
 
-  // 4. Token Vault (AES-256-GCM) with Meta Access Token Simulation
+  const igAuthUrl = igProvider.getAuthorizationUrl(testState, igRedirectUri);
+  assert.ok(igAuthUrl.startsWith("https://www.facebook.com/v20.0/dialog/oauth?"));
+  assert.ok(igAuthUrl.includes(`redirect_uri=${encodeURIComponent(igRedirectUri)}`));
+  assert.ok(igAuthUrl.includes("instagram_basic"));
+  assert.ok(igAuthUrl.includes("instagram_content_publish"));
+  console.log("  ✔ Facebook and Instagram OAuth URL generation, state, and scopes verified independently");
+
+  // 4. Regression: Missing valid authorization token rejection
+  await assert.rejects(
+    async () => {
+      await fbProvider.getAccounts("");
+    },
+    /Missing valid authorization token/,
+    "Must reject empty access token with descriptive error before sending malformed Authorization header"
+  );
+  console.log("  ✔ Regression test: empty/missing Meta access token safely intercepted before network call");
+
+  // 5. Token Vault (AES-256-GCM) with Meta Access Token Simulation
   const sampleToken = "EAABtest_mock_meta_access_token_super_long_payload_for_testing";
   const encrypted = encryptToken(sampleToken);
   assert.ok(encrypted.encrypted.length > 0);

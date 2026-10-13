@@ -121,11 +121,15 @@ export class MetaProvider implements SocialProvider {
     });
 
     const longLivedRes = await fetch(`https://graph.facebook.com/v20.0/oauth/access_token?${exchangeParams.toString()}`);
-    const longLivedData = longLivedRes.ok ? await longLivedRes.json() : data;
+    const longLivedData = longLivedRes.ok ? await longLivedRes.json().catch(() => data) : data;
+    const finalToken = longLivedData?.access_token || shortLivedToken;
+    if (!finalToken || typeof finalToken !== "string" || finalToken.trim() === "") {
+      throw new Error("Meta OAuth exchange did not return a valid access token.");
+    }
 
     return {
-      accessToken: longLivedData.access_token,
-      expiresIn: longLivedData.expires_in || 5184000, // 60 days in seconds
+      accessToken: finalToken,
+      expiresIn: longLivedData?.expires_in || 5184000, // 60 days in seconds
       scopes: ["pages_manage_posts", "instagram_content_publish", "instagram_basic"],
       metadata: { tokenType: "Bearer" },
     };
@@ -158,8 +162,12 @@ export class MetaProvider implements SocialProvider {
   }
 
   async getAccounts(accessToken: string): Promise<SocialAccountInfo[]> {
+    if (!accessToken || typeof accessToken !== "string" || accessToken.trim() === "") {
+      throw new Error("Missing valid authorization token for Meta Graph API");
+    }
+
     const res = await fetch(
-      `https://graph.facebook.com/v20.0/me/accounts?access_token=${encodeURIComponent(accessToken)}&fields=id,name,picture{url},access_token,instagram_business_account{id,username,profile_picture_url}`,
+      `https://graph.facebook.com/v20.0/me/accounts?fields=id,name,picture{url},access_token,instagram_business_account{id,username,profile_picture_url}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -204,7 +212,7 @@ export class MetaProvider implements SocialProvider {
     if (accounts.length === 0 && this.platform === "facebook") {
       try {
         const meRes = await fetch(
-          `https://graph.facebook.com/v20.0/me?access_token=${encodeURIComponent(accessToken)}&fields=id,name,picture{url},email`,
+          `https://graph.facebook.com/v20.0/me?fields=id,name,picture{url},email`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -227,14 +235,24 @@ export class MetaProvider implements SocialProvider {
       } catch {}
     }
 
+    if (this.platform === "instagram" && accounts.length === 0) {
+      throw new Error(
+        "No linked Instagram Business accounts found. Ensure your Instagram account is switched to a Professional/Business account and connected to your Facebook Page in Meta Business Suite."
+      );
+    }
+
     return accounts;
   }
 
   async getProfile(accessToken: string, accountId: string): Promise<SocialProfileResult> {
+    if (!accessToken || typeof accessToken !== "string" || accessToken.trim() === "") {
+      return { followersCount: null, followingCount: null, postsCount: null };
+    }
+
     try {
       if (this.platform === "instagram") {
         const res = await fetch(
-          `https://graph.facebook.com/v20.0/${accountId}?access_token=${encodeURIComponent(accessToken)}&fields=biography,followers_count,follows_count,media_count,website,profile_picture_url`,
+          `https://graph.facebook.com/v20.0/${accountId}?fields=biography,followers_count,follows_count,media_count,website,profile_picture_url`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -254,7 +272,7 @@ export class MetaProvider implements SocialProvider {
         };
       } else {
         const res = await fetch(
-          `https://graph.facebook.com/v20.0/${accountId}?access_token=${encodeURIComponent(accessToken)}&fields=fan_count,followers_count,about,website`,
+          `https://graph.facebook.com/v20.0/${accountId}?fields=fan_count,followers_count,about,website`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,

@@ -30,10 +30,17 @@ export async function GET(
       url.searchParams.get("format") === "json" ||
       req.headers.get("accept")?.includes("application/json");
 
-    const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
-    const proto = req.headers.get("x-forwarded-proto") || (host?.includes("localhost") ? "http" : "https");
+    let host = req.headers.get("x-forwarded-host") || req.headers.get("host") || "";
+    if (host.includes(",")) host = host.split(",")[0].trim();
+    if (host.endsWith(":443")) host = host.slice(0, -4);
+    if (host.endsWith(":80")) host = host.slice(0, -3);
+
+    let proto = req.headers.get("x-forwarded-proto") || (host.includes("localhost") ? "http" : "https");
+    if (host.includes("vercel.app")) proto = "https";
+
     const appUrl = host ? `${proto}://${host}` : (process.env.NEXT_PUBLIC_APP_URL || url.origin);
-    const redirectUri = `${appUrl}/api/social/${platformKey}/callback`;
+    const cleanAppUrl = appUrl.replace(/\/+$/, "");
+    const redirectUri = `${cleanAppUrl}/api/social/${platformKey}/callback`;
 
     // Resolve tenant organization
     let orgId = session.activeOrgId;

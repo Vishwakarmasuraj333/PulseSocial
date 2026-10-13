@@ -265,7 +265,12 @@ function SocialConnectInner() {
               </div>
               <button
                 type="button"
-                onClick={() => setDismissedError(true)}
+                onClick={() => {
+                  setDismissedError(true);
+                  if (typeof window !== "undefined") {
+                    window.history.replaceState({}, "", window.location.pathname);
+                  }
+                }}
                 className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
                 title="Dismiss message"
               >

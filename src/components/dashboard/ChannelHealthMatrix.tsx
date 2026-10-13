@@ -35,7 +35,6 @@ export function ChannelHealthMatrix({
     "youtube",
     "tiktok",
     "google_business",
-    "pinterest",
     "threads",
     "bluesky",
     "whatsapp",

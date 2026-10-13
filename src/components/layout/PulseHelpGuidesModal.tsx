@@ -36,7 +36,7 @@ const TABS = [
 const GUIDES = [
   {
     title: "Connecting Your Social Channels",
-    desc: "Authorize YouTube, Instagram, LinkedIn, TikTok, X, Facebook, Pinterest & Google Business via official OAuth.",
+    desc: "Authorize YouTube, Instagram, LinkedIn, TikTok, X, Facebook & Google Business via official OAuth.",
     href: "/connections",
     icon: Share2,
     badge: "Essential",

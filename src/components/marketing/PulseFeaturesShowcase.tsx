@@ -13,7 +13,6 @@ import {
   GoogleBusinessIcon,
   InstagramIcon,
   YouTubeIcon,
-  PinterestIcon,
 } from "@/components/icons/PlatformIcons";
 
 interface FeatureDisplayProps {
@@ -187,7 +186,6 @@ export function PulseFeaturesShowcase() {
                     { icon: <GoogleBusinessIcon size={9} />, bg: "#1668e3" },
                     { icon: <InstagramIcon size={9} />, bg: "#E1306C" },
                     { icon: <YouTubeIcon size={9} />, bg: "#FF0000" },
-                    { icon: <PinterestIcon size={9} />, bg: "#E60023" },
                   ].map((ch, idx) => (
                     <div
                       key={idx}

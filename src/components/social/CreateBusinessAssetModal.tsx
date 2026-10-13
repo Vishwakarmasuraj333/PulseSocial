@@ -67,15 +67,6 @@ const PLATFORM_CAPABILITIES: PlatformCapability[] = [
       "LinkedIn Company Pages require verification of company email domain and personal LinkedIn administrator rights through the LinkedIn setup portal.",
   },
   {
-    id: "pinterest",
-    name: "Pinterest",
-    assetType: "Business Board / Account",
-    supportsApiCreation: true,
-    officialCreationUrl: "https://business.pinterest.com/",
-    explanation:
-      "Pinterest Business boards can be initialized via the Pinterest API if an authenticated Pinterest account is connected, or created directly on Pinterest.",
-  },
-  {
     id: "tiktok",
     name: "TikTok",
     assetType: "Business Account",
@@ -166,48 +157,6 @@ export function CreateBusinessAssetModal({
     PLATFORM_CAPABILITIES.find((p) => p.id === selectedPlatformId) ||
     PLATFORM_CAPABILITIES[0];
 
-  const handleCreatePinterestBoard = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!assetName.trim()) {
-      toast({
-        title: "Name Required",
-        message: "Please enter a board name.",
-        type: "error",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const res = await fetch("/api/social/pinterest/boards", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: assetName.trim(), description }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to create board on Pinterest");
-      }
-      toast({
-        title: "Board Created",
-        message: `Pinterest board "${assetName}" created successfully.`,
-        type: "success",
-      });
-      setAssetName("");
-      setDescription("");
-      onClose();
-    } catch (err: unknown) {
-      toast({
-        title: "Creation Error",
-        message:
-          (err as Error).message ||
-          "Could not create board. Please ensure Pinterest is connected.",
-        type: "error",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
@@ -303,60 +252,8 @@ export function CreateBusinessAssetModal({
             </p>
           </div>
 
-          {/* Creation Flow: Form if supported, Direct portal if unsupported */}
-          {currentPlatform.supportsApiCreation ? (
-            <form onSubmit={handleCreatePinterestBoard} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Board Name *
-                </label>
-                <input
-                  type="text"
-                  value={assetName}
-                  onChange={(e) => setAssetName(e.target.value)}
-                  placeholder="e.g. Summer Marketing Campaign"
-                  className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Description (Optional)
-                </label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={2}
-                  placeholder="Describe the content of this board..."
-                  className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="px-4 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-4 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
-                >
-                  {isSubmitting ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                  )}
-                  <span>Create on {currentPlatform.name}</span>
-                </button>
-              </div>
-            </form>
-          ) : (
-            <div className="space-y-4 pt-1">
+          {/* Creation Flow: Direct Portal */}
+          <div className="space-y-4 pt-1">
               <div className="p-4 rounded-xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/50 dark:bg-blue-950/20 text-xs text-blue-800 dark:text-blue-300 flex items-start gap-3">
                 <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                 <div className="space-y-1">
@@ -399,7 +296,6 @@ export function CreateBusinessAssetModal({
                 </button>
               </div>
             </div>
-          )}
         </div>
       </div>
     </div>

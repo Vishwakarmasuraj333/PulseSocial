@@ -18,7 +18,6 @@ import {
   TikTokIcon,
   LinkedInIcon,
   XIcon,
-  PinterestIcon,
   FacebookIcon,
 } from "@/components/icons/PlatformIcons";
 
@@ -213,49 +212,6 @@ const PLATFORMS_DATA: PlatformShowcase[] = [
         author: "@marketsignals",
         likes: "19.8K",
         comments: "1.3K",
-        tilt: "rotate-2",
-      },
-    ],
-  },
-  {
-    id: "pinterest",
-    name: "Pinterest",
-    tag: "PINTEREST",
-    tagColor: "text-red-700 bg-red-50 border-red-200 dark:bg-red-950/40 dark:border-red-800",
-    title: "Drive evergreen organic traffic from visual searches.",
-    description:
-      "Batch pin high-resolution ideas, schedule boards weeks in advance, and turn passive visual searchers into loyal high-ticket buyers.",
-    link: "/platforms#pinterest",
-    iconRenderer: () => <PinterestIcon size={18} />,
-    cards: [
-      {
-        id: 0,
-        image:
-          "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=700&auto=format&fit=crop&q=85",
-        caption: "Cozy scandinavian living room inspiration & warm lighting aesthetics 🛋️🕯️",
-        author: "@minimalistliving",
-        likes: "28.4K",
-        comments: "640",
-        tilt: "-rotate-2",
-      },
-      {
-        id: 1,
-        image:
-          "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=700&auto=format&fit=crop&q=85",
-        caption: "Handcrafted artisan ceramic collection launch & studio process 🏺🎨",
-        author: "@artisanatelier",
-        likes: "36.2K",
-        comments: "980",
-        tilt: "rotate-0",
-      },
-      {
-        id: 2,
-        image:
-          "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=700&auto=format&fit=crop&q=85",
-        caption: "Urban terrace garden design & indoor botanical styling guide 🌿🪴",
-        author: "@greenhabitats",
-        likes: "44.9K",
-        comments: "1.2K",
         tilt: "rotate-2",
       },
     ],

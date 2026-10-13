@@ -168,15 +168,6 @@ export function PostPreview({
         />
       )}
 
-      {provider.includes("pinterest") && (
-        <PinterestPostPreview
-          account={currentAccount}
-          content={content}
-          media={media}
-          destinationUrl={linkData?.url}
-        />
-      )}
-
       {provider.includes("thread") && (
         <ThreadsPostPreview
           account={currentAccount}

@@ -71,15 +71,6 @@ export function PulseSocialRibbon() {
       badge: "Direct Sync",
     },
     {
-      id: "pinterest",
-      name: "Pinterest",
-      tag: "Idea Pins & Visual Boards",
-      logo: "/images/social/logos/pinterest-icon.svg",
-      color: "#E60023",
-      borderColor: "hover:border-red-600/50",
-      badge: "Shopping Ready",
-    },
-    {
       id: "threads",
       name: "Threads",
       tag: "Conversations & Cross-post",

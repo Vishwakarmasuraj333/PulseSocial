@@ -10,7 +10,6 @@ import {
   InstagramIcon,
   YouTubeIcon,
   TikTokIcon,
-  PinterestIcon,
   ThreadsIcon,
   SnapchatIcon,
   WhatsAppIcon,
@@ -96,14 +95,6 @@ export function HeroSocialOrbit() {
         color: "#000000",
         glowColor: "rgba(168, 85, 247, 0.5)",
         icon: (s) => <ThreadsIcon size={s} className="shrink-0" />,
-      },
-      {
-        id: "pinterest",
-        name: "Pinterest",
-        badge: "Rich Idea Pins & Boards",
-        color: "#E60023",
-        glowColor: "rgba(230, 0, 35, 0.5)",
-        icon: (s) => <PinterestIcon size={s} className="shrink-0" />,
       },
       {
         id: "linkedin",

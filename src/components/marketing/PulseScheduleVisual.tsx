@@ -19,7 +19,6 @@ import {
   LinkedInIcon,
   InstagramIcon,
   YouTubeIcon,
-  PinterestIcon,
   GoogleBusinessIcon,
 } from "@/components/icons/PlatformIcons";
 
@@ -68,12 +67,6 @@ export function PulseScheduleVisual() {
       name: "YouTube",
       icon: (s: number) => <YouTubeIcon size={s} />,
       badgeBg: "#FF0000",
-    },
-    {
-      id: "pinterest",
-      name: "Pinterest",
-      icon: (s: number) => <PinterestIcon size={s} />,
-      badgeBg: "#E60023",
     },
   ];
 

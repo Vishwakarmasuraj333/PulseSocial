@@ -119,21 +119,6 @@ export const BRAND_CHANNELS: ChannelTabConfig[] = [
     ],
   },
   {
-    id: "pinterest",
-    name: "Pinterest",
-    connectTitle: "Connect your official Pinterest account.",
-    buttonLabel: "Continue with Pinterest",
-    buttonClass: "bg-[#E60023] hover:bg-red-800 text-white",
-    realOAuthUrl: "/api/social/pinterest/connect",
-    description: "Connect your Pinterest account to publish visual pins, link back to your site, and manage boards.",
-    scopes: [
-      { name: "boards:read", description: "Read public and private Pinterest boards" },
-      { name: "boards:write", description: "Create and organize pin boards" },
-      { name: "pins:read", description: "Read existing pin metrics and saves" },
-      { name: "pins:write", description: "Create rich visual pins with destination links" },
-    ],
-  },
-  {
     id: "google_business",
     name: "Google Business Profile",
     connectTitle: "Connect your official Google Business Profile.",

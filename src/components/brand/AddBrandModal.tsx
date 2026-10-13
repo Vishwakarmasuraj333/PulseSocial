@@ -19,7 +19,6 @@ const BRAND_PLATFORMS = [
   { id: "linkedin", name: "LinkedIn", desc: "Connect a LinkedIn account associated with the Profile and/or Company Page you'd like to add." },
   { id: "youtube", name: "YouTube", desc: "Connect the YouTube channel you'd like to add." },
   { id: "tiktok", name: "TikTok", desc: "Connect a TikTok creator or business account you'd like to add." },
-  { id: "pinterest", name: "Pinterest", desc: "Connect a Pinterest account you'd like to add." },
   { id: "snapchat", name: "Snapchat", desc: "Connect a Snapchat Professional Account you'd like to add." },
   { id: "threads", name: "Threads", desc: "Connect a Threads account you'd like to add." },
   { id: "whatsapp", name: "WhatsApp Business", desc: "Connect a WhatsApp account you'd like to add." },

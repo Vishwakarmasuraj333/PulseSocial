@@ -212,8 +212,6 @@ export function PostEngagementDetailsModal({
         return `https://x.com/i/status/${externalId}`;
       case "youtube":
         return `https://www.youtube.com/watch?v=${externalId}`;
-      case "pinterest":
-        return `https://www.pinterest.com/pin/${externalId}/`;
       default:
         return null;
     }

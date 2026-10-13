@@ -53,14 +53,14 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
         badgeGlow: "rgba(225, 48, 108, 0.4)",
       },
       itemB: {
-        platform: "Pinterest",
-        networkTag: "Rich Idea Pins & Shoppable Boards",
-        logo: "/images/social/logos/pinterest-icon.svg",
+        platform: "YouTube",
+        networkTag: "Shorts & Video Optimization",
+        logo: "/images/social/logos/youtube-icon.svg",
         image: "/images/social/social-post8.png",
-        alt: "Pinterest post with architectural interior bookshelf",
-        description: "High-intent visual discovery boards scheduled weeks ahead.",
-        reach: "31.2K Monthly Views",
-        badgeGlow: "rgba(230, 0, 35, 0.4)",
+        alt: "YouTube shorts and video publishing analytics",
+        description: "Scheduled video uploads, community posts, and shorts optimization.",
+        reach: "38.5K Monthly Views",
+        badgeGlow: "rgba(255, 0, 0, 0.4)",
       },
     },
     {
@@ -357,7 +357,7 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
 
             <button
               onClick={() => setActiveSlide(1)}
-              aria-label="Show Set 2 (Pinterest, Bluesky, Threads, WhatsApp)"
+              aria-label="Show Set 2 (YouTube, Bluesky, Threads, WhatsApp)"
               className={`flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] font-bold transition-all duration-300 cursor-pointer ${
                 activeSlide === 1
                   ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-md scale-105"

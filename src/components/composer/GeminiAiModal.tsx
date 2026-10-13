@@ -62,7 +62,6 @@ const PLATFORMS = [
   { id: "facebook", label: "Facebook" },
   { id: "tiktok", label: "TikTok" },
   { id: "youtube", label: "YouTube" },
-  { id: "pinterest", label: "Pinterest" },
   { id: "threads", label: "Threads" },
 ];
 
@@ -93,7 +92,7 @@ const ASPECT_RATIOS = [
   { id: "4:5", label: "Portrait 4:5", desc: "Carousel / Vertical feed" },
   { id: "9:16", label: "Story 9:16", desc: "Reels, Stories & TikTok" },
   { id: "16:9", label: "Landscape 16:9", desc: "LinkedIn & X banner" },
-  { id: "2:3", label: "Pin 2:3", desc: "Pinterest Pin" },
+  { id: "2:3", label: "Portrait 2:3", desc: "Vertical poster / media" },
 ];
 
 export function GeminiAiModal({

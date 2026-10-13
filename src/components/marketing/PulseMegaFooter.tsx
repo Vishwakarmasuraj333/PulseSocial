@@ -8,7 +8,6 @@ import {
   LinkedInIcon,
   InstagramIcon,
   YouTubeIcon,
-  PinterestIcon,
 } from "@/components/icons/PlatformIcons";
 import { Search, Globe, ShieldCheck, Mail, ArrowUpRight, CheckCircle2 } from "lucide-react";
 import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
@@ -55,7 +54,6 @@ export function PulseMegaFooter() {
         { label: "WhatsApp", href: "/platforms#whatsapp" },
         { label: "Google Business Profile", href: "/platforms#google" },
         { label: "YouTube", href: "/platforms#youtube" },
-        { label: "Pinterest", href: "/platforms#pinterest" },
         { label: "TikTok", href: "/platforms#tiktok" },
         { label: "Mastodon", href: "/platforms#mastodon" },
         { label: "Threads", href: "/platforms#threads" },
@@ -187,9 +185,6 @@ export function PulseMegaFooter() {
             </Link>
             <Link href="https://youtube.com" target="_blank" className="p-2 rounded-full bg-slate-800 hover:bg-slate-700 text-white transition" aria-label="YouTube">
               <YouTubeIcon size={14} />
-            </Link>
-            <Link href="https://pinterest.com" target="_blank" className="p-2 rounded-full bg-slate-800 hover:bg-slate-700 text-white transition" aria-label="Pinterest">
-              <PinterestIcon size={14} />
             </Link>
           </div>
         </div>

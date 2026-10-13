@@ -22,7 +22,7 @@ export function PulseFaqSection() {
             <span className="font-semibold text-slate-800 dark:text-slate-200 underline decoration-slate-300">
               Social media management software
             </span>{" "}
-            is an application or software suite module that helps a company interact on social media effectively across multiple communication channels. Good software will help in the process of creating, publishing, scheduling, managing, and analyzing content on social media platforms, such as Facebook, X (formerly Twitter), Instagram, YouTube, Pinterest, LinkedIn, TikTok, and others.
+            is an application or software suite module that helps a company interact on social media effectively across multiple communication channels. Good software will help in the process of creating, publishing, scheduling, managing, and analyzing content on social media platforms, such as Facebook, X (formerly Twitter), Instagram, YouTube, LinkedIn, TikTok, and others.
           </p>
 
           <div>
@@ -99,7 +99,7 @@ export function PulseFaqSection() {
       answer: (
         <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed pt-2 space-y-2">
           <p>
-            PulseSocial is an AI-powered social media command center designed for creators, marketing agencies, and global businesses. We support 14+ major channels including Facebook Pages & Groups, Instagram Business & Creators, LinkedIn Profiles & Company Pages, X (Twitter), YouTube Shorts & Channels, TikTok, Pinterest, Google Business Profile, Threads, Telegram, WhatsApp, and Mastodon.
+            PulseSocial is an AI-powered social media command center designed for creators, marketing agencies, and global businesses. We support 14+ major channels including Facebook Pages & Groups, Instagram Business & Creators, LinkedIn Profiles & Company Pages, X (Twitter), YouTube Shorts & Channels, TikTok, Google Business Profile, Threads, Telegram, WhatsApp, and Mastodon.
           </p>
         </div>
       ),

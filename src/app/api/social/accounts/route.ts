@@ -99,39 +99,57 @@ export async function DELETE(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const accountId = searchParams.get("id");
+    const provider = searchParams.get("provider");
 
-    if (!accountId) {
-      return NextResponse.json({ error: "Account ID is required" }, { status: 400 });
+    if (!accountId && !provider) {
+      return NextResponse.json({ error: "Account ID or provider is required" }, { status: 400 });
     }
 
-    const account = await prisma.socialAccount.findFirst({
-      where: {
-        id: accountId,
+    if (accountId) {
+      const account = await prisma.socialAccount.findFirst({
+        where: {
+          id: accountId,
+          organizationId: session.activeOrgId,
+        },
+      });
+
+      if (!account) {
+        return NextResponse.json({ error: "Social account not found" }, { status: 404 });
+      }
+
+      await prisma.socialAccount.delete({
+        where: { id: account.id },
+      });
+
+      await logAudit({
         organizationId: session.activeOrgId,
-      },
-    });
+        userId: session.id,
+        action: "SOCIAL_ACCOUNT_DISCONNECTED",
+        resourceType: "SocialAccount",
+        resourceId: account.id,
+        details: { provider: account.provider, displayName: account.displayName },
+      });
 
-    if (!account) {
-      return NextResponse.json({ error: "Social account not found" }, { status: 404 });
+      return NextResponse.json({
+        success: true,
+        message: `${account.displayName} has been disconnected.`,
+      });
     }
 
-    await prisma.socialAccount.delete({
-      where: { id: account.id },
-    });
+    if (provider) {
+      const deleted = await prisma.socialAccount.deleteMany({
+        where: {
+          organizationId: session.activeOrgId,
+          provider: provider.toLowerCase(),
+        },
+      });
 
-    await logAudit({
-      organizationId: session.activeOrgId,
-      userId: session.id,
-      action: "SOCIAL_ACCOUNT_DISCONNECTED",
-      resourceType: "SocialAccount",
-      resourceId: account.id,
-      details: { provider: account.provider, displayName: account.displayName },
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: `${account.displayName} has been disconnected.`,
-    });
+      return NextResponse.json({
+        success: true,
+        message: `Accounts for ${provider} have been disconnected.`,
+        count: deleted.count,
+      });
+    }
   } catch (err: unknown) {
     return NextResponse.json(
       { error: (err as Error).message || "Failed to disconnect account" },

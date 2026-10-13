@@ -195,16 +195,10 @@ function SocialConnectInner() {
       {/* Header Bar */}
       <div className="w-full max-w-6xl mx-auto flex items-center justify-between pb-8">
         <PulseSocialLogo size="md" theme="light" variant="with-tagline" />
-        <button
-          type="button"
-          onClick={() => {
-            window.location.href = "/dashboard";
-          }}
-          className="text-xs font-semibold px-4 py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition flex items-center gap-1.5 cursor-pointer"
-        >
-          <span>Continue to Dashboard</span>
-          <ArrowRight className="w-3.5 h-3.5" />
-        </button>
+        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-800 text-xs text-slate-300 shadow-sm backdrop-blur-md">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="font-medium text-emerald-400">{connectedIds.length} Channels Connected</span>
+        </div>
       </div>
 
       {/* Main Content Area */}
@@ -255,6 +249,16 @@ function SocialConnectInner() {
                     >
                       <span>Meta Developer Setup Guide</span>
                       <ExternalLink className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        window.location.href = "/dashboard";
+                      }}
+                      className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition inline-flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <span>Skip &amp; Open Dashboard</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
@@ -354,13 +358,22 @@ function SocialConnectInner() {
                 {isConnected ? (
                   <button
                     type="button"
-                    onClick={() => {
-                      setConnectedIds((prev) => prev.filter((id) => id !== platform.id));
-                      toast({
-                        title: "Account Disconnected",
-                        message: `${platform.name} has been disconnected.`,
-                        type: "info",
-                      });
+                    onClick={async () => {
+                      try {
+                        await fetch(`/api/social/accounts?provider=${platform.id}`, { method: "DELETE" });
+                        setConnectedIds((prev) => prev.filter((id) => id !== platform.id));
+                        toast({
+                          title: "Account Disconnected",
+                          message: `${platform.name} has been disconnected.`,
+                          type: "info",
+                        });
+                      } catch {
+                        toast({
+                          title: "Error",
+                          message: `Failed to disconnect ${platform.name}.`,
+                          type: "error",
+                        });
+                      }
                     }}
                     className="w-full py-2 px-3 rounded-lg border border-slate-700 bg-slate-800/60 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition cursor-pointer"
                   >
@@ -441,27 +454,84 @@ function SocialConnectInner() {
 
             {/* Step-by-step instructions */}
             <div className="space-y-4 text-xs">
-              {/* Step 1: App Domains */}
-              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-2">
+              {/* Step 1: App Domains & Basic Info */}
+              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-indigo-400 uppercase tracking-wider text-[11px]">
-                    Step 1: Add App Domain
+                    Step 1: Settings &gt; Basic Requirements
                   </span>
-                  <span className="text-[10px] text-slate-500">Settings &gt; Basic</span>
+                  <span className="text-[10px] text-slate-500">App settings &gt; Basic</span>
                 </div>
                 <p className="text-slate-300">
-                  Open your Meta App &gt; <strong>App settings &gt; Basic</strong>. Paste this in <strong>App Domains</strong>:
+                  Fill in these required fields to clear &quot;Ineligible for submission&quot;:
                 </p>
-                <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/80 font-mono text-slate-200">
-                  <span>pulsesocial1.vercel.app</span>
-                  <button
-                    type="button"
-                    onClick={() => copyToClipboard("pulsesocial1.vercel.app", "domain")}
-                    className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold flex items-center gap-1 cursor-pointer"
-                  >
-                    {copiedField === "domain" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedField === "domain" ? "Copied" : "Copy"}</span>
-                  </button>
+                <div className="space-y-2">
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-400">App Domains</label>
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/80 font-mono text-slate-200 mt-1">
+                      <span>pulsesocial1.vercel.app</span>
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard("pulsesocial1.vercel.app", "domain")}
+                        className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold flex items-center gap-1 cursor-pointer"
+                      >
+                        {copiedField === "domain" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{copiedField === "domain" ? "Copied" : "Copy"}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-400">Privacy Policy URL</label>
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/80 font-mono text-slate-200 mt-1">
+                      <span className="truncate mr-2">https://pulsesocial1.vercel.app/privacy</span>
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard("https://pulsesocial1.vercel.app/privacy", "privacy_url")}
+                        className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold flex items-center gap-1 cursor-pointer"
+                      >
+                        {copiedField === "privacy_url" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{copiedField === "privacy_url" ? "Copied" : "Copy"}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-400">Terms of Service URL</label>
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/80 font-mono text-slate-200 mt-1">
+                      <span className="truncate mr-2">https://pulsesocial1.vercel.app/terms</span>
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard("https://pulsesocial1.vercel.app/terms", "terms_url")}
+                        className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold flex items-center gap-1 cursor-pointer"
+                      >
+                        {copiedField === "terms_url" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{copiedField === "terms_url" ? "Copied" : "Copy"}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-400">User Data Deletion Instructions URL</label>
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/80 font-mono text-slate-200 mt-1">
+                      <span className="truncate mr-2">https://pulsesocial1.vercel.app/data-deletion</span>
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard("https://pulsesocial1.vercel.app/data-deletion", "deletion_url")}
+                        className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold flex items-center gap-1 cursor-pointer"
+                      >
+                        {copiedField === "deletion_url" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{copiedField === "deletion_url" ? "Copied" : "Copy"}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-400">Category &amp; Contact Email</label>
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      Select <strong>Business and Pages</strong> (or Social Networking) for Category, and enter your email address.
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -471,10 +541,10 @@ function SocialConnectInner() {
                   <span className="font-bold text-indigo-400 uppercase tracking-wider text-[11px]">
                     Step 2: Add Website Platform
                   </span>
-                  <span className="text-[10px] text-slate-500">Settings &gt; Basic &gt; Website</span>
+                  <span className="text-[10px] text-slate-500">Settings &gt; Basic &gt; + Add Platform</span>
                 </div>
                 <p className="text-slate-300">
-                  Under <strong>Add Platform &gt; Website</strong>, set <strong>Site URL</strong> to:
+                  Scroll to bottom of Basic Settings, click <strong>+ Add Platform</strong>, select <strong>Website</strong>, and set <strong>Site URL</strong>:
                 </p>
                 <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/80 font-mono text-slate-200">
                   <span>https://pulsesocial1.vercel.app</span>
@@ -492,14 +562,14 @@ function SocialConnectInner() {
               {/* Step 3: Valid OAuth Redirect URIs */}
               <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-indigo-400 uppercase tracking-wider text-[11px]">
-                    Step 3: Valid OAuth Redirect URIs
+                  <span className="font-bold text-emerald-400 uppercase tracking-wider text-[11px]">
+                    Step 3: Valid OAuth Redirect URIs (Fixes URL Blocked)
                   </span>
                   <span className="text-[10px] text-slate-500">Facebook Login &gt; Settings</span>
                 </div>
-                <p className="text-slate-300">
-                  Add both callback URIs in <strong>Valid OAuth Redirect URIs</strong>:
-                </p>
+                <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-[11px]">
+                  ⚠️ <strong>IMPORTANT:</strong> Do <strong>NOT</strong> paste in &quot;Share Redirect Domain Allow List&quot;. You must go to <strong>Use cases &gt; Authentication (or Facebook Login &gt; Settings)</strong> and paste into <strong>Valid OAuth Redirect URIs</strong>:
+                </div>
                 <div className="space-y-1.5 font-mono text-[11px]">
                   <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/80 text-slate-200">
                     <span className="truncate mr-2">https://pulsesocial1.vercel.app/api/social/facebook/callback</span>
@@ -521,12 +591,22 @@ function SocialConnectInner() {
                       {copiedField === "ig_cb" ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                     </button>
                   </div>
+                  <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/80 text-slate-200">
+                    <span className="truncate mr-2">http://localhost:3000/api/social/facebook/callback</span>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard("http://localhost:3000/api/social/facebook/callback", "fb_local")}
+                      className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold flex items-center gap-1 cursor-pointer shrink-0"
+                    >
+                      {copiedField === "fb_local" ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    </button>
+                  </div>
                 </div>
               </div>
 
               {/* Step 4: Permissions Note */}
               <div className="p-3.5 rounded-2xl bg-indigo-950/40 border border-indigo-900/60 text-indigo-300 leading-relaxed text-xs">
-                💡 <strong>Why &quot;Permission scope is not valid&quot; appeared:</strong> Under <strong>App Review &gt; Permissions and Features</strong>, search for <code>pages_show_list</code>, <code>pages_read_engagement</code>, and <code>pages_manage_posts</code> and add them to your app.
+                💡 <strong>Permissions:</strong> Under <strong>App Review &gt; Permissions and Features</strong>, make sure <code>pages_show_list</code> and <code>pages_read_engagement</code> are added. For testing, add your own Facebook account as a Developer/Tester under <strong>App roles &gt; Roles</strong> so you don&apos;t need App Review.
               </div>
             </div>
 

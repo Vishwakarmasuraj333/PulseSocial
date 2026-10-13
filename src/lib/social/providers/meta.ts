@@ -32,10 +32,7 @@ export class MetaProvider implements SocialProvider {
   }
 
   isConfigured(): boolean {
-    return Boolean(
-      (process.env.META_APP_ID && process.env.META_APP_SECRET) ||
-      "1427242679545054"
-    );
+    return Boolean(process.env.META_APP_ID && process.env.META_APP_SECRET);
   }
 
   getMissingConfigMessage(): string {
@@ -43,7 +40,8 @@ export class MetaProvider implements SocialProvider {
   }
 
   getAuthorizationUrl(state: string, redirectUri: string, codeVerifier?: string, options?: Record<string, any>): string {
-    const appId = process.env.META_APP_ID || "1427242679545054";
+    const appId = process.env.META_APP_ID;
+    if (!appId) throw new Error(this.getMissingConfigMessage());
     const tier = options?.tier || "full";
 
     let scopes: string;
@@ -91,8 +89,9 @@ export class MetaProvider implements SocialProvider {
   }
 
   async exchangeCode(code: string, redirectUri: string): Promise<OAuthTokenResult> {
-    const appId = process.env.META_APP_ID || "1427242679545054";
-    const appSecret = process.env.META_APP_SECRET || "e3b5c0a667fce83937f96ac464060b97";
+    const appId = process.env.META_APP_ID;
+    const appSecret = process.env.META_APP_SECRET;
+    if (!appId || !appSecret) throw new Error(this.getMissingConfigMessage());
 
     const params = new URLSearchParams({
       client_id: appId,

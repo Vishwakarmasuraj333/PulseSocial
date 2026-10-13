@@ -8,6 +8,7 @@ import { runPublishingContractTests } from "./integration/publishing-contract.te
 import { runConsentUnitTests } from "./unit/consent.test";
 import { runRealtimeIntegrationTests } from "./integration/realtime.test";
 import { runAuditScreenFixesTests } from "./integration/audit-screen-fixes.test";
+import { runProductionAuditMasterTests } from "./integration/production-audit-master.test";
 import { prisma } from "../src/lib/prisma";
 
 async function main() {
@@ -17,7 +18,7 @@ async function main() {
 
   const startTime = Date.now();
   let passedSuites = 0;
-  const totalSuites = 10;
+  const totalSuites = 11;
 
   const baseUrl = process.env.BASE_URL || (process.env.APP_URL || "https://pulsesocial1.vercel.app");
   process.env.BASE_URL = baseUrl;
@@ -68,6 +69,10 @@ async function main() {
 
       // Suite 10: Screen Audit Fixes & Truth Contract
       await runAuditScreenFixesTests();
+      passedSuites++;
+
+      // Suite 11: Final Production Audit & Truthfulness Tests
+      await runProductionAuditMasterTests();
       passedSuites++;
     } else {
       console.log("\n--- [HTTP SUITES 6, 7, 9, 10: NOTICE] ---");

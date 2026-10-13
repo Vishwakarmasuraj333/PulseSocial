@@ -14,6 +14,8 @@ import {
   SocialActionResult,
   SocialMetricsResult,
   ExternalCommentData,
+  ExternalPostData,
+  ExternalInsightsData,
 } from "../types";
 import { SOCIAL_API_VERSIONS } from "../api-versions";
 
@@ -628,5 +630,41 @@ export class LinkedInProvider implements SocialProvider {
     } catch {
       return [];
     }
+  }
+
+  async fetchPosts(accessToken: string, accountId: string, limit: number = 25): Promise<ExternalPostData[]> {
+    try {
+      const authorUrn = accountId.startsWith("urn:li:") ? accountId : `urn:li:person:${accountId}`;
+      const res = await fetch(`https://api.linkedin.com/v2/shares?q=owners&owners=${encodeURIComponent(authorUrn)}&count=${limit}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "X-Restli-Protocol-Version": "2.0.0",
+        },
+      });
+
+      if (!res.ok) return [];
+      const data = await res.json().catch(() => ({}));
+      const elements = data.elements || [];
+
+      return elements.map((item: any) => ({
+        platformPostId: item.id || item.activity,
+        platform: "linkedin" as SupportedPlatform,
+        content: item.text?.text || "",
+        permalink: `https://www.linkedin.com/feed/update/${item.activity || item.id}`,
+        media: [],
+        publishedAt: item.created?.time ? new Date(item.created.time) : new Date(),
+        likes: null,
+        comments: null,
+        shares: null,
+        views: null,
+        rawJson: JSON.stringify(item),
+      }));
+    } catch {
+      return [];
+    }
+  }
+
+  async fetchInsights(accessToken: string, accountId: string): Promise<ExternalInsightsData[]> {
+    return [];
   }
 }

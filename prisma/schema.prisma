@@ -32,6 +32,7 @@ model User {
   auditLogs             AuditLog[]
   assignedComments      SocialComment[]
   assignedMessages      SocialMessage[]
+  assignedConversations SocialConversation[]
   aiGenerations         AiGeneration[]
   authSessions          AuthSession[]
   consentRecords        ConsentRecord[]
@@ -60,6 +61,8 @@ model Organization {
   auditLogs             AuditLog[]
   settings              Settings?
   aiGenerations         AiGeneration[]
+  conversations         SocialConversation[]
+  syncJobs              SyncJob[]
 }
 
 model OrganizationMember {
@@ -147,6 +150,8 @@ model SocialAccount {
   actions           SocialAction[]
   engagementSnapshots SocialEngagementSnapshot[]
   capabilitySnapshots ProviderCapabilitySnapshot[]
+  conversations     SocialConversation[]
+  syncJobs          SyncJob[]
 
   @@unique([organizationId, provider, providerAccountId])
 }
@@ -375,21 +380,80 @@ model SocialEngagementSnapshot {
   @@index([lastSyncedAt])
 }
 
-model SocialMessage {
-  id              String        @id @default(cuid())
-  socialAccountId String
-  platformMessageId String
-  senderName      String
-  senderAvatarUrl String?
-  senderUsername  String?
-  content         String
-  isRead          Boolean       @default(false)
-  assignedUserId  String?
-  sentAt          DateTime
-  createdAt       DateTime      @default(now())
+model SocialConversation {
+  id                    String              @id @default(cuid())
+  organizationId        String
+  socialAccountId       String
+  platformConversationId String
+  platform              String              // facebook, instagram, whatsapp, etc.
+  participantId         String?
+  participantName       String
+  participantUsername   String?
+  participantAvatarUrl  String?
+  lastMessageSnippet    String?
+  lastMessageAt         DateTime            @default(now())
+  unreadCount           Int                 @default(0)
+  status                String              @default("OPEN") // OPEN, RESOLVED, SNOOZED
+  assignedUserId        String?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
 
+  organization          Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  socialAccount         SocialAccount       @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+  assignedUser          User?               @relation(fields: [assignedUserId], references: [id], onDelete: SetNull)
+  messages              SocialMessage[]
+
+  @@unique([platform, socialAccountId, platformConversationId])
+  @@index([organizationId])
+  @@index([socialAccountId])
+  @@index([lastMessageAt])
+}
+
+model SocialMessage {
+  id                String              @id @default(cuid())
+  socialAccountId   String
+  conversationId    String?
+  platformMessageId String
+  platform          String              @default("facebook")
+  senderName        String
+  senderAvatarUrl   String?
+  senderUsername    String?
+  content           String
+  direction         String              @default("INBOUND") // INBOUND, OUTBOUND
+  isRead            Boolean             @default(false)
+  assignedUserId    String?
+  sentAt            DateTime
+  createdAt         DateTime            @default(now())
+
+  socialAccount     SocialAccount       @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+  conversation      SocialConversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  assignedUser      User?               @relation(fields: [assignedUserId], references: [id], onDelete: SetNull)
+
+  @@index([socialAccountId])
+  @@index([conversationId])
+  @@index([platformMessageId])
+}
+
+model SyncJob {
+  id              String        @id @default(cuid())
+  organizationId  String
+  socialAccountId String
+  provider        String
+  jobType         String        @default("FULL") // FULL, PROFILE, POSTS, COMMENTS, INBOX, ANALYTICS
+  status          String        @default("COMPLETED") // QUEUED, IN_PROGRESS, COMPLETED, FAILED
+  processedCount  Int           @default(0)
+  errorMessage    String?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
-  assignedUser    User?         @relation(fields: [assignedUserId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([socialAccountId])
+  @@index([status])
 }
 
 model SocialNotification {

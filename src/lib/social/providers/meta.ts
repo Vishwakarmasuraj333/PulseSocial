@@ -14,6 +14,9 @@ import {
   SocialActionResult,
   SocialMetricsResult,
   ExternalCommentData,
+  ExternalPostData,
+  ExternalConversationData,
+  ExternalInsightsData,
 } from "../types";
 import { SOCIAL_API_VERSIONS } from "../api-versions";
 
@@ -922,4 +925,192 @@ export class MetaProvider implements SocialProvider {
       return [];
     }
   }
+
+  async fetchPosts(accessToken: string, accountId: string, limit: number = 25): Promise<ExternalPostData[]> {
+    const version = SOCIAL_API_VERSIONS.META_GRAPH;
+    try {
+      if (this.platform === "facebook") {
+        const fields = "id,message,created_time,permalink_url,full_picture,shares,reactions.summary(true),comments.summary(true)";
+        let res = await fetch(`https://graph.facebook.com/${version}/${accountId}/published_posts?fields=${fields}&limit=${limit}&access_token=${accessToken}`);
+        if (!res.ok) {
+          res = await fetch(`https://graph.facebook.com/${version}/${accountId}/feed?fields=${fields}&limit=${limit}&access_token=${accessToken}`);
+        }
+        if (!res.ok) return [];
+
+        const data = await res.json().catch(() => ({}));
+        const posts: ExternalPostData[] = [];
+
+        for (const item of (data.data || [])) {
+          posts.push({
+            platformPostId: item.id,
+            platform: "facebook",
+            content: item.message || "",
+            permalink: item.permalink_url,
+            media: item.full_picture ? [{ url: item.full_picture, type: "IMAGE" }] : [],
+            publishedAt: new Date(item.created_time),
+            likes: item.reactions?.summary?.total_count ?? null,
+            comments: item.comments?.summary?.total_count ?? null,
+            shares: item.shares?.count ?? null,
+            views: null,
+            rawJson: JSON.stringify(item),
+          });
+        }
+        return posts;
+      } else {
+        // Instagram
+        const fields = "id,caption,media_type,media_url,thumbnail_url,permalink,timestamp,like_count,comments_count";
+        const res = await fetch(`https://graph.facebook.com/${version}/${accountId}/media?fields=${fields}&limit=${limit}&access_token=${accessToken}`);
+        if (!res.ok) return [];
+
+        const data = await res.json().catch(() => ({}));
+        const posts: ExternalPostData[] = [];
+
+        for (const item of (data.data || [])) {
+          const mediaUrl = item.media_url || item.thumbnail_url;
+          posts.push({
+            platformPostId: item.id,
+            platform: "instagram",
+            content: item.caption || "",
+            permalink: item.permalink,
+            media: mediaUrl ? [{ url: mediaUrl, type: item.media_type === "VIDEO" ? "VIDEO" : "IMAGE" }] : [],
+            publishedAt: new Date(item.timestamp),
+            likes: item.like_count ?? null,
+            comments: item.comments_count ?? null,
+            shares: null,
+            views: null,
+            rawJson: JSON.stringify(item),
+          });
+        }
+        return posts;
+      }
+    } catch (e) {
+      console.warn(`[MetaProvider] Failed to fetch posts for ${accountId}:`, e);
+      return [];
+    }
+  }
+
+  async fetchInboxConversations(accessToken: string, accountId: string, limit: number = 20): Promise<ExternalConversationData[]> {
+    const version = SOCIAL_API_VERSIONS.META_GRAPH;
+    try {
+      const fields = "id,updated_time,unread_count,senders,messages{id,message,created_time,from}";
+      const res = await fetch(`https://graph.facebook.com/${version}/${accountId}/conversations?fields=${fields}&limit=${limit}&access_token=${accessToken}`);
+      if (!res.ok) return [];
+
+      const data = await res.json().catch(() => ({}));
+      const conversations: ExternalConversationData[] = [];
+
+      for (const item of (data.data || [])) {
+        const senders = item.senders?.data || [];
+        const otherSender = senders.find((s: any) => s.id !== accountId) || senders[0] || {};
+        const msgs = (item.messages?.data || []).map((m: any) => ({
+          platformMessageId: m.id,
+          senderId: m.from?.id || "unknown",
+          senderName: m.from?.name || otherSender.name || "Customer",
+          senderUsername: m.from?.id,
+          content: m.message || "",
+          sentAt: new Date(m.created_time),
+          direction: (m.from?.id === accountId ? "OUTBOUND" : "INBOUND") as "INBOUND" | "OUTBOUND",
+        }));
+
+        conversations.push({
+          platformConversationId: item.id,
+          platform: this.platform,
+          participantId: otherSender.id,
+          participantName: otherSender.name || "Customer",
+          participantUsername: otherSender.email || otherSender.id,
+          lastMessageSnippet: msgs[0]?.content || "",
+          lastMessageAt: new Date(item.updated_time || (msgs[0]?.sentAt || new Date())),
+          unreadCount: item.unread_count || 0,
+          messages: msgs,
+        });
+      }
+      return conversations;
+    } catch {
+      return [];
+    }
+  }
+
+  async sendMessageOrReply(accessToken: string, conversationId: string, content: string, accountId?: string): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    const version = SOCIAL_API_VERSIONS.META_GRAPH;
+    try {
+      const res = await fetch(`https://graph.facebook.com/${version}/${conversationId}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: content,
+          access_token: accessToken,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.id) {
+        return {
+          success: false,
+          error: data.error?.message || "Failed to deliver message via Meta Graph API",
+        };
+      }
+
+      return {
+        success: true,
+        messageId: data.id,
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        error: e.message || "Failed to deliver message",
+      };
+    }
+  }
+
+  async fetchInsights(accessToken: string, accountId: string, since?: Date, until?: Date): Promise<ExternalInsightsData[]> {
+    const version = SOCIAL_API_VERSIONS.META_GRAPH;
+    try {
+      if (this.platform === "facebook") {
+        const metrics = "page_impressions,page_post_engagements,page_fans";
+        const res = await fetch(`https://graph.facebook.com/${version}/${accountId}/insights?metric=${metrics}&period=day&access_token=${accessToken}`);
+        if (!res.ok) return [];
+
+        const data = await res.json().catch(() => ({}));
+        const dateMap = new Map<string, ExternalInsightsData>();
+
+        for (const item of (data.data || [])) {
+          for (const val of (item.values || [])) {
+            const dateStr = val.end_time.split("T")[0];
+            const existing = dateMap.get(dateStr) || { date: new Date(dateStr) };
+
+            if (item.name === "page_impressions") existing.impressions = val.value;
+            if (item.name === "page_post_engagements") existing.engagementCount = val.value;
+            if (item.name === "page_fans") existing.followers = val.value;
+
+            dateMap.set(dateStr, existing);
+          }
+        }
+        return Array.from(dateMap.values());
+      } else {
+        // Instagram
+        const metrics = "impressions,reach,profile_views";
+        const res = await fetch(`https://graph.facebook.com/${version}/${accountId}/insights?metric=${metrics}&period=day&metric_type=total_value&access_token=${accessToken}`);
+        if (!res.ok) return [];
+
+        const data = await res.json().catch(() => ({}));
+        const dateMap = new Map<string, ExternalInsightsData>();
+
+        for (const item of (data.data || [])) {
+          for (const val of (item.total_value?.breakdowns || item.values || [])) {
+            const dateStr = (val.end_time || new Date().toISOString()).split("T")[0];
+            const existing = dateMap.get(dateStr) || { date: new Date(dateStr) };
+
+            if (item.name === "impressions") existing.impressions = val.value;
+            if (item.name === "reach") existing.reach = val.value;
+
+            dateMap.set(dateStr, existing);
+          }
+        }
+        return Array.from(dateMap.values());
+      }
+    } catch {
+      return [];
+    }
+  }
 }
+

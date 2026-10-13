@@ -6,6 +6,7 @@ import { SupportedPlatform } from "@/lib/social/types";
 import { encryptToken } from "@/lib/security/encryption";
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit/logger";
+import { syncAccountData } from "@/lib/social/sync-engine";
 
 export async function GET(
   req: Request,
@@ -202,6 +203,16 @@ export async function GET(
       });
     } catch (e) {
       console.warn("Could not sync profile metrics immediately:", e);
+    }
+
+    // 7. Full authorized data sync (posts, media, comments, inbox, analytics)
+    try {
+      await syncAccountData({
+        socialAccountId: socialAccount.id,
+        organizationId: orgId,
+      });
+    } catch (syncErr) {
+      console.warn("Initial full sync warning:", syncErr);
     }
 
     await logAudit({

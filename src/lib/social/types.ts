@@ -556,4 +556,67 @@ export interface SocialProvider {
   savePost?(accessToken: string, target: { externalPostId: string; accountId?: string }): Promise<SocialActionResult>;
   syncPostEngagement?(accessToken: string, externalPostId: string, accountId?: string): Promise<SocialMetricsResult>;
   fetchPostComments?(accessToken: string, externalPostId: string, accountId?: string): Promise<ExternalCommentData[]>;
+
+  // Real Account Data & Inbox Sync Additions
+  fetchPosts?(accessToken: string, accountId: string, limit?: number): Promise<ExternalPostData[]>;
+  fetchInboxConversations?(accessToken: string, accountId: string, limit?: number): Promise<ExternalConversationData[]>;
+  sendMessageOrReply?(accessToken: string, conversationId: string, content: string, accountId?: string): Promise<{ success: boolean; messageId?: string; error?: string }>;
+  fetchInsights?(accessToken: string, accountId: string, since?: Date, until?: Date): Promise<ExternalInsightsData[]>;
 }
+
+export interface ExternalPostMedia {
+  url: string;
+  type: "IMAGE" | "VIDEO" | "GIF";
+  altText?: string;
+}
+
+export interface ExternalPostData {
+  platformPostId: string;
+  platform: SupportedPlatform;
+  content: string;
+  permalink?: string;
+  media?: ExternalPostMedia[];
+  publishedAt: Date;
+  likes?: number | null;
+  comments?: number | null;
+  shares?: number | null;
+  views?: number | null;
+  rawJson?: string;
+}
+
+export interface ExternalMessageData {
+  platformMessageId: string;
+  senderId: string;
+  senderName: string;
+  senderUsername?: string;
+  senderAvatarUrl?: string;
+  content: string;
+  sentAt: Date;
+  direction: "INBOUND" | "OUTBOUND";
+}
+
+export interface ExternalConversationData {
+  platformConversationId: string;
+  platform: SupportedPlatform;
+  participantId?: string;
+  participantName: string;
+  participantUsername?: string;
+  participantAvatarUrl?: string;
+  lastMessageSnippet?: string;
+  lastMessageAt: Date;
+  unreadCount: number;
+  messages: ExternalMessageData[];
+}
+
+export interface ExternalInsightsData {
+  date: Date;
+  followers?: number | null;
+  following?: number | null;
+  impressions?: number | null;
+  reach?: number | null;
+  engagementCount?: number | null;
+  clicks?: number | null;
+  shares?: number | null;
+  saves?: number | null;
+}
+

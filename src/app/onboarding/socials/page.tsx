@@ -72,13 +72,6 @@ const SUPPORTED_PLATFORMS: PlatformDef[] = [
     oauthUrl: "/api/social/tiktok/connect",
   },
   {
-    id: "pinterest",
-    name: "Pinterest",
-    category: "publishing",
-    description: "Grow visual traffic, schedule rich pins, and manage product boards.",
-    oauthUrl: "/api/social/pinterest/connect",
-  },
-  {
     id: "google_business",
     name: "Google Business Profile",
     category: "business",

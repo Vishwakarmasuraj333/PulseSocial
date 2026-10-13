@@ -139,7 +139,7 @@ export default function BrandBoardsPage() {
               </h1>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Curate visual campaigns, Pinterest board bridges, and marketing asset collections for {activeBrand.name}.
+              Curate visual campaigns, dynamic moodboards, and marketing asset collections for {activeBrand.name}.
             </p>
           </div>
 
@@ -281,7 +281,7 @@ export default function BrandBoardsPage() {
                   >
                     <option value="Visual Campaign">Visual Campaign</option>
                     <option value="Social Video Hooks">Social Video Hooks</option>
-                    <option value="Pinterest Moodboard">Pinterest Moodboard</option>
+                    <option value="Visual Moodboard">Visual Moodboard</option>
                     <option value="Product Photography">Product Photography</option>
                     <option value="Brand Assets">Brand Assets</option>
                   </select>

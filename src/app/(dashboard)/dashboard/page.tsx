@@ -29,12 +29,12 @@ import {
 } from "lucide-react";
 
 const CHANNEL_ICONS = [
+  { id: "facebook", name: "Facebook" },
+  { id: "instagram", name: "Instagram" },
   { id: "x", name: "X (Twitter)" },
   { id: "linkedin", name: "LinkedIn" },
-  { id: "instagram", name: "Instagram" },
-  { id: "google_business", name: "Google Business" },
   { id: "youtube", name: "YouTube" },
-  { id: "pinterest", name: "Pinterest" },
+  { id: "google_business", name: "Google Business" },
   { id: "threads", name: "Threads" },
   { id: "mastodon", name: "Mastodon" },
   { id: "telegram", name: "Telegram" },
@@ -49,7 +49,7 @@ export default function DashboardPage() {
 
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const [isComposerOpen, setIsComposerOpen] = useState(false);
-  const [selectedConnectPlatform, setSelectedConnectPlatform] = useState<string>("pinterest");
+  const [selectedConnectPlatform, setSelectedConnectPlatform] = useState<string>("facebook");
   const [selectedMediaPost, setSelectedMediaPost] = useState<any | null>(null);
 
   const [livePosts, setLivePosts] = useState<any[]>([]);
@@ -182,7 +182,7 @@ export default function DashboardPage() {
 
       if (isExplicitSetup && !hasDoneSetup) {
         setIsConnectModalOpen(true);
-        setSelectedConnectPlatform(urlParams.get("platform") || "pinterest");
+        setSelectedConnectPlatform(urlParams.get("platform") || "facebook");
       }
     }
 
@@ -243,7 +243,7 @@ export default function DashboardPage() {
     };
   }, [activeBrand?.id]);
 
-  const openConnect = (platform = "pinterest") => {
+  const openConnect = (platform = "facebook") => {
     setSelectedConnectPlatform(platform);
     setIsConnectModalOpen(true);
   };

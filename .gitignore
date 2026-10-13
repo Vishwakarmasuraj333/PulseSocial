@@ -30,3 +30,6 @@ crop_*.js
 test-results/
 playwright-report/
 blob-report/
+
+# Local backups
+backups/

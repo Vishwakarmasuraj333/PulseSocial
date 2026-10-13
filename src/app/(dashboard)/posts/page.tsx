@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PostComposerModal } from "@/components/composer/PostComposerModal";
 import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
@@ -89,11 +90,29 @@ interface PostItem {
 export default function PostsPage() {
   const { toast } = useToast();
   const { activeBrand } = useBrand();
+  const searchParams = useSearchParams();
+
+  const getInitialTab = () => {
+    const filter = (searchParams.get("filter") || searchParams.get("tab") || "").toLowerCase();
+    if (filter === "scheduled") return "scheduled";
+    if (filter === "draft" || filter === "drafts") return "drafts";
+    if (filter === "approvals") return "approvals";
+    if (filter === "unpublished") return "unpublished";
+    return "published";
+  };
 
   // Sidebar navigation subtab
   const [sidebarTab, setSidebarTab] = useState<
     "published" | "scheduled" | "approvals" | "unpublished" | "drafts" | "rss" | "library"
-  >("published");
+  >(getInitialTab());
+
+  useEffect(() => {
+    const filter = (searchParams.get("filter") || searchParams.get("tab") || "").toLowerCase();
+    if (filter === "scheduled") setSidebarTab("scheduled");
+    else if (filter === "draft" || filter === "drafts") setSidebarTab("drafts");
+    else if (filter === "published") setSidebarTab("published");
+    else if (filter === "approvals") setSidebarTab("approvals");
+  }, [searchParams]);
 
   // Filter & Sort state
   const [selectedPlatform, setSelectedPlatform] = useState<string>("ALL");
@@ -492,7 +511,6 @@ export default function PostsPage() {
                 { id: "tiktok", name: "TikTok", icon: "tiktok", unread: 0 },
                 { id: "bluesky", name: "Bluesky", icon: "bluesky", unread: 0 },
                 { id: "threads", name: "Threads", icon: "threads", unread: 0 },
-                { id: "pinterest", name: "Pinterest", icon: "pinterest", unread: 0 },
                 { id: "youtube", name: "YouTube", icon: "youtube", unread: 0 },
               ].map((ch) => {
                 const isSelected = commentsPlatform === ch.id;

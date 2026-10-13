@@ -1118,14 +1118,6 @@ function SettingsContent() {
                       cardBorder: "hover:border-slate-500/50 hover:bg-slate-50/30",
                     },
                     {
-                      platform: "pinterest",
-                      name: "Pinterest",
-                      desc: "Rich Image Pins, Creative Idea Boards & Direct Site Links",
-                      btnLabel: "Connect Pinterest",
-                      btnClass: "bg-[#E60023] hover:bg-[#ad081b] text-white shadow-xs hover:shadow-md hover:shadow-red-600/25",
-                      cardBorder: "hover:border-red-400/50 hover:bg-red-50/20",
-                    },
-                    {
                       platform: "snapchat",
                       name: "Snapchat",
                       desc: "Camera Stories, Lens Assets & Vertical Creative Kit Publishing",

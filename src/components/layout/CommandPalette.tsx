@@ -95,16 +95,6 @@ export function CommandPalette({
       },
     },
     {
-      id: "nav-messages",
-      title: "Go to Direct Messages & Chats",
-      category: "Navigation",
-      icon: MessageSquare,
-      action: () => {
-        onClose();
-        router.push("/messages");
-      },
-    },
-    {
       id: "nav-inbox",
       title: "Go to Social Inbox & Comments",
       category: "Navigation",
@@ -116,17 +106,17 @@ export function CommandPalette({
     },
     {
       id: "nav-connections",
-      title: "Go to Social Connections & Accounts",
+      title: "Go to Connected Social Accounts",
       category: "Navigation",
       icon: Zap,
       action: () => {
         onClose();
-        router.push("/connections");
+        router.push("/social-accounts");
       },
     },
     {
       id: "nav-calendar",
-      title: "Go to Calendar Planner",
+      title: "Go to Content Calendar Planner",
       category: "Navigation",
       icon: Calendar,
       action: () => {
@@ -136,7 +126,7 @@ export function CommandPalette({
     },
     {
       id: "nav-ai",
-      title: "Open Pulse AI Studio",
+      title: "Open Gemini AI Assistant",
       category: "Tool",
       icon: Bot,
       action: () => {
@@ -146,27 +136,27 @@ export function CommandPalette({
     },
     {
       id: "nav-collaborate",
-      title: "Go to Team Collaboration & Approvals",
+      title: "Go to Workspace Team Management",
       category: "Navigation",
       icon: Users,
       action: () => {
         onClose();
-        router.push("/collaborate");
+        router.push("/team");
       },
     },
     {
-      id: "nav-reports",
-      title: "Go to Analytics & Reports",
+      id: "nav-analytics",
+      title: "Go to Analytics & Telemetry",
       category: "Navigation",
       icon: BarChart3,
       action: () => {
         onClose();
-        router.push("/reports");
+        router.push("/analytics");
       },
     },
     {
       id: "nav-settings",
-      title: "Go to Settings",
+      title: "Go to Workspace Settings",
       category: "Navigation",
       icon: Settings,
       action: () => {
@@ -242,63 +232,67 @@ export function CommandPalette({
           </button>
         </div>
 
-          {/* Results List */}
-          <div className="max-h-80 overflow-y-auto p-2 divide-y divide-slate-50">
-            {filtered.length === 0 ? (
-              <div className="py-8 text-center text-slate-400 text-xs">
-                No matching commands or pages found for &quot;{query}&quot;
-              </div>
-            ) : (
-              filtered.map((cmd, idx) => {
-                const IconComp = cmd.icon;
-                const isSelected = idx === selectedIndex;
-
-                return (
-                  <button
-                    key={cmd.id}
-                    onClick={cmd.action}
-                    onMouseEnter={() => setSelectedIndex(idx)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left transition ${
-                      isSelected ? "bg-blue-50 text-blue-900 font-medium" : "text-slate-700 hover:bg-slate-50"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div
-                        className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${
-                          isSelected ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-600"
-                        }`}
-                      >
-                        <IconComp className="w-3.5 h-3.5" />
-                      </div>
-                      <span className="text-xs truncate">{cmd.title}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-[10px] uppercase font-bold text-slate-400">
-                        {cmd.category}
-                      </span>
-                      {cmd.shortcut && (
-                        <kbd className="px-1.5 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-500 border border-slate-200">
-                          {cmd.shortcut}
-                        </kbd>
-                      )}
-                      {isSelected && <CornerDownLeft className="w-3.5 h-3.5 text-blue-600" />}
-                    </div>
-                  </button>
-                );
-              })
-            )}
-          </div>
-
-          {/* Footer */}
-          <div className="px-4 py-2 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-            <div className="flex items-center gap-3">
-              <span>Use <kbd className="font-mono">↑</kbd> <kbd className="font-mono">↓</kbd> to navigate</span>
-              <span><kbd className="font-mono">↵</kbd> to select</span>
+        {/* Results List */}
+        <div className="max-h-80 overflow-y-auto p-2 divide-y divide-slate-100 dark:divide-slate-800/60">
+          {filtered.length === 0 ? (
+            <div className="py-8 text-center text-slate-400 text-xs">
+              No matching commands or pages found for &quot;{query}&quot;
             </div>
-            <span>PulseSocial Command Bar</span>
+          ) : (
+            filtered.map((cmd, idx) => {
+              const IconComp = cmd.icon;
+              const isSelected = idx === selectedIndex;
+
+              return (
+                <button
+                  key={cmd.id}
+                  onClick={cmd.action}
+                  onMouseEnter={() => setSelectedIndex(idx)}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left transition cursor-pointer ${
+                    isSelected
+                      ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 font-medium"
+                      : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div
+                      className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${
+                        isSelected
+                          ? "bg-emerald-600 text-white"
+                          : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                      }`}
+                    >
+                      <IconComp className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs truncate">{cmd.title}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-[10px] uppercase font-bold text-slate-400">
+                      {cmd.category}
+                    </span>
+                    {cmd.shortcut && (
+                      <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-mono text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                        {cmd.shortcut}
+                      </kbd>
+                    )}
+                    {isSelected && <CornerDownLeft className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />}
+                  </div>
+                </button>
+              );
+            })
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="px-4 py-2 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+          <div className="flex items-center gap-3">
+            <span>Use <kbd className="font-mono">↑</kbd> <kbd className="font-mono">↓</kbd> to navigate</span>
+            <span><kbd className="font-mono">↵</kbd> to select</span>
           </div>
+          <span>PulseSocial Command Bar</span>
         </div>
       </div>
+    </div>
   );
 }

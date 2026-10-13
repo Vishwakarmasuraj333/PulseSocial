@@ -157,11 +157,6 @@ export default function NewPostPage() {
       }
 
       setMedia((prev) => [...prev, ...uploadedItems]);
-      toast({
-        title: "Media Attached",
-        message: `${uploadedItems.length} file(s) uploaded successfully.`,
-        type: "success",
-      });
     } catch (err: unknown) {
       toast({
         title: "Upload Failed",
@@ -730,7 +725,6 @@ export default function NewPostPage() {
                   "x",
                   "tiktok",
                   "youtube",
-                  "pinterest",
                   "threads",
                   "google",
                   "mastodon",

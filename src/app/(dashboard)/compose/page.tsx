@@ -38,7 +38,6 @@ const PLATFORM_LIMITS: Record<string, number> = {
   linkedin: 3000,
   tiktok: 2200,
   youtube: 5000,
-  pinterest: 500,
 };
 
 export default function ComposePage() {
@@ -559,7 +558,6 @@ export default function ComposePage() {
                   "x",
                   "tiktok",
                   "youtube",
-                  "pinterest",
                   "threads",
                   "google",
                   "mastodon",

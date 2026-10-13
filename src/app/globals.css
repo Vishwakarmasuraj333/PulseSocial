@@ -4,35 +4,40 @@
 
 @layer base {
   :root {
-    /* PulseSocial Design Tokens */
-    --primary-purple: #8B6BD6;
-    --primary-purple-hover: #795BC2;
-    --primary-purple-deep: #6F52B5;
-    --primary-purple-dark: #59409A;
-    --primary-purple-soft: #A78BDF;
-    --primary-purple-light: #F4F0FC;
-    --border-purple: #DDD3F4;
-    --lavender-background: #F8F7FB;
-    --surface: #FFFFFF;
-    --surface-secondary: #F4F1FA;
-    --surface-hover: #F0EBF9;
-    --text-primary: #17132B;
-    --text-secondary: #68627A;
-    --text-muted: #9690A5;
-    --link: #6F52B5;
-    --border: #E7E2F0;
-    --success: #218A62;
-    --warning: #B7791F;
-    --error: #D64545;
+    /* PulseSocial Design Tokens - Emerald Modern SaaS Palette */
+    --brand-emerald: #059669;
+    --brand-emerald-hover: #047857;
+    --brand-emerald-light: #ecfdf5;
+    --brand-emerald-border: #a7f3d0;
+
+    --primary-purple: #059669;
+    --primary-purple-hover: #047857;
+    --primary-purple-deep: #065f46;
+    --primary-purple-dark: #064e3b;
+    --primary-purple-soft: #34d399;
+    --primary-purple-light: #ecfdf5;
+    --border-purple: #e2e8f0;
+    --lavender-background: #f8fafc;
+    --surface: #ffffff;
+    --surface-secondary: #f8fafc;
+    --surface-hover: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --link: #059669;
+    --border: #e2e8f0;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
 
     /* Legacy CSS Variable Aliases */
-    --primary: #6F52B5;
-    --primary-hover: #59409A;
-    --background: #F8F7FB;
-    --surface-hover: #F0EBF9;
-    --text: #17132B;
-    --muted: #68627A;
-    --danger: #D64545;
+    --primary: #059669;
+    --primary-hover: #047857;
+    --background: #f8fafc;
+    --surface-hover: #f1f5f9;
+    --text: #0f172a;
+    --muted: #64748b;
+    --danger: #ef4444;
 
     /* Tailwind HSL mappings */
     --foreground: 222.2 84% 4.9%;
@@ -40,39 +45,44 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --secondary: 260 40% 97%;
-    --secondary-foreground: 260 47% 11%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 260 40% 96%;
-    --accent-foreground: 260 47% 11%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 254 44% 47%;
+    --ring: 160 84% 39%;
     --radius: 0.75rem;
   }
 
   .dark {
-    --primary-purple: #7c68ce;
-    --primary-purple-hover: #6c57bf;
-    --primary-purple-light: #9d8de6;
-    --primary-purple-soft: #1e1b4b;
-    --lavender-background: #0b0f19;
-    --surface: #111827;
-    --surface-secondary: #1a1f33;
+    --brand-emerald: #10b981;
+    --brand-emerald-hover: #059669;
+    --brand-emerald-light: #064e3b;
+    --brand-emerald-border: #065f46;
+
+    --primary-purple: #10b981;
+    --primary-purple-hover: #059669;
+    --primary-purple-light: #064e3b;
+    --primary-purple-soft: #065f46;
+    --lavender-background: #0f172a;
+    --surface: #1e293b;
+    --surface-secondary: #0f172a;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
-    --border: #1e293b;
-    --border-purple: #2e2850;
+    --border: #334155;
+    --border-purple: #334155;
     --success: #10b981;
     --warning: #f59e0b;
     --error: #ef4444;
 
-    --primary: #7c68ce;
-    --primary-hover: #6c57bf;
-    --background: #0b0f19;
-    --surface-hover: #1f2937;
+    --primary: #10b981;
+    --primary-hover: #059669;
+    --background: #0f172a;
+    --surface-hover: #334155;
     --text: #f8fafc;
     --muted: #94a3b8;
     --danger: #ef4444;
@@ -82,15 +92,15 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 6.5%;
     --popover-foreground: 210 40% 98%;
-    --secondary: 260 30% 18%;
+    --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 260 30% 18%;
+    --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 254 44% 57%;
+    --ring: 160 84% 39%;
   }
 }
 

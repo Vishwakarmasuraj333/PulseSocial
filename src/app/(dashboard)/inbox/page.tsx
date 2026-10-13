@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
 import { inboxService, InboxConversation, InboxMessage, aiService } from "@/lib/services";
@@ -59,8 +60,19 @@ const CANNED_RESPONSES = [
 
 export default function InboxPage() {
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const initialTab = (searchParams.get("tab") as any) || "all";
 
-  const [activeTab, setActiveTab] = useState<"all" | "unread" | "mentions" | "comments" | "messages">("all");
+  const [activeTab, setActiveTab] = useState<"all" | "unread" | "mentions" | "comments" | "messages">(
+    ["all", "unread", "mentions", "comments", "messages"].includes(initialTab) ? initialTab : "all"
+  );
+
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam && ["all", "unread", "mentions", "comments", "messages"].includes(tabParam)) {
+      setActiveTab(tabParam as any);
+    }
+  }, [searchParams]);
   const [conversations, setConversations] = useState<InboxConversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<InboxConversation | null>(null);
   const [replyText, setReplyText] = useState("");
@@ -240,11 +252,6 @@ export default function InboxPage() {
         throw new Error(data.error || "Failed to upload attachment");
       }
       setAttachedImage(data.url);
-      toast({
-        title: "Media Attached",
-        message: "Image attachment ready to send with reply.",
-        type: "success",
-      });
     } catch (err: unknown) {
       toast({
         title: "Attachment Error",

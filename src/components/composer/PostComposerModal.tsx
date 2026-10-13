@@ -418,11 +418,6 @@ export function PostComposerModal({
 
     setMedia((prev) => [...prev, ...uploadedList]);
     setIsUploadingMedia(false);
-    toast({
-      title: "Media Attached",
-      message: `${files.length} file(s) attached to post.`,
-      type: "success",
-    });
 
     if (desktopFileInputRef.current) {
       desktopFileInputRef.current.value = "";

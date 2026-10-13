@@ -12,7 +12,6 @@ import {
   XIcon,
   LinkedInIcon,
   InstagramIcon,
-  PinterestIcon,
   ThreadsIcon,
   YouTubeIcon,
 } from "@/components/icons/PlatformIcons";
@@ -102,7 +101,7 @@ export default function AutomationPage() {
       time: "07:15 PM",
       timezone: "Asia/Kolkata",
       days: ["Everyday"],
-      platforms: ["instagram", "facebook", "pinterest"],
+      platforms: ["instagram", "facebook"],
       status: "ACTIVE",
       isPeakWindow: false,
       queuedCount: 3,
@@ -182,8 +181,6 @@ export default function AutomationPage() {
         return <LinkedInIcon size={size} />;
       case "instagram":
         return <InstagramIcon size={size} />;
-      case "pinterest":
-        return <PinterestIcon size={size} />;
       case "threads":
         return <ThreadsIcon size={size} />;
       case "youtube":
@@ -891,7 +888,6 @@ export default function AutomationPage() {
                   { id: "x", name: "X (Twitter)" },
                   { id: "instagram", name: "Instagram" },
                   { id: "facebook", name: "Facebook" },
-                  { id: "pinterest", name: "Pinterest" },
                   { id: "threads", name: "Threads" },
                 ].map((plat) => {
                   const isChecked = newQueuePlatforms.includes(plat.id);

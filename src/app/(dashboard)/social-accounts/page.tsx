@@ -68,7 +68,6 @@ export const PLATFORM_NAV_ITEMS = [
   { id: "threads", name: "Threads", icon: "threads" },
   { id: "linkedin", name: "LinkedIn", icon: "linkedin" },
   { id: "tiktok", name: "TikTok", icon: "tiktok" },
-  { id: "pinterest", name: "Pinterest", icon: "pinterest" },
   { id: "youtube", name: "YouTube", icon: "youtube" },
   { id: "community", name: "Community", icon: "telegram" },
   { id: "x", name: "X", icon: "x" },
@@ -88,7 +87,6 @@ export default function SocialAccountsPage() {
   const [activeSettingsTab, setActiveSettingsTab] = useState<
     | "social_accounts"
     | "communities"
-    | "pinterest"
     | "notifications"
     | "social_categories"
     | "watermark"
@@ -372,20 +370,6 @@ export default function SocialAccountsPage() {
                   <span>Communities</span>
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => setActiveSettingsTab("pinterest")}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
-                    activeSettingsTab === "pinterest"
-                      ? "bg-[#eef4ff] text-[#1877F2] dark:bg-blue-950/60 dark:text-blue-400"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
-                  }`}
-                >
-                  <div className="w-4 h-4 flex items-center justify-center">
-                    {renderPlatformIcon("pinterest", 16)}
-                  </div>
-                  <span>Pinterest</span>
-                </button>
 
                 <button
                   type="button"
@@ -1000,32 +984,6 @@ export default function SocialAccountsPage() {
                 </div>
               )}
 
-              {/* TAB 3: PINTEREST */}
-              {activeSettingsTab === "pinterest" && (
-                <div className="space-y-6">
-                  <div>
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Pinterest Settings</h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Configure default boards, Rich Pin metadata synchronization, and destination link tracking.
-                    </p>
-                  </div>
-
-                  <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 space-y-3">
-                    <h3 className="text-xs font-bold text-slate-900 dark:text-white">Pinterest Board Provisioning</h3>
-                    <p className="text-xs text-slate-600 dark:text-slate-400">
-                      You can create and manage Pinterest boards directly via official Pinterest API v5.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => setIsAssetModalOpen(true)}
-                      className="px-3.5 py-2 rounded-xl bg-[#E60023] hover:bg-red-700 text-white text-xs font-bold transition flex items-center gap-1.5"
-                    >
-                      <PlusCircle className="w-3.5 h-3.5" />
-                      <span>Create New Pinterest Board</span>
-                    </button>
-                  </div>
-                </div>
-              )}
 
               {/* TAB 4: NOTIFICATIONS */}
               {activeSettingsTab === "notifications" && (

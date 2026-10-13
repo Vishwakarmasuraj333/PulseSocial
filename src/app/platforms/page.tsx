@@ -52,13 +52,6 @@ export default function PlatformsPage() {
       features: ["Direct video upload with progress tracking", "Aspect ratio validation (9:16 vertical)", "Cover frame selection", "Virality telemetry"],
     },
     {
-      id: "pinterest",
-      name: "Pinterest Business",
-      type: "Visual Discovery",
-      desc: "Pinterest v5 API for rich product pins, board categorization, high-resolution visual curation, and outbound click analytics.",
-      features: ["Product pin creation with destination links", "Custom board selector", "Pin scheduling with peak discovery time slots", "Saves and referral analytics"],
-    },
-    {
       id: "google_business",
       name: "Google Business Profile",
       type: "Local Commerce",

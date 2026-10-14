@@ -46,15 +46,15 @@ export function CanvaModal({ isOpen, onClose, onSelectMedia }: CanvaModalProps) 
 
         <div className="p-3 bg-slate-50 rounded-xl text-left border border-slate-100 space-y-1.5 text-xs text-slate-600">
           <div className="flex items-center gap-2">
-            <Check className="w-3.5 h-3.5 text-emerald-600" />
+            <Check className="w-3.5 h-3.5 text-purple-600" />
             <span>Access your Canva Pro or Free brand templates</span>
           </div>
           <div className="flex items-center gap-2">
-            <Check className="w-3.5 h-3.5 text-emerald-600" />
+            <Check className="w-3.5 h-3.5 text-purple-600" />
             <span>Export high-resolution PNG & MP4 directly</span>
           </div>
           <div className="flex items-center gap-2">
-            <Check className="w-3.5 h-3.5 text-emerald-600" />
+            <Check className="w-3.5 h-3.5 text-purple-600" />
             <span>Zero file downloads needed</span>
           </div>
         </div>

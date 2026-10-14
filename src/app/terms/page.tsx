@@ -38,7 +38,7 @@ export default function TermsOfServicePage() {
         <div className="prose prose-invert max-w-none text-slate-300 text-sm space-y-6 leading-relaxed">
           <section className="space-y-3 bg-slate-800/40 p-6 rounded-2xl border border-slate-800">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <CheckCircle2 className="w-4 h-4 text-purple-400" />
               <span>1. Acceptance of Terms</span>
             </h2>
             <p>

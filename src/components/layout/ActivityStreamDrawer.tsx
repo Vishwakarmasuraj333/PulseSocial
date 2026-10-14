@@ -99,8 +99,8 @@ export function ActivityStreamDrawer({ isOpen, onClose }: ActivityStreamDrawerPr
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-sm font-bold tracking-tight">Live Activity Stream</h3>
-                  <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40">
+                    <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
                     LIVE PULSE
                   </span>
                 </div>
@@ -155,7 +155,7 @@ export function ActivityStreamDrawer({ isOpen, onClose }: ActivityStreamDrawerPr
                 </>
               ) : (
                 <>
-                  <Play className="w-3 h-3 text-emerald-500" />
+                  <Play className="w-3 h-3 text-purple-500" />
                   <span>Resume</span>
                 </>
               )}
@@ -184,7 +184,7 @@ export function ActivityStreamDrawer({ isOpen, onClose }: ActivityStreamDrawerPr
                         evt.type === "PUBLISHING"
                           ? "bg-blue-100 text-blue-700"
                           : evt.type === "ACCOUNT"
-                          ? "bg-emerald-100 text-emerald-700"
+                          ? "bg-purple-100 text-purple-700"
                           : evt.type === "TEAM"
                           ? "bg-purple-100 text-purple-700"
                           : "bg-amber-100 text-amber-700"

@@ -303,8 +303,8 @@ export function CanvaConnectModal({
               <div className="flex items-center gap-2">
                 <h3 className="text-base font-bold text-slate-900 tracking-tight">Canva Connect</h3>
                 {isConnected ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200">
+                    <CheckCircle2 className="w-3 h-3 text-purple-600" />
                     Canva Connected
                   </span>
                 ) : (
@@ -355,7 +355,7 @@ export function CanvaConnectModal({
               {/* Security Banner */}
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 text-left text-xs space-y-2">
                 <div className="flex items-center gap-2 font-semibold text-slate-700">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <span className="w-2 h-2 rounded-full bg-purple-500" />
                   Official Canva Connect API Integration
                 </div>
                 <p className="text-[11px] text-slate-500">
@@ -629,7 +629,7 @@ export function CanvaConnectModal({
 
                   <div className="pt-3 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
                     <span>
-                      Token Status: <b className="text-emerald-600 font-semibold">Active & Auto-Refreshing</b>
+                      Token Status: <b className="text-purple-600 font-semibold">Active & Auto-Refreshing</b>
                     </span>
                     <button
                       type="button"

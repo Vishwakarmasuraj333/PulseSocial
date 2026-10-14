@@ -9,6 +9,8 @@ import { runConsentUnitTests } from "./unit/consent.test";
 import { runRealtimeIntegrationTests } from "./integration/realtime.test";
 import { runAuditScreenFixesTests } from "./integration/audit-screen-fixes.test";
 import { runProductionAuditMasterTests } from "./integration/production-audit-master.test";
+import { runSocialMetricsNullTest } from "./unit/social-metrics-null.test";
+import { runWebhooksAndSsrfTests } from "./unit/webhooks-and-ssrf.test";
 import { prisma } from "../src/lib/prisma";
 
 async function main() {
@@ -18,7 +20,7 @@ async function main() {
 
   const startTime = Date.now();
   let passedSuites = 0;
-  const totalSuites = 11;
+  const totalSuites = 13;
 
   const baseUrl = process.env.BASE_URL || (process.env.APP_URL || "https://pulsesocial1.vercel.app");
   process.env.BASE_URL = baseUrl;
@@ -49,8 +51,16 @@ async function main() {
     await runTenantIsolationTests();
     passedSuites++;
 
-    // Suite 8: Cookie Consent Engine
+    // Suite 6: Cookie Consent Engine
     await runConsentUnitTests();
+    passedSuites++;
+
+    // Suite 7: Social Metrics Null vs 0 Truthfulness
+    await runSocialMetricsNullTest();
+    passedSuites++;
+
+    // Suite 8: Webhook Signatures & SSRF Security
+    await runWebhooksAndSsrfTests();
     passedSuites++;
 
     // HTTP Integration Suites (6, 7, 9, 10)

@@ -308,7 +308,7 @@ export function PulseHelpGuidesModal({
                     <span className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-blue-600">
                       Privacy & Security
                     </span>
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                    <ShieldCheck className="w-3.5 h-3.5 text-purple-500" />
                   </div>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
                     Review official OAuth scopes, data retention policies, and account disconnect steps.
@@ -341,7 +341,7 @@ export function PulseHelpGuidesModal({
 
         {/* Footer */}
         <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+          <div className="flex items-center gap-1.5 text-[11px] text-purple-600 dark:text-purple-400 font-medium">
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>All Systems Operational (v2.8 Production)</span>
           </div>

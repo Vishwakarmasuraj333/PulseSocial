@@ -452,7 +452,7 @@ export default function ForgotPasswordPage() {
             {/* ============================================================== */}
             {step === "success" && (
               <div className="text-center py-4 space-y-5 animate-in fade-in duration-200">
-                <div className="w-16 h-16 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-600 flex items-center justify-center mx-auto shadow-md shadow-emerald-500/10">
+                <div className="w-16 h-16 rounded-full bg-purple-100 border border-purple-300 text-purple-600 flex items-center justify-center mx-auto shadow-md shadow-purple-500/10">
                   <CheckCircle2 className="w-9 h-9" />
                 </div>
 

@@ -370,7 +370,7 @@ export function HeroSocialOrbit() {
             </div>
             <div className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5">
               <span>Omnichannel Engine</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
             </div>
           </div>
         </Link>
@@ -443,7 +443,7 @@ export function HeroSocialOrbit() {
           }}
         >
           <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-slate-900/95 dark:bg-slate-950/95 text-white border border-purple-400/50 shadow-xl shadow-purple-500/30 backdrop-blur-md whitespace-nowrap">
-            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
             <div className="text-left">
               <div className="text-xs font-bold text-white flex items-center gap-1">
                 <span>{activeHoveredNode.name}</span>

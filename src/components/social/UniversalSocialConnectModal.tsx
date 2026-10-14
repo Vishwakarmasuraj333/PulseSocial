@@ -464,7 +464,7 @@ export function UniversalSocialConnectModal({
                       }}
                       className="px-2 py-0.5 rounded bg-amber-200/70 dark:bg-amber-800/60 hover:bg-amber-300 dark:hover:bg-amber-700 text-amber-900 dark:text-amber-200 font-semibold flex items-center gap-1 cursor-pointer shrink-0"
                     >
-                      {copiedRedirect ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                      {copiedRedirect ? <Check className="w-3 h-3 text-purple-600" /> : <Copy className="w-3 h-3" />}
                       <span>{copiedRedirect ? "Copied" : "Copy URI"}</span>
                     </button>
                   </div>
@@ -572,7 +572,7 @@ export function UniversalSocialConnectModal({
                   <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">
                     {connectedAccount.displayName}
                   </h4>
-                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 text-[10px] font-bold">
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-purple-500/10 text-purple-600 text-[10px] font-bold">
                     <CheckCircle2 className="w-3 h-3" />
                     Verified
                   </span>
@@ -594,7 +594,7 @@ export function UniversalSocialConnectModal({
                     key={idx}
                     className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800 flex items-start gap-2.5"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4 h-4 text-purple-500 shrink-0 mt-0.5" />
                     <div className="text-xs">
                       <span className="font-semibold text-slate-800 dark:text-slate-200 block">
                         {s.name}
@@ -618,7 +618,7 @@ export function UniversalSocialConnectModal({
               <button
                 type="button"
                 onClick={handleConfirmLinkAccount}
-                className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition cursor-pointer flex items-center gap-1.5"
+                className="px-5 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs transition cursor-pointer flex items-center gap-1.5"
               >
                 <Check className="w-4 h-4" />
                 <span>Confirm & Link Account</span>
@@ -632,7 +632,7 @@ export function UniversalSocialConnectModal({
         {/* ======================================================== */}
         {step === "success" && (
           <div className="p-8 text-center space-y-4 animate-in zoom-in-95 duration-200">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 flex items-center justify-center text-emerald-600 mx-auto">
+            <div className="w-16 h-16 rounded-full bg-purple-100 dark:bg-purple-950/50 border border-purple-300 dark:border-purple-800 flex items-center justify-center text-purple-600 mx-auto">
               <CheckCircle2 className="w-8 h-8" />
             </div>
 

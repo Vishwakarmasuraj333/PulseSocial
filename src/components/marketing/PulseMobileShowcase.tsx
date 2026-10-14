@@ -20,7 +20,7 @@ export function PulseMobileShowcase() {
                 <div className="w-full h-full bg-slate-950 rounded-[28px] p-3 overflow-hidden text-left space-y-3">
                   <div className="flex justify-between items-center text-[10px] text-slate-400">
                     <span className="font-bold">Published Posts</span>
-                    <span className="text-emerald-400">● Live</span>
+                    <span className="text-purple-400">● Live</span>
                   </div>
                   <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
                     <div className="text-[10px] font-bold text-white flex items-center gap-1">
@@ -55,8 +55,8 @@ export function PulseMobileShowcase() {
                       <div className="text-[10px] text-slate-400">PulseSocial Global</div>
                     </div>
                     <div className="flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      <span className="text-[9px] text-emerald-400 font-bold">Online</span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+                      <span className="text-[9px] text-purple-400 font-bold">Online</span>
                     </div>
                   </div>
 
@@ -68,8 +68,8 @@ export function PulseMobileShowcase() {
                       <div className="text-[10px] font-semibold opacity-90 leading-tight">Total Audience</div>
                     </div>
 
-                    {/* Green Tile */}
-                    <div className="p-3 rounded-xl bg-[#10B981] text-white space-y-0.5 shadow-md">
+                    {/* Purple Tile */}
+                    <div className="p-3 rounded-xl bg-[#8B6BD6] text-white space-y-0.5 shadow-md">
                       <div className="text-lg sm:text-xl font-black">9.1K</div>
                       <div className="text-[10px] font-semibold opacity-90 leading-tight">Active Audience</div>
                     </div>

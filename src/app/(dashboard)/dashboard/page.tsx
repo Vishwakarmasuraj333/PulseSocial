@@ -272,7 +272,7 @@ export default function DashboardPage() {
               <span className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                 {connectedChannels.length}
               </span>
-              <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+              <span className="text-xs font-medium text-purple-600 dark:text-purple-400">
                 {connectedChannels.length > 0 ? "Channels active" : "None connected"}
               </span>
             </div>
@@ -324,7 +324,7 @@ export default function DashboardPage() {
               <div
                 className={`w-8 h-8 rounded-xl flex items-center justify-center ${
                   connectedChannels.length > 0
-                    ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-300"
+                    ? "bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-300"
                     : "bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-300"
                 }`}
               >
@@ -417,7 +417,7 @@ export default function DashboardPage() {
                           <td className="py-3.5 text-right font-medium text-slate-800 dark:text-slate-200">
                             <span>{channel.connectedAccount?.followerCount != null ? channel.connectedAccount.followerCount.toLocaleString() : "—"}</span>
                             {channel.growth && (
-                              <span className="text-[11px] text-emerald-600 font-semibold ml-1.5">
+                              <span className="text-[11px] text-purple-600 font-semibold ml-1.5">
                                 ↑ {channel.growth}
                               </span>
                             )}
@@ -524,7 +524,7 @@ export default function DashboardPage() {
                           </span>
                           <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
                             livePosts[0]?.status === "PUBLISHED"
-                              ? "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800"
+                              ? "text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800"
                               : "text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800"
                           }`}>
                             {livePosts[0]?.status || "READY"}
@@ -659,8 +659,8 @@ export default function DashboardPage() {
                   </p>
                 </div>
                 {streamStatus === "connected" ? (
-                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                    <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
                     REALTIME
                   </span>
                 ) : streamStatus === "polling" ? (

@@ -78,15 +78,15 @@ export function FacebookLoginDialog({
             </p>
             <ul className="space-y-1.5 pl-1">
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
                 <span>Publish approved posts & reels to your selected Facebook Pages</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
                 <span>Read engagement metrics, reach, and performance analytics</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
                 <span>Manage inbox comments and direct interactions</span>
               </li>
             </ul>

@@ -118,7 +118,7 @@ export function CloudPickerModal({
           ))}
 
           <div className="mt-4 p-3 rounded-lg bg-slate-50 border border-slate-100 flex items-center gap-2 text-[11px] text-slate-500">
-            <Shield className="w-4 h-4 text-emerald-600 shrink-0" />
+            <Shield className="w-4 h-4 text-purple-600 shrink-0" />
             <span>OAuth 2.0 end-to-end encrypted storage permissions.</span>
           </div>
         </div>

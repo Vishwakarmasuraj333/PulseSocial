@@ -304,7 +304,7 @@ export function PulseSocialSidebar() {
               <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#1E3A8A] via-[#2E3788] to-[#4F46E5] flex items-center justify-center text-white font-black text-[11px] shadow-sm">
                 PS
               </div>
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900 animate-pulse" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-purple-500 rounded-full border-2 border-white dark:border-slate-900 animate-pulse" />
             </div>
           </button>
         </div>
@@ -337,7 +337,7 @@ export function PulseSocialSidebar() {
                   <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#1E3A8A] via-[#2E3788] to-[#4F46E5] flex items-center justify-center text-white font-black text-[10px] shadow-sm">
                     PS
                   </div>
-                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full border border-white dark:border-slate-900 animate-pulse" />
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-purple-500 rounded-full border border-white dark:border-slate-900 animate-pulse" />
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
@@ -402,7 +402,7 @@ export function PulseSocialSidebar() {
                               />
                               {ch.name}
                             </span>
-                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-emerald-400 font-mono font-semibold">
+                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-purple-400 font-mono font-semibold">
                               {ch.badge}
                             </span>
                           </div>
@@ -486,7 +486,7 @@ export function PulseSocialSidebar() {
                   <span className="font-bold text-slate-600 dark:text-slate-300">
                     Integration Status:
                   </span>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 font-bold text-[11px]">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     100% Direct API Verified (2026)
                   </span>
@@ -494,7 +494,7 @@ export function PulseSocialSidebar() {
 
                 <div className="flex items-center justify-between text-[11px] px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-mono">
                   <span className="truncate">{activeModalChannel.apiProtocol}</span>
-                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold shrink-0 ml-2">
+                  <span className="text-purple-600 dark:text-purple-400 font-semibold shrink-0 ml-2">
                     ⚡ {activeModalChannel.latency}
                   </span>
                 </div>
@@ -504,7 +504,7 @@ export function PulseSocialSidebar() {
               <div className="space-y-2.5 pt-1">
                 <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
                   <span>Included Capabilities:</span>
-                  <span className="text-emerald-500 font-semibold lowercase">
+                  <span className="text-purple-500 font-semibold lowercase">
                     {activeModalChannel.uptime}
                   </span>
                 </div>
@@ -528,7 +528,7 @@ export function PulseSocialSidebar() {
                     <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                       Official OAuth 2.0 PKCE Handshake
                     </span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 font-bold">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 font-bold">
                       SOC-2 Compliant
                     </span>
                   </div>

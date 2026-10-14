@@ -64,7 +64,7 @@ export function PulseMonitorVisual() {
                   <XIcon size={11} />
                 </span>
                 <span>Mentions</span>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse ml-0.5" />
+                <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse ml-0.5" />
               </div>
               <MoreHorizontal className="w-3.5 h-3.5 text-slate-400" />
             </div>

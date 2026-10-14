@@ -92,7 +92,7 @@ export default function AnalyticsPage() {
                 Social Analytics & Insights
               </h1>
               {(data as any)?.dataSource === "API_SYNCED" ? (
-                <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold">
+                <span className="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-400 text-[10px] font-bold">
                   ● Real API Data
                 </span>
               ) : (data as any)?.dataSource === "DATABASE_CALCULATED" ? (
@@ -117,7 +117,7 @@ export default function AnalyticsPage() {
               onClick={handleExportCSV}
               className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition cursor-pointer"
             >
-              <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+              <FileSpreadsheet className="w-3.5 h-3.5 text-purple-600" />
               <span>Export CSV</span>
             </button>
 
@@ -212,7 +212,7 @@ export default function AnalyticsPage() {
             <div className="text-xl font-bold text-slate-900 dark:text-white">
               {data?.totalFollowers ? data.totalFollowers.toLocaleString() : "0"}
             </div>
-            <span className="text-[10px] text-emerald-500 font-semibold mt-0.5 block">
+            <span className="text-[10px] text-purple-500 font-semibold mt-0.5 block">
               +{data?.followerGrowth || 0}% this period
             </span>
           </div>
@@ -238,7 +238,7 @@ export default function AnalyticsPage() {
             <div className="text-xl font-bold text-slate-900 dark:text-white">
               {data?.totalReach ? data.totalReach.toLocaleString() : "0"}
             </div>
-            <span className="text-[10px] text-emerald-500 font-semibold mt-0.5 block">Unique accounts seen</span>
+            <span className="text-[10px] text-purple-500 font-semibold mt-0.5 block">Unique accounts seen</span>
           </div>
 
           {/* 4. Impressions */}
@@ -274,14 +274,14 @@ export default function AnalyticsPage() {
             <div className="text-xl font-bold text-slate-900 dark:text-white">
               {data?.totalLikes ? data.totalLikes.toLocaleString() : "0"}
             </div>
-            <span className="text-[10px] text-emerald-500 font-semibold mt-0.5 block">Positive sentiment</span>
+            <span className="text-[10px] text-purple-500 font-semibold mt-0.5 block">Positive sentiment</span>
           </div>
 
           {/* 7. Comments */}
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between text-slate-400 mb-1.5">
               <span className="text-xs font-medium">Comments</span>
-              <MessageCircle className="w-4 h-4 text-emerald-500" />
+              <MessageCircle className="w-4 h-4 text-purple-500" />
             </div>
             <div className="text-xl font-bold text-slate-900 dark:text-white">
               {data?.totalComments ? data.totalComments.toLocaleString() : "0"}

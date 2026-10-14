@@ -336,7 +336,7 @@ export function PulseInstagramShowcase() {
                 <span className="relative z-10">{p.iconRenderer()}</span>
                 <span className="relative z-10">{p.name}</span>
                 {isSelected && (
-                  <span className="relative z-10 w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-0.5" />
+                  <span className="relative z-10 w-2 h-2 rounded-full bg-purple-400 animate-pulse ml-0.5" />
                 )}
               </button>
             );
@@ -364,7 +364,7 @@ export function PulseInstagramShowcase() {
             >
               {isPaused ? (
                 <>
-                  <Play className="w-2.5 h-2.5 text-emerald-500 fill-emerald-500" />
+                  <Play className="w-2.5 h-2.5 text-purple-500 fill-purple-500" />
                   <span>Resume Auto-Play</span>
                 </>
               ) : (

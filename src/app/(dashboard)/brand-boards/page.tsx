@@ -224,7 +224,7 @@ export default function BrandBoardsPage() {
                       className="p-1.5 rounded-lg text-slate-500 hover:text-[#5846A8] hover:bg-purple-50 dark:hover:bg-slate-800 transition cursor-pointer"
                       title="Copy Share Link"
                     >
-                      {copiedId === board.id ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copiedId === board.id ? <Check className="w-3.5 h-3.5 text-purple-600" /> : <Copy className="w-3.5 h-3.5" />}
                     </button>
                     <button
                       type="button"

@@ -336,8 +336,8 @@ function MessagesContent() {
                     <h3 className="text-xs font-bold text-slate-900 dark:text-white">
                       {activeThread.name}
                     </h3>
-                    <p className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" /> Active on Facebook
+                    <p className="text-[10px] text-purple-600 font-semibold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-purple-500 inline-block" /> Active on Facebook
                     </p>
                   </div>
                 </div>

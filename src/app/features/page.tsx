@@ -6,15 +6,13 @@ import {
   Send,
   Calendar,
   MessageSquare,
-  Clock,
   BarChart3,
-  Share2,
   Users,
   Sparkles,
   Shield,
   Layers,
-  FileSpreadsheet,
   Radio,
+  Smartphone,
   ArrowRight,
   CheckCircle2,
 } from "lucide-react";
@@ -25,45 +23,133 @@ export default function FeaturesPage() {
   const featureList = [
     {
       id: "publishing",
-      title: "Universal Multi-Platform Composer",
-      desc: "Write once, preview everywhere. Automatic aspect-ratio verification, video duration checks, and per-platform character counts for Meta, LinkedIn, X, TikTok, and YouTube.",
+      title: "1. Social Media Publishing and Scheduling",
+      desc: "Universal post composer with multi-platform previews, real character counts, automated aspect-ratio verification, video constraints, and instant or queued publishing.",
       icon: Send,
-      points: ["Character counter with native truncation rules", "Media drag & drop with automated format conversion", "Drafts, immediate publishing, and recurring queues"],
+      ctaHref: "/compose",
+      ctaLabel: "Open Post Composer",
+      points: [
+        "Live native previews for Instagram, Facebook, LinkedIn, X, and YouTube",
+        "Strict platform limit validation preventing failed publishes",
+        "Persistent background worker queue with automatic retry policies",
+      ],
     },
     {
       id: "calendar",
-      title: "Visual Content Calendar",
-      desc: "A responsive birds-eye timeline of every piece of scheduled content. Switch between Month, Week, Day, and List views with full drag-and-drop rescheduling.",
+      title: "2. Visual Content Calendar",
+      desc: "Intuitive publishing calendar to plan and coordinate multi-channel campaigns. Switch across Month, Week, and Day views with fluid drag-and-drop rescheduling.",
       icon: Calendar,
-      points: ["Color-coded channel badges", "Immediate rescheduling and time-slot locking", "Detailed inspection drawer for team approvals"],
+      ctaHref: "/calendar",
+      ctaLabel: "Launch Visual Calendar",
+      points: [
+        "Drag-and-drop rescheduling synchronized to database timestamps",
+        "Color-coded channel chips and post status indicators",
+        "Timezone-aware scheduling tailored to global audience windows",
+      ],
     },
     {
       id: "inbox",
-      title: "Unified Social Inbox",
-      desc: "Never miss a customer inquiry, high-intent lead, or comment. Consolidate interactions across Facebook, Instagram, LinkedIn, and X into a single two-pane thread stream.",
+      title: "3. Unified Social Inbox",
+      desc: "Consolidate inbound customer comments, mentions, and private messages across all connected channels into a single, high-speed unified response center.",
       icon: MessageSquare,
-      points: ["Real interaction threads with author avatars", "One-click inline replies dispatched directly through official APIs", "Conversation status flags and team member assignment"],
+      ctaHref: "/inbox",
+      ctaLabel: "View Social Inbox",
+      points: [
+        "Real-time synchronized comment threads with authentic author metadata",
+        "Direct API-backed reply dispatch with zero mock delays",
+        "Unread tracking, teammate assignment, and internal resolution flags",
+      ],
+    },
+    {
+      id: "monitor",
+      title: "4. Social Listening and Brand Monitoring",
+      desc: "Track brand keywords, competitors, hashtags, and industry sentiment across networks to capture high-intent leads and manage reputation in real time.",
+      icon: Radio,
+      ctaHref: "/monitor",
+      ctaLabel: "Open Listening Center",
+      points: [
+        "Custom keyword, hashtag, and brand mention listening streams",
+        "Multi-column live feed interface for instant team awareness",
+        "Sentiment filtering to catch critical customer inquiries immediately",
+      ],
     },
     {
       id: "analytics",
-      title: "Real-Time Telemetry & Analytics",
-      desc: "True official metrics without fabricated guesswork. Monitor organic impressions, engagement curves, profile clicks, and follower growth with exportable PDF and CSV reports.",
+      title: "5. Cross-Platform Analytics and Reporting",
+      desc: "Transparent telemetry and genuine provider metrics. Monitor impressions, reach, engagements, follower growth, and top-performing content without fake data.",
       icon: BarChart3,
-      points: ["Cross-channel performance comparison", "Aggregated reach and impression curves", "Zero fake numbers: transparent API data only"],
+      ctaHref: "/analytics",
+      ctaLabel: "Explore Analytics",
+      points: [
+        "Authenticated API metrics with transparent sync timestamps",
+        "Explicit engagement rate calculations and multi-platform comparisons",
+        "One-click exportable CSV and PDF reports for executive stakeholders",
+      ],
+    },
+    {
+      id: "ai-assistant",
+      title: "6. AI-Powered Caption and Content Assistance",
+      desc: "Harness Google Gemini 2.5 Flash on the server for viral hooks, hashtag optimization, platform repurposing, tone adaptation, and calendar ideas.",
+      icon: Sparkles,
+      ctaHref: "/ai-assistant",
+      ctaLabel: "Try AI Assistant",
+      points: [
+        "Audience-targeted caption writing and hook variations",
+        "Hashtag generator categorized by primary, niche, and branded reach",
+        "Saved drafts and full generation audit history in the database",
+      ],
+    },
+    {
+      id: "approvals",
+      title: "7. Team Collaboration and Post Approvals",
+      desc: "Built-in approval workflows preventing unauthorized or unreviewed posts from publishing. Ensure quality control across junior copywriters and clients.",
+      icon: Users,
+      ctaHref: "/approvals",
+      ctaLabel: "Manage Approvals",
+      points: [
+        "Granular RBAC: Owner, Admin, Manager, Editor, Analyst, and Viewer",
+        "Formal draft review requests with rejection notes and revision loops",
+        "Immutable audit log tracking every action, user, and IP address",
+      ],
+    },
+    {
+      id: "workspaces",
+      title: "8. Multi-Brand and Agency Workspaces",
+      desc: "Manage multiple client brands or business units under one login with strict data isolation. Never cross-contaminate client social tokens, posts, or metrics.",
+      icon: Layers,
+      ctaHref: "/brand-boards",
+      ctaLabel: "View Brand Workspaces",
+      points: [
+        "One-click brand switching with dedicated settings and color schemes",
+        "Separate OAuth credentials and token isolation per workspace",
+        "Client portal mode with customizable permissions and views",
+      ],
     },
     {
       id: "security",
-      title: "Hardware-Grade AES-256 Vault",
-      desc: "All OAuth 2.0 access tokens and refresh tokens are encrypted at rest with AES-256-GCM hardware encryption. We never collect or store third-party user passwords.",
+      title: "9. Secure Social Account Management",
+      desc: "Enterprise hardware-grade token protection. Social access and refresh tokens are encrypted at rest with AES-256-GCM authenticated cipher with key rotation.",
       icon: Shield,
-      points: ["Zero password collection", "Cryptographic state and PKCE validation", "Automated token refresh before expiration"],
+      ctaHref: "/connections",
+      ctaLabel: "Inspect Social Connections",
+      points: [
+        "Zero storage of client social passwords; official OAuth 2.0 PKCE only",
+        "AES-256-GCM encryption with 16-byte random IVs and integrity tags",
+        "Automated token refresh before expiry and honest reconnect notifications",
+      ],
     },
     {
-      id: "team",
-      title: "Role-Based Team Collaboration",
-      desc: "Safely scale your social team. Assign members granular roles (Owner, Admin, Editor, Analyst, Viewer) with optional mandatory post approvals before publishing.",
-      icon: Users,
-      points: ["Custom channel access permissions", "Approval workflows for junior copywriters", "Complete audit trail of all workspace actions"],
+      id: "mobile",
+      title: "10. Mobile-Responsive Workflows",
+      desc: "Responsive web application engineered to operate seamlessly across mobile, tablet, and desktop viewports with fluid touch controls and instant notifications.",
+      icon: Smartphone,
+      ctaHref: "/dashboard",
+      ctaLabel: "Experience Dashboard",
+      points: [
+        "Full composer, calendar, and inbox navigation on mobile devices",
+        "Server-side session synchronization across all logged-in devices",
+        "Accessible, high-contrast layouts conforming to WCAG 2.1 AA standards",
+      ],
     },
   ];
 
@@ -71,16 +157,16 @@ export default function FeaturesPage() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-indigo-500 selection:text-white font-sans">
       <MarketingHeader />
 
-      <main className="pt-32 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <main className="pt-28 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
           <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-            Platform Capabilities
+            Enterprise Social Operations
           </span>
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-950 dark:text-white">
-            Built for Serious Social Media Operations
+            10 Pillars of Modern Social Media Management
           </h1>
           <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
-            PulseSocial replaces multiple disconnected point solutions with a single, high-performance workspace.
+            SocialPulse replaces disconnected point tools with a single unified, production-grade social operations platform.
           </p>
         </div>
 
@@ -89,7 +175,7 @@ export default function FeaturesPage() {
             const Icon = f.icon;
             return (
               <div
-                key={f.title}
+                key={f.id}
                 id={f.id}
                 className="scroll-mt-32 p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-xl hover:border-indigo-500/40 transition-all duration-200 flex flex-col justify-between"
               >
@@ -106,20 +192,27 @@ export default function FeaturesPage() {
                   <ul className="space-y-2.5 mb-6 text-xs text-slate-700 dark:text-slate-300">
                     {f.points.map((pt) => (
                       <li key={pt} className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                        <CheckCircle2 className="w-4 h-4 text-purple-500 shrink-0" />
                         <span>{pt}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                   <Link
-                    href="/signup"
+                    href={f.ctaHref}
                     className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
                   >
-                    <span>Try in workspace</span>
+                    <span>{f.ctaLabel}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+
+                  <Link
+                    href="/signup"
+                    className="text-[11px] text-slate-500 hover:text-slate-900 dark:hover:text-white font-medium"
+                  >
+                    Start Free Trial →
                   </Link>
                 </div>
               </div>

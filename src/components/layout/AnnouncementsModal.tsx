@@ -50,7 +50,7 @@ const RELEASES = [
     description:
       "Direct OAuth 2.0 connections now automatically detect expiration and allow 1-click reauthorization without losing scheduling queues.",
     icon: Zap,
-    color: "bg-emerald-500/10 text-emerald-600 border-emerald-200",
+    color: "bg-purple-500/10 text-purple-600 border-purple-200",
     actionText: "View Connections",
     actionRoute: "/connections",
   },

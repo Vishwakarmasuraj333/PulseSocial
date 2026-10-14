@@ -209,7 +209,7 @@ export function PerformanceDynamicsChart({ dateRange }: PerformanceDynamicsChart
               className={`text-[11px] font-semibold mt-0.5 inline-block ${
                 m.badge.includes("No") || m.badge.includes("Provider")
                   ? "text-slate-400 dark:text-slate-500"
-                  : "text-emerald-600 dark:text-emerald-400"
+                  : "text-purple-600 dark:text-purple-400"
               }`}
             >
               {m.badge}

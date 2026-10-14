@@ -285,7 +285,7 @@ export default function InboxPage() {
               <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                 Unified Social Inbox
               </h1>
-              <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
                 Live Sync
               </span>
             </div>
@@ -455,7 +455,7 @@ export default function InboxPage() {
                           {selectedConversation.senderName.charAt(0)}
                         </div>
                       )}
-                      <div className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" />
+                      <div className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-purple-500 ring-2 ring-white dark:ring-slate-900" />
                     </div>
 
                     <div>
@@ -468,7 +468,7 @@ export default function InboxPage() {
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
-                        <span className="text-emerald-500 font-medium">● Online</span>
+                        <span className="text-purple-500 font-medium">● Online</span>
                         <span>•</span>
                         <span>Direct social channel sync</span>
                       </div>

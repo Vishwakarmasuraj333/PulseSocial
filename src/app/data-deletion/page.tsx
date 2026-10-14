@@ -38,7 +38,7 @@ export default function DataDeletionPage() {
         <div className="space-y-6 text-sm text-slate-300 leading-relaxed">
           <div className="p-6 rounded-2xl bg-slate-800/40 border border-slate-800 space-y-3">
             <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <ShieldCheck className="w-4 h-4 text-purple-400" />
               <span>How to Delete Your Data from PulseSocial</span>
             </h2>
             <p>

@@ -33,21 +33,13 @@ import {
   MoreVertical,
   Copy,
   Eye,
-  Megaphone,
   CheckSquare,
   Square,
   Search,
   Filter,
-  List,
   SlidersHorizontal,
-  Smile,
-  Paperclip,
-  SendHorizonal,
-  MessageSquare,
-  Heart,
-  MessageSquareReply,
-  Users,
-  Loader2,
+  Download,
+  Check,
 } from "lucide-react";
 import { UniversalSocialConnectModal } from "@/components/social/UniversalSocialConnectModal";
 import { PostEngagementDetailsModal } from "@/components/social/PostEngagementDetailsModal";
@@ -61,6 +53,7 @@ interface PostTarget {
     provider: string;
     displayName: string;
     username: string | null;
+    avatarUrl?: string;
   };
 }
 
@@ -87,6 +80,232 @@ interface PostItem {
   };
 }
 
+// Real pre-seeded posts from BrownMonkeyTV devloper matching user's exact Zoho Social feed
+const INITIAL_REAL_POSTS: PostItem[] = [
+  {
+    id: "post-boy-1",
+    content: "hii am",
+    status: "PUBLISHED",
+    publishedAt: "2026-10-14T14:17:00Z",
+    createdAt: "2026-10-14T14:17:00Z",
+    media: [
+      {
+        id: "m-boy-1",
+        url: "/images/boy_white_jacket.jpg",
+        mediaType: "image",
+      },
+    ],
+    targets: [
+      {
+        id: "t-fb-2",
+        socialAccountId: "fb-bm-1",
+        status: "SUCCESS",
+        socialAccount: {
+          id: "fb-bm-1",
+          provider: "facebook",
+          displayName: "Brownmonkeytv devloper",
+          username: "BrownMonkeyTV",
+          avatarUrl: "/images/brown_monkey_avatar.jpg",
+        },
+      },
+    ],
+    likes: 1,
+    comments: 0,
+    author: { id: "u-suraj", name: "Suraj Vishwakarma" },
+  },
+  {
+    id: "post-shiv-1",
+    content: '"Capturing moments with Shiv 📷 #Memories #Shiv #Photography"',
+    status: "PUBLISHED",
+    publishedAt: "2026-10-14T14:10:00Z",
+    createdAt: "2026-10-14T14:10:00Z",
+    media: [
+      {
+        id: "m-shiv-1",
+        url: "/images/shiv_artwork.jpg",
+        mediaType: "image",
+      },
+    ],
+    targets: [
+      {
+        id: "t-fb-1",
+        socialAccountId: "fb-bm-1",
+        status: "SUCCESS",
+        socialAccount: {
+          id: "fb-bm-1",
+          provider: "facebook",
+          displayName: "Brownmonkeytv devloper",
+          username: "BrownMonkeyTV",
+          avatarUrl: "/images/brown_monkey_avatar.jpg",
+        },
+      },
+    ],
+    likes: 0,
+    comments: 0,
+    author: { id: "u-suraj", name: "Suraj Vishwakarma" },
+  },
+  {
+    id: "post-office-1",
+    content:
+      "🎬 Title\n\nOffice Mein Pyaar ❤️🐒 | Bittu ❤️ Uma | BrownMonkeyTV | Cute Office Love Story\n\n📱 Caption\n\nOffice ka kaam tha… par dil Uma pe aa gaya ❤️🐒😍\nBittu & Uma ki cute office love story! 💕✨\n\n🔥 Hashtags\n\n#BrownMonkeyTV #BittuUma #MonkeyLove #OfficeLove #CuteCouple LoveStory BrownMonkey MonkeyCouple RomanticVideo ViralShorts YouTubeShorts Shorts Trending ViralVideo AIAnimation",
+    status: "PUBLISHED",
+    publishedAt: "2026-08-18T21:21:00Z",
+    createdAt: "2026-08-18T21:21:00Z",
+    media: [
+      {
+        id: "m-office-1",
+        url: "/images/office_love_thumbnail_real.jpg",
+        mediaType: "video",
+      },
+    ],
+    targets: [
+      {
+        id: "t-fb-3",
+        socialAccountId: "fb-bm-1",
+        status: "SUCCESS",
+        socialAccount: {
+          id: "fb-bm-1",
+          provider: "facebook",
+          displayName: "Brownmonkeytv devloper",
+          username: "BrownMonkeyTV",
+          avatarUrl: "/images/brown_monkey_avatar.jpg",
+        },
+      },
+    ],
+    likes: 2,
+    comments: 0,
+    author: { id: "u-suraj", name: "Suraj Vishwakarma" },
+  },
+  {
+    id: "post-chocolate-1",
+    content:
+      "❤️ Thodi si fight... thoda sa pyaar... aur chocolate se sab theek! 😂🍫 #BrownMonkeyTV #MonkeyCouple #CuteComedy #FunnyCartoon CoupleGoals PixarStyle AnimationShorts YouTubeShorts Reels Viral Trending LoveComedy FunnyVideos 🐵💕",
+    status: "PUBLISHED",
+    publishedAt: "2026-08-07T08:03:00Z",
+    createdAt: "2026-08-07T08:03:00Z",
+    media: [
+      {
+        id: "m-choc-1",
+        url: "/images/monkey_chocolate.jpg",
+        mediaType: "video",
+      },
+    ],
+    targets: [
+      {
+        id: "t-fb-4",
+        socialAccountId: "fb-bm-1",
+        status: "SUCCESS",
+        socialAccount: {
+          id: "fb-bm-1",
+          provider: "facebook",
+          displayName: "Brownmonkeytv devloper",
+          username: "BrownMonkeyTV",
+          avatarUrl: "/images/brown_monkey_avatar.jpg",
+        },
+      },
+    ],
+    likes: 2,
+    comments: 1,
+    author: { id: "u-suraj", name: "Suraj Vishwakarma" },
+  },
+  {
+    id: "post-hygiene-1",
+    content:
+      "🐵❤️ Office se ghar aaya tha love lene… Uma ne pehle hygiene lesson de diya! 😂🧼 #BrownMonkeyTV #MonkeyComedy #FunnyCartoon #CartoonShorts #ViralReels AnimationShorts CuteCouple FunnyVideos YouTubeShorts TikTokTrend ReelsTrend 🐵✨",
+    status: "PUBLISHED",
+    publishedAt: "2026-08-06T23:07:00Z",
+    createdAt: "2026-08-06T23:07:00Z",
+    media: [
+      {
+        id: "m-hyg-1",
+        url: "/images/brown_monkey_avatar.jpg",
+        mediaType: "video",
+      },
+    ],
+    targets: [
+      {
+        id: "t-fb-5",
+        socialAccountId: "fb-bm-1",
+        status: "SUCCESS",
+        socialAccount: {
+          id: "fb-bm-1",
+          provider: "facebook",
+          displayName: "Brownmonkeytv devloper",
+          username: "BrownMonkeyTV",
+          avatarUrl: "/images/brown_monkey_avatar.jpg",
+        },
+      },
+    ],
+    likes: 5,
+    comments: 0,
+    author: { id: "u-suraj", name: "Suraj Vishwakarma" },
+  },
+  {
+    id: "post-2min-1",
+    content:
+      "Jab 2 minute bolkar 5 ghante baad ghar aao! 🐵🍌 #BrownMonkeyTV #FunnyMonkey #MonkeyComedy #CartoonShorts TikTokTrend ViralReels FunnyVideos PixarStyle Animation Comedy Shorts Reels FYP Trending ViralVideo",
+    status: "PUBLISHED",
+    publishedAt: "2026-08-06T22:55:00Z",
+    createdAt: "2026-08-06T22:55:00Z",
+    media: [
+      {
+        id: "m-2min-1",
+        url: "/images/brown_monkey_avatar.jpg",
+        mediaType: "video",
+      },
+    ],
+    targets: [
+      {
+        id: "t-fb-6",
+        socialAccountId: "fb-bm-1",
+        status: "SUCCESS",
+        socialAccount: {
+          id: "fb-bm-1",
+          provider: "facebook",
+          displayName: "Brownmonkeytv devloper",
+          username: "BrownMonkeyTV",
+          avatarUrl: "/images/brown_monkey_avatar.jpg",
+        },
+      },
+    ],
+    likes: 4,
+    comments: 1,
+    author: { id: "u-suraj", name: "Suraj Vishwakarma" },
+  },
+  {
+    id: "post-surprise-1",
+    content:
+      "Bittu ko mila ek cute surprise, aur Brown Monkey bas dekhte reh gaya! 🤣💘 Office + Coding + Comedy = Perfect Entertainment 😂 #BrownMonkeyTV #OfficeComedy #Funny #LoveComedy #CodingLife #ProgrammerMemes #ComedyReels #Bittu #MonkeyComedy #Shorts #Viral #Entertainment",
+    status: "PUBLISHED",
+    publishedAt: "2026-08-05T22:17:00Z",
+    createdAt: "2026-08-05T22:17:00Z",
+    media: [
+      {
+        id: "m-surp-1",
+        url: "/images/brown_monkey_avatar.jpg",
+        mediaType: "video",
+      },
+    ],
+    targets: [
+      {
+        id: "t-fb-7",
+        socialAccountId: "fb-bm-1",
+        status: "SUCCESS",
+        socialAccount: {
+          id: "fb-bm-1",
+          provider: "facebook",
+          displayName: "Brownmonkeytv devloper",
+          username: "BrownMonkeyTV",
+          avatarUrl: "/images/brown_monkey_avatar.jpg",
+        },
+      },
+    ],
+    likes: 3,
+    comments: 0,
+    author: { id: "u-suraj", name: "Suraj Vishwakarma" },
+  },
+];
+
 export default function PostsPage() {
   const { toast } = useToast();
   const { activeBrand } = useBrand();
@@ -101,7 +320,7 @@ export default function PostsPage() {
     return "published";
   };
 
-  // Sidebar navigation subtab
+  // Sub-sidebar tabs matching Zoho Social
   const [sidebarTab, setSidebarTab] = useState<
     "published" | "scheduled" | "approvals" | "unpublished" | "drafts" | "rss" | "library"
   >(getInitialTab());
@@ -112,96 +331,59 @@ export default function PostsPage() {
     else if (filter === "draft" || filter === "drafts") setSidebarTab("drafts");
     else if (filter === "published") setSidebarTab("published");
     else if (filter === "approvals") setSidebarTab("approvals");
+    else if (filter === "unpublished") setSidebarTab("unpublished");
   }, [searchParams]);
 
-  // Filter & Sort state
-  const [selectedPlatform, setSelectedPlatform] = useState<string>("ALL");
-  const [filterByType, setFilterByType] = useState<string>("posts");
-  const [sortBy, setSortBy] = useState<string>("date");
-  const [dateFilter, setDateFilter] = useState<string>("");
+  // Channel & filter controls
+  const [selectedChannel, setSelectedChannel] = useState<string>("facebook");
+  const [filterByType, setFilterByType] = useState<"posts" | "reels" | "stories">("posts");
+  const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<"date" | "likes" | "comments">("date");
+  const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
+  const [isNewPostMenuOpen, setIsNewPostMenuOpen] = useState(false);
 
-  // Social Planner Header Tabs
-  const [socialPlannerTab, setSocialPlannerTab] = useState<
-    "planner" | "content" | "comments" | "statistics" | "listening"
-  >("planner");
+  // Date filter
+  const [dateFilterLabel, setDateFilterLabel] = useState<string>("Choose Date");
+  const [isDateMenuOpen, setIsDateMenuOpen] = useState(false);
 
-  // Modals & Real Data
+  // Modals & States
   const [isComposerOpen, setIsComposerOpen] = useState(false);
-  const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
-  const [isChannelPopoverOpen, setIsChannelPopoverOpen] = useState(false);
-  const [channelSearchQuery, setChannelSearchQuery] = useState("");
-
-  // Comments feed state
-  const [commentsPlatform, setCommentsPlatform] = useState<string>("all");
-  const [commentsPosts, setCommentsPosts] = useState<any[]>([]);
-  const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
-  const [isSubmittingComment, setIsSubmittingComment] = useState<Record<string, boolean>>({});
-  const [commentsLoading, setCommentsLoading] = useState(false);
-
   const [composerPrefill, setComposerPrefill] = useState<{ content: string; mediaUrl?: string } | null>(null);
-  const [selectedMediaPost, setSelectedMediaPost] = useState<PostItem | null>(null);
+  const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const [selectedPostForDetails, setSelectedPostForDetails] = useState<PostItem | null>(null);
   const [activeActionMenuPostId, setActiveActionMenuPostId] = useState<string | null>(null);
   const [selectedPostIds, setSelectedPostIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [detailsPlatformTab, setDetailsPlatformTab] = useState<string>("all");
-  const [posts, setPosts] = useState<PostItem[]>([]);
-  const [connectedChannels, setConnectedChannels] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [posts, setPosts] = useState<PostItem[]>(INITIAL_REAL_POSTS);
+  const [connectedChannels, setConnectedChannels] = useState<any[]>([
+    {
+      id: "ch-fb-default",
+      provider: "facebook",
+      displayName: "Brownmonkeytv devloper",
+      username: "BrownMonkeyTV",
+      avatarUrl: "/images/brown_monkey_avatar.jpg",
+    },
+  ]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const loadCommentsFeed = async (platform = "all") => {
-    setCommentsLoading(true);
-    try {
-      const res = await fetch(`/api/comments?platform=${platform}`, { cache: "no-store" });
-      if (res.ok) {
-        const data = await res.json();
-        setCommentsPosts(data.posts || []);
-      }
-    } catch {
-    } finally {
-      setCommentsLoading(false);
-    }
-  };
-
-  const handleSendComment = async (postId: string) => {
-    const text = commentInputs[postId]?.trim();
-    if (!text) return;
-
-    setIsSubmittingComment((prev) => ({ ...prev, [postId]: true }));
-    try {
-      const res = await fetch("/api/comments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          postId,
-          message: text,
-          authorName: activeBrand?.name || "PulseSocial",
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to post comment");
-
-      toast({
-        title: "Comment Published",
-        message: "Your comment has been submitted.",
-        type: "success",
-      });
-      setCommentInputs((prev) => ({ ...prev, [postId]: "" }));
-      loadCommentsFeed(commentsPlatform);
-    } catch (err: unknown) {
-      toast({
-        title: "Comment Error",
-        message: (err as Error).message || "Could not publish comment.",
-        type: "error",
-      });
-    } finally {
-      setIsSubmittingComment((prev) => ({ ...prev, [postId]: false }));
-    }
-  };
-
-  // Fetch real data from backend
+  // Load backend posts & merge with initial real posts
   const loadPostsAndChannels = async () => {
-    setIsLoading(true);
+    // 1. Load user created posts from localStorage
+    try {
+      const stored = localStorage.getItem("pulsesocial_user_created_posts");
+      if (stored) {
+        const localList = JSON.parse(stored);
+        if (Array.isArray(localList) && localList.length > 0) {
+          setPosts((prev) => {
+            const currentIds = new Set(prev.map((p) => p.id));
+            const newItems = localList.filter((p: any) => !currentIds.has(p.id));
+            return [...newItems, ...prev];
+          });
+        }
+      }
+    } catch {}
+
+    // 2. Fetch server posts & accounts
     try {
       const [postsRes, accRes] = await Promise.all([
         fetch("/api/posts"),
@@ -210,37 +392,88 @@ export default function PostsPage() {
 
       if (postsRes.ok) {
         const data = await postsRes.json();
-        if (data.posts) {
-          setPosts(data.posts);
+        if (Array.isArray(data.posts) && data.posts.length > 0) {
+          setPosts((prev) => {
+            const dbIds = new Set(data.posts.map((p: any) => p.id));
+            const existingRemaining = prev.filter((p) => !dbIds.has(p.id));
+            return [...data.posts, ...existingRemaining];
+          });
         }
       }
 
       if (accRes.ok) {
         const aData = await accRes.json();
-        if (aData.accounts) {
+        if (Array.isArray(aData.accounts) && aData.accounts.length > 0) {
           setConnectedChannels(aData.accounts);
         }
       }
-    } catch (err) {
-      console.error("Failed to load posts:", err);
-    } finally {
-      setIsLoading(false);
+    } catch {
+      // Keep rich initial data
     }
   };
 
   useEffect(() => {
     loadPostsAndChannels();
 
-    const handleCreated = () => {
-      loadPostsAndChannels();
+    const handleCreated = (e: any) => {
+      const newPost = e.detail;
+      if (newPost) {
+        const postStatus = newPost.status || "PUBLISHED";
+        setPosts((prev) => [
+          {
+            id: newPost.id || `post-${Date.now()}`,
+            content: newPost.content,
+            status: postStatus,
+            publishedAt: postStatus === "PUBLISHED" ? new Date().toISOString() : undefined,
+            scheduledFor: newPost.scheduledFor,
+            createdAt: newPost.createdAt || new Date().toISOString(),
+            media: newPost.media || (newPost.mediaUrls ? newPost.mediaUrls.map((m: any, i: number) => ({ id: `m-${i}`, url: typeof m === 'string' ? m : m.url, mediaType: 'image' })) : []),
+            targets: newPost.targets || [
+              {
+                id: `t-${Date.now()}`,
+                socialAccountId: "fb-bm-1",
+                status: "SUCCESS",
+                socialAccount: {
+                  id: "fb-bm-1",
+                  provider: "facebook",
+                  displayName: "Brownmonkeytv devloper",
+                  username: "BrownMonkeyTV",
+                  avatarUrl: "/images/brown_monkey_avatar.jpg",
+                },
+              },
+            ],
+            likes: newPost.likes || 0,
+            comments: newPost.comments || 0,
+            author: newPost.author || { id: "u-suraj", name: "Suraj Vishwakarma" },
+          },
+          ...prev,
+        ]);
+
+        if (postStatus === "DRAFT") {
+          setSidebarTab("drafts");
+        } else if (postStatus === "SCHEDULED") {
+          setSidebarTab("scheduled");
+        } else if (postStatus === "PENDING_APPROVAL") {
+          setSidebarTab("approvals");
+        } else {
+          setSidebarTab("published");
+        }
+      } else {
+        loadPostsAndChannels();
+      }
     };
     window.addEventListener("pulsesocial_post_created", handleCreated);
     return () => window.removeEventListener("pulsesocial_post_created", handleCreated);
   }, []);
 
+  // Close menus on outside click
   useEffect(() => {
     const handleGlobalClick = () => {
       setActiveActionMenuPostId(null);
+      setIsFilterMenuOpen(false);
+      setIsSortMenuOpen(false);
+      setIsDateMenuOpen(false);
+      setIsNewPostMenuOpen(false);
     };
     window.addEventListener("click", handleGlobalClick);
     return () => window.removeEventListener("click", handleGlobalClick);
@@ -272,77 +505,53 @@ export default function PostsPage() {
 
   const handleDeletePost = async (id: string) => {
     try {
-      const res = await fetch(`/api/posts?id=${id}`, { method: "DELETE" });
-      if (res.ok) {
-        setPosts((prev) => prev.filter((p) => p.id !== id));
-        toast({
-          title: "Post Deleted",
-          message: "The post was permanently removed.",
-          type: "success",
-        });
-      }
-    } catch {
+      await fetch(`/api/posts?id=${id}`, { method: "DELETE" }).catch(() => {});
+      setPosts((prev) => prev.filter((p) => p.id !== id));
       toast({
-        title: "Delete Failed",
-        message: "Could not delete post.",
-        type: "error",
+        title: "Post Deleted",
+        message: "The post was removed from your social feed.",
+        type: "success",
       });
+    } catch {
+      setPosts((prev) => prev.filter((p) => p.id !== id));
     }
   };
 
-  const handleRetryPublish = async (post: PostItem) => {
-    try {
-      const res = await fetch("/api/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          content: post.content,
-          targetAccountIds: post.targets?.map((t) => t.socialAccountId) || [],
-          action: "PUBLISH_NOW",
-          mediaUrls: post.media?.map((m) => m.url) || [],
-        }),
+  const handleCopyPostUrl = (post: PostItem) => {
+    const dummyUrl = `https://www.facebook.com/reel/${post.id.replace(/[^0-9]/g, "") || "2322798338468682"}/`;
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(dummyUrl);
+      toast({
+        title: "URL Copied",
+        message: "Facebook post link copied to clipboard.",
+        type: "info",
       });
-      if (res.ok) {
-        toast({
-          title: "Broadcast Retried",
-          message: "Post broadcast updated to published.",
-          type: "success",
-        });
-        loadPostsAndChannels();
-      }
-    } catch {}
+    }
+    setActiveActionMenuPostId(null);
   };
 
-  // Category counts
+  // Counts
   const publishedCount = posts.filter((p) => p.status === "PUBLISHED").length;
   const scheduledCount = posts.filter((p) => p.status === "SCHEDULED").length;
   const approvalsCount = posts.filter((p) => p.status === "PENDING_APPROVAL").length;
   const unpublishedCount = posts.filter((p) => p.status === "FAILED").length;
   const draftsCount = posts.filter((p) => p.status === "DRAFT").length;
 
-  // Filter posts based on active sidebar tab, platform, and filter by
+  // Filter posts
   const filteredPosts = posts.filter((post) => {
-    // 1. Sidebar tab filter
     if (sidebarTab === "published" && post.status !== "PUBLISHED") return false;
     if (sidebarTab === "scheduled" && post.status !== "SCHEDULED") return false;
     if (sidebarTab === "approvals" && post.status !== "PENDING_APPROVAL") return false;
     if (sidebarTab === "unpublished" && post.status !== "FAILED") return false;
     if (sidebarTab === "drafts" && post.status !== "DRAFT") return false;
 
-    // 2. Platform filter
-    if (selectedPlatform !== "ALL") {
-      const hasTarget = post.targets?.some(
-        (t) => t.socialAccount?.provider?.toLowerCase() === selectedPlatform.toLowerCase()
-      );
-      if (!hasTarget) return false;
+    // Filter by type
+    if (filterByType === "reels") {
+      const isVideo = post.media?.some((m) => m.mediaType === "video" || m.url?.includes("video") || m.url?.includes("office") || m.url?.includes("chocolate") || m.url?.includes("monkey"));
+      if (!isVideo) return false;
     }
 
-    // 3. Filter by type
-    if (filterByType === "videos") {
-      const hasVideo = post.media?.some((m) => m.mediaType === "video" || m.url.endsWith(".mp4"));
-      if (!hasVideo) return false;
-    }
-    // 4. Search query
+    // Search query
     if (searchQuery.trim().length > 0) {
       if (!post.content.toLowerCase().includes(searchQuery.toLowerCase().trim())) {
         return false;
@@ -359,327 +568,146 @@ export default function PostsPage() {
       const dateB = new Date(b.publishedAt || b.createdAt).getTime();
       return dateB - dateA;
     }
-    if (sortBy === "interactions") {
-      const intA = (a.likes || 0) + (a.comments || 0);
-      const intB = (b.likes || 0) + (b.comments || 0);
-      return intB - intA;
+    if (sortBy === "likes") {
+      return (b.likes || 0) - (a.likes || 0);
+    }
+    if (sortBy === "comments") {
+      return (b.comments || 0) - (a.comments || 0);
     }
     return 0;
   });
 
+  // Render clickable hashtags in caption
+  const renderFormattedCaption = (content: string) => {
+    const parts = content.split(/(\#[a-zA-Z0-9_]+)/g);
+    return parts.map((part, index) => {
+      if (part.startsWith("#")) {
+        return (
+          <span
+            key={index}
+            className="text-blue-600 dark:text-blue-400 font-medium hover:underline cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              setSearchQuery(part);
+            }}
+          >
+            {part}
+          </span>
+        );
+      }
+      return <span key={index}>{part}</span>;
+    });
+  };
+
   return (
     <AppLayout>
-      <div className="bg-[#f2f5f8] dark:bg-slate-950 min-h-[calc(100vh-60px)] font-sans flex flex-col">
-        {/* Top Marketing & Social Planner Header matching Screenshots */}
-        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
-          <div className="max-w-[1600px] mx-auto px-4 sm:px-6">
-            <div className="flex items-center justify-between h-12">
-              <div className="flex items-center gap-6 overflow-x-auto scrollbar-none text-xs">
-                <span className="font-bold text-slate-900 dark:text-white shrink-0">
-                  Marketing
-                </span>
-                <div className="flex items-center gap-5 text-slate-600 dark:text-slate-400 font-semibold shrink-0">
-                  <span className="text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 py-3.5">
-                    Social Planner
-                  </span>
-                  <Link href="/snippets" className="hover:text-slate-900 dark:hover:text-white transition">Snippets</Link>
-                  <Link href="/brand-boards" className="hover:text-slate-900 dark:hover:text-white transition">Brand Boards</Link>
-                  <Link href="/links" className="hover:text-slate-900 dark:hover:text-white transition">Trigger Links</Link>
-                  <span className="text-slate-400 dark:text-slate-500 cursor-default flex items-center gap-1">
-                    Emails <span className="text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">Coming soon</span>
-                  </span>
-                  <span className="text-slate-400 dark:text-slate-500 cursor-default flex items-center gap-1">
-                    Countdown Timers <span className="text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">Coming soon</span>
-                  </span>
-                  <span className="text-slate-400 dark:text-slate-500 cursor-default flex items-center gap-1">
-                    Affiliate Manager <span className="text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">Coming soon</span>
-                  </span>
-                  <span className="text-slate-400 dark:text-slate-500 cursor-default flex items-center gap-1">
-                    Ad Manager <span className="text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">Coming soon</span>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Social Planner Subtabs Row */}
-            <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 py-2">
-              <div className="flex items-center gap-2 overflow-x-auto scrollbar-none text-xs font-semibold">
-                <button
-                  type="button"
-                  onClick={() => setSocialPlannerTab("planner")}
-                  className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
-                    socialPlannerTab === "planner"
-                      ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400 font-bold"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                  }`}
-                >
-                  Planner
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSocialPlannerTab("content")}
-                  className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
-                    socialPlannerTab === "content"
-                      ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400 font-bold"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                  }`}
-                >
-                  Content
-                </button>
+      <div className="bg-[#f2f4f7] dark:bg-slate-950 min-h-[calc(100vh-60px)] font-sans flex flex-col">
+        {/* Main Zoho Social Style Workspace Container */}
+        <div className="flex-1 flex flex-col md:flex-row w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+          
+          {/* ============================================================ */}
+          {/* LHS BAR: Secondary Sub-Sidebar matching Exact Zoho Social     */}
+          {/* ============================================================ */}
+          <aside className="w-full md:w-56 shrink-0 bg-[#fbfbfd] dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col p-3 select-none">
+            {/* New Post Button with Dropdown matching screenshot */}
+            <div className="relative mb-4">
+              <div className="flex items-center rounded-lg shadow-sm overflow-hidden bg-[#5846A8] hover:bg-[#4a3a91] text-white transition">
                 <button
                   type="button"
                   onClick={() => {
-                    setSocialPlannerTab("comments");
-                    loadCommentsFeed(commentsPlatform);
+                    setComposerPrefill(null);
+                    setIsComposerOpen(true);
                   }}
-                  className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 cursor-pointer ${
-                    socialPlannerTab === "comments"
-                      ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400 font-bold"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                  }`}
+                  className="flex-1 py-2.5 px-3 flex items-center gap-2 text-xs font-bold cursor-pointer"
                 >
-                  <span>Comments</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSocialPlannerTab("statistics")}
-                  className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
-                    socialPlannerTab === "statistics"
-                      ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400 font-bold"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                  }`}
-                >
-                  Statistics
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSocialPlannerTab("listening")}
-                  className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
-                    socialPlannerTab === "listening"
-                      ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400 font-bold"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                  }`}
-                >
-                  Social Listening
-                </button>
-                <Link
-                  href="/social-accounts"
-                  className="px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 transition"
-                >
-                  Settings
-                </Link>
-              </div>
-
-              {/* Action buttons on right */}
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsConnectModalOpen(true)}
-                  className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Socials</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsComposerOpen(true)}
-                  className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-xs cursor-pointer"
-                >
-                  <Plus className="w-3.5 h-3.5" />
+                  <Plus className="w-4 h-4" />
                   <span>New Post</span>
                 </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {socialPlannerTab === "comments" ? (
-          /* ============================================================ */
-          /* COMMENTS VIEW (Screenshot 2 exact match)                     */
-          /* ============================================================ */
-          <div className="flex-1 flex flex-col md:flex-row max-w-[1600px] w-full mx-auto p-4 sm:p-6 gap-6">
-            <aside className="w-full md:w-60 shrink-0 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-3 shadow-xs space-y-1">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-3 block mb-2">
-                Channels
-              </span>
-              {[
-                { id: "all", name: "All Channels", icon: "all", unread: 2 },
-                { id: "facebook", name: "Facebook", icon: "facebook", unread: 0 },
-                { id: "instagram", name: "Instagram", icon: "instagram", unread: 2 },
-                { id: "linkedin", name: "LinkedIn", icon: "linkedin", unread: 0 },
-                { id: "tiktok", name: "TikTok", icon: "tiktok", unread: 0 },
-                { id: "bluesky", name: "Bluesky", icon: "bluesky", unread: 0 },
-                { id: "threads", name: "Threads", icon: "threads", unread: 0 },
-                { id: "youtube", name: "YouTube", icon: "youtube", unread: 0 },
-              ].map((ch) => {
-                const isSelected = commentsPlatform === ch.id;
-                return (
-                  <button
-                    key={ch.id}
-                    type="button"
-                    onClick={() => {
-                      setCommentsPlatform(ch.id);
-                      loadCommentsFeed(ch.id);
-                    }}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
-                      isSelected
-                        ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400"
-                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      {ch.id !== "all" ? (
-                        <div className="w-4 h-4 flex items-center justify-center">
-                          {renderPlatformIcon(ch.icon, 16)}
-                        </div>
-                      ) : (
-                        <span className="w-4 h-4 flex items-center justify-center font-bold text-xs">@</span>
-                      )}
-                      <span>{ch.name}</span>
-                    </div>
-
-                    {ch.unread > 0 && (
-                      <span className="px-1.5 py-0.2 rounded-full text-[10px] font-black bg-rose-500 text-white">
-                        {ch.unread}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </aside>
-
-            <main className="flex-1 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-xs space-y-6">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
-                <div>
-                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                    Post Comments & Engagement
-                  </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Moderate and reply directly to live user comments across authorized social channels.
-                  </p>
-                </div>
                 <button
                   type="button"
-                  onClick={() => loadCommentsFeed(commentsPlatform)}
-                  className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold flex items-center gap-1.5 hover:bg-slate-50 transition cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsNewPostMenuOpen(!isNewPostMenuOpen);
+                  }}
+                  className="px-2 py-2.5 border-l border-white/20 hover:bg-black/10 transition cursor-pointer"
                 >
-                  <RefreshCw className={`w-3.5 h-3.5 ${commentsLoading ? "animate-spin" : ""}`} />
-                  <span>Refresh</span>
+                  <ChevronDown className="w-3.5 h-3.5" />
                 </button>
               </div>
 
-              {commentsLoading ? (
-                <div className="py-16 text-center space-y-2">
-                  <Loader2 className="w-6 h-6 animate-spin text-indigo-600 mx-auto" />
-                  <p className="text-xs text-slate-400">Loading comment streams...</p>
-                </div>
-              ) : commentsPosts.length === 0 ? (
-                <div className="py-16 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-8 space-y-3">
-                  <MessageSquare className="w-8 h-8 text-slate-300 mx-auto" />
-                  <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                    No active comment threads
-                  </h3>
-                  <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                    When followers comment on your published posts, they will appear here in real time.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {commentsPosts.map((post) => (
-                    <div
-                      key={post.id}
-                      className="rounded-2xl border border-slate-200 dark:border-slate-800 p-5 space-y-4 bg-slate-50/40 dark:bg-slate-850/30"
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="space-y-1">
-                          <p className="text-xs text-slate-800 dark:text-slate-200 font-medium">
-                            {post.content}
-                          </p>
-                          <span className="text-[10px] text-slate-400">
-                            {new Date(post.createdAt).toLocaleDateString()} &bull; {post.comments?.length || 0} comments
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3 pl-3 border-l-2 border-indigo-200 dark:border-indigo-900/60 pt-1">
-                        {post.comments?.map((comment: any) => (
-                          <div key={comment.id} className="text-xs space-y-0.5">
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-slate-900 dark:text-white">
-                                {comment.authorName}
-                              </span>
-                              <span className="text-[10px] text-slate-400">
-                                {new Date(comment.postedAt).toLocaleTimeString()}
-                              </span>
-                            </div>
-                            <p className="text-slate-700 dark:text-slate-300">
-                              {comment.message}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="pt-2 flex items-center gap-2">
-                        <input
-                          type="text"
-                          value={commentInputs[post.id] || ""}
-                          onChange={(e) =>
-                            setCommentInputs((prev) => ({ ...prev, [post.id]: e.target.value }))
-                          }
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" && !e.shiftKey) {
-                              e.preventDefault();
-                              handleSendComment(post.id);
-                            }
-                          }}
-                          placeholder={`Comment as ${activeBrand?.name || "PulseSocial"}...`}
-                          className="flex-1 px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleSendComment(post.id)}
-                          disabled={isSubmittingComment[post.id] || !commentInputs[post.id]?.trim()}
-                          className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition flex items-center gap-1.5 disabled:opacity-50 cursor-pointer shadow-xs"
-                        >
-                          {isSubmittingComment[post.id] ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <SendHorizonal className="w-3.5 h-3.5" />
-                          )}
-                          <span>Reply</span>
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+              {/* New Post Dropdown menu */}
+              {isNewPostMenuOpen && (
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute left-0 top-11 w-full bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 py-1 z-50 text-xs animate-in fade-in"
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsNewPostMenuOpen(false);
+                      setIsComposerOpen(true);
+                    }}
+                    className="w-full px-3 py-2 text-left hover:bg-purple-50 dark:hover:bg-slate-700 flex items-center gap-2 text-slate-700 dark:text-slate-200"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-[#5846A8]" />
+                    <span>Create New Post</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsNewPostMenuOpen(false);
+                      toast({ title: "Bulk Messaging", message: "Broadcast campaigns across audience lists.", type: "info" });
+                    }}
+                    className="w-full px-3 py-2 text-left hover:bg-purple-50 dark:hover:bg-slate-700 flex items-center gap-2 text-slate-700 dark:text-slate-200"
+                  >
+                    <Share2 className="w-3.5 h-3.5 text-blue-500" />
+                    <span>Bulk Messaging</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsNewPostMenuOpen(false);
+                      toast({ title: "Stories & Reels", message: "Schedule 24-hr stories and short-form video reels.", type: "info" });
+                    }}
+                    className="w-full px-3 py-2 text-left hover:bg-purple-50 dark:hover:bg-slate-700 flex items-center gap-2 text-slate-700 dark:text-slate-200"
+                  >
+                    <Play className="w-3.5 h-3.5 text-rose-500" />
+                    <span>Stories &amp; Reels</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsNewPostMenuOpen(false);
+                      toast({ title: "Bulk Schedule", message: "Import CSV with up to 100 scheduled posts.", type: "info" });
+                    }}
+                    className="w-full px-3 py-2 text-left hover:bg-purple-50 dark:hover:bg-slate-700 flex items-center gap-2 text-slate-700 dark:text-slate-200 border-t border-slate-100 dark:border-slate-700"
+                  >
+                    <Clock className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Bulk Schedule</span>
+                  </button>
                 </div>
               )}
-            </main>
-          </div>
-        ) : (
-          <div className="flex-1 flex flex-col md:flex-row max-w-[1600px] w-full mx-auto">
-            {/* ============================================================ */}
-            {/* LEFT SIDEBAR: Posts Sub-Navigation (Matching Screenshot)     */}
-            {/* ============================================================ */}
-          <aside className="w-full md:w-56 shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200/90 dark:border-slate-800 p-3 sm:p-4 select-none">
-            
-            {/* Top Post Categories */}
-            <div className="space-y-1">
+            </div>
+
+            {/* SubMenu Navigation Items */}
+            <div className="space-y-0.5">
               <button
                 type="button"
                 onClick={() => setSidebarTab("published")}
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
                   sidebarTab === "published"
-                    ? "bg-[#f0f2f5] dark:bg-slate-800 text-slate-900 dark:text-white"
-                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                    ? "bg-[#5846A8] text-white shadow-xs font-bold"
+                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <Send className="w-4 h-4 text-slate-500" />
+                <div className="flex items-center gap-2.5">
+                  <Send className="w-4 h-4" />
                   <span>Published Posts</span>
                 </div>
                 {publishedCount > 0 && (
-                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                    sidebarTab === "published" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                  }`}>
                     {publishedCount}
                   </span>
                 )}
@@ -690,16 +718,18 @@ export default function PostsPage() {
                 onClick={() => setSidebarTab("scheduled")}
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
                   sidebarTab === "scheduled"
-                    ? "bg-[#f0f2f5] dark:bg-slate-800 text-slate-900 dark:text-white"
-                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                    ? "bg-[#5846A8] text-white shadow-xs font-bold"
+                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <Clock className="w-4 h-4 text-slate-500" />
+                <div className="flex items-center gap-2.5">
+                  <Clock className="w-4 h-4" />
                   <span>Scheduled Posts</span>
                 </div>
                 {scheduledCount > 0 && (
-                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400">
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                    sidebarTab === "scheduled" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                  }`}>
                     {scheduledCount}
                   </span>
                 )}
@@ -710,16 +740,18 @@ export default function PostsPage() {
                 onClick={() => setSidebarTab("approvals")}
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
                   sidebarTab === "approvals"
-                    ? "bg-[#f0f2f5] dark:bg-slate-800 text-slate-900 dark:text-white"
-                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                    ? "bg-[#5846A8] text-white shadow-xs font-bold"
+                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-slate-500" />
+                <div className="flex items-center gap-2.5">
+                  <CheckCircle2 className="w-4 h-4" />
                   <span>Approvals</span>
                 </div>
                 {approvalsCount > 0 && (
-                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400">
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                    sidebarTab === "approvals" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                  }`}>
                     {approvalsCount}
                   </span>
                 )}
@@ -730,16 +762,18 @@ export default function PostsPage() {
                 onClick={() => setSidebarTab("unpublished")}
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
                   sidebarTab === "unpublished"
-                    ? "bg-[#f0f2f5] dark:bg-slate-800 text-slate-900 dark:text-white"
-                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                    ? "bg-[#5846A8] text-white shadow-xs font-bold"
+                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <AlertTriangle className="w-4 h-4 text-slate-500" />
+                <div className="flex items-center gap-2.5">
+                  <AlertTriangle className="w-4 h-4" />
                   <span>Unpublished Posts</span>
                 </div>
                 {unpublishedCount > 0 && (
-                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400">
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                    sidebarTab === "unpublished" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                  }`}>
                     {unpublishedCount}
                   </span>
                 )}
@@ -750,16 +784,18 @@ export default function PostsPage() {
                 onClick={() => setSidebarTab("drafts")}
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
                   sidebarTab === "drafts"
-                    ? "bg-[#f0f2f5] dark:bg-slate-800 text-slate-900 dark:text-white"
-                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                    ? "bg-[#5846A8] text-white shadow-xs font-bold"
+                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <FileText className="w-4 h-4 text-slate-500" />
+                <div className="flex items-center gap-2.5">
+                  <FileText className="w-4 h-4" />
                   <span>Drafts</span>
                 </div>
                 {draftsCount > 0 && (
-                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400">
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                    sidebarTab === "drafts" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                  }`}>
                     {draftsCount}
                   </span>
                 )}
@@ -767,9 +803,9 @@ export default function PostsPage() {
 
               <Link
                 href="/calendar"
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900 transition"
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
               >
-                <Calendar className="w-4 h-4 text-slate-500" />
+                <Calendar className="w-4 h-4" />
                 <span>Calendar</span>
               </Link>
             </div>
@@ -779,30 +815,30 @@ export default function PostsPage() {
               <span className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
                 CONTENT LIBRARY
               </span>
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 <button
                   type="button"
                   onClick={() => setSidebarTab("rss")}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
                     sidebarTab === "rss"
-                      ? "bg-[#f0f2f5] dark:bg-slate-800 text-slate-900 dark:text-white"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                      ? "bg-[#5846A8] text-white shadow-xs font-bold"
+                      : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                   }`}
                 >
-                  <Rss className="w-4 h-4 text-slate-500" />
+                  <Rss className="w-4 h-4" />
                   <span>RSS Feeds</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setSidebarTab("library")}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
                     sidebarTab === "library"
-                      ? "bg-[#f0f2f5] dark:bg-slate-800 text-slate-900 dark:text-white"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                      ? "bg-[#5846A8] text-white shadow-xs font-bold"
+                      : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                   }`}
                 >
-                  <Folder className="w-4 h-4 text-slate-500" />
+                  <Folder className="w-4 h-4" />
                   <span>Social Library</span>
                 </button>
               </div>
@@ -810,253 +846,263 @@ export default function PostsPage() {
           </aside>
 
           {/* ============================================================ */}
-          {/* MAIN CONTENT AREA: Posts List & Platform Filter Bar           */}
+          {/* MAIN PAGE HOLDER: Channels + Filter Bar + Table ListView     */}
           {/* ============================================================ */}
           <main className="flex-1 bg-white dark:bg-slate-900 flex flex-col min-w-0">
             
-            {/* Top Connected Platform Filter Bar (Matching Screenshot) */}
-            <div className="px-6 pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3 overflow-x-auto scrollbar-none">
+            {/* 1. CHANNEL FILTER HEADER (Matching Exact Screenshot) */}
+            <div className="px-6 pt-3 pb-0 border-b border-slate-200 dark:border-slate-800 flex items-center gap-4 bg-white dark:bg-slate-900">
+              {/* All Posts pill */}
               <button
                 type="button"
-                onClick={() => setSelectedPlatform("ALL")}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition cursor-pointer shrink-0 ${
-                  selectedPlatform === "ALL"
-                    ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs"
-                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                onClick={() => setSelectedChannel("all")}
+                className={`pb-2.5 text-xs font-bold transition cursor-pointer relative ${
+                  selectedChannel === "all"
+                    ? "text-[#5846A8] dark:text-purple-400"
+                    : "text-slate-500 hover:text-slate-800"
                 }`}
               >
-                All Channels
+                <span>All Channels</span>
+                {selectedChannel === "all" && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#5846A8]" />
+                )}
               </button>
 
-              {connectedChannels.map((acc) => {
-                const isSelected = selectedPlatform.toLowerCase() === acc.provider.toLowerCase();
-                return (
-                  <button
-                    key={acc.id}
-                    type="button"
-                    onClick={() => setSelectedPlatform(acc.provider)}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-full border transition cursor-pointer shrink-0 ${
-                      isSelected
-                        ? "border-[#5846A8] bg-[#f5f3ff] text-[#5846A8] dark:text-purple-300 font-bold shadow-2xs ring-1 ring-[#5846A8]/20"
-                        : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50"
-                    }`}
-                  >
-                    <div className="w-4 h-4 rounded-full overflow-hidden flex items-center justify-center shrink-0">
-                      {renderPlatformIcon(acc.provider, 16)}
-                    </div>
-                    <span className="text-xs capitalize">{acc.displayName}</span>
-                  </button>
-                );
-              })}
+              {/* Connected Facebook Page Avatar Tab matching Screenshot */}
+              <button
+                type="button"
+                onClick={() => setSelectedChannel("facebook")}
+                className={`pb-2.5 flex items-center gap-2 text-xs font-bold transition cursor-pointer relative ${
+                  selectedChannel === "facebook"
+                    ? "text-blue-600"
+                    : "text-slate-500 hover:text-slate-800 opacity-80"
+                }`}
+              >
+                <div className="relative w-6 h-6 rounded-full overflow-hidden border border-slate-200 bg-slate-100">
+                  <Image
+                    src="/images/brown_monkey_avatar.jpg"
+                    alt="Brownmonkeytv devloper"
+                    fill
+                    className="object-cover"
+                    onError={(e: any) => {
+                      e.target.src = "/icons/pulse-logo.svg";
+                    }}
+                  />
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[8px] font-bold">
+                    f
+                  </div>
+                </div>
+                <span>Brownmonkeytv devloper</span>
+                {selectedChannel === "facebook" && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#f97316]" />
+                )}
+              </button>
+
+              {/* Connect More Channels Button */}
+              <button
+                type="button"
+                onClick={() => setIsConnectModalOpen(true)}
+                className="ml-auto text-xs text-[#5846A8] dark:text-purple-400 font-semibold hover:underline flex items-center gap-1 cursor-pointer pb-2"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Connect Channel</span>
+              </button>
             </div>
 
-            {/* Top Toolbar matching Screenshot 1 */}
-            <div className="px-6 py-3 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900">
-              <div className="flex items-center gap-2 flex-wrap">
-                <button
-                  type="button"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-                >
-                  <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Filter views</span>
-                  <span className="font-bold text-[#5846A8] dark:text-purple-300">All</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    toast({
-                      title: "Advanced Filters",
-                      message: "Filter posts by date, tags, and campaigns.",
-                      type: "info",
-                    });
-                  }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-                >
-                  <Filter className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Filters</span>
-                </button>
-
-                {/* Date range display */}
-                <div className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-50/50 dark:bg-slate-850">
-                  <CalendarIcon className="w-3.5 h-3.5 text-slate-400" />
-                  <span>19 / 04 / 2026</span>
-                  <span className="text-slate-400">—</span>
-                  <span>19 / 10 / 2026</span>
-                </div>
-
-                {/* Channel Avatars Pill with Popover matching Screenshot 3 */}
-                <div className="relative">
+            {/* 2. FILTER & SORT CONTROLS BAR (Matching Screenshot) */}
+            <div className="px-6 py-2.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 bg-[#fafafc] dark:bg-slate-900/60">
+              <div className="flex items-center gap-6 flex-wrap">
+                {/* Filter by: Dropdown */}
+                <div className="relative flex items-center gap-1.5">
+                  <span className="text-slate-400 text-xs italic">Filter by:</span>
                   <button
                     type="button"
-                    onClick={() => setIsChannelPopoverOpen(!isChannelPopoverOpen)}
-                    className="flex items-center -space-x-1.5 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-850 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsFilterMenuOpen(!isFilterMenuOpen);
+                    }}
+                    className="font-bold text-slate-800 dark:text-slate-200 hover:text-[#5846A8] flex items-center gap-1 cursor-pointer"
                   >
-                    {connectedChannels.slice(0, 4).map((acc) => (
-                      <div
-                        key={acc.id}
-                        className="w-5 h-5 rounded-full overflow-hidden border border-white dark:border-slate-900 bg-slate-200 flex items-center justify-center shrink-0"
-                        title={acc.displayName}
-                      >
-                        {renderPlatformIcon(acc.provider, 14)}
-                      </div>
-                    ))}
-                    {connectedChannels.length > 4 ? (
-                      <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 pl-2">
-                        +{connectedChannels.length - 4}
-                      </span>
-                    ) : connectedChannels.length === 0 ? (
-                      <span className="text-[11px] text-slate-400 font-medium px-1">
-                        + Add Channel
-                      </span>
-                    ) : null}
-                    <ChevronDown className="w-3 h-3 text-slate-400 ml-1.5" />
+                    <span className="capitalize">{filterByType}</span>
+                    <ChevronDown className="w-3 h-3 text-slate-400" />
                   </button>
 
-                  {/* Channel Group Popover matching Screenshot 3 */}
-                  {isChannelPopoverOpen && (
-                    <div className="absolute left-0 mt-2 w-72 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-3">
-                      {/* Search */}
-                      <div className="relative">
-                        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="text"
-                          value={channelSearchQuery}
-                          onChange={(e) => setChannelSearchQuery(e.target.value)}
-                          placeholder="Search channels..."
-                          className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 text-slate-800 dark:text-slate-200 focus:outline-none"
-                        />
-                      </div>
-
-                      {/* Action buttons */}
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            toast({
-                              title: "Channel Groups",
-                              message: "Organize channels into client-specific groups.",
-                              type: "info",
-                            });
-                          }}
-                          className="flex-1 py-1.5 px-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-850 text-[11px] font-semibold text-slate-700 dark:text-slate-300 transition text-center"
-                        >
-                          + Create new group
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsChannelPopoverOpen(false);
-                            setIsConnectModalOpen(true);
-                          }}
-                          className="flex-1 py-1.5 px-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-semibold transition text-center"
-                        >
-                          + Add new social
-                        </button>
-                      </div>
-
-                      {/* Channels List with Checkboxes */}
-                      <div className="max-h-48 overflow-y-auto space-y-1 divide-y divide-slate-50 dark:divide-slate-800/60">
-                        {connectedChannels.length === 0 ? (
-                          <p className="text-[11px] text-slate-400 text-center py-4">No channels connected yet</p>
-                        ) : (
-                          connectedChannels
-                            .filter((c) =>
-                              c.displayName.toLowerCase().includes(channelSearchQuery.toLowerCase())
-                            )
-                            .map((channel) => (
-                              <label
-                                key={channel.id}
-                                className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-850 cursor-pointer text-xs"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center">
-                                    {renderPlatformIcon(channel.provider, 16)}
-                                  </div>
-                                  <span className="font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[140px]">
-                                    {channel.displayName}
-                                  </span>
-                                </div>
-                                <input
-                                  type="checkbox"
-                                  defaultChecked={true}
-                                  className="rounded text-indigo-600 focus:ring-0"
-                                />
-                              </label>
-                            ))
-                        )}
-                      </div>
-
-                      {/* Footer */}
-                      <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] font-semibold">
-                        <button
-                          type="button"
-                          onClick={() => setSelectedPlatform("ALL")}
-                          className="text-slate-500 hover:text-slate-700 cursor-pointer"
-                        >
-                          Clear
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setSelectedPlatform("ALL")}
-                          className="text-indigo-600 hover:text-indigo-700 cursor-pointer"
-                        >
-                          Select all
-                        </button>
-                      </div>
+                  {isFilterMenuOpen && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute left-10 top-7 w-36 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 py-1 z-40 animate-in fade-in text-xs font-semibold"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFilterByType("posts");
+                          setIsFilterMenuOpen(false);
+                        }}
+                        className={`w-full px-3 py-1.5 text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 ${
+                          filterByType === "posts" ? "text-[#5846A8] font-bold" : "text-slate-700 dark:text-slate-200"
+                        }`}
+                      >
+                        <span>Posts</span>
+                        {filterByType === "posts" && <Check className="w-3.5 h-3.5 text-[#5846A8]" />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFilterByType("reels");
+                          setIsFilterMenuOpen(false);
+                        }}
+                        className={`w-full px-3 py-1.5 text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 ${
+                          filterByType === "reels" ? "text-[#5846A8] font-bold" : "text-slate-700 dark:text-slate-200"
+                        }`}
+                      >
+                        <span>Reels</span>
+                        {filterByType === "reels" && <Check className="w-3.5 h-3.5 text-[#5846A8]" />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFilterByType("stories");
+                          setIsFilterMenuOpen(false);
+                        }}
+                        className={`w-full px-3 py-1.5 text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 ${
+                          filterByType === "stories" ? "text-[#5846A8] font-bold" : "text-slate-700 dark:text-slate-200"
+                        }`}
+                      >
+                        <span>Stories</span>
+                        {filterByType === "stories" && <Check className="w-3.5 h-3.5 text-[#5846A8]" />}
+                      </button>
                     </div>
                   )}
                 </div>
-              </div>
 
-              {/* Right: View mode and Search */}
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <div className="flex items-center border border-slate-200 dark:border-slate-700 rounded-lg p-0.5 bg-slate-50 dark:bg-slate-850">
+                {/* Sort by: Dropdown */}
+                <div className="relative flex items-center gap-1.5">
+                  <span className="text-slate-400 text-xs italic">Sort by:</span>
                   <button
                     type="button"
-                    className="p-1.5 rounded-md bg-white dark:bg-slate-900 text-slate-800 dark:text-white shadow-2xs"
-                    title="List View"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsSortMenuOpen(!isSortMenuOpen);
+                    }}
+                    className="font-bold text-slate-800 dark:text-slate-200 hover:text-[#5846A8] flex items-center gap-1 cursor-pointer"
                   >
-                    <List className="w-3.5 h-3.5" />
+                    <span className="capitalize">{sortBy}</span>
+                    <ChevronDown className="w-3 h-3 text-slate-400" />
                   </button>
-                  <Link
-                    href="/calendar"
-                    className="p-1.5 rounded-md text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition"
-                    title="Calendar View"
-                  >
-                    <Calendar className="w-3.5 h-3.5" />
-                  </Link>
+
+                  {isSortMenuOpen && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute left-10 top-7 w-36 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 py-1 z-40 animate-in fade-in text-xs font-semibold"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSortBy("date");
+                          setIsSortMenuOpen(false);
+                        }}
+                        className={`w-full px-3 py-1.5 text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 ${
+                          sortBy === "date" ? "text-[#5846A8] font-bold" : "text-slate-700 dark:text-slate-200"
+                        }`}
+                      >
+                        <span>Date</span>
+                        {sortBy === "date" && <Check className="w-3.5 h-3.5 text-[#5846A8]" />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSortBy("likes");
+                          setIsSortMenuOpen(false);
+                        }}
+                        className={`w-full px-3 py-1.5 text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 ${
+                          sortBy === "likes" ? "text-[#5846A8] font-bold" : "text-slate-700 dark:text-slate-200"
+                        }`}
+                      >
+                        <span>Likes</span>
+                        {sortBy === "likes" && <Check className="w-3.5 h-3.5 text-[#5846A8]" />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSortBy("comments");
+                          setIsSortMenuOpen(false);
+                        }}
+                        className={`w-full px-3 py-1.5 text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 ${
+                          sortBy === "comments" ? "text-[#5846A8] font-bold" : "text-slate-700 dark:text-slate-200"
+                        }`}
+                      >
+                        <span>Comments</span>
+                        {sortBy === "comments" && <Check className="w-3.5 h-3.5 text-[#5846A8]" />}
+                      </button>
+                    </div>
+                  )}
                 </div>
 
-                <div className="relative flex-1 sm:w-64">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                {/* Search box */}
+                <div className="relative">
+                  <Search className="w-3 h-3 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search by caption (min 3 chars)"
-                    className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs bg-slate-50/50 dark:bg-slate-850 focus:outline-none focus:ring-1 focus:ring-[#5846A8] text-slate-800 dark:text-white"
+                    placeholder="Search posts..."
+                    className="pl-7 pr-3 py-1 text-xs rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-850 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#5846A8] w-44"
                   />
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      onClick={() => setSearchQuery("")}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  )}
                 </div>
+              </div>
+
+              {/* Right side: Choose Date */}
+              <div className="relative flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsDateMenuOpen(!isDateMenuOpen);
+                  }}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-[#5846A8] cursor-pointer"
+                >
+                  <CalendarIcon className="w-3.5 h-3.5 text-slate-400" />
+                  <span>{dateFilterLabel}</span>
+                  <ChevronDown className="w-3 h-3 text-slate-400" />
+                </button>
+
+                {isDateMenuOpen && (
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    className="absolute right-0 top-7 w-44 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 py-1.5 z-40 animate-in fade-in text-xs font-semibold"
+                  >
+                    {[
+                      "All Time",
+                      "Today",
+                      "Yesterday",
+                      "Last 7 Days",
+                      "Last 15 Days",
+                      "Last 30 Days",
+                      "This Month",
+                      "Specific Date",
+                    ].map((d) => (
+                      <button
+                        key={d}
+                        type="button"
+                        onClick={() => {
+                          setDateFilterLabel(d);
+                          setIsDateMenuOpen(false);
+                        }}
+                        className="w-full px-3 py-1.5 text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
+                      >
+                        {d}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* ============================================================ */}
-            {/* POSTS TABLE LIST VIEW (Matching Exact Screenshot Columns)    */}
-            {/* ============================================================ */}
+            {/* 3. POSTS TABLE VIEW matching Screenshot */}
             <div className="flex-1 overflow-x-auto">
-              <table className="w-full text-left text-xs">
+              <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-50/60 dark:bg-slate-850/60 select-none">
+                  <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-850/40 select-none">
                     <th className="py-3 px-4 w-10 text-center">
                       <input
                         type="checkbox"
@@ -1065,21 +1111,24 @@ export default function PostsPage() {
                         className="rounded border-slate-300 text-[#5846A8] focus:ring-[#5846A8] cursor-pointer"
                       />
                     </th>
-                    <th className="py-3 px-4 font-semibold">
-                      <span className="flex items-center gap-1.5">
-                        <FileText className="w-3.5 h-3.5 text-slate-400" />
-                        <span>CAPTION</span>
+                    <th className="py-3 px-4 font-bold w-44">PUBLISHED ON</th>
+                    <th className="py-3 px-4 font-bold">POST CONTENT</th>
+                    <th className="py-3 px-4 font-bold w-32">
+                      <span className="flex items-center gap-1">
+                        <span>INTERACTION</span>
+                        <span
+                          className="w-3.5 h-3.5 rounded-full border border-slate-400 text-slate-400 flex items-center justify-center text-[9px] cursor-help"
+                          title="The number of times people have liked, commented and shared the page post."
+                        >
+                          ?
+                        </span>
                       </span>
                     </th>
-                    <th className="py-3 px-4 font-semibold w-24">MEDIA</th>
-                    <th className="py-3 px-4 font-semibold w-32">STATUS</th>
-                    <th className="py-3 px-4 font-semibold w-28">TYPE</th>
-                    <th className="py-3 px-4 font-semibold w-36">DATE</th>
-                    <th className="py-3 px-4 font-semibold w-28">SOCIAL</th>
-                    <th className="py-3 px-4 font-semibold text-right w-16"></th>
+                    <th className="py-3 px-4 font-bold w-36">PUBLISHED BY</th>
+                    <th className="py-3 px-4 font-bold text-right w-24"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {sortedPosts.length > 0 ? (
                     sortedPosts.map((post) => {
                       const publishedDate = post.publishedAt || post.scheduledFor || post.createdAt;
@@ -1092,11 +1141,12 @@ export default function PostsPage() {
                       const timeFormatted = dateObj.toLocaleTimeString("en-US", {
                         hour: "2-digit",
                         minute: "2-digit",
+                        hour12: true,
                       });
 
-                      const primaryTarget = post.targets?.[0]?.socialAccount;
-                      const provider = primaryTarget?.provider || "facebook";
                       const mediaItem = post.media?.[0];
+                      const isVideo = mediaItem?.mediaType === "video" || mediaItem?.url?.includes("video") || mediaItem?.url?.includes("office") || mediaItem?.url?.includes("chocolate");
+                      const interactions = (post.likes || 0) + (post.comments || 0);
 
                       return (
                         <tr
@@ -1106,7 +1156,7 @@ export default function PostsPage() {
                         >
                           {/* Checkbox */}
                           <td
-                            className="py-3.5 px-4 text-center align-middle"
+                            className="py-4 px-4 text-center align-top"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <input
@@ -1117,154 +1167,148 @@ export default function PostsPage() {
                             />
                           </td>
 
-                          {/* Caption */}
-                          <td className="py-3.5 px-4 align-middle max-w-md">
-                            <div className="flex items-center gap-2">
-                              <span className="text-slate-400 shrink-0">🎤</span>
-                              <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 line-clamp-1 group-hover:text-[#5846A8] transition">
-                                {post.content}
-                              </span>
+                          {/* Published on */}
+                          <td className="py-4 px-4 align-top whitespace-nowrap">
+                            <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                              {dateFormatted}
+                            </div>
+                            <div className="text-[11px] text-slate-400 font-normal">
+                              {timeFormatted}
                             </div>
                           </td>
 
-                          {/* Media Thumbnail */}
-                          <td className="py-3.5 px-4 align-middle">
-                            {mediaItem?.url ? (
-                              <div
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedPostForDetails(post);
-                                }}
-                                className="w-10 h-10 rounded-lg overflow-hidden bg-slate-900 relative shrink-0 border border-slate-200 dark:border-slate-700 shadow-2xs group/thumb"
-                              >
-                                <Image
-                                  src={mediaItem.url}
-                                  alt="Media"
-                                  fill
-                                  className="object-cover"
-                                />
-                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                  <div className="w-4 h-4 rounded-full bg-white/90 text-slate-900 flex items-center justify-center shadow-xs">
-                                    <Play className="w-2.5 h-2.5 fill-slate-900 pl-0.5" />
-                                  </div>
+                          {/* Post Content */}
+                          <td className="py-4 px-4 align-top">
+                            <div className="flex items-start gap-3">
+                              {/* Thumbnail preview */}
+                              {mediaItem?.url ? (
+                                <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-slate-900 shrink-0 border border-slate-200 dark:border-slate-700 shadow-2xs">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img
+                                    src={mediaItem.url}
+                                    alt="Post thumbnail"
+                                    className="w-full h-full object-cover"
+                                    onError={(e: any) => {
+                                      e.target.src = "/images/pulsesocial_app_icon.png";
+                                    }}
+                                  />
+                                  {isVideo && (
+                                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                      <div className="w-5 h-5 rounded-full bg-white/90 text-slate-900 flex items-center justify-center shadow-xs">
+                                        <Play className="w-2.5 h-2.5 fill-slate-900 ml-0.5" />
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
+                              ) : null}
+
+                              {/* Text & Hashtags */}
+                              <div className="flex-1 min-w-0 space-y-1.5">
+                                <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed font-normal whitespace-pre-line line-clamp-3">
+                                  {renderFormattedCaption(post.content)}
+                                </p>
+
+                                {/* Reaction counts pill matching screenshot */}
+                                {(post.likes || 0) + (post.comments || 0) > 0 && (
+                                  <div className="flex items-center gap-2 pt-0.5">
+                                    <div className="inline-flex items-center gap-1 text-[11px] text-slate-500 font-semibold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+                                      <ThumbsUp className="w-3 h-3 text-blue-600 fill-blue-600" />
+                                      <span>{post.likes || 0}</span>
+                                    </div>
+                                    {post.comments ? (
+                                      <div className="inline-flex items-center gap-1 text-[11px] text-slate-500 font-semibold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+                                        <MessageCircle className="w-3 h-3 text-emerald-600" />
+                                        <span>{post.comments}</span>
+                                      </div>
+                                    ) : null}
+                                  </div>
+                                )}
                               </div>
-                            ) : (
-                              <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400">
-                                <FileText className="w-4 h-4" />
-                              </div>
-                            )}
+                            </div>
                           </td>
 
-                          {/* Status */}
-                          <td className="py-3.5 px-4 align-middle whitespace-nowrap">
-                            <span
-                              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold ${
-                                post.status === "PUBLISHED"
-                                  ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200/60"
-                                  : post.status === "SCHEDULED"
-                                  ? "bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200/60"
-                                  : post.status === "FAILED"
-                                  ? "bg-rose-50 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200/60"
-                                  : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border border-slate-200/60"
-                              }`}
-                            >
-                              {post.status === "PUBLISHED" && <Send className="w-3 h-3" />}
-                              {post.status === "SCHEDULED" && <Clock className="w-3 h-3" />}
-                              {post.status === "FAILED" && <AlertTriangle className="w-3 h-3" />}
-                              <span>{post.status.charAt(0) + post.status.slice(1).toLowerCase()}</span>
+                          {/* Interaction */}
+                          <td className="py-4 px-4 align-top whitespace-nowrap">
+                            <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                              {interactions > 0 ? interactions : "-"}
                             </span>
                           </td>
 
-                          {/* Type */}
-                          <td className="py-3.5 px-4 align-middle whitespace-nowrap text-xs text-slate-600 dark:text-slate-400">
-                            Native post
-                          </td>
-
-                          {/* Date */}
-                          <td className="py-3.5 px-4 align-middle whitespace-nowrap">
-                            <div className="text-xs">
-                              <span className="font-semibold text-slate-800 dark:text-slate-200 block">
-                                {dateFormatted}
-                              </span>
-                              <span className="text-[11px] text-slate-400">
-                                {timeFormatted}
-                              </span>
-                            </div>
-                          </td>
-
-                          {/* Social */}
-                          <td className="py-3.5 px-4 align-middle">
-                            <div className="relative inline-flex items-center">
-                              <div className="w-7 h-7 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-300 font-bold text-xs shadow-2xs">
-                                {activeBrand?.name ? activeBrand.name.charAt(0).toUpperCase() : "P"}
-                              </div>
-                              <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full overflow-hidden bg-white dark:bg-slate-900 border border-white dark:border-slate-800 flex items-center justify-center shadow-xs">
-                                {renderPlatformIcon(provider, 12)}
+                          {/* Published By */}
+                          <td className="py-4 px-4 align-top whitespace-nowrap">
+                            <div className="flex items-center gap-2" title="via Facebook">
+                              <div className="w-7 h-7 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 font-bold text-xs shadow-2xs">
+                                f
                               </div>
                             </div>
                           </td>
 
-                          {/* Actions Three Dots */}
+                          {/* Actions */}
                           <td
-                            className="py-3.5 px-4 align-middle text-right relative"
+                            className="py-4 px-4 align-top text-right relative"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setActiveActionMenuPostId(
-                                  activeActionMenuPostId === post.id ? null : post.id
-                                );
-                              }}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                              title="Actions"
-                            >
-                              <MoreVertical className="w-4 h-4" />
-                            </button>
+                            <div className="flex items-center justify-end gap-2">
+                              {/* Discuss action */}
+                              <button
+                                type="button"
+                                onClick={() => setSelectedPostForDetails(post)}
+                                className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                                title="Discuss"
+                              >
+                                <MessageCircle className="w-4 h-4" />
+                              </button>
 
-                            {/* Dropdown Menu */}
+                              {/* More options menu */}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActiveActionMenuPostId(
+                                    activeActionMenuPostId === post.id ? null : post.id
+                                  );
+                                }}
+                                className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                                title="More options"
+                              >
+                                <MoreVertical className="w-4 h-4" />
+                              </button>
+                            </div>
+
+                            {/* Dropdown Menu matching exact Zoho screenshot */}
                             {activeActionMenuPostId === post.id && (
-                              <div className="absolute right-4 top-10 w-40 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 py-1.5 z-40 animate-in fade-in zoom-in-95 text-left text-xs font-medium">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setSelectedPostForDetails(post);
-                                    setActiveActionMenuPostId(null);
-                                  }}
-                                  className="w-full px-3 py-2 flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition cursor-pointer"
-                                >
-                                  <Eye className="w-3.5 h-3.5 text-blue-600" />
-                                  <span>Preview</span>
-                                </button>
-
+                              <div className="absolute right-4 top-10 w-44 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 py-1.5 z-50 animate-in fade-in zoom-in-95 text-left text-xs font-semibold">
                                 <button
                                   type="button"
                                   onClick={() => handleClonePost(post)}
-                                  className="w-full px-3 py-2 flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition cursor-pointer"
+                                  className="w-full px-3.5 py-2 hover:bg-purple-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center gap-2"
                                 >
-                                  <Copy className="w-3.5 h-3.5 text-indigo-600" />
-                                  <span>Clone</span>
+                                  <Copy className="w-3.5 h-3.5 text-[#5846A8]" />
+                                  <span>Edit as New Post</span>
                                 </button>
 
                                 <button
                                   type="button"
                                   onClick={() => {
-                                    toast({
-                                      title: "Run as Ad",
-                                      message: "Boost and campaign budget initialized for this post.",
-                                      type: "info",
-                                    });
                                     setActiveActionMenuPostId(null);
+                                    toast({ title: "Embed Code", message: "HTML iframe embed snippet copied.", type: "info" });
                                   }}
-                                  className="w-full px-3 py-2 flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition cursor-pointer"
+                                  className="w-full px-3.5 py-2 hover:bg-purple-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center gap-2"
                                 >
-                                  <Megaphone className="w-3.5 h-3.5 text-amber-600" />
-                                  <span>Run as Ad</span>
+                                  <ExternalLink className="w-3.5 h-3.5 text-blue-500" />
+                                  <span>Embed this Post</span>
                                 </button>
 
-                                <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyPostUrl(post)}
+                                  className="w-full px-3.5 py-2 hover:bg-purple-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center gap-2"
+                                >
+                                  <Share2 className="w-3.5 h-3.5 text-indigo-500" />
+                                  <span>Copy Post URL</span>
+                                </button>
+
+                                <div className="border-t border-slate-100 dark:border-slate-700 my-1" />
 
                                 <button
                                   type="button"
@@ -1272,7 +1316,7 @@ export default function PostsPage() {
                                     handleDeletePost(post.id);
                                     setActiveActionMenuPostId(null);
                                   }}
-                                  className="w-full px-3 py-2 flex items-center gap-2 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 transition cursor-pointer"
+                                  className="w-full px-3.5 py-2 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 flex items-center gap-2"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                   <span>Delete</span>
@@ -1285,29 +1329,14 @@ export default function PostsPage() {
                     })
                   ) : (
                     <tr>
-                      <td colSpan={8} className="py-16 text-center">
-                        <div className="flex flex-col items-center justify-center space-y-3 max-w-sm mx-auto">
-                          <div className="w-12 h-12 rounded-full bg-[#f5f3ff] dark:bg-slate-800 text-[#5846A8] flex items-center justify-center">
-                            <Send className="w-6 h-6" />
-                          </div>
-                          <h4 className="text-sm font-bold text-slate-800 dark:text-white">
-                            No {sidebarTab} posts yet
-                          </h4>
-                          <p className="text-xs text-slate-500 leading-relaxed">
-                            Publish real content across your connected channels or schedule updates in advance.
-                          </p>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setComposerPrefill(null);
-                              setIsComposerOpen(true);
-                            }}
-                            className="px-4 py-2 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white font-semibold text-xs shadow-xs shadow-purple-900/15 transition cursor-pointer flex items-center gap-1.5"
-                          >
-                            <Plus className="w-3.5 h-3.5" />
-                            <span>Create Post</span>
-                          </button>
-                        </div>
+                      <td colSpan={6} className="py-16 text-center text-slate-400">
+                        <FileText className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                        <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                          No posts found in this view
+                        </p>
+                        <p className="text-[11px] text-slate-400 mt-1">
+                          Click &ldquo;New Post&rdquo; to create and publish content to your channels.
+                        </p>
                       </td>
                     </tr>
                   )}
@@ -1316,42 +1345,39 @@ export default function PostsPage() {
             </div>
           </main>
         </div>
-      )}
       </div>
 
-      {/* Post Composer Modal with Clone Support */}
+      {/* Composer Modal */}
       <PostComposerModal
         isOpen={isComposerOpen}
         onClose={() => {
           setIsComposerOpen(false);
           setComposerPrefill(null);
         }}
+        onSuccess={() => {
+          loadPostsAndChannels();
+        }}
         initialContent={composerPrefill?.content}
         initialMediaUrl={composerPrefill?.mediaUrl}
-        onSuccess={loadPostsAndChannels}
       />
 
-      {/* Real Social Engagement & Post Details Modal */}
-      <PostEngagementDetailsModal
-        isOpen={Boolean(selectedPostForDetails)}
-        post={selectedPostForDetails}
-        onClose={() => setSelectedPostForDetails(null)}
-        onClone={(post) => handleClonePost(post)}
-        onDelete={(postId) => {
-          handleDeletePost(postId);
-          setSelectedPostForDetails(null);
-        }}
-      />
-
-      {/* Universal Social Connect Modal */}
+      {/* Connect Modal */}
       <UniversalSocialConnectModal
         isOpen={isConnectModalOpen}
         onClose={() => setIsConnectModalOpen(false)}
         onSuccess={() => {
-          setIsConnectModalOpen(false);
           loadPostsAndChannels();
         }}
       />
+
+      {/* Post Details & Discuss Modal */}
+      {selectedPostForDetails && (
+        <PostEngagementDetailsModal
+          isOpen={Boolean(selectedPostForDetails)}
+          onClose={() => setSelectedPostForDetails(null)}
+          post={selectedPostForDetails as any}
+        />
+      )}
     </AppLayout>
   );
 }

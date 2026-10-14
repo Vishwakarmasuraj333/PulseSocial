@@ -114,7 +114,7 @@ export function AddBrandModal({ isOpen, onClose }: AddBrandModalProps) {
                 <div className="flex items-center gap-1 border-b border-slate-200 pb-1">
                   <div className="w-1.5 h-1.5 rounded-full bg-rose-400" />
                   <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-purple-400" />
                 </div>
                 <div className="w-12 h-8 rounded bg-sky-100/70 mt-1" />
                 <div className="w-20 h-1.5 bg-slate-200 rounded" />
@@ -136,7 +136,7 @@ export function AddBrandModal({ isOpen, onClose }: AddBrandModalProps) {
 
               {/* Node badges */}
               <div className="absolute left-10 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border-2 border-slate-800 flex items-center justify-center shadow">
-                <span className="text-xs font-bold text-emerald-600">↑</span>
+                <span className="text-xs font-bold text-purple-600">↑</span>
               </div>
               <div className="absolute right-10 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border-2 border-slate-800 flex items-center justify-center shadow">
                 <span className="text-xs font-bold text-blue-600">+</span>

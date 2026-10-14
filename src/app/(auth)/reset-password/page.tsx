@@ -39,7 +39,7 @@ function ResetPasswordContent() {
 
     if (score <= 1) return { label: "Weak", color: "bg-rose-500", width: "33%" };
     if (score <= 3) return { label: "Medium", color: "bg-amber-500", width: "66%" };
-    return { label: "Strong", color: "bg-emerald-500", width: "100%" };
+    return { label: "Strong", color: "bg-purple-500", width: "100%" };
   };
 
   const strength = getPasswordStrength(password);
@@ -138,10 +138,10 @@ function ResetPasswordContent() {
 
           {isSuccess ? (
             <CardContent className="space-y-4 text-center py-6">
-              <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 mx-auto flex items-center justify-center animate-bounce">
+              <div className="w-12 h-12 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 mx-auto flex items-center justify-center animate-bounce">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
-              <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm">
+              <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 text-sm">
                 Password updated successfully! Redirecting you to sign in...
               </div>
               <Link
@@ -226,7 +226,7 @@ function ResetPasswordContent() {
                       <div className="flex items-center justify-between text-[11px]">
                         <span className="text-slate-400">Strength</span>
                         <span className={`font-semibold ${
-                          strength.label === "Strong" ? "text-emerald-400" :
+                          strength.label === "Strong" ? "text-purple-400" :
                           strength.label === "Medium" ? "text-amber-400" : "text-rose-400"
                         }`}>
                           {strength.label}

@@ -915,7 +915,7 @@ function SettingsContent() {
                         </button>
 
                         {photoUrl && (
-                          <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-900/60">
+                          <span className="text-[11px] text-purple-600 dark:text-purple-400 font-medium flex items-center gap-1 bg-purple-50 dark:bg-purple-950/40 px-2 py-0.5 rounded-full border border-purple-200/60 dark:border-purple-900/60">
                             <CheckCircle2 className="w-3.5 h-3.5" /> Live Synced
                           </span>
                         )}
@@ -965,7 +965,7 @@ function SettingsContent() {
                       <h3 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                         <span>Brand Cover Banner</span>
                         {activeBrand?.coverUrl && (
-                          <span className="text-[10px] text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full font-medium">
+                          <span className="text-[10px] text-purple-600 bg-purple-50 dark:bg-purple-950/40 px-2 py-0.5 rounded-full font-medium">
                             Active
                           </span>
                         )}
@@ -1138,8 +1138,8 @@ function SettingsContent() {
                       name: "WhatsApp Business",
                       desc: "Direct Customer Channels, Broadcast Messages & Verified Catalogs",
                       btnLabel: "Connect WhatsApp",
-                      btnClass: "bg-[#25D366] hover:bg-[#20ba59] text-white shadow-xs hover:shadow-md hover:shadow-emerald-500/25",
-                      cardBorder: "hover:border-emerald-400/50 hover:bg-emerald-50/20",
+                      btnClass: "bg-[#25D366] hover:bg-[#20ba59] text-white shadow-xs hover:shadow-md hover:shadow-purple-500/25",
+                      cardBorder: "hover:border-purple-400/50 hover:bg-purple-50/20",
                     },
                     {
                       platform: "reddit",
@@ -1201,7 +1201,7 @@ function SettingsContent() {
                                 {chan.name}
                               </h4>
                               {isConnected && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200 shrink-0">
                                   <Check className="w-2.5 h-2.5" /> Connected
                                 </span>
                               )}
@@ -1318,7 +1318,7 @@ function SettingsContent() {
                         <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
                           {integ.name}
                           {integ.connected && (
-                            <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">
+                            <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-purple-100 text-purple-700">
                               Active
                             </span>
                           )}
@@ -1417,7 +1417,7 @@ function SettingsContent() {
                             </span>
                           </td>
                           <td className="py-3 px-4">
-                            <span className={`text-[11px] font-semibold ${m.status === "Active" ? "text-emerald-600" : "text-amber-600"}`}>
+                            <span className={`text-[11px] font-semibold ${m.status === "Active" ? "text-purple-600" : "text-amber-600"}`}>
                               ● {m.status}
                             </span>
                           </td>
@@ -1471,7 +1471,7 @@ function SettingsContent() {
                           <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
                             {m.role}
                           </span>
-                          <span className={`text-[11px] font-semibold ${m.status === "Active" ? "text-emerald-600" : "text-amber-600"}`}>
+                          <span className={`text-[11px] font-semibold ${m.status === "Active" ? "text-purple-600" : "text-amber-600"}`}>
                             ● {m.status}
                           </span>
                         </div>

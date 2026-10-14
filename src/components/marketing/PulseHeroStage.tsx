@@ -159,64 +159,64 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
         </div>
 
         <h1 className="text-4xl sm:text-6xl lg:text-[68px] font-black text-slate-900 dark:text-white tracking-tight leading-[1.08]">
-          Manage all your social media. <br className="hidden sm:inline" />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#DF3024] via-[#F59E0B] to-[#6F52B5] dark:from-[#F87171] dark:via-[#FBBF24] dark:to-[#A78BDF]">
-            In one place.
+          Your Entire Social Media Workflow. <br className="hidden sm:inline" />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-500 dark:from-indigo-400 dark:via-purple-400 dark:to-sky-400">
+            One Powerful Platform.
           </span>
         </h1>
 
         <p className="text-base sm:text-xl lg:text-[21px] text-slate-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed font-normal">
-          PulseSocial helps businesses and agencies streamline publishing, engage with audiences, analyze performance, and grow brand presence across all social networks.
+          Plan, create, schedule, publish, monitor, and measure your social media performance from one organized workspace.
         </p>
 
         {/* Action Button Row */}
         <div className="pt-3 sm:pt-5 flex flex-wrap items-center justify-center gap-3.5 sm:gap-5">
-          <button
-            onClick={onBookDemo || (() => (window.location.href = "/contact"))}
-            className="px-8 sm:px-10 py-3.5 rounded-[6px] border-[2px] border-slate-900 dark:border-white text-slate-900 dark:text-white bg-white/90 dark:bg-slate-900/80 hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 shadow-md hover:shadow-2xl hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-sm"
-          >
-            BOOK A DEMO
-          </button>
-
           <Link
             href="/signup"
-            className="px-8 sm:px-10 py-3.5 rounded-[6px] bg-[#E42527] hover:bg-[#c81e20] text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 shadow-lg shadow-red-500/25 hover:shadow-red-500/50 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2 group"
+            className="px-8 sm:px-10 py-3.5 rounded-[8px] bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2 group"
           >
-            <span>GET STARTED</span>
+            <span>START FREE TRIAL</span>
             <span className="group-hover:translate-x-1 transition-transform">→</span>
+          </Link>
+
+          <Link
+            href="/features"
+            className="px-8 sm:px-10 py-3.5 rounded-[8px] border-[2px] border-slate-900 dark:border-white text-slate-900 dark:text-white bg-white/90 dark:bg-slate-900/80 hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 shadow-md hover:shadow-2xl hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-sm flex items-center gap-2"
+          >
+            <span>EXPLORE FEATURES</span>
           </Link>
         </div>
 
         {/* Guarantees Row with Checkmarks */}
         <div className="pt-2 flex flex-wrap items-center justify-center gap-3 sm:gap-5 text-xs text-slate-500 dark:text-slate-400 font-medium">
           <div className="flex items-center gap-1.5">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
             <span>15-day free trial</span>
           </div>
           <span className="hidden sm:inline text-slate-300 dark:text-slate-700">•</span>
           <div className="flex items-center gap-1.5">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
             <span>No credit card required</span>
           </div>
           <span className="hidden sm:inline text-slate-300 dark:text-slate-700">•</span>
           <div className="flex items-center gap-1.5">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
             <span>Instant setup in 60 seconds</span>
           </div>
         </div>
       </div>
 
       {/* ========================================================= */}
-      {/* 2. FULL-WIDTH MINT-GREEN FLOATING CARDS BANNER            */}
+      {/* 2. FULL-WIDTH PURPLE/LAVENDER FLOATING CARDS BANNER       */}
       {/* (100% Full Viewport Width, Edge-to-Edge)                  */}
       {/* ========================================================= */}
       <div
-        className="w-full bg-gradient-to-b from-[#E7FAF4] via-[#EFFBF7] to-[#E3F8F2] dark:from-[#06241D] dark:via-[#081F1A] dark:to-[#0A2620] border-t border-b border-[#D0ECE4] dark:border-emerald-900/40 py-12 sm:py-16 relative overflow-hidden select-none"
+        className="w-full bg-gradient-to-b from-[#F5F2FD] via-[#F8F5FE] to-[#F1ECFB] dark:from-[#18112C] dark:via-[#1B1432] dark:to-[#150F28] border-t border-b border-[#DDD3F4] dark:border-purple-900/40 py-12 sm:py-16 relative overflow-hidden select-none"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
         {/* Subtle ambient radial wash */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(167,243,208,0.4),transparent_75%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(167,139,223,0.3),transparent_75%)] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           {/* ------------------------------------------------------ */}
@@ -286,7 +286,7 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
                       {/* Hover Overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-3">
                         <span className="px-3 py-1 rounded-full bg-white/95 dark:bg-slate-900/95 text-slate-900 dark:text-white text-[11px] font-bold shadow-md flex items-center gap-1.5 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                          <Eye className="w-3 h-3 text-emerald-500" />
+                          <Eye className="w-3 h-3 text-[#5846A8] dark:text-purple-400" />
                           <span>Inspect Post</span>
                         </span>
                       </div>
@@ -327,7 +327,7 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
                       {/* Hover Overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-3">
                         <span className="px-3 py-1 rounded-full bg-white/95 dark:bg-slate-900/95 text-slate-900 dark:text-white text-[11px] font-bold shadow-md flex items-center gap-1.5 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                          <Eye className="w-3 h-3 text-emerald-500" />
+                          <Eye className="w-3 h-3 text-[#5846A8] dark:text-purple-400" />
                           <span>Inspect Post</span>
                         </span>
                       </div>
@@ -351,7 +351,7 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
                   : "bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-white"
               }`}
             >
-              <span className={`w-2 h-2 rounded-full ${activeSlide === 0 ? "bg-emerald-400 animate-pulse" : "bg-slate-400"}`} />
+              <span className={`w-2 h-2 rounded-full ${activeSlide === 0 ? "bg-purple-500 animate-pulse" : "bg-slate-400"}`} />
               <span>Core Networks</span>
             </button>
 
@@ -364,7 +364,7 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
                   : "bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-white"
               }`}
             >
-              <span className={`w-2 h-2 rounded-full ${activeSlide === 1 ? "bg-emerald-400 animate-pulse" : "bg-slate-400"}`} />
+              <span className={`w-2 h-2 rounded-full ${activeSlide === 1 ? "bg-purple-500 animate-pulse" : "bg-slate-400"}`} />
               <span>Messaging & Visual</span>
             </button>
           </div>
@@ -409,7 +409,7 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
                   <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                     <span>{previewPost.platform} {previewPost.networkTag}</span>
                     <span>&bull;</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Scheduled via SmartQ</span>
+                    <span className="text-[#5846A8] dark:text-purple-400 font-semibold">Scheduled via SmartQ</span>
                   </div>
                 </div>
               </div>
@@ -456,14 +456,14 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
                   <span>24</span>
                 </span>
 
-                <span className="flex items-center gap-1.5 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer hover:scale-105">
+                <span className="flex items-center gap-1.5 hover:text-[#5846A8] dark:hover:text-purple-400 transition-colors cursor-pointer hover:scale-105">
                   <Share2 className="w-4 h-4" />
                   <span>48</span>
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 font-bold text-[11px] shadow-xs">
+                <span className="px-2.5 py-1 rounded-full bg-purple-50 dark:bg-purple-950/80 text-[#5846A8] dark:text-purple-300 font-bold text-[11px] shadow-xs">
                   🚀 {previewPost.reach}
                 </span>
               </div>

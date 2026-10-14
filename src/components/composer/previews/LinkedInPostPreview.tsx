@@ -159,7 +159,7 @@ export function LinkedInPostPreview({
           <span className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">
             👍
           </span>
-          <span className="w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] -ml-1.5">
+          <span className="w-4 h-4 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] -ml-1.5">
             👏
           </span>
           <span className="ml-1">Publishing preview</span>

@@ -46,7 +46,7 @@ const SUITE_APPS = [
     description: "Comments, mentions & sentiment",
     icon: Inbox,
     href: "/inbox",
-    color: "bg-emerald-500/10 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white",
+    color: "bg-purple-500/10 text-purple-600 group-hover:bg-purple-500 group-hover:text-white",
   },
   {
     id: "calendar",

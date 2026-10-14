@@ -142,7 +142,7 @@ export default function TeamPage() {
               <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
                 <span className="text-slate-500 dark:text-slate-400 text-[11px] font-medium">{m.channels}</span>
                 {m.isApprover ? (
-                  <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold text-[11px]">
+                  <span className="inline-flex items-center gap-1 text-purple-600 font-semibold text-[11px]">
                     <CheckCircle2 className="w-3.5 h-3.5" /> Approver
                   </span>
                 ) : (
@@ -203,7 +203,7 @@ export default function TeamPage() {
 
                     <td className="p-4">
                       {m.isApprover ? (
-                        <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold">
+                        <span className="inline-flex items-center gap-1 text-purple-600 font-semibold">
                           <CheckCircle2 className="w-4 h-4" /> Authorized Approver
                         </span>
                       ) : (

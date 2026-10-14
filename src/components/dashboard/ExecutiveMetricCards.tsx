@@ -91,7 +91,7 @@ export function ExecutiveMetricCards({
 
           <div className="flex-1 space-y-1">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+              <span className="text-xs font-bold text-purple-600 dark:text-purple-400">
                 Grade A — Optimal
               </span>
             </div>
@@ -114,7 +114,7 @@ export function ExecutiveMetricCards({
           </div>
           <div>
             <span className="text-[10px] text-slate-400 block">Sentiment</span>
-            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">98%</span>
+            <span className="text-xs font-bold text-purple-600 dark:text-purple-400">98%</span>
           </div>
         </div>
       </div>
@@ -135,7 +135,7 @@ export function ExecutiveMetricCards({
             {formatNum(data.totalFollowers)}
           </div>
           <div className="flex items-center gap-1.5 mt-1">
-            <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+            <span className="inline-flex items-center gap-0.5 text-xs font-bold text-purple-600 dark:text-purple-400">
               <TrendingUp className="w-3.5 h-3.5" />
               +{data.followerGrowth}%
             </span>
@@ -179,7 +179,7 @@ export function ExecutiveMetricCards({
             {formatNum(data.totalReach)}
           </div>
           <div className="flex items-center gap-1.5 mt-1">
-            <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+            <span className="inline-flex items-center gap-0.5 text-xs font-bold text-purple-600 dark:text-purple-400">
               <TrendingUp className="w-3.5 h-3.5" />
               +14.8%
             </span>
@@ -212,7 +212,7 @@ export function ExecutiveMetricCards({
           <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
             Engagement & Inbox
           </span>
-          <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+          <div className="w-7 h-7 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center">
             <Heart className="w-4 h-4" />
           </div>
         </div>
@@ -222,7 +222,7 @@ export function ExecutiveMetricCards({
             {data.engagementRate}%
           </div>
           <div className="flex items-center gap-1.5 mt-1">
-            <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+            <span className="inline-flex items-center gap-0.5 text-xs font-bold text-purple-600 dark:text-purple-400">
               <TrendingUp className="w-3.5 h-3.5" />
               +0.64%
             </span>

@@ -652,7 +652,7 @@ export default function CalendarPage() {
                                   </div>
                                 </div>
 
-                                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EAF8ED] text-[#22C55E] dark:bg-emerald-950/60 dark:text-emerald-400">
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EAF8ED] text-[#22C55E] dark:bg-purple-950/60 dark:text-purple-400">
                                   <span>✓</span>
                                   <span>
                                     {post.status === "PUBLISHED"
@@ -789,7 +789,7 @@ export default function CalendarPage() {
                                 )}
                               </div>
 
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EAF8ED] text-[#22C55E] dark:bg-emerald-950/60 dark:text-emerald-400">
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EAF8ED] text-[#22C55E] dark:bg-purple-950/60 dark:text-purple-400">
                                 ✓ Published
                               </span>
                             </div>
@@ -918,7 +918,7 @@ export default function CalendarPage() {
                               {renderPlatformIcon(tgt.socialAccount?.provider || "facebook", 12)}
                               <span className="font-semibold">{tgt.socialAccount?.displayName}</span>
                             </div>
-                            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold ml-1">
+                            <span className="text-[10px] text-purple-600 dark:text-purple-400 font-bold ml-1">
                               ● {tgt.status}
                             </span>
                           </div>

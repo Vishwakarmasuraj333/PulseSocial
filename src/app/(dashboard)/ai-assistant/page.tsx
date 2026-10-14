@@ -432,8 +432,8 @@ export default function GeminiAiStudioPage() {
                   <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
                     Google Gemini AI Studio
                   </h1>
-                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold border border-emerald-200 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800 text-[11px] font-bold border border-purple-200 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
                     Gemini 3.8 Flash Ready
                   </span>
                 </div>
@@ -509,18 +509,18 @@ export default function GeminiAiStudioPage() {
               <div
                 className={`p-2.5 rounded-xl text-xs flex items-center gap-2 ${
                   keyStatus.ok
-                    ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                    ? "bg-purple-50 text-purple-800 border border-purple-200"
                     : "bg-red-50 text-red-800 border border-red-200"
                 }`}
               >
                 {keyStatus.ok ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
                 ) : (
                   <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
                 )}
                 <span>{keyStatus.message}</span>
                 {keyStatus.latencyMs && (
-                  <span className="ml-auto font-mono text-[10px] bg-white px-2 py-0.5 rounded-full border border-emerald-300">
+                  <span className="ml-auto font-mono text-[10px] bg-white px-2 py-0.5 rounded-full border border-purple-300">
                     {keyStatus.latencyMs}ms
                   </span>
                 )}
@@ -660,7 +660,7 @@ export default function GeminiAiStudioPage() {
                 {/* Quick Rule Pill */}
                 <div className="mt-2.5 p-2 rounded-xl bg-slate-50 border border-slate-200/80 text-[11px] text-slate-600 flex items-center justify-between">
                   <span className="flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                    <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
                     <span>Max {activeRule.maxHashtags} hashtags • Hook &lt; {activeRule.idealHookLength} chars</span>
                   </span>
                   <button
@@ -748,7 +748,7 @@ export default function GeminiAiStudioPage() {
                             <span
                               className={`px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 ${
                                 validation.isCompliant
-                                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                  ? "bg-purple-50 text-purple-700 border border-purple-200"
                                   : "bg-amber-50 text-amber-700 border border-amber-200"
                               }`}
                             >
@@ -785,8 +785,8 @@ export default function GeminiAiStudioPage() {
                             >
                               {copiedId === v.id ? (
                                 <>
-                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
-                                  <span className="text-emerald-600 font-bold">Copied</span>
+                                  <Check className="w-3.5 h-3.5 text-purple-600" />
+                                  <span className="text-purple-600 font-bold">Copied</span>
                                 </>
                               ) : (
                                 <>
@@ -1082,7 +1082,7 @@ export default function GeminiAiStudioPage() {
                   <div className="p-4 rounded-xl bg-slate-800/80 border border-slate-700/80 space-y-3">
                     <div className="flex items-center justify-between text-xs text-slate-300">
                       <span className="flex items-center gap-1.5">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        <CheckCircle2 className="w-4 h-4 text-purple-400" />
                         <strong>{generatedMeta?.generator || "Flux.1 Pro Photoreal"}</strong>
                       </span>
                       <span className="font-mono text-[11px] text-slate-400">
@@ -1139,13 +1139,13 @@ export default function GeminiAiStudioPage() {
                   </p>
                   <div className="mt-5 flex items-center gap-3 text-xs text-slate-500">
                     <span className="flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Flux.1 Pro Realism
+                      <CheckCircle2 className="w-4 h-4 text-purple-500" /> Flux.1 Pro Realism
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" /> 8K Ultra-HD
+                      <CheckCircle2 className="w-4 h-4 text-purple-500" /> 8K Ultra-HD
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" /> 1-Click Composer Export
+                      <CheckCircle2 className="w-4 h-4 text-purple-500" /> 1-Click Composer Export
                     </span>
                   </div>
                 </div>

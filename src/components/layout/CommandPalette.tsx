@@ -250,7 +250,7 @@ export function CommandPalette({
                   onMouseEnter={() => setSelectedIndex(idx)}
                   className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left transition cursor-pointer ${
                     isSelected
-                      ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 font-medium"
+                      ? "bg-purple-50 dark:bg-purple-950/40 text-purple-900 dark:text-purple-200 font-medium"
                       : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
                   }`}
                 >
@@ -258,7 +258,7 @@ export function CommandPalette({
                     <div
                       className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${
                         isSelected
-                          ? "bg-emerald-600 text-white"
+                          ? "bg-[#5846A8] text-white"
                           : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
                       }`}
                     >
@@ -276,7 +276,7 @@ export function CommandPalette({
                         {cmd.shortcut}
                       </kbd>
                     )}
-                    {isSelected && <CornerDownLeft className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />}
+                    {isSelected && <CornerDownLeft className="w-3.5 h-3.5 text-[#5846A8] dark:text-purple-400" />}
                   </div>
                 </button>
               );

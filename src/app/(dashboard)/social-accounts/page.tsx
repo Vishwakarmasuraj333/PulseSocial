@@ -727,7 +727,7 @@ export default function SocialAccountsPage() {
 
                                 {/* Column 2: Status */}
                                 <td className="py-3.5 px-4 whitespace-nowrap">
-                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#EAF8ED] text-[#22C55E] dark:bg-emerald-950/60 dark:text-emerald-400">
+                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#EAF8ED] text-[#22C55E] dark:bg-purple-950/60 dark:text-purple-400">
                                     {account.status === "CONNECTED" ? "Connected" : account.status}
                                   </span>
                                 </td>
@@ -853,7 +853,7 @@ export default function SocialAccountsPage() {
                                 </div>
                               </div>
 
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400">
                                 {account.status}
                               </span>
                             </div>
@@ -936,7 +936,7 @@ export default function SocialAccountsPage() {
                             <span className="text-[11px] text-slate-500">Official Telegram Bot API</span>
                           </div>
                         </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Supported</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">Supported</span>
                       </div>
                       <p className="text-xs text-slate-600 dark:text-slate-400">
                         Broadcast approved posts, announcements, and rich media directly to your public or private Telegram channels.
@@ -964,7 +964,7 @@ export default function SocialAccountsPage() {
                             <span className="text-[11px] text-slate-500">Cloud API Verified</span>
                           </div>
                         </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Supported</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">Supported</span>
                       </div>
                       <p className="text-xs text-slate-600 dark:text-slate-400">
                         Integrate verified WhatsApp Business Cloud API for multi-client announcements and verified broadcasts.
@@ -1044,7 +1044,7 @@ export default function SocialAccountsPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     {[
                       { name: "Promotions & Offers", color: "bg-purple-100 text-purple-700" },
-                      { name: "Behind the Scenes", color: "bg-emerald-100 text-emerald-700" },
+                      { name: "Behind the Scenes", color: "bg-purple-100 text-purple-700" },
                       { name: "Educational Tips", color: "bg-blue-100 text-blue-700" },
                       { name: "Product Announcements", color: "bg-amber-100 text-amber-700" },
                     ].map((cat, idx) => (

@@ -568,7 +568,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           <button
             type="button"
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="hidden lg:flex w-7 h-7 rounded-lg items-center justify-center text-slate-400 hover:text-emerald-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            className="hidden lg:flex w-7 h-7 rounded-lg items-center justify-center text-slate-400 hover:text-[#5846A8] hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
             title={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
           >
             {isSidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
@@ -588,7 +588,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         {isSidebarOpen && (
           <div className="p-3 mx-3 mt-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs overflow-hidden">
+              <div className="w-7 h-7 rounded-lg bg-[#5846A8] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs overflow-hidden">
                 {activeBrand?.avatarUrl ? (
                   <img
                     src={activeBrand.avatarUrl}
@@ -611,7 +611,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <button
               type="button"
               onClick={() => setIsConnectModalOpen(true)}
-              className="p-1 rounded-md text-emerald-600 dark:text-emerald-400 hover:bg-white dark:hover:bg-slate-700 transition cursor-pointer"
+              className="p-1 rounded-md text-[#5846A8] dark:text-purple-400 hover:bg-white dark:hover:bg-slate-700 transition cursor-pointer"
               title="Connect Channel"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -641,12 +641,12 @@ export function AppLayout({ children }: AppLayoutProps) {
                     href={item.href}
                     className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 ${
                       isActive
-                        ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-100 dark:border-emerald-900/40 shadow-2xs"
+                        ? "bg-purple-50 dark:bg-purple-950/40 text-purple-900 dark:text-purple-200 font-bold border border-purple-100 dark:border-purple-900/40 shadow-2xs"
                         : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/60"
                     }`}
                     title={!isSidebarOpen ? item.label : undefined}
                   >
-                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300"}`} />
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-[#5846A8] dark:text-purple-400" : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300"}`} />
                     {isSidebarOpen && (
                       <span className="truncate flex-1">{item.label}</span>
                     )}
@@ -654,8 +654,8 @@ export function AppLayout({ children }: AppLayoutProps) {
                       <span
                         className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
                           isActive
-                            ? "bg-emerald-600 text-white"
-                            : "bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300"
+                            ? "bg-[#5846A8] text-white"
+                            : "bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300"
                         }`}
                       >
                         {item.badge}
@@ -674,7 +674,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <button
               type="button"
               onClick={() => setIsConnectModalOpen(true)}
-              className="w-full py-2 px-3 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/60 text-emerald-700 dark:text-emerald-300 border border-slate-200 dark:border-slate-700 text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+              className="w-full py-2 px-3 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/60 text-[#5846A8] dark:text-purple-300 border border-slate-200 dark:border-slate-700 text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
             >
               <Share2 className="w-3.5 h-3.5" />
               <span>Connect Platform</span>
@@ -683,7 +683,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <button
               type="button"
               onClick={() => setIsConnectModalOpen(true)}
-              className="w-full py-2 rounded-xl text-emerald-600 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer"
+              className="w-full py-2 rounded-xl text-[#5846A8] hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer"
               title="Connect Platform"
             >
               <Share2 className="w-4 h-4" />
@@ -731,7 +731,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 onClick={() => setIsBrandMenuOpen(!isBrandMenuOpen)}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition cursor-pointer text-xs font-semibold text-slate-800 dark:text-slate-200"
               >
-                <div className="w-5 h-5 rounded-md bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold overflow-hidden shrink-0 shadow-2xs">
+                <div className="w-5 h-5 rounded-md bg-[#5846A8] text-white flex items-center justify-center text-[10px] font-bold overflow-hidden shrink-0 shadow-2xs">
                   {activeBrand?.avatarUrl ? (
                     <img
                       src={activeBrand.avatarUrl}
@@ -759,7 +759,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                         key={b.id}
                         className={`w-full flex items-center justify-between p-2 rounded-lg text-xs transition ${
                           b.id === activeBrand.id
-                            ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-bold"
+                            ? "bg-purple-50 dark:bg-purple-950/40 text-purple-900 dark:text-purple-200 font-bold"
                             : "hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
                         }`}
                       >
@@ -776,7 +776,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                           }}
                           className="flex items-center gap-2 truncate flex-1 text-left cursor-pointer"
                         >
-                          <div className="w-6 h-6 rounded-md bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0 overflow-hidden shadow-2xs">
+                          <div className="w-6 h-6 rounded-md bg-[#5846A8] text-white flex items-center justify-center text-[10px] font-bold shrink-0 overflow-hidden shadow-2xs">
                             {b.avatarUrl ? (
                               <img
                                 src={b.avatarUrl}
@@ -800,7 +800,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                         setIsBrandMenuOpen(false);
                         setIsCreateBrandOpen(true);
                       }}
-                      className="w-full flex items-center gap-2 p-2 rounded-lg text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-800 transition cursor-pointer"
+                      className="w-full flex items-center gap-2 p-2 rounded-lg text-xs font-semibold text-[#5846A8] dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-slate-800 transition cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>Create New Workspace</span>
@@ -816,7 +816,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <button
               type="button"
               onClick={() => setIsCommandPaletteOpen(true)}
-              className="w-full flex items-center justify-between px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/60 text-slate-400 hover:border-emerald-500/50 hover:bg-white dark:hover:bg-slate-800 transition cursor-pointer shadow-2xs"
+              className="w-full flex items-center justify-between px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/60 text-slate-400 hover:border-[#5846A8]/50 hover:bg-white dark:hover:bg-slate-800 transition cursor-pointer shadow-2xs"
             >
               <div className="flex items-center gap-2">
                 <Search className="w-3.5 h-3.5 text-slate-400" />
@@ -834,18 +834,18 @@ export function AppLayout({ children }: AppLayoutProps) {
             {/* Connected Social Channels Badge */}
             <Link
               href="/social-accounts"
-              className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition hover:bg-slate-100"
+              className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-50 dark:bg-purple-950/50 text-[#5846A8] dark:text-purple-300 border border-purple-100 dark:border-purple-900 transition hover:bg-purple-100/60"
               title="Manage Connected Channels"
             >
-              <span className={`w-2 h-2 rounded-full ${connectedAccounts.length > 0 ? "bg-emerald-500 animate-pulse" : "bg-slate-300"}`} />
+              <span className={`w-2 h-2 rounded-full ${connectedAccounts.length > 0 ? "bg-[#8B6BD6] animate-pulse" : "bg-slate-300"}`} />
               <span>{connectedAccounts.length} Connected</span>
             </Link>
 
-            {/* + New Post Emerald Button */}
+            {/* + New Post Purple Button */}
             <button
               type="button"
               onClick={() => setIsComposerOpen(true)}
-              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+              className="px-3.5 py-2 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white text-xs font-semibold shadow-xs shadow-purple-900/20 transition flex items-center gap-1.5 cursor-pointer active:scale-95"
             >
               <Plus className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">New Post</span>
@@ -871,7 +871,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               >
                 <Bell className="w-4 h-4" />
                 {unreadNotificationsCount > 0 && (
-                  <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" />
+                  <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-purple-600 ring-2 ring-white dark:ring-slate-900" />
                 )}
               </button>
 
@@ -883,7 +883,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                       <button
                         type="button"
                         onClick={handleMarkAllNotificationsRead}
-                        className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold hover:underline cursor-pointer"
+                        className="text-[10px] text-[#5846A8] dark:text-purple-400 font-semibold hover:underline cursor-pointer"
                       >
                         Mark all as read
                       </button>
@@ -918,7 +918,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                 className="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
               >
-                <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs ring-2 ring-emerald-100 dark:ring-emerald-900 shadow-xs">
+                <div className="w-8 h-8 rounded-full bg-[#5846A8] text-white flex items-center justify-center font-bold text-xs ring-2 ring-purple-100 dark:ring-purple-900 shadow-xs">
                   {initial}
                 </div>
                 <div className="hidden xl:flex flex-col text-left">
@@ -934,7 +934,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
               {isUserMenuOpen && (
                 <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-2.5 z-50 animate-in fade-in zoom-in-95 duration-150 text-xs">
-                  <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-xl mb-1.5 border border-slate-200/80 dark:border-slate-700/60">
+                  <div className="p-3 bg-purple-50/60 dark:bg-slate-800/80 rounded-xl mb-1.5 border border-purple-100/80 dark:border-purple-900/40">
                     <p className="font-bold text-slate-900 dark:text-white truncate text-sm">
                       {realName}
                     </p>
@@ -944,11 +944,11 @@ export function AppLayout({ children }: AppLayoutProps) {
                       </p>
                     )}
                     <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                      <span className="inline-block text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-600 text-white shadow-2xs">
+                      <span className="inline-block text-[9px] font-bold px-2 py-0.5 rounded bg-[#5846A8] text-white shadow-2xs">
                         {realRole}
                       </span>
                       {user?.activeOrganization?.name && (
-                        <span className="inline-block text-[9px] font-semibold px-2 py-0.5 rounded bg-slate-200/70 text-slate-800 dark:bg-slate-700 dark:text-slate-200 truncate max-w-[140px]">
+                        <span className="inline-block text-[9px] font-semibold px-2 py-0.5 rounded bg-purple-100 text-[#5846A8] dark:bg-purple-900/60 dark:text-purple-300 truncate max-w-[140px]">
                           🏢 {user.activeOrganization.name}
                         </span>
                       )}

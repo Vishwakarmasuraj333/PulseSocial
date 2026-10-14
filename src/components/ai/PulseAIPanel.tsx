@@ -202,8 +202,8 @@ export function PulseAIPanel({ isOpen, onClose, onInsertToComposer }: PulseAIPan
                     >
                       {copiedId === msg.id ? (
                         <>
-                          <Check className="w-3 h-3 text-emerald-400" />
-                          <span className="text-emerald-400">Copied</span>
+                          <Check className="w-3 h-3 text-purple-400" />
+                          <span className="text-purple-400">Copied</span>
                         </>
                       ) : (
                         <>

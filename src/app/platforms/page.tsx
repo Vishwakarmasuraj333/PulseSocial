@@ -152,7 +152,7 @@ export default function PlatformsPage() {
                 <div className="space-y-1.5 mb-6 text-xs text-slate-700 dark:text-slate-300">
                   {n.features.map((f) => (
                     <div key={f} className="flex items-center gap-2">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-purple-500 shrink-0" />
                       <span className="truncate">{f}</span>
                     </div>
                   ))}
@@ -160,7 +160,7 @@ export default function PlatformsPage() {
               </div>
 
               <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <span className="text-[11px] font-semibold text-purple-600 dark:text-purple-400 flex items-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5" /> Official API
                 </span>
                 <Link

@@ -64,7 +64,7 @@ export function ApiHealthCheckView() {
   const getAuditBadge = (status: ProductionAuditStatus) => {
     switch (status) {
       case "LIVE ACCOUNT TESTED":
-        return "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-300";
+        return "bg-purple-100 text-purple-800 dark:bg-purple-950/80 dark:text-purple-300 border-purple-300";
       case "EXTERNAL API VERIFIED":
         return "bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border-blue-300";
       case "CODE VERIFIED":
@@ -151,8 +151,8 @@ export function ApiHealthCheckView() {
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
           <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Live Account Tested</div>
-          <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">{totalLiveTested}</div>
-          <div className="text-[10px] text-emerald-600/80 mt-0.5">Confirmed end-to-end publish</div>
+          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mt-1">{totalLiveTested}</div>
+          <div className="text-[10px] text-purple-600/80 mt-0.5">Confirmed end-to-end publish</div>
         </div>
       </div>
 
@@ -183,8 +183,8 @@ export function ApiHealthCheckView() {
             </span>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/40">
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-300 block w-fit mb-1">
+          <div className="p-2.5 rounded-xl bg-purple-50/60 dark:bg-purple-950/20 border border-purple-200/60 dark:border-purple-800/40">
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-purple-100 text-purple-800 dark:bg-purple-950/80 dark:text-purple-300 border-purple-300 block w-fit mb-1">
               LIVE ACCOUNT TESTED
             </span>
             <span className="text-slate-600 dark:text-slate-400 text-[10px] leading-tight block">
@@ -290,7 +290,7 @@ export function ApiHealthCheckView() {
                     {/* 1. Connected */}
                     <td className="py-3 px-2 text-center whitespace-nowrap">
                       <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                        item.CONNECTED ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400" : "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500"
+                        item.CONNECTED ? "bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400" : "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500"
                       }`}>
                         {item.CONNECTED ? "YES" : "NO"}
                       </span>
@@ -300,7 +300,7 @@ export function ApiHealthCheckView() {
                     <td className="py-3 px-2 text-center whitespace-nowrap">
                       <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
                         item.TOKEN_VALID === "VALID"
-                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400"
+                          ? "bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400"
                           : item.TOKEN_VALID === "EXPIRED"
                           ? "bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400"
                           : "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500"
@@ -313,7 +313,7 @@ export function ApiHealthCheckView() {
                     <td className="py-3 px-2 text-center whitespace-nowrap">
                       <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
                         item.ACCOUNT_SYNCED
-                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400"
+                          ? "bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400"
                           : "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500"
                       }`}>
                         {item.ACCOUNT_SYNCED ? "YES" : "NO"}
@@ -324,7 +324,7 @@ export function ApiHealthCheckView() {
                     <td className="py-3 px-2 text-center whitespace-nowrap">
                       <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
                         item.PUBLISHING_AVAILABLE
-                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400"
+                          ? "bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400"
                           : "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400"
                       }`}>
                         {item.PUBLISHING_AVAILABLE ? "AVAILABLE" : "BLOCKED"}
@@ -346,7 +346,7 @@ export function ApiHealthCheckView() {
                     <td className="py-3 px-2 text-center whitespace-nowrap">
                       <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
                         item.LIVE_ACCOUNT_TESTED
-                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400"
+                          ? "bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400"
                           : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
                       }`}>
                         {item.LIVE_ACCOUNT_TESTED ? "TESTED" : "NOT TESTED"}
@@ -382,7 +382,7 @@ export function ApiHealthCheckView() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
           <div><strong className="text-purple-600">CODE VERIFIED:</strong> Adapter and endpoints implemented and build-passing, but awaiting external credentials.</div>
           <div><strong className="text-blue-600">EXTERNAL API VERIFIED:</strong> Real external endpoint tested and authenticated via OAuth.</div>
-          <div><strong className="text-emerald-600">LIVE ACCOUNT TESTED:</strong> Real production account has successfully published a live post.</div>
+          <div><strong className="text-purple-600">LIVE ACCOUNT TESTED:</strong> Real production account has successfully published a live post.</div>
           <div><strong className="text-amber-600">APPROVAL REQUIRED:</strong> Third-party platform partner/app review approval required (TikTok Direct Post, YouTube audit, Meta review).</div>
           <div><strong className="text-slate-600">CREDENTIALS REQUIRED:</strong> Environment variables (client ID / secret) missing in production.</div>
           <div><strong className="text-red-600">BLOCKED:</strong> Restricted by platform vendor policy (e.g. Snapchat).</div>

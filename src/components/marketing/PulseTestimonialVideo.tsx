@@ -93,7 +93,7 @@ export function PulseTestimonialVideo({ onWatchVideo }: PulseTestimonialVideoPro
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Decorative ambient glow orbs */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-emerald-400/15 dark:bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-purple-400/15 dark:bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 sm:space-y-8 relative z-10">
         {/* Rating Stars & Trust Pill */}
@@ -103,7 +103,7 @@ export function PulseTestimonialVideo({ onWatchVideo }: PulseTestimonialVideoPro
               <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
             ))}
           </div>
-          <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider">
+          <span className="text-xs font-bold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
             Rated 4.9/5 by 50,000+ Social Media Professionals
           </span>
         </div>
@@ -122,14 +122,14 @@ export function PulseTestimonialVideo({ onWatchVideo }: PulseTestimonialVideoPro
             </div>
 
             {/* Verified badge */}
-            <span className="absolute bottom-1 right-1 w-7 h-7 rounded-full bg-white dark:bg-slate-900 shadow-md flex items-center justify-center text-emerald-600 border border-emerald-100 dark:border-emerald-900">
-              <CheckCircle2 className="w-5 h-5 fill-emerald-500 text-white" />
+            <span className="absolute bottom-1 right-1 w-7 h-7 rounded-full bg-white dark:bg-slate-900 shadow-md flex items-center justify-center text-purple-600 border border-purple-100 dark:border-purple-900">
+              <CheckCircle2 className="w-5 h-5 fill-purple-500 text-white" />
             </span>
           </div>
 
           {/* Metric Pill Badge */}
-          <div className="mt-3.5 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-slate-800/95 border border-emerald-200/80 dark:border-emerald-900/60 shadow-xs text-xs font-bold text-emerald-800 dark:text-emerald-300">
-            <TrendingUp className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <div className="mt-3.5 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-slate-800/95 border border-purple-200/80 dark:border-purple-900/60 shadow-xs text-xs font-bold text-purple-800 dark:text-purple-300">
+            <TrendingUp className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
             <span>
               {item.metric} {item.metricLabel}
             </span>

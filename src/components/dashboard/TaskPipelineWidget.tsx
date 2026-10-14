@@ -81,7 +81,7 @@ export function TaskPipelineWidget() {
     <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
       <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+          <div className="w-7 h-7 rounded-lg bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 flex items-center justify-center">
             <CheckSquare className="w-4 h-4" />
           </div>
           <div>
@@ -115,7 +115,7 @@ export function TaskPipelineWidget() {
               className="mt-0.5 text-indigo-600 dark:text-indigo-400 shrink-0 cursor-pointer"
             >
               {task.isCompleted ? (
-                <CheckSquare className="w-4 h-4 text-emerald-500" />
+                <CheckSquare className="w-4 h-4 text-purple-500" />
               ) : (
                 <Square className="w-4 h-4 text-slate-400" />
               )}

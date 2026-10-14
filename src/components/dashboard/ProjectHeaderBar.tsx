@@ -97,7 +97,7 @@ export function ProjectHeaderBar({
                 <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                   <span>{activeBrand?.slug ? `${activeBrand.slug}.social` : "project.workspace"}</span>
                   <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
-                  <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                  <span className="text-purple-600 dark:text-purple-400 font-medium">
                     {connectedCount} channels active
                   </span>
                 </div>
@@ -151,8 +151,8 @@ export function ProjectHeaderBar({
           </div>
 
           {/* Real-time Health Indicator Badge */}
-          <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/50 text-xs font-semibold text-purple-700 dark:text-purple-400">
+            <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
             <span>Telemetry Live & Connected</span>
           </div>
         </div>

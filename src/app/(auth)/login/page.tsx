@@ -678,7 +678,7 @@ export default function LoginPage() {
                     </div>
 
                     <p className="text-xs text-slate-500 leading-relaxed">
-                      We'll send a secure 6-digit one-time verification code to this email address. No password required.
+                      We&apos;ll send a secure 6-digit one-time verification code to this email address. No password required.
                     </p>
 
                     <button

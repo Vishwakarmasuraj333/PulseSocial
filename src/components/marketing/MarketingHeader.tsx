@@ -250,7 +250,7 @@ export function MarketingHeader() {
                 href="/login"
                 className="px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 rounded-xl transition duration-150"
               >
-                Log in
+                Sign In
               </Link>
               <Link
                 href="/signup"
@@ -323,7 +323,7 @@ export function MarketingHeader() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="w-full py-2.5 text-center text-xs font-bold rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
                 >
-                  Log in
+                  Sign In
                 </Link>
                 <Link
                   href="/signup"

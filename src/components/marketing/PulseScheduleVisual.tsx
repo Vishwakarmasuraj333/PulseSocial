@@ -194,7 +194,7 @@ export function PulseScheduleVisual() {
                   <div
                     className={`w-8.5 h-8.5 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-[#1E3A8A] via-[#2E3788] to-[#4F46E5] flex items-center justify-center p-0.5 shadow-sm border transition-all duration-300 ${
                       isActive
-                        ? "border-emerald-500 scale-110 ring-2 ring-emerald-400/40"
+                        ? "border-purple-500 scale-110 ring-2 ring-purple-400/40"
                         : "border-white dark:border-slate-800 group-hover:scale-105"
                     }`}
                   >
@@ -306,7 +306,7 @@ export function PulseScheduleVisual() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1 text-[11px] font-bold text-slate-700 dark:text-slate-300">
                 <span>SmartQ</span>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse ml-1" />
+                <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse ml-1" />
                 <Info className="w-3 h-3 text-slate-400" />
               </div>
               <button className="flex items-center gap-1 text-[10px] font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
@@ -358,7 +358,7 @@ export function PulseScheduleVisual() {
               onClick={handleAddToQueue}
               className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs shadow-md transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
                 isAdded
-                  ? "bg-emerald-600 text-white scale-102"
+                  ? "bg-purple-600 text-white scale-102"
                   : "bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 active:scale-98"
               }`}
             >

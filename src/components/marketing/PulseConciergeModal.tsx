@@ -23,7 +23,7 @@ export function PulseConciergeModal({ isOpen, onClose }: PulseConciergeModalProp
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-[#2D7A58] dark:bg-[#1E523B] text-white rounded-2xl shadow-2xl overflow-hidden border border-emerald-400/40">
+      <div className="relative w-full max-w-lg bg-[#2D7A58] dark:bg-[#1E523B] text-white rounded-2xl shadow-2xl overflow-hidden border border-purple-400/40">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -41,7 +41,7 @@ export function PulseConciergeModal({ isOpen, onClose }: PulseConciergeModalProp
                 <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white">
                   Can&apos;t find what you&apos;re looking for?
                 </h3>
-                <p className="text-xs sm:text-sm text-emerald-100 mt-1 font-medium">
+                <p className="text-xs sm:text-sm text-purple-100 mt-1 font-medium">
                   We&apos;re here to help you.
                 </p>
               </div>
@@ -63,7 +63,7 @@ export function PulseConciergeModal({ isOpen, onClose }: PulseConciergeModalProp
                     </button>
                   </div>
 
-                  <div className="pt-3 border-t border-emerald-500/40 text-[11px] text-emerald-100">
+                  <div className="pt-3 border-t border-purple-500/40 text-[11px] text-purple-100">
                     <div className="font-semibold text-white">Still not sure?</div>
                     <div>call us at <strong className="text-white">1800 103 1123</strong> | <strong className="text-white">1800 572 3535</strong></div>
                   </div>
@@ -111,12 +111,12 @@ export function PulseConciergeModal({ isOpen, onClose }: PulseConciergeModalProp
               )}
 
               {formStep === "success" && (
-                <div className="pt-2 text-left space-y-2 bg-emerald-900/50 p-4 rounded-xl border border-emerald-400/40">
+                <div className="pt-2 text-left space-y-2 bg-purple-900/50 p-4 rounded-xl border border-purple-400/40">
                   <div className="flex items-center gap-2 text-white font-bold text-sm">
                     <CheckCircle2 className="w-5 h-5 text-amber-300" />
                     <span>Request Received!</span>
                   </div>
-                  <p className="text-xs text-emerald-100">
+                  <p className="text-xs text-purple-100">
                     A PulseSocial product specialist will connect with you within 15 minutes.
                   </p>
                   <button
@@ -131,13 +131,13 @@ export function PulseConciergeModal({ isOpen, onClose }: PulseConciergeModalProp
 
             {/* Right Character Illustration matching PDF page 7 */}
             <div className="shrink-0 relative hidden sm:flex flex-col items-center justify-center">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white/10 border-2 border-emerald-300/40 flex items-center justify-center shadow-inner overflow-hidden">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white/10 border-2 border-purple-300/40 flex items-center justify-center shadow-inner overflow-hidden">
                 <div className="relative flex flex-col items-center">
                   <Headset className="w-16 h-16 text-amber-300" />
-                  <span className="w-2 h-2 rounded-full bg-emerald-300 absolute top-2 right-2 animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-purple-300 absolute top-2 right-2 animate-ping" />
                 </div>
               </div>
-              <div className="text-[10px] font-bold text-emerald-100 mt-2 text-center">
+              <div className="text-[10px] font-bold text-purple-100 mt-2 text-center">
                 Dedicated Specialist
               </div>
             </div>

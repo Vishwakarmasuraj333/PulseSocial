@@ -90,7 +90,7 @@ export default function NotificationsPage() {
   const getIcon = (type: string) => {
     switch (type) {
       case "post_published":
-        return <CheckCircle2 className="w-4 h-4 text-emerald-500" />;
+        return <CheckCircle2 className="w-4 h-4 text-purple-500" />;
       case "post_failed":
         return <AlertCircle className="w-4 h-4 text-rose-500" />;
       case "account_connected":
@@ -111,7 +111,7 @@ export default function NotificationsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
-              <Bell className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+              <Bell className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               Notifications
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -126,7 +126,7 @@ export default function NotificationsPage() {
                 onClick={handleMarkAllRead}
                 className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition flex items-center gap-1.5 cursor-pointer"
               >
-                <CheckCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <CheckCheck className="w-3.5 h-3.5 text-purple-600" />
                 Mark all as read
               </button>
             )}
@@ -191,7 +191,7 @@ export default function NotificationsPage() {
                 onClick={() => !item.read && handleMarkRead(item.id)}
                 className={`p-4 rounded-xl border transition flex items-start justify-between gap-3 cursor-pointer ${
                   !item.read
-                    ? "bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200/80 dark:border-emerald-800/40"
+                    ? "bg-purple-50/40 dark:bg-purple-950/20 border-purple-200/80 dark:border-purple-800/40"
                     : "bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700"
                 }`}
               >
@@ -214,7 +214,7 @@ export default function NotificationsPage() {
                 </div>
 
                 {!item.read && (
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 mt-2" />
+                  <span className="w-2 h-2 rounded-full bg-purple-500 shrink-0 mt-2" />
                 )}
               </div>
             ))}

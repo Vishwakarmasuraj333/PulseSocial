@@ -263,7 +263,7 @@ export async function GET(
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #0B0F19; color: #fff; }
     .box { text-align: center; padding: 32px; background: #111827; border-radius: 16px; border: 1px solid #1f2937; max-width: 420px; }
-    h2 { margin: 0 0 8px; font-size: 20px; color: #10b981; }
+    h2 { margin: 0 0 8px; font-size: 20px; color: #8B6BD6; }
     p { margin: 0; font-size: 14px; color: #9ca3af; }
   </style>
 </head>

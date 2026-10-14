@@ -154,15 +154,15 @@ export function ContentLeaderboardTable({
                     {/* Shares */}
                     <td className="py-3.5 text-right font-medium text-slate-700 dark:text-slate-300">
                       <span className="inline-flex items-center gap-1">
-                        <Share2 className="w-3 h-3 text-emerald-500" />
+                        <Share2 className="w-3 h-3 text-purple-500" />
                         {shares.toLocaleString()}
                       </span>
                     </td>
 
                     {/* Sentiment Badge */}
                     <td className="py-3.5 text-right">
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40">
-                        <Sparkles className="w-3 h-3 text-emerald-500" />
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-400 border border-purple-200/60 dark:border-purple-800/40">
+                        <Sparkles className="w-3 h-3 text-purple-500" />
                         <span>{sentiment}% Pos</span>
                       </span>
                     </td>

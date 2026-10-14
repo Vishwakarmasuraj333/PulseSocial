@@ -67,7 +67,7 @@ export function PulseVideoModal({ isOpen, onClose }: PulseVideoModalProps) {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">
+              <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 font-bold text-[10px]">
                 1080p HD
               </span>
               <Maximize2 className="w-4 h-4 cursor-pointer hover:text-white" />

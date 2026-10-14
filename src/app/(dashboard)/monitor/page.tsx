@@ -310,7 +310,7 @@ export default function MonitorPage() {
                   onClick={() => handleAddColumn("page_search")}
                   className="w-full flex items-center gap-4 p-3.5 rounded-xl border border-slate-100 hover:border-slate-300 hover:bg-slate-50/70 transition cursor-pointer text-left group"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] flex items-center justify-center text-[#059669] shrink-0 group-hover:scale-105 transition-transform">
+                  <div className="w-10 h-10 rounded-xl bg-[#F4F0FC] border border-[#DDD3F4] flex items-center justify-center text-[#6F52B5] shrink-0 group-hover:scale-105 transition-transform">
                     <Flag className="w-5 h-5" />
                   </div>
                   <div>

@@ -189,8 +189,8 @@ function SocialConnectInner() {
       <div className="w-full max-w-6xl mx-auto flex items-center justify-between pb-8">
         <PulseSocialLogo size="md" theme="light" variant="with-tagline" />
         <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-800 text-xs text-slate-300 shadow-sm backdrop-blur-md">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="font-medium text-emerald-400">{connectedIds.length} Channels Connected</span>
+          <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
+          <span className="font-medium text-purple-400">{connectedIds.length} Channels Connected</span>
         </div>
       </div>
 
@@ -332,8 +332,8 @@ function SocialConnectInner() {
                     </div>
 
                     {isConnected ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-semibold">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[11px] font-semibold">
+                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
                         Connected
                       </span>
                     ) : (
@@ -488,7 +488,7 @@ function SocialConnectInner() {
                         onClick={() => copyToClipboard("https://pulsesocial1.vercel.app/privacy", "privacy_url")}
                         className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold flex items-center gap-1 cursor-pointer"
                       >
-                        {copiedField === "privacy_url" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copiedField === "privacy_url" ? <Check className="w-3.5 h-3.5 text-purple-400" /> : <Copy className="w-3.5 h-3.5" />}
                         <span>{copiedField === "privacy_url" ? "Copied" : "Copy"}</span>
                       </button>
                     </div>
@@ -503,7 +503,7 @@ function SocialConnectInner() {
                         onClick={() => copyToClipboard("https://pulsesocial1.vercel.app/terms", "terms_url")}
                         className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold flex items-center gap-1 cursor-pointer"
                       >
-                        {copiedField === "terms_url" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copiedField === "terms_url" ? <Check className="w-3.5 h-3.5 text-purple-400" /> : <Copy className="w-3.5 h-3.5" />}
                         <span>{copiedField === "terms_url" ? "Copied" : "Copy"}</span>
                       </button>
                     </div>
@@ -518,7 +518,7 @@ function SocialConnectInner() {
                         onClick={() => copyToClipboard("https://pulsesocial1.vercel.app/data-deletion", "deletion_url")}
                         className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold flex items-center gap-1 cursor-pointer"
                       >
-                        {copiedField === "deletion_url" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copiedField === "deletion_url" ? <Check className="w-3.5 h-3.5 text-purple-400" /> : <Copy className="w-3.5 h-3.5" />}
                         <span>{copiedField === "deletion_url" ? "Copied" : "Copy"}</span>
                       </button>
                     </div>
@@ -560,7 +560,7 @@ function SocialConnectInner() {
               {/* Step 3: Valid OAuth Redirect URIs */}
               <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-emerald-400 uppercase tracking-wider text-[11px]">
+                  <span className="font-bold text-purple-400 uppercase tracking-wider text-[11px]">
                     Step 3: Valid OAuth Redirect URIs (Fixes URL Blocked)
                   </span>
                   <span className="text-[10px] text-slate-500">Facebook Login &gt; Settings</span>
@@ -576,7 +576,7 @@ function SocialConnectInner() {
                       onClick={() => copyToClipboard("https://pulsesocial1.vercel.app/api/social/facebook/callback", "fb_cb")}
                       className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold flex items-center gap-1 cursor-pointer shrink-0"
                     >
-                      {copiedField === "fb_cb" ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                      {copiedField === "fb_cb" ? <Check className="w-3 h-3 text-purple-400" /> : <Copy className="w-3 h-3" />}
                     </button>
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/80 text-slate-200">
@@ -586,7 +586,7 @@ function SocialConnectInner() {
                       onClick={() => copyToClipboard("https://pulsesocial1.vercel.app/api/social/instagram/callback", "ig_cb")}
                       className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold flex items-center gap-1 cursor-pointer shrink-0"
                     >
-                      {copiedField === "ig_cb" ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                      {copiedField === "ig_cb" ? <Check className="w-3 h-3 text-purple-400" /> : <Copy className="w-3 h-3" />}
                     </button>
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/80 text-slate-200">
@@ -596,7 +596,7 @@ function SocialConnectInner() {
                       onClick={() => copyToClipboard("http://localhost:3000/api/social/facebook/callback", "fb_local")}
                       className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold flex items-center gap-1 cursor-pointer shrink-0"
                     >
-                      {copiedField === "fb_local" ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                      {copiedField === "fb_local" ? <Check className="w-3 h-3 text-purple-400" /> : <Copy className="w-3 h-3" />}
                     </button>
                   </div>
                 </div>

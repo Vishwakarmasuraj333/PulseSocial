@@ -46,7 +46,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             key={t.id}
             className="pointer-events-auto flex items-start gap-3 p-4 rounded-xl border bg-white shadow-xl text-slate-900 dark:bg-slate-900 dark:border-slate-800 dark:text-white transition-all animate-in fade-in slide-in-from-bottom-5"
           >
-            {t.type === "success" && <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />}
+            {t.type === "success" && <CheckCircle2 className="h-5 w-5 text-purple-500 shrink-0 mt-0.5" />}
             {t.type === "error" && <XCircle className="h-5 w-5 text-rose-500 shrink-0 mt-0.5" />}
             {t.type === "warning" && <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />}
             {t.type === "info" && <Info className="h-5 w-5 text-indigo-500 shrink-0 mt-0.5" />}

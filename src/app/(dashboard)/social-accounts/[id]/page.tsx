@@ -245,7 +245,7 @@ export default function SocialAccountDetailsPage() {
                 <h1 className="text-xl font-bold text-slate-900 dark:text-white">
                   {account.displayName}
                 </h1>
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400">
                   {account.status}
                 </span>
                 <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
@@ -350,7 +350,7 @@ export default function SocialAccountDetailsPage() {
                   <Send className="w-3.5 h-3.5 text-indigo-600" />
                   Publishing
                 </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400">
                   Ready
                 </span>
               </div>
@@ -365,7 +365,7 @@ export default function SocialAccountDetailsPage() {
                   <BarChart3 className="w-3.5 h-3.5 text-indigo-600" />
                   Analytics
                 </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400">
                   Live API
                 </span>
               </div>
@@ -394,12 +394,12 @@ export default function SocialAccountDetailsPage() {
         {/* Security & Scopes */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-xs space-y-4">
           <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <ShieldCheck className="w-4 h-4 text-purple-600" />
             <span>Authorized Scopes & Security Enclave</span>
           </h2>
 
           <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-100 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 flex items-start gap-3">
-            <Lock className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            <Lock className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
             <p className="leading-relaxed">
               Access tokens are encrypted at rest with AES-256-GCM. Tokens are never transmitted to client browsers, and API operations enforce strict workspace-level isolation to prevent unauthorized cross-tenant operations.
             </p>

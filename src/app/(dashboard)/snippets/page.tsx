@@ -229,7 +229,7 @@ export default function SnippetsPage() {
                   >
                     {copiedId === snippet.id ? (
                       <>
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        <Check className="w-3.5 h-3.5 text-purple-600" />
                         <span>Copied!</span>
                       </>
                     ) : (

@@ -62,7 +62,7 @@ export function ChannelHealthMatrix({
             <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
               Channel Health & Visibility Matrix
             </h2>
-            <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full">
+            <span className="text-[11px] font-semibold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50 px-2 py-0.5 rounded-full">
               {connectedChannels.length} Connected
             </span>
           </div>
@@ -130,7 +130,7 @@ export function ChannelHealthMatrix({
                     </td>
 
                     {/* Growth */}
-                    <td className="py-3.5 text-right font-bold text-emerald-600 dark:text-emerald-400">
+                    <td className="py-3.5 text-right font-bold text-purple-600 dark:text-purple-400">
                       +{(acc.connectedAccount?.followerCount ? Math.round(acc.connectedAccount.followerCount * 0.042) : 48).toLocaleString()} (+3.4%)
                     </td>
 
@@ -151,8 +151,8 @@ export function ChannelHealthMatrix({
 
                     {/* Token Status Badge */}
                     <td className="py-3.5 text-right">
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-400 border border-purple-200/60 dark:border-purple-800/40">
+                        <CheckCircle2 className="w-3 h-3 text-purple-500" />
                         <span>Active</span>
                       </span>
                     </td>

@@ -71,7 +71,7 @@ export function PulseAgencyBanner() {
               </div>
 
               <div className="pt-2 flex items-center justify-between text-[11px] text-slate-500">
-                <span className="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400">
+                <span className="flex items-center gap-1 font-semibold text-purple-600 dark:text-purple-400">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   White-label custom domain active
                 </span>

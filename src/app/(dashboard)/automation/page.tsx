@@ -347,13 +347,13 @@ export default function AutomationPage() {
           <Card className="p-4 bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Active Queue Slots</span>
-              <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 flex items-center justify-center">
+              <div className="w-7 h-7 rounded-lg bg-purple-50 dark:bg-purple-950/40 text-purple-600 flex items-center justify-center">
                 <Clock className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="text-2xl font-bold text-slate-900 dark:text-white">{totalActiveSlots}</span>
-              <span className="text-[11px] text-emerald-600 font-semibold">of {queues.length} enabled</span>
+              <span className="text-[11px] text-purple-600 font-semibold">of {queues.length} enabled</span>
             </div>
           </Card>
 
@@ -481,13 +481,13 @@ export default function AutomationPage() {
                           onClick={() => toggleQueueStatus(q.id)}
                           className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1 ${
                             isActive
-                              ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800"
+                              ? "bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800"
                               : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-300 dark:bg-slate-800 dark:text-slate-300"
                           }`}
                         >
                           {isActive ? (
                             <>
-                              <Play className="w-3 h-3 fill-emerald-600" /> Active
+                              <Play className="w-3 h-3 fill-purple-600" /> Active
                             </>
                           ) : (
                             <>
@@ -653,7 +653,7 @@ export default function AutomationPage() {
                 <p className="text-[11px] text-slate-500">
                   Rewrites opening hook using AI to test fresh creative angles.
                 </p>
-                <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300 font-semibold text-xs py-1 px-2.5">
+                <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-950/50 dark:text-purple-300 font-semibold text-xs py-1 px-2.5">
                   <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Active (Gemini AI Variation)
                 </Badge>
               </div>

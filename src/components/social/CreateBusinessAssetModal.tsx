@@ -237,7 +237,7 @@ export function CreateBusinessAssetModal({
               <span
                 className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                   currentPlatform.supportsApiCreation
-                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400"
+                    ? "bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400"
                     : "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400"
                 }`}
               >

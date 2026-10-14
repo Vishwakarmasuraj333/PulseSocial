@@ -55,26 +55,26 @@ export function PulseSocialLogo({
         className="relative z-10 transition-transform duration-200 group-hover:scale-105"
       >
         <defs>
-          <linearGradient id="psEmeraldBrand" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#064E3B" />
-            <stop offset="50%" stopColor="#047857" />
-            <stop offset="100%" stopColor="#059669" />
+          <linearGradient id="psPurpleBrand" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#312E81" />
+            <stop offset="50%" stopColor="#5846A8" />
+            <stop offset="100%" stopColor="#795BC2" />
           </linearGradient>
 
-          <linearGradient id="psLightAccent" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#A7F3D0" />
-            <stop offset="100%" stopColor="#34D399" />
+          <linearGradient id="psPurpleAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#DDD3F4" />
+            <stop offset="100%" stopColor="#A78BDF" />
           </linearGradient>
         </defs>
 
-        {/* Squircle Rounded Base (Professional Dark Forest / Emerald) */}
-        <rect x="3" y="3" width="58" height="58" rx="16" fill="url(#psEmeraldBrand)" />
+        {/* Squircle Rounded Base (Professional Royal Purple / Navy) */}
+        <rect x="3" y="3" width="58" height="58" rx="16" fill="url(#psPurpleBrand)" />
 
         {/* Subtle Glass Highlight */}
         <path
           d="M4 18 C4 10 10 4 18 4 L46 4 C54 4 60 10 60 18 L60 22 C40 20 20 25 4 30 Z"
           fill="white"
-          fillOpacity="0.12"
+          fillOpacity="0.16"
         />
 
         {/* Letter 'P' (Left) in Crisp White */}
@@ -87,19 +87,19 @@ export function PulseSocialLogo({
           strokeLinejoin="round"
         />
 
-        {/* Letter 'S' (Right) in Fresh Mint / Emerald Accent */}
+        {/* Letter 'S' (Right) in Lavender/Purple Accent */}
         <path
           d="M47 22 C44 18 38 18 35 21 C32 24 34.5 28 40.5 30.5 C46.5 33 48.5 36.5 46.5 41 C44.5 45.5 37.5 46.5 31.5 44"
           fill="none"
-          stroke="url(#psLightAccent)"
+          stroke="url(#psPurpleAccent)"
           strokeWidth="5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
 
         {/* Connecting Pulse Nodes */}
-        <circle cx="28" cy="26.5" r="2.5" fill="#34D399" />
-        <circle cx="46.5" cy="41" r="2.5" fill="#34D399" stroke="#FFFFFF" strokeWidth="0.8" />
+        <circle cx="28" cy="26.5" r="2.5" fill="#A78BDF" />
+        <circle cx="46.5" cy="41" r="2.5" fill="#DDD3F4" stroke="#FFFFFF" strokeWidth="0.8" />
         <circle cx="18" cy="46" r="2" fill="#FFFFFF" />
       </svg>
     </div>
@@ -123,7 +123,7 @@ export function PulseSocialLogo({
                   : "text-slate-900 dark:text-white"
               }`}
             >
-              Pulse<span className="text-emerald-600 dark:text-emerald-400">Social</span>
+              Pulse<span className="text-[#6F52B5] dark:text-[#A78BDF]">Social</span>
             </span>
           </div>
           {variant === "with-tagline" && (

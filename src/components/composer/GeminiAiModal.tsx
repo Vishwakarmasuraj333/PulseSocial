@@ -513,7 +513,7 @@ export function GeminiAiModal({
             </div>
 
             <div className="hidden sm:flex items-center gap-2 text-[11px] text-purple-700 font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
               <span>Gemini 3.8 Production</span>
             </div>
           </div>
@@ -652,7 +652,7 @@ export function GeminiAiModal({
                       {/* Top Action Bar */}
                       <div className="flex items-center justify-between pb-2 border-b border-slate-200">
                         <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          <Check className="w-3.5 h-3.5 text-purple-600" />
                           <span>Generated Copy</span>
                           <span className="text-[10px] font-normal text-slate-400">
                             ({generatedData.model || selectedTextModel})

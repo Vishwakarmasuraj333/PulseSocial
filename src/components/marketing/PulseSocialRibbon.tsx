@@ -85,7 +85,7 @@ export function PulseSocialRibbon() {
       tag: "Broadcasts & Support Chat",
       logo: "/images/social/logos/whatsapp-icon.svg",
       color: "#25D366",
-      borderColor: "hover:border-emerald-500/50",
+      borderColor: "hover:border-purple-500/50",
       badge: "Cloud API",
     },
     {
@@ -159,7 +159,7 @@ export function PulseSocialRibbon() {
                 <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight">
                   {item.name}
                 </span>
-                <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold tracking-wide flex items-center gap-0.5">
+                <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400 font-semibold tracking-wide flex items-center gap-0.5">
                   <CheckCircle2 className="w-2.5 h-2.5" />
                   {item.badge}
                 </span>

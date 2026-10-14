@@ -23,7 +23,7 @@ export default function CanvaIntegrationPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
-              <Palette className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+              <Palette className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               Canva Design Studio
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -65,20 +65,20 @@ export default function CanvaIntegrationPage() {
           <div className="pt-4 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 space-y-2">
               <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                <Sparkles className="w-3.5 h-3.5 text-purple-600" />
                 Supported Workflows
               </h4>
               <ul className="text-xs text-slate-500 dark:text-slate-400 space-y-1.5">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-purple-500 shrink-0" />
                   Direct design creation inside post composer
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-purple-500 shrink-0" />
                   Seamless export of Instagram, X &amp; LinkedIn banners
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-purple-500 shrink-0" />
                   Auto-sync with workspace Brand Assets folder
                 </li>
               </ul>
@@ -113,7 +113,7 @@ export default function CanvaIntegrationPage() {
                       type: "success",
                     });
                   }}
-                  className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition cursor-pointer"
+                  className="w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold transition cursor-pointer"
                 >
                   Save Canva Credentials
                 </button>

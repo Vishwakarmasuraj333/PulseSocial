@@ -165,7 +165,7 @@ export function CompetitorBenchmarkWidget() {
 
                 {/* Growth */}
                 <td className="py-3 text-right">
-                  <span className="inline-flex items-center gap-0.5 font-bold text-emerald-600 dark:text-emerald-400">
+                  <span className="inline-flex items-center gap-0.5 font-bold text-purple-600 dark:text-purple-400">
                     <TrendingUp className="w-3 h-3" />
                     +{c.growthPct}%
                   </span>

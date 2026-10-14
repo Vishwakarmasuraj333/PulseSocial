@@ -141,7 +141,7 @@ export default function PricingPage() {
                 }`}
               >
                 <span>Annual</span>
-                <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500 text-white font-bold">
+                <span className="text-[10px] px-1.5 py-0.2 rounded bg-purple-500 text-white font-bold">
                   Save 20%
                 </span>
               </button>
@@ -193,7 +193,7 @@ export default function PricingPage() {
                   <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 mb-6">
                     {p.features.map((f: string) => (
                       <li key={f} className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                        <Check className="w-4 h-4 text-purple-500 shrink-0 mt-0.5" />
                         <span className="leading-snug">{f}</span>
                       </li>
                     ))}

@@ -86,7 +86,7 @@ export function PulseAnalyticsVisual() {
           <h3 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100">
             Page Views via Internal Referrer
           </h3>
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
         </div>
 
         {/* 4 Horizontal Data Bars */}

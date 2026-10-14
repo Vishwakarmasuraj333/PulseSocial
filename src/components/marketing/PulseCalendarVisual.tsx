@@ -181,7 +181,7 @@ export function PulseCalendarVisual() {
             <div className="p-1.5 rounded-lg border border-slate-100 dark:border-slate-800/80 min-h-[65px]">
               <div className="text-[10px] font-bold text-slate-500">13</div>
               <div className="mt-1 flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span className="w-2 h-2 rounded-full bg-purple-500" />
                 <span className="w-2 h-2 rounded-full bg-amber-500" />
               </div>
             </div>
@@ -191,7 +191,7 @@ export function PulseCalendarVisual() {
               <div className="text-[10px] font-bold text-slate-500">14</div>
               <div className="mt-1 flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-sky-500" />
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span className="w-2 h-2 rounded-full bg-purple-500" />
               </div>
             </div>
 

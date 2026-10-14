@@ -115,7 +115,7 @@ export function BulkScheduleModal({
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+            <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
               <FileSpreadsheet className="w-4 h-4" />
             </div>
             <div>
@@ -172,17 +172,17 @@ export function BulkScheduleModal({
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 text-xs">
                 <div className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-600" />
+                  <Check className="w-4 h-4 text-purple-600" />
                   <span className="font-semibold">{fileName}</span>
-                  <span className="text-emerald-700 font-normal">
+                  <span className="text-purple-700 font-normal">
                     ({posts.length} posts ready for review)
                   </span>
                 </div>
                 <button
                   onClick={() => setFileUploaded(false)}
-                  className="text-xs text-emerald-700 hover:underline font-semibold"
+                  className="text-xs text-purple-700 hover:underline font-semibold"
                 >
                   Upload another file
                 </button>
@@ -212,7 +212,7 @@ export function BulkScheduleModal({
                           {post.content}
                         </td>
                         <td className="py-2.5 px-3 text-right">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 text-[10px] font-bold">
                             <Check className="w-2.5 h-2.5" /> Ready
                           </span>
                         </td>
@@ -239,7 +239,7 @@ export function BulkScheduleModal({
             type="button"
             disabled={!fileUploaded || isSubmitting}
             onClick={handleConfirmBulkSchedule}
-            className="flex items-center gap-1.5 px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition cursor-pointer disabled:opacity-50"
+            className="flex items-center gap-1.5 px-5 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs transition cursor-pointer disabled:opacity-50"
           >
             <Calendar className="w-3.5 h-3.5" />
             <span>{isSubmitting ? "Queueing Posts..." : `Schedule All ${posts.length || ""} Posts`}</span>

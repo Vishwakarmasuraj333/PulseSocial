@@ -392,7 +392,7 @@ export default function NewPostPage() {
 
                       const badgeStyle =
                         status === "Ready to publish"
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800"
+                          ? "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800"
                           : status === "Connected — Publishing approval required"
                           ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800"
                           : status === "Reauthorization required"
@@ -436,7 +436,7 @@ export default function NewPostPage() {
                             <span
                               className={`w-1.5 h-1.5 rounded-full ${
                                 status === "Ready to publish"
-                                  ? "bg-emerald-500"
+                                  ? "bg-purple-500"
                                   : status === "Connected — Publishing approval required"
                                   ? "bg-amber-500"
                                   : status === "Reauthorization required"

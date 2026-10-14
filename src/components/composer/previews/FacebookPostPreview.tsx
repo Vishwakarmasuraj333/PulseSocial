@@ -115,21 +115,21 @@ export function FacebookPostPreview({
 
       {/* Media Display */}
       {media.length > 0 && (
-        <div className="relative w-full bg-slate-950 flex items-center justify-center overflow-hidden">
+        <div className="relative w-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
           {media[activeMediaIndex]?.type === "video" ? (
             <video
               src={media[activeMediaIndex].url}
               controls
               playsInline
-              className="w-full max-h-[340px] object-contain bg-black"
+              className="w-full max-h-[380px] object-contain bg-black"
             />
           ) : (
-            <div className="relative w-full h-72">
+            <div className="relative w-full aspect-4/5 max-h-[380px] bg-slate-100 dark:bg-slate-900">
               <Image
                 src={media[activeMediaIndex].url}
                 alt="Facebook media"
                 fill
-                className="object-contain"
+                className="object-cover object-top"
                 unoptimized
               />
             </div>

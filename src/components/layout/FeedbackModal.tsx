@@ -197,22 +197,22 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
         id="pulse-feedback-file-input"
       />
 
-      {/* Floating Bottom-Right Zoho Social Style Docked Widget */}
-      <div
-        className={`fixed bottom-12 right-4 sm:right-6 z-50 w-[420px] max-w-[calc(100vw-32px)] bg-white dark:bg-slate-900 rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.22)] border border-slate-200 dark:border-slate-800 flex flex-col overflow-visible animate-in slide-in-from-bottom-3 duration-200 text-slate-900 dark:text-white ${
-          isMinimized ? "h-auto" : ""
-        }`}
-      >
-        {/* Downward triangle pointer pointing toward dock's Feedback button */}
-        <div className="absolute -bottom-1.5 right-12 w-3.5 h-3.5 bg-white dark:bg-slate-900 border-b border-r border-slate-200 dark:border-slate-800 rotate-45 pointer-events-none" />
+        {/* Floating Bottom-Right SocialPulse Docked Feedback Widget */}
+        <div
+          className={`fixed bottom-12 right-4 sm:right-6 z-50 w-[420px] max-w-[calc(100vw-32px)] bg-white dark:bg-slate-900 rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.22)] border border-slate-200 dark:border-slate-800 flex flex-col overflow-visible animate-in slide-in-from-bottom-3 duration-200 text-slate-900 dark:text-white ${
+            isMinimized ? "h-auto" : ""
+          }`}
+        >
+          {/* Downward triangle pointer pointing toward dock's Feedback button */}
+          <div className="absolute -bottom-1.5 right-12 w-3.5 h-3.5 bg-white dark:bg-slate-900 border-b border-r border-slate-200 dark:border-slate-800 rotate-45 pointer-events-none" />
 
-        {/* 1. Header: Solid Zoho Blue */}
-        <div className="relative flex items-center justify-between px-5 py-3.5 bg-[#1e70eb] text-white rounded-t-xl select-none">
-          <div className="flex items-center gap-2">
-            <h2 className="text-[15px] font-semibold tracking-tight text-white">
-              Share Your Feedback
-            </h2>
-          </div>
+          {/* 1. Header: SocialPulse Brand Header */}
+          <div className="relative flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-[#312E81] via-[#5846A8] to-[#6F52B5] text-white rounded-t-xl select-none shadow-xs">
+            <div className="flex items-center gap-2">
+              <h2 className="text-[15px] font-semibold tracking-tight text-white">
+                Share Your Feedback
+              </h2>
+            </div>
 
           <div className="flex items-center gap-1">
             {/* Minimize / Maximize button */}
@@ -250,7 +250,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
             >
               <Paperclip className="w-5 h-5 transition-transform group-hover:rotate-12 text-slate-600 dark:text-slate-300 group-hover:text-[#1e70eb]" />
               {attachedFile && (
-                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-white dark:border-slate-800 rounded-full" />
+                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-purple-500 border-2 border-white dark:border-slate-800 rounded-full" />
               )}
             </button>
           )}
@@ -261,7 +261,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
           <div className="p-5 pt-6 bg-white dark:bg-slate-900 rounded-b-xl">
             {isSubmitted ? (
               <div className="py-8 px-4 text-center space-y-3 animate-in fade-in zoom-in-95 duration-200">
-                <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-inner">
+                <div className="w-14 h-14 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center mx-auto shadow-inner">
                   <CheckCircle2 className="w-8 h-8 animate-bounce" />
                 </div>
                 <h3 className="text-base font-bold text-slate-900 dark:text-white">

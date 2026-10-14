@@ -9,7 +9,7 @@ import {
   InstagramIcon,
   YouTubeIcon,
 } from "@/components/icons/PlatformIcons";
-import { Search, Globe, ShieldCheck, Mail, ArrowUpRight, CheckCircle2 } from "lucide-react";
+import { Search, Globe, ShieldCheck, Mail, ArrowUpRight, CheckCircle2, Phone, MapPin } from "lucide-react";
 import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
 
 export function PulseMegaFooter() {
@@ -138,6 +138,132 @@ export function PulseMegaFooter() {
   return (
     <footer className="bg-slate-900 text-slate-400 text-xs border-t border-slate-800 pt-16 pb-12 select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        {/* ============================================================ */}
+        {/* TOP CONTACT & GLOBAL SUPPORT HUB                             */}
+        {/* ============================================================ */}
+        <div className="pb-10 border-b border-slate-800">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[11px] font-semibold mb-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>24/7 Global Support &amp; Customer Advisory</span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                Get in Touch with PulseSocial Specialists
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 max-w-xl">
+                Have questions about official OAuth permissions, high-volume publishing, or custom enterprise SLA contracts? Our engineering and product support team is ready to help.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/contact"
+                className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs transition shadow-md shadow-purple-600/20 flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>Contact Support Team</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </Link>
+              <a
+                href="tel:+18007857362"
+                className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition flex items-center gap-1.5"
+              >
+                <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Call Helpline</span>
+              </a>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {/* 1. Direct Helpline */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-slate-800/60 border border-slate-700/60 hover:border-purple-500/40 transition group">
+              <div className="flex items-center gap-3 mb-2.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center group-hover:scale-105 transition">
+                  <Phone className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">Toll-Free Helpline</h4>
+                  <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    Live 24/7
+                  </span>
+                </div>
+              </div>
+              <a
+                href="tel:+18007857362"
+                className="text-xs font-bold text-white hover:text-purple-300 transition block font-mono"
+              >
+                +1 (800) 785-PULSE
+              </a>
+              <p className="text-[10px] text-slate-400 mt-0.5">
+                +1 (800) 785-7362 &bull; Direct phone assistance
+              </p>
+            </div>
+
+            {/* 2. Support & Helpdesk */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-slate-800/60 border border-slate-700/60 hover:border-purple-500/40 transition group">
+              <div className="flex items-center gap-3 mb-2.5">
+                <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center justify-center group-hover:scale-105 transition">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">Support Desk</h4>
+                  <span className="text-[10px] text-purple-400 font-semibold">Response &lt; 15 mins</span>
+                </div>
+              </div>
+              <a
+                href="mailto:support@pulsesocial.io"
+                className="text-xs font-bold text-white hover:text-purple-300 transition block underline underline-offset-2"
+              >
+                support@pulsesocial.io
+              </a>
+              <p className="text-[10px] text-slate-400 mt-0.5">
+                Publishing, OAuth &amp; workspace troubleshooting
+              </p>
+            </div>
+
+            {/* 3. Sales & Enterprise Advisory */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-slate-800/60 border border-slate-700/60 hover:border-purple-500/40 transition group">
+              <div className="flex items-center gap-3 mb-2.5">
+                <div className="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center group-hover:scale-105 transition">
+                  <ShieldCheck className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">Sales &amp; Demos</h4>
+                  <span className="text-[10px] text-indigo-400 font-semibold">Enterprise Team</span>
+                </div>
+              </div>
+              <a
+                href="mailto:sales@pulsesocial.io"
+                className="text-xs font-bold text-white hover:text-purple-300 transition block underline underline-offset-2"
+              >
+                sales@pulsesocial.io
+              </a>
+              <p className="text-[10px] text-slate-400 mt-0.5">
+                Custom agency pricing, SLAs &amp; procurement
+              </p>
+            </div>
+
+            {/* 4. Global HQ & Office */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-slate-800/60 border border-slate-700/60 hover:border-purple-500/40 transition group">
+              <div className="flex items-center gap-3 mb-2.5">
+                <div className="w-9 h-9 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 flex items-center justify-center group-hover:scale-105 transition">
+                  <MapPin className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">Global HQ</h4>
+                  <span className="text-[10px] text-cyan-400 font-semibold">San Francisco, CA</span>
+                </div>
+              </div>
+              <p className="text-xs font-medium text-slate-200">
+                450 Mission St, Suite 1400
+              </p>
+              <p className="text-[10px] text-slate-400 mt-0.5">
+                San Francisco, CA 94105, United States
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Navigation Link Columns */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
           {footerGroups.map((group) => (
@@ -161,16 +287,35 @@ export function PulseMegaFooter() {
           ))}
         </div>
 
-        {/* Contact Email & Social Icons Row (Matching PDF page 15) */}
-        <div className="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-slate-300">
-            <Mail className="w-4 h-4 text-slate-400" />
-            <a
-              href="mailto:support@pulsesocial.com"
-              className="hover:text-white transition-colors underline underline-offset-2"
-            >
-              support@pulsesocial.com
-            </a>
+        {/* Contact Email, Phone & Social Icons Row */}
+        <div className="pt-8 border-t border-slate-800 flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 text-slate-300 text-xs">
+            <div className="flex items-center gap-2">
+              <Mail className="w-4 h-4 text-purple-400" />
+              <span className="text-slate-400">Support:</span>
+              <a
+                href="mailto:support@pulsesocial.io"
+                className="hover:text-white transition-colors underline underline-offset-2 font-medium"
+              >
+                support@pulsesocial.io
+              </a>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4 text-emerald-400" />
+              <span className="text-slate-400">Helpline:</span>
+              <a
+                href="tel:+18007857362"
+                className="hover:text-white transition-colors font-medium"
+              >
+                +1 (800) 785-PULSE (+1 800-785-7362)
+              </a>
+            </div>
+
+            <div className="flex items-center gap-2 text-slate-400">
+              <MapPin className="w-4 h-4 text-purple-400" />
+              <span>450 Mission St, Suite 1400, San Francisco, CA 94105</span>
+            </div>
           </div>
 
           <div className="flex items-center gap-3">

@@ -34,6 +34,11 @@ import {
   Loader2,
 } from "lucide-react";
 import { UniversalSocialConnectModal } from "@/components/social/UniversalSocialConnectModal";
+import {
+  AdvancedFiltersModal,
+  FilterCriteria,
+  DEFAULT_FILTER_CRITERIA,
+} from "@/components/filters/AdvancedFiltersModal";
 
 export interface CalendarPostTarget {
   id: string;
@@ -81,6 +86,8 @@ export default function CalendarPage() {
 
   // Filters & Popover state
   const [selectedPlatform, setSelectedPlatform] = useState<string>("ALL");
+  const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>(DEFAULT_FILTER_CRITERIA);
+  const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
   const [isChannelPopoverOpen, setIsChannelPopoverOpen] = useState(false);
   const [channelSearchQuery, setChannelSearchQuery] = useState("");
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
@@ -158,15 +165,68 @@ export default function CalendarPage() {
 
   const monthName = currentDate.toLocaleString("default", { month: "long" });
 
-  // Filter posts by selected channel if any
+  // Filter posts by selected channel and advanced filter criteria
   const filteredPosts = useMemo(() => {
-    if (selectedPlatform === "ALL") return posts;
-    return posts.filter((p) =>
-      p.targets?.some(
-        (t) => t.socialAccount?.provider?.toLowerCase() === selectedPlatform.toLowerCase()
-      )
-    );
-  }, [posts, selectedPlatform]);
+    return posts.filter((p) => {
+      // 1. Quick channel filter from toolbar
+      if (selectedPlatform !== "ALL") {
+        const matchesQuick = p.targets?.some(
+          (t) => t.socialAccount?.provider?.toLowerCase() === selectedPlatform.toLowerCase()
+        );
+        if (!matchesQuick) return false;
+      }
+
+      // 2. Advanced Platforms filter
+      if (filterCriteria.platforms.length > 0) {
+        const matchesPlatform = p.targets?.some((t) => {
+          const prov = (t.socialAccount?.provider || "").toLowerCase();
+          return filterCriteria.platforms.some((plat) => {
+            if (plat === "x") return prov.includes("x") || prov.includes("twitter");
+            if (plat === "threads") return prov.includes("thread");
+            if (plat === "google") return prov.includes("google");
+            return prov.includes(plat);
+          });
+        });
+        if (!matchesPlatform) return false;
+      }
+
+      // 3. Advanced Approval / Publication Status filter
+      if (filterCriteria.approvalStatuses.length > 0) {
+        const matchesStatus = filterCriteria.approvalStatuses.includes(p.status);
+        if (!matchesStatus) return false;
+      }
+
+      // 4. Advanced Content Types filter
+      if (filterCriteria.contentTypes.length > 0) {
+        const hasVideo = p.media?.some((m) => m.url?.match(/\.(mp4|webm|mov)$/i));
+        const matchesType = filterCriteria.contentTypes.some((type) => {
+          if (type === "reels") return Boolean(hasVideo);
+          if (type === "videos") return Boolean(hasVideo);
+          if (type === "posts") return !hasVideo;
+          return true;
+        });
+        if (!matchesType) return false;
+      }
+
+      // 5. Advanced Campaign filter
+      if (filterCriteria.campaigns.length > 0) {
+        const postCampaign = (p as any).campaignId || (p as any).campaign || "";
+        const contentLower = (p.content || "").toLowerCase();
+        const matchesCampaign = filterCriteria.campaigns.some((camp) => {
+          if (postCampaign === camp) return true;
+          if (camp === "q4-growth" && (contentLower.includes("growth") || contentLower.includes("q4"))) return true;
+          if (camp === "product-launch" && (contentLower.includes("launch") || contentLower.includes("feature") || contentLower.includes("ai"))) return true;
+          if (camp === "community-stories" && (contentLower.includes("community") || contentLower.includes("customer") || contentLower.includes("story"))) return true;
+          if (camp === "thought-leadership" && (contentLower.includes("insight") || contentLower.includes("founder") || contentLower.includes("leadership"))) return true;
+          if (camp === "seasonal-promos" && (contentLower.includes("sale") || contentLower.includes("promo") || contentLower.includes("discount"))) return true;
+          return false;
+        });
+        if (!matchesCampaign) return false;
+      }
+
+      return true;
+    });
+  }, [posts, selectedPlatform, filterCriteria]);
 
   // Retrieve posts for a specific day in the active month
   const getPostsForDay = (day: number) => {
@@ -251,18 +311,51 @@ export default function CalendarPage() {
 
               <button
                 type="button"
-                onClick={() => {
-                  toast({
-                    title: "Advanced Filters",
-                    message: "Filter posts by platform, campaign, and approval status.",
-                    type: "info",
-                  });
-                }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                onClick={() => setIsAdvancedFiltersOpen(true)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition cursor-pointer ${
+                  filterCriteria.platforms.length > 0 ||
+                  filterCriteria.approvalStatuses.length > 0 ||
+                  filterCriteria.campaigns.length > 0 ||
+                  filterCriteria.contentTypes.length > 0
+                    ? "bg-purple-50 dark:bg-purple-950/40 border-[#5846A8] text-[#5846A8] dark:text-purple-300 shadow-2xs font-bold"
+                    : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                }`}
               >
-                <Filter className="w-3.5 h-3.5 text-slate-500" />
+                <Filter className="w-3.5 h-3.5 text-[#5846A8]" />
                 <span>Filters</span>
+                {(filterCriteria.platforms.length > 0 ||
+                  filterCriteria.approvalStatuses.length > 0 ||
+                  filterCriteria.campaigns.length > 0 ||
+                  filterCriteria.contentTypes.length > 0) && (
+                  <span className="w-4 h-4 rounded-full bg-[#5846A8] text-white text-[10px] flex items-center justify-center font-bold">
+                    {filterCriteria.platforms.length +
+                      filterCriteria.approvalStatuses.length +
+                      filterCriteria.campaigns.length +
+                      filterCriteria.contentTypes.length}
+                  </span>
+                )}
               </button>
+
+              {/* Quick Clear Filter Pill */}
+              {(filterCriteria.platforms.length > 0 ||
+                filterCriteria.approvalStatuses.length > 0 ||
+                filterCriteria.campaigns.length > 0 ||
+                filterCriteria.contentTypes.length > 0) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFilterCriteria(DEFAULT_FILTER_CRITERIA);
+                    toast({
+                      title: "Filters Reset",
+                      message: "Showing all calendar posts.",
+                      type: "info",
+                    });
+                  }}
+                  className="text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 underline cursor-pointer"
+                >
+                  Clear all
+                </button>
+              )}
             </div>
 
             {/* Right Tools: Channel Popover Pill + View Switcher */}
@@ -1031,6 +1124,23 @@ export default function CalendarPage() {
             setIsConnectModalOpen(false);
             loadPostsAndChannels();
           }}
+        />
+
+        {/* Real Interactive Advanced Filters Modal */}
+        <AdvancedFiltersModal
+          isOpen={isAdvancedFiltersOpen}
+          onClose={() => setIsAdvancedFiltersOpen(false)}
+          activeCriteria={filterCriteria}
+          onApply={(newCriteria) => {
+            setFilterCriteria(newCriteria);
+            toast({
+              title: "Filters Applied",
+              message: "Updated calendar view with selected platform, campaign, and status filters.",
+              type: "success",
+            });
+          }}
+          totalPostsCount={posts.length}
+          filteredPostsCount={filteredPosts.length}
         />
       </div>
     </AppLayout>

@@ -559,8 +559,9 @@ export async function generateSocialCopy(req: SocialCopyRequest): Promise<Social
   // Fallback models in case primary model hits temporary 503 or 429
   const candidateModels = [
     modelId,
+    "gemini-flash-lite-latest",
     "gemini-3.1-flash-lite",
-    "gemini-3-flash-preview",
+    "gemini-3.7-flash",
     "gemini-3.8-flash",
     "gemini-flash-latest",
   ].filter((v, i, a) => a.indexOf(v) === i);
@@ -639,10 +640,10 @@ export async function generateSocialCopy(req: SocialCopyRequest): Promise<Social
     } catch (err: any) {
       lastError = err;
       const normalized = normalizeGeminiError(err);
-      if (normalized.statusCode !== 503 && normalized.statusCode !== 429) {
+      if (normalized.statusCode !== 503 && normalized.statusCode !== 429 && normalized.statusCode !== 404) {
         throw err;
       }
-      // If it was 503 or 429, loop to next candidate model
+      // If it was 503, 429, or 404, loop to next candidate model
       console.warn(`[AI:Gemini] Model ${currentModel} returned ${normalized.error}. Attempting candidate model.`);
     }
   }

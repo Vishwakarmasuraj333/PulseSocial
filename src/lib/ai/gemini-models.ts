@@ -102,9 +102,12 @@ export function resolveGeminiTextModel(rawInput?: string): string {
   const envModel = process.env.GEMINI_MODEL?.trim();
   if (envModel) return envModel;
 
-  if (!rawInput) return "gemini-3.1-flash-lite";
+  if (!rawInput) return "gemini-flash-lite-latest";
   const normalized = rawInput.trim().toLowerCase();
 
+  if (normalized.includes("flash-lite-latest") || normalized === "gemini-flash-lite-latest") {
+    return "gemini-flash-lite-latest";
+  }
   if (normalized.includes("3.1-flash-lite") || normalized.includes("lite")) {
     return "gemini-3.1-flash-lite";
   }
@@ -121,10 +124,10 @@ export function resolveGeminiTextModel(rawInput?: string): string {
     return "gemini-3.1-pro-preview";
   }
   if (normalized.includes("latest") || normalized === "gemini-flash-latest") {
-    return "gemini-flash-latest";
+    return "gemini-flash-lite-latest";
   }
 
-  return "gemini-3.1-flash-lite";
+  return "gemini-flash-lite-latest";
 }
 
 export function resolveGeminiImageModel(rawInput?: string): string {

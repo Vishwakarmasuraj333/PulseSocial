@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
 import { PreviewAccount, PreviewMediaItem, FacebookPostPreview } from "./FacebookPostPreview";
@@ -13,10 +13,40 @@ import { PinterestPostPreview } from "./PinterestPostPreview";
 import { ThreadsPostPreview } from "./ThreadsPostPreview";
 import { GoogleBusinessPostPreview } from "./GoogleBusinessPostPreview";
 import { MastodonPostPreview } from "./MastodonPostPreview";
-import { Sparkles, Plus, Layers } from "lucide-react";
+import { Plus } from "lucide-react";
 
-interface PostPreviewProps {
-  accounts: PreviewAccount[];
+export type SupportedPlatformKey =
+  | "linkedin"
+  | "instagram"
+  | "x"
+  | "facebook"
+  | "youtube"
+  | "threads"
+  | "tiktok"
+  | "pinterest"
+  | "google";
+
+export interface PlatformTabOption {
+  key: SupportedPlatformKey;
+  label: string;
+  provider: string;
+  defaultHeadline: string;
+}
+
+export const ALL_PREVIEW_PLATFORMS: PlatformTabOption[] = [
+  { key: "linkedin", label: "LinkedIn", provider: "LINKEDIN", defaultHeadline: "Company Page · 1st" },
+  { key: "instagram", label: "Instagram", provider: "INSTAGRAM", defaultHeadline: "Official Profile" },
+  { key: "x", label: "X (Twitter)", provider: "TWITTER", defaultHeadline: "Verified Organization" },
+  { key: "facebook", label: "Facebook", provider: "FACEBOOK", defaultHeadline: "Official Page" },
+  { key: "youtube", label: "YouTube", provider: "YOUTUBE", defaultHeadline: "Official Channel" },
+  { key: "threads", label: "Threads", provider: "THREADS", defaultHeadline: "Official Account" },
+  { key: "tiktok", label: "TikTok", provider: "TIKTOK", defaultHeadline: "Creator Profile" },
+  { key: "pinterest", label: "Pinterest", provider: "PINTEREST", defaultHeadline: "Business Account" },
+  { key: "google", label: "Google Business", provider: "GOOGLE_BUSINESS", defaultHeadline: "Verified Business" },
+];
+
+export interface PostPreviewProps {
+  accounts?: PreviewAccount[];
   activeAccountId?: string;
   onSelectAccount?: (id: string) => void;
   onOpenConnectModal?: () => void;
@@ -27,10 +57,13 @@ interface PostPreviewProps {
   firstComment?: string | null;
   youtubeTitle?: string;
   isShorts?: boolean;
+  brandName?: string;
+  brandAvatar?: string;
+  brandHandle?: string;
 }
 
 export function PostPreview({
-  accounts,
+  accounts = [],
   activeAccountId,
   onSelectAccount,
   onOpenConnectModal,
@@ -41,99 +74,167 @@ export function PostPreview({
   firstComment,
   youtubeTitle,
   isShorts,
+  brandName = "Pulse Media Global",
+  brandAvatar = "/icons/pulse-logo.svg",
+  brandHandle = "@pulsemedia",
 }: PostPreviewProps) {
-  // If multiple accounts are selected, track active tab locally if not provided
-  const [localActiveId, setLocalActiveId] = useState<string>(accounts[0]?.id || "");
+  // Determine starting platform based on connected accounts or default to linkedin
+  const initialPlatform: SupportedPlatformKey = useMemo(() => {
+    if (accounts && accounts.length > 0) {
+      const active = accounts.find((a) => a.id === activeAccountId) || accounts[0];
+      const p = (active.provider || "").toLowerCase();
+      if (p.includes("linkedin")) return "linkedin";
+      if (p.includes("instagram")) return "instagram";
+      if (p.includes("x") || p.includes("twitter")) return "x";
+      if (p.includes("facebook")) return "facebook";
+      if (p.includes("youtube")) return "youtube";
+      if (p.includes("thread")) return "threads";
+      if (p.includes("tiktok")) return "tiktok";
+      if (p.includes("pinterest")) return "pinterest";
+      if (p.includes("google")) return "google";
+    }
+    return "linkedin";
+  }, [accounts, activeAccountId]);
 
-  const effectiveActiveId = activeAccountId || localActiveId;
-  const currentAccount =
-    accounts.find((a) => a.id === effectiveActiveId) || accounts[0];
+  const [activePlatform, setActivePlatform] = useState<SupportedPlatformKey>(initialPlatform);
 
-  const handleTabClick = (id: string) => {
-    setLocalActiveId(id);
-    if (onSelectAccount) onSelectAccount(id);
+  // Keep in sync if activeAccountId or accounts change
+  useEffect(() => {
+    if (activeAccountId && accounts.length > 0) {
+      const match = accounts.find((a) => a.id === activeAccountId);
+      if (match) {
+        const p = match.provider.toLowerCase();
+        if (p.includes("linkedin")) setActivePlatform("linkedin");
+        else if (p.includes("instagram")) setActivePlatform("instagram");
+        else if (p.includes("x") || p.includes("twitter")) setActivePlatform("x");
+        else if (p.includes("facebook")) setActivePlatform("facebook");
+        else if (p.includes("youtube")) setActivePlatform("youtube");
+        else if (p.includes("thread")) setActivePlatform("threads");
+        else if (p.includes("tiktok")) setActivePlatform("tiktok");
+        else if (p.includes("pinterest")) setActivePlatform("pinterest");
+        else if (p.includes("google")) setActivePlatform("google");
+      }
+    }
+  }, [activeAccountId, accounts]);
+
+  // Find if an authentic connected account matches the selected platform
+  const matchingConnectedAccount = useMemo(() => {
+    if (!accounts || accounts.length === 0) return null;
+    return accounts.find((a) => {
+      const prov = (a.provider || "").toLowerCase();
+      if (activePlatform === "x") return prov.includes("x") || prov.includes("twitter");
+      if (activePlatform === "threads") return prov.includes("thread");
+      if (activePlatform === "google") return prov.includes("google");
+      return prov.includes(activePlatform);
+    }) || null;
+  }, [accounts, activePlatform]);
+
+  // Fallback simulated account so preview is 100% realistic and never blocked
+  const effectiveAccount: PreviewAccount = useMemo(() => {
+    if (matchingConnectedAccount) {
+      return matchingConnectedAccount;
+    }
+
+    const platformDef = ALL_PREVIEW_PLATFORMS.find((p) => p.key === activePlatform);
+    const cleanHandle = brandHandle ? (brandHandle.startsWith("@") ? brandHandle : `@${brandHandle}`) : "@pulsemedia";
+
+    return {
+      id: `sim-${activePlatform}`,
+      provider: platformDef?.provider || "LINKEDIN",
+      displayName: brandName || "Pulse Media Global",
+      username: cleanHandle,
+      profileImageUrl: brandAvatar || "/icons/pulse-logo.svg",
+      accountType: platformDef?.defaultHeadline || "Verified Channel",
+      isVerified: true,
+    };
+  }, [matchingConnectedAccount, activePlatform, brandName, brandAvatar, brandHandle]);
+
+  const handlePlatformSelect = (key: SupportedPlatformKey) => {
+    setActivePlatform(key);
+    // If a connected account exists for this platform, notify parent
+    const match = (accounts || []).find((a) => {
+      const prov = (a.provider || "").toLowerCase();
+      if (key === "x") return prov.includes("x") || prov.includes("twitter");
+      if (key === "threads") return prov.includes("thread");
+      if (key === "google") return prov.includes("google");
+      return prov.includes(key);
+    });
+    if (match && onSelectAccount) {
+      onSelectAccount(match.id);
+    }
   };
-
-  // Empty state: No accounts selected
-  if (!accounts || accounts.length === 0 || !currentAccount) {
-    return (
-      <div className="h-full min-h-[360px] flex flex-col items-center justify-center p-6 text-center rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
-        <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3 shadow-inner">
-          <Layers className="w-7 h-7" />
-        </div>
-        <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">
-          No channel selected
-        </h4>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-[240px] leading-relaxed">
-          Select or connect a verified social channel at the top of the composer to see its live platform preview.
-        </p>
-        {onOpenConnectModal && (
-          <button
-            type="button"
-            onClick={onOpenConnectModal}
-            className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow transition cursor-pointer"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Connect Social Account</span>
-          </button>
-        )}
-      </div>
-    );
-  }
-
-  const provider = currentAccount.provider.toLowerCase();
 
   return (
     <div className="space-y-3">
-      {/* Multi-Account Preview Tabs */}
-      {accounts.length > 1 && (
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-          {accounts.map((acc) => {
-            const isSelected = acc.id === currentAccount.id;
+      {/* Platform Preview Selector Bar supporting ALL platforms */}
+      <div className="bg-slate-100/80 dark:bg-slate-900/80 p-1.5 rounded-xl border border-slate-200/70 dark:border-slate-800">
+        <div className="flex items-center gap-1 overflow-x-auto pb-0.5 scrollbar-thin">
+          {ALL_PREVIEW_PLATFORMS.map((plat) => {
+            const isSelected = activePlatform === plat.key;
+            const hasConnected = (accounts || []).some((a) => {
+              const prov = (a.provider || "").toLowerCase();
+              if (plat.key === "x") return prov.includes("x") || prov.includes("twitter");
+              if (plat.key === "threads") return prov.includes("thread");
+              if (plat.key === "google") return prov.includes("google");
+              return prov.includes(plat.key);
+            });
+
             return (
               <button
-                key={acc.id}
+                key={plat.key}
                 type="button"
-                onClick={() => handleTabClick(acc.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition border cursor-pointer ${
+                onClick={() => handlePlatformSelect(plat.key)}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition cursor-pointer border ${
                   isSelected
-                    ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800 shadow-xs"
-                    : "bg-slate-100/70 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 border-transparent hover:bg-slate-200/60"
+                    ? "bg-[#5846A8] text-white border-[#5846A8] shadow-xs scale-[1.02]"
+                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200/80 dark:border-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-700"
                 }`}
+                title={`Preview on ${plat.label}${hasConnected ? " (Connected)" : " (Live Simulator)"}`}
               >
-                {renderPlatformIcon(acc.provider, 13)}
-                <span className="truncate max-w-[90px]">{acc.displayName}</span>
+                {renderPlatformIcon(plat.provider, 13)}
+                <span>{plat.label}</span>
+                {hasConnected ? (
+                  <span
+                    className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"
+                    title="Connected Channel Active"
+                  />
+                ) : (
+                  <span
+                    className={`text-[9px] uppercase tracking-wider px-1 py-0.2 rounded font-mono ${
+                      isSelected ? "bg-white/20 text-white" : "text-slate-400"
+                    }`}
+                  >
+                    Sim
+                  </span>
+                )}
               </button>
             );
           })}
         </div>
+      </div>
+
+      {/* Discreet helper bar when viewing simulated platform */}
+      {!matchingConnectedAccount && (
+        <div className="flex items-center justify-between px-2.5 py-1 rounded-lg bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 text-[11px] text-indigo-700 dark:text-indigo-300">
+          <span className="truncate">
+            Live {ALL_PREVIEW_PLATFORMS.find((p) => p.key === activePlatform)?.label} Preview &middot; Updates as you type
+          </span>
+          {onOpenConnectModal && (
+            <button
+              type="button"
+              onClick={onOpenConnectModal}
+              className="inline-flex items-center gap-1 text-[10.5px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline shrink-0 ml-2 cursor-pointer"
+            >
+              <Plus className="w-3 h-3" /> Connect Account
+            </button>
+          )}
+        </div>
       )}
 
-      {/* Dynamic Platform-Specific Renderer */}
-      {provider.includes("facebook") && (
-        <FacebookPostPreview
-          account={currentAccount}
-          content={content}
-          media={media}
-          location={location}
-          linkData={linkData}
-          firstComment={firstComment}
-        />
-      )}
-
-      {provider.includes("instagram") && (
-        <InstagramPostPreview
-          account={currentAccount}
-          content={content}
-          media={media}
-          location={location}
-          firstComment={firstComment}
-        />
-      )}
-
-      {provider.includes("linkedin") && (
+      {/* Dynamic Platform-Specific Live Preview Renderers */}
+      {activePlatform === "linkedin" && (
         <LinkedInPostPreview
-          account={currentAccount}
+          account={effectiveAccount}
           content={content}
           media={media}
           linkData={linkData}
@@ -141,26 +242,39 @@ export function PostPreview({
         />
       )}
 
-      {(provider.includes("x") || provider.includes("twitter")) && (
+      {activePlatform === "instagram" && (
+        <InstagramPostPreview
+          account={effectiveAccount}
+          content={content}
+          media={media}
+          location={location}
+          firstComment={firstComment}
+        />
+      )}
+
+      {activePlatform === "x" && (
         <XPostPreview
-          account={currentAccount}
+          account={effectiveAccount}
           content={content}
           media={media}
           location={location}
         />
       )}
 
-      {provider.includes("tiktok") && (
-        <TikTokPostPreview
-          account={currentAccount}
+      {activePlatform === "facebook" && (
+        <FacebookPostPreview
+          account={effectiveAccount}
           content={content}
           media={media}
+          location={location}
+          linkData={linkData}
+          firstComment={firstComment}
         />
       )}
 
-      {provider.includes("youtube") && (
+      {activePlatform === "youtube" && (
         <YouTubePostPreview
-          account={currentAccount}
+          account={effectiveAccount}
           content={content}
           media={media}
           title={youtubeTitle}
@@ -168,52 +282,38 @@ export function PostPreview({
         />
       )}
 
-      {provider.includes("thread") && (
+      {activePlatform === "threads" && (
         <ThreadsPostPreview
-          account={currentAccount}
+          account={effectiveAccount}
           content={content}
           media={media}
         />
       )}
 
-      {provider.includes("google") && (
+      {activePlatform === "tiktok" && (
+        <TikTokPostPreview
+          account={effectiveAccount}
+          content={content}
+          media={media}
+        />
+      )}
+
+      {activePlatform === "pinterest" && (
+        <PinterestPostPreview
+          account={effectiveAccount}
+          content={content}
+          media={media}
+        />
+      )}
+
+      {activePlatform === "google" && (
         <GoogleBusinessPostPreview
-          account={currentAccount}
+          account={effectiveAccount}
           content={content}
           media={media}
           ctaUrl={linkData?.url}
         />
       )}
-
-      {provider.includes("mastodon") && (
-        <MastodonPostPreview
-          account={currentAccount}
-          content={content}
-          media={media}
-        />
-      )}
-
-      {/* Fallback if none matched */}
-      {!provider.includes("facebook") &&
-        !provider.includes("instagram") &&
-        !provider.includes("linkedin") &&
-        !provider.includes("x") &&
-        !provider.includes("twitter") &&
-        !provider.includes("tiktok") &&
-        !provider.includes("youtube") &&
-        !provider.includes("pinterest") &&
-        !provider.includes("thread") &&
-        !provider.includes("google") &&
-        !provider.includes("mastodon") && (
-          <FacebookPostPreview
-            account={currentAccount}
-            content={content}
-            media={media}
-            location={location}
-            linkData={linkData}
-            firstComment={firstComment}
-          />
-        )}
     </div>
   );
 }

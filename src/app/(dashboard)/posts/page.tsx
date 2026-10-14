@@ -43,6 +43,11 @@ import {
 } from "lucide-react";
 import { UniversalSocialConnectModal } from "@/components/social/UniversalSocialConnectModal";
 import { PostEngagementDetailsModal } from "@/components/social/PostEngagementDetailsModal";
+import {
+  AdvancedFiltersModal,
+  FilterCriteria,
+  DEFAULT_FILTER_CRITERIA,
+} from "@/components/filters/AdvancedFiltersModal";
 
 interface PostTarget {
   id: string;
@@ -345,6 +350,8 @@ export default function PostsPage() {
   // Date filter
   const [dateFilterLabel, setDateFilterLabel] = useState<string>("Choose Date");
   const [isDateMenuOpen, setIsDateMenuOpen] = useState(false);
+  const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>(DEFAULT_FILTER_CRITERIA);
+  const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
 
   // Modals & States
   const [isComposerOpen, setIsComposerOpen] = useState(false);
@@ -556,6 +563,43 @@ export default function PostsPage() {
       if (!post.content.toLowerCase().includes(searchQuery.toLowerCase().trim())) {
         return false;
       }
+    }
+
+    // Advanced Platforms filter
+    if (filterCriteria.platforms.length > 0) {
+      const matchesPlatform = post.targets?.some((t) => {
+        const prov = (t.socialAccount?.provider || "").toLowerCase();
+        return filterCriteria.platforms.some((plat) => {
+          if (plat === "x") return prov.includes("x") || prov.includes("twitter");
+          if (plat === "threads") return prov.includes("thread");
+          if (plat === "google") return prov.includes("google");
+          return prov.includes(plat);
+        });
+      });
+      if (!matchesPlatform) return false;
+    }
+
+    // Advanced Approval Status filter
+    if (filterCriteria.approvalStatuses.length > 0) {
+      if (!filterCriteria.approvalStatuses.includes(post.status)) {
+        return false;
+      }
+    }
+
+    // Advanced Campaign filter
+    if (filterCriteria.campaigns.length > 0) {
+      const postCampaign = (post as any).campaignId || (post as any).campaign || "";
+      const contentLower = (post.content || "").toLowerCase();
+      const matchesCampaign = filterCriteria.campaigns.some((camp) => {
+        if (postCampaign === camp) return true;
+        if (camp === "q4-growth" && (contentLower.includes("growth") || contentLower.includes("q4"))) return true;
+        if (camp === "product-launch" && (contentLower.includes("launch") || contentLower.includes("feature") || contentLower.includes("ai"))) return true;
+        if (camp === "community-stories" && (contentLower.includes("community") || contentLower.includes("customer") || contentLower.includes("story"))) return true;
+        if (camp === "thought-leadership" && (contentLower.includes("insight") || contentLower.includes("founder") || contentLower.includes("leadership"))) return true;
+        if (camp === "seasonal-promos" && (contentLower.includes("sale") || contentLower.includes("promo") || contentLower.includes("discount"))) return true;
+        return false;
+      });
+      if (!matchesCampaign) return false;
     }
 
     return true;
@@ -1049,6 +1093,55 @@ export default function PostsPage() {
                     className="pl-7 pr-3 py-1 text-xs rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-850 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#5846A8] w-44"
                   />
                 </div>
+
+                {/* Advanced Filters Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsAdvancedFiltersOpen(true)}
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-xs font-semibold transition cursor-pointer ${
+                    filterCriteria.platforms.length > 0 ||
+                    filterCriteria.approvalStatuses.length > 0 ||
+                    filterCriteria.campaigns.length > 0 ||
+                    filterCriteria.contentTypes.length > 0
+                      ? "bg-purple-50 dark:bg-purple-950/40 border-[#5846A8] text-[#5846A8] dark:text-purple-300 shadow-2xs font-bold"
+                      : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-850 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
+                  }`}
+                  title="Filter posts by platform, campaign, and approval status"
+                >
+                  <Filter className="w-3.5 h-3.5 text-[#5846A8]" />
+                  <span>Advanced Filters</span>
+                  {(filterCriteria.platforms.length > 0 ||
+                    filterCriteria.approvalStatuses.length > 0 ||
+                    filterCriteria.campaigns.length > 0 ||
+                    filterCriteria.contentTypes.length > 0) && (
+                    <span className="w-4 h-4 rounded-full bg-[#5846A8] text-white text-[10px] flex items-center justify-center font-bold">
+                      {filterCriteria.platforms.length +
+                        filterCriteria.approvalStatuses.length +
+                        filterCriteria.campaigns.length +
+                        filterCriteria.contentTypes.length}
+                    </span>
+                  )}
+                </button>
+
+                {(filterCriteria.platforms.length > 0 ||
+                  filterCriteria.approvalStatuses.length > 0 ||
+                  filterCriteria.campaigns.length > 0 ||
+                  filterCriteria.contentTypes.length > 0) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFilterCriteria(DEFAULT_FILTER_CRITERIA);
+                      toast({
+                        title: "Filters Reset",
+                        message: "All posts displayed.",
+                        type: "info",
+                      });
+                    }}
+                    className="text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 underline cursor-pointer"
+                  >
+                    Clear
+                  </button>
+                )}
               </div>
 
               {/* Right side: Choose Date */}
@@ -1378,6 +1471,23 @@ export default function PostsPage() {
           post={selectedPostForDetails as any}
         />
       )}
+
+      {/* Advanced Filters Modal */}
+      <AdvancedFiltersModal
+        isOpen={isAdvancedFiltersOpen}
+        onClose={() => setIsAdvancedFiltersOpen(false)}
+        activeCriteria={filterCriteria}
+        onApply={(newCriteria) => {
+          setFilterCriteria(newCriteria);
+          toast({
+            title: "Filters Applied",
+            message: "Filtered posts by platform, campaign, and approval status.",
+            type: "success",
+          });
+        }}
+        totalPostsCount={posts.length}
+        filteredPostsCount={filteredPosts.length}
+      />
     </AppLayout>
   );
 }

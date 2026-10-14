@@ -10,6 +10,7 @@ import {
   XIcon,
   YouTubeIcon,
 } from "@/components/icons/PlatformIcons";
+import { Phone, Mail, MapPin, ArrowUpRight, ShieldCheck, Headphones } from "lucide-react";
 
 export function MarketingFooter() {
   const footerSections = [
@@ -56,7 +57,49 @@ export function MarketingFooter() {
 
   return (
     <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 pt-16 pb-12 select-none">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        {/* ============================================================ */}
+        {/* TOP CONTACT & ADVISORY BANNER                                */}
+        {/* ============================================================ */}
+        <div className="p-6 sm:p-8 rounded-3xl bg-slate-800/40 border border-slate-700/60 flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div className="space-y-1 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-semibold mb-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Direct Support &amp; Product Consultation</span>
+            </div>
+            <h3 className="text-xl font-bold text-white">
+              Questions about SocialPulse or need custom onboarding?
+            </h3>
+            <p className="text-xs text-slate-400 max-w-xl">
+              Connect directly with our engineering and growth advisory team. Available 24/7 with under 15-minute response SLA.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
+            <a
+              href="tel:+18007857362"
+              className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs border border-slate-600 transition flex items-center gap-2 shadow-xs"
+            >
+              <Phone className="w-3.5 h-3.5 text-emerald-400" />
+              <span>+1 (800) 785-PULSE</span>
+            </a>
+            <a
+              href="mailto:support@pulsesocial.io"
+              className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs border border-slate-600 transition flex items-center gap-2 shadow-xs"
+            >
+              <Mail className="w-3.5 h-3.5 text-purple-400" />
+              <span>support@pulsesocial.io</span>
+            </a>
+            <Link
+              href="/contact"
+              className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs transition shadow-md shadow-purple-600/20 flex items-center gap-1.5"
+            >
+              <span>Contact Us Form</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </div>
+
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12 pb-12 border-b border-slate-800/80">
           {/* Brand Col */}
           <div className="col-span-2 space-y-4">
@@ -64,6 +107,32 @@ export function MarketingFooter() {
             <p className="text-xs text-slate-300 max-w-sm leading-relaxed">
               PulseSocial is the unified social media management SaaS platform for modern teams, creators, and enterprises. Publish, schedule, collaborate, and analyze from one powerful workspace.
             </p>
+
+            {/* Direct Contact Info Details */}
+            <div className="pt-2 space-y-2.5 text-xs text-slate-300 border-t border-slate-800/80">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-white">Support &amp; Inquiries:</span>
+                <a href="mailto:support@pulsesocial.io" className="hover:text-purple-400 transition underline underline-offset-2">
+                  support@pulsesocial.io
+                </a>
+              </div>
+              <div className="flex items-center gap-2 text-slate-300">
+                <span className="font-semibold text-white">Direct Line:</span>
+                <a href="tel:+18007857362" className="hover:text-purple-400 transition font-mono">
+                  +1 (800) 785-PULSE (+1 800-785-7362)
+                </a>
+              </div>
+              <div className="flex items-center gap-2 text-slate-300">
+                <span className="font-semibold text-white">Enterprise Sales:</span>
+                <a href="mailto:sales@pulsesocial.io" className="hover:text-purple-400 transition underline underline-offset-2">
+                  sales@pulsesocial.io
+                </a>
+              </div>
+              <div className="text-slate-400 text-[11px] pt-1">
+                HQ: 450 Mission St, Suite 1400, San Francisco, CA 94105 &bull; 24/7 Global Response
+              </div>
+            </div>
+
             <div className="flex items-center gap-3 pt-2">
               <Link href="https://twitter.com" target="_blank" className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white transition" aria-label="X">
                 <XIcon size={16} />

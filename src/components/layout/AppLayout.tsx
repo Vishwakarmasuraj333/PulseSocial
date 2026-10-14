@@ -1006,8 +1006,20 @@ export function AppLayout({ children }: AppLayoutProps) {
         <main className="flex-1 overflow-y-auto pb-16 flex flex-col justify-between">
           <div>{children}</div>
           <footer className="mt-auto px-6 py-4 border-t border-slate-200/80 dark:border-slate-800/80 text-[11px] text-slate-500 dark:text-slate-400 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <span>PulseSocial Platform</span>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="font-semibold text-slate-700 dark:text-slate-300">PulseSocial</span>
+              <span>•</span>
+              <Link href="/contact" className="hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition">
+                Contact Support
+              </Link>
+              <span>•</span>
+              <a href="tel:+18007857362" className="hover:text-emerald-600 dark:hover:text-emerald-400 font-medium transition flex items-center gap-1 font-mono">
+                <span>+1 (800) 785-PULSE</span>
+              </a>
+              <span>•</span>
+              <a href="mailto:support@pulsesocial.io" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">
+                support@pulsesocial.io
+              </a>
               <span>•</span>
               <Link href="/cookie-policy" className="hover:text-slate-800 dark:hover:text-slate-200 underline">
                 Cookie Policy
@@ -1030,7 +1042,14 @@ export function AppLayout({ children }: AppLayoutProps) {
                 Cookie settings
               </button>
             </div>
-            <span>TLS 1.3 • Encrypted Session &amp; Token Storage • Role-Based Access Control</span>
+            <div className="flex items-center gap-3 text-slate-400 text-[10px]">
+              <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                All Systems Operational
+              </span>
+              <span>•</span>
+              <span>TLS 1.3 AES-256 Vault</span>
+            </div>
           </footer>
         </main>
       </div>

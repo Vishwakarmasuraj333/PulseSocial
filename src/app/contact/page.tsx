@@ -1,20 +1,37 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MarketingHeader } from "@/components/marketing/MarketingHeader";
 import { MarketingFooter } from "@/components/marketing/MarketingFooter";
-import { Mail, MessageSquare, ShieldCheck, Send, CheckCircle2, Clock, MapPin, Loader2 } from "lucide-react";
+import { Mail, MessageSquare, ShieldCheck, Send, CheckCircle2, Clock, MapPin, Loader2, Phone, Headphones, Building } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 
 export default function ContactPage() {
   const { toast } = useToast();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [category, setCategory] = useState("SUPPORT");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Check URL hash for callback or demo
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash;
+      const search = window.location.search;
+      if (hash === "#callback" || search.includes("callback")) {
+        setCategory("CALLBACK");
+        setSubject("Request a Callback from Product Specialist");
+      } else if (search.includes("demo") || search.includes("sales")) {
+        setCategory("SALES");
+        setSubject("Enterprise Demo & Pricing Consultation");
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,10 +39,11 @@ export default function ContactPage() {
     setIsSubmitting(true);
 
     try {
+      const formattedMessage = phone ? `${message}\n\n[Preferred Callback Phone: ${phone}]` : message;
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, subject, message }),
+        body: JSON.stringify({ name, email, subject, message: formattedMessage, category }),
       });
 
       const data = await res.json();
@@ -35,8 +53,8 @@ export default function ContactPage() {
 
       setIsSubmitted(true);
       toast({
-        title: "Message Dispatched!",
-        message: "We have received your support inquiry and will reply promptly.",
+        title: "Inquiry Dispatched Successfully!",
+        message: "Your message has been routed to our dedicated enterprise queue.",
         type: "success",
       });
     } catch (err: unknown) {
@@ -55,7 +73,7 @@ export default function ContactPage() {
         <div className="text-center max-w-2xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-semibold mb-4">
             <Mail className="w-3.5 h-3.5" />
-            <span>Dedicated Support & Advisory</span>
+            <span>Dedicated 24/7 Global Support &amp; Advisory</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-950 dark:text-white">
             We&apos;re Here to Help
@@ -73,37 +91,89 @@ export default function ContactPage() {
                 Contact Information
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                PulseSocial engineers and support staff monitor inquiries across all worldwide timezones.
+                PulseSocial engineers and support staff monitor inquiries across all worldwide timezones with guaranteed SLA response times.
               </p>
 
               <div className="space-y-4 pt-2">
+                {/* 1. Toll Free Helpline */}
+                <div className="flex items-start gap-4 p-3 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/40">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                    <Phone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white">24/7 Helpline</h4>
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    </div>
+                    <a href="tel:+18007857362" className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 block hover:underline font-mono">
+                      +1 (800) 785-PULSE (+1 800-785-7362)
+                    </a>
+                    <span className="text-[10px] text-slate-400">Toll-free across North America</span>
+                  </div>
+                </div>
+
+                {/* 2. General Support */}
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
                     <Mail className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900 dark:text-white">General & Support</h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">support@pulsesocial.io</p>
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-white">Technical &amp; General Support</h4>
+                    <a href="mailto:support@pulsesocial.io" className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline mt-0.5 block">
+                      support@pulsesocial.io
+                    </a>
                   </div>
                 </div>
 
+                {/* 3. Sales & Advisory */}
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                    <Headphones className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-white">Enterprise Sales &amp; Custom Demos</h4>
+                    <a href="mailto:sales@pulsesocial.io" className="text-xs text-purple-600 dark:text-purple-400 hover:underline mt-0.5 block">
+                      sales@pulsesocial.io
+                    </a>
+                  </div>
+                </div>
+
+                {/* 4. Security & Compliance */}
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-xl bg-cyan-50 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">
                     <ShieldCheck className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900 dark:text-white">Security & Compliance</h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">security@pulsesocial.io</p>
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-white">Security &amp; Compliance</h4>
+                    <a href="mailto:security@pulsesocial.io" className="text-xs text-cyan-600 dark:text-cyan-400 hover:underline mt-0.5 block">
+                      security@pulsesocial.io
+                    </a>
                   </div>
                 </div>
 
+                {/* 5. Global HQ Address */}
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                    <MapPin className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-white">Global Headquarters</h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      450 Mission St, Suite 1400, San Francisco, CA 94105, USA
+                    </p>
+                  </div>
+                </div>
+
+                {/* 6. Response SLA */}
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center shrink-0">
                     <Clock className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900 dark:text-white">Response Time</h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Under 2 hours for active workspaces</p>
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-white">Response Guarantee</h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      Average response under 15 minutes for enterprise accounts
+                    </p>
                   </div>
                 </div>
               </div>
@@ -138,6 +208,38 @@ export default function ContactPage() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
+                  {/* Category Pills */}
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-2">
+                      Inquiry Department / Type
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { id: "SUPPORT", label: "Technical Support" },
+                        { id: "SALES", label: "Enterprise Sales & Demo" },
+                        { id: "CALLBACK", label: "Request a Callback" },
+                        { id: "BILLING", label: "Billing & Plans" },
+                        { id: "PARTNER", label: "Partnership & Agency" },
+                      ].map((cat) => {
+                        const isSelected = category === cat.id;
+                        return (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            onClick={() => setCategory(cat.id)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer border ${
+                              isSelected
+                                ? "bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-600/30"
+                                : "bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-indigo-400"
+                            }`}
+                          >
+                            {cat.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
@@ -166,6 +268,21 @@ export default function ContactPage() {
                         className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
                       />
                     </div>
+                  </div>
+
+                  {/* Phone field (especially for callbacks) */}
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
+                      Phone Number {category === "CALLBACK" ? "(Required for Callback)" : "(Optional for fast follow-up)"}
+                    </label>
+                    <input
+                      type="tel"
+                      required={category === "CALLBACK"}
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+1 (555) 000-0000"
+                      className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 font-mono"
+                    />
                   </div>
 
                   <div>

@@ -63,72 +63,72 @@ export function ZiaCopilotModal({
 
     setStep("generating");
 
-    // Perform API call or intelligent matching
     try {
-      // 1. Try real Gemini API first
-      let apiCaption = "";
-      try {
-        const res = await fetch("/api/ai/gemini/social-copy", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            prompt: prompt.trim(),
-            brandName,
-            industry: "Entertainment & Animation",
-            tone: tone === "Normal" ? "Engaging & Viral" : tone,
-            language,
-            includeHashtags: true,
-          }),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data?.primaryCaption) {
-            apiCaption = data.primaryCaption;
-          }
-        }
-      } catch {}
+      // 1. Call real Google Gemini Social Copy API
+      const res = await fetch("/api/ai/gemini/social-copy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: prompt.trim(),
+          brandName: brandName || "SocialPulse",
+          industry: "Digital & Social Media Marketing",
+          tone: tone === "Normal" ? "Engaging & Viral" : tone,
+          language,
+          includeHashtags: true,
+          includeFirstComment: true,
+          category,
+        }),
+      });
 
-      // 2. Intelligent topic matching corresponding to user's exact demo prompts
-      const lower = prompt.toLowerCase();
-      let matchedCaption = apiCaption;
-      let matchedImage: string | null = null;
-
-      if (lower.includes("shiv")) {
-        matchedCaption = matchedCaption || '"Capturing moments with Shiv 📷 #Memories #Shiv #Photography"';
-        matchedImage = "/images/shiv_artwork.jpg";
-      } else if (lower.includes("hii") || lower.includes("am") || lower.includes("boy") || lower.includes("portrait")) {
-        matchedCaption = matchedCaption || "hii am";
-        matchedImage = "/images/boy_white_jacket.jpg";
-      } else if (lower.includes("office") || lower.includes("bittu") || lower.includes("uma")) {
-        matchedCaption =
-          matchedCaption ||
-          "Office ka kaam tha… par dil Uma pe aa gaya ❤️🐒😍\nBittu & Uma ki cute office love story! 💕✨\n\n#BrownMonkeyTV #BittuUma #MonkeyLove #OfficeLove #CuteCouple";
-        matchedImage = "/images/office_love_thumbnail_real.jpg";
-      } else if (lower.includes("chocolate") || lower.includes("fight") || lower.includes("funny")) {
-        matchedCaption =
-          matchedCaption ||
-          "❤️ Thodi si fight... thoda sa pyaar... aur chocolate se sab theek! 😂🍫 #BrownMonkeyTV #MonkeyCouple #CuteComedy";
-        matchedImage = "/images/monkey_chocolate.jpg";
-      } else {
-        if (!matchedCaption) {
-          matchedCaption = `✨ ${prompt}\n\nExcited to share this with our amazing community! Drop your thoughts below. 👇\n\n#${brandName.replace(/[^a-zA-Z0-9]/g, "")} #Trending #PulseSocial #NewPost`;
-        }
-        matchedImage = "/images/boy_white_jacket.jpg";
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || data.error || "Gemini generation could not be completed.");
       }
 
-      setGeneratedCaption(matchedCaption);
-      setSuggestedImageUrl(includeImages ? matchedImage : null);
-      setImageSelected(Boolean(includeImages && matchedImage));
+      let fullCaption = (data.primaryCaption || "").trim();
+      if (Array.isArray(data.hashtags) && data.hashtags.length > 0) {
+        const hashtagsString = data.hashtags.join(" ");
+        if (!fullCaption.includes(data.hashtags[0])) {
+          fullCaption = `${fullCaption}\n\n${hashtagsString}`;
+        }
+      }
 
-      // Show magical animation for 1.8 seconds matching screenshot
-      setTimeout(() => {
-        setStep("result");
-      }, 1800);
-    } catch {
+      setGeneratedCaption(fullCaption);
+
+      // 2. Generate Real AI Visual if requested
+      let generatedImage: string | null = null;
+      if (includeImages) {
+        try {
+          const imgRes = await fetch("/api/ai/image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              prompt: data.imagePrompt || prompt.trim(),
+              brandName: brandName || "SocialPulse",
+              aspectRatio: "1:1",
+              style: "realistic",
+            }),
+          });
+          if (imgRes.ok) {
+            const imgData = await imgRes.json();
+            if (imgData?.imageUrl) {
+              generatedImage = imgData.imageUrl;
+            }
+          }
+        } catch (imgErr) {
+          console.warn("[Copilot Image Generation Warning]", imgErr);
+        }
+      }
+
+      setSuggestedImageUrl(generatedImage);
+      setImageSelected(Boolean(generatedImage));
+
+      setStep("result");
+    } catch (err: any) {
       setStep("input");
       toast({
-        title: "Generation Failed",
-        message: "Something went wrong generating copy. Please try again.",
+        title: "Gemini Generation Failed",
+        message: err.message || "Failed to generate copy from Google Gemini. Please check prompt and retry.",
         type: "error",
       });
     }
@@ -231,20 +231,20 @@ export function ZiaCopilotModal({
                 <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="What would you like to post? e.g. shiv img, or hii am, or launching 20% discount on summer apparel..."
+                  placeholder="What would you like Google Gemini to write about? e.g. Announcing our 2026 product release, or tips for remote marketing teams..."
                   rows={3}
                   className="w-full p-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 focus:outline-none focus:ring-2 focus:ring-[#5846A8]/40 resize-none leading-relaxed text-slate-900 dark:text-white"
                   autoFocus
                 />
 
-                {/* Quick Chips matching user tests */}
+                {/* Quick Chips */}
                 <div className="flex flex-wrap items-center gap-1.5 mt-2">
                   <span className="text-[10px] text-slate-400 font-medium">Quick ideas:</span>
                   {[
-                    { label: "shiv img", promptText: "shiv img" },
-                    { label: "hii am", promptText: "hii am" },
-                    { label: "Office Mein Pyaar ❤️", promptText: "Office Mein Pyaar cute cartoon story" },
-                    { label: "Weekend Motivation 🚀", promptText: "Inspirational weekend quote for creators" },
+                    { label: "Product Launch 🚀", promptText: "Announcing our breakthrough new platform feature with top benefits" },
+                    { label: "5 Growth Tips 💡", promptText: "5 actionable social media growth strategies for modern founders" },
+                    { label: "Engagement Hook 🔥", promptText: "Thought-provoking community question about AI and digital marketing" },
+                    { label: "Customer Win ✨", promptText: "Inspiring customer success milestone and results story" },
                   ].map((chip) => (
                     <button
                       key={chip.label}

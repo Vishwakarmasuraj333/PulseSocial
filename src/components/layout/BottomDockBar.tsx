@@ -25,6 +25,9 @@ import {
   Play,
   Pause,
   Square,
+  Phone,
+  Mail,
+  Headphones,
 } from "lucide-react";
 import { FeedbackModal } from "@/components/layout/FeedbackModal";
 import { PulseHelpGuidesModal } from "@/components/layout/PulseHelpGuidesModal";
@@ -710,7 +713,7 @@ export function BottomDockBar() {
 
           {/* Filter Pills */}
           <div className="flex items-center gap-1 pb-2 overflow-x-auto no-scrollbar text-[11px]">
-            {["Frequents", "Unread", "All", "People", "Messages", "Chats", "Pins"].map((pill) => {
+            {["Frequents", "Support", "All", "People", "Messages", "Chats", "Pins"].map((pill) => {
               const pillKey = pill.toLowerCase();
               const isSelected = contactFilter === pillKey || (contactFilter === "all" && pill === "All");
               return (
@@ -732,6 +735,57 @@ export function BottomDockBar() {
 
           {/* Contacts List */}
           <div className="py-2 max-h-56 overflow-y-auto space-y-1.5 text-xs">
+            {/* Pulse 24/7 Support Contact Card */}
+            {(contactFilter === "all" || contactFilter === "support" || contactFilter === "frequents") && (
+              <div className="p-2.5 rounded-xl bg-purple-500/5 dark:bg-purple-950/20 border border-purple-500/20 hover:border-purple-500/40 transition">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-xs">
+                      <Headphones className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <p className="font-bold text-slate-900 dark:text-white truncate text-xs">
+                          Pulse 24/7 Support Desk
+                        </p>
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      </div>
+                      <p className="text-[10px] text-purple-600 dark:text-purple-400 font-medium truncate">
+                        support@pulsesocial.io
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <a
+                      href="tel:+18007857362"
+                      className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 hover:bg-emerald-100 transition cursor-pointer"
+                      title="Call Helpline: +1 (800) 785-PULSE"
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                    </a>
+                    <a
+                      href="mailto:support@pulsesocial.io"
+                      className="p-1.5 rounded-lg bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 hover:bg-purple-100 transition cursor-pointer"
+                      title="Email Support Desk"
+                    >
+                      <Mail className="w-3.5 h-3.5" />
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => setIsFeedbackOpen(true)}
+                      className="p-1.5 rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 hover:bg-blue-100 transition cursor-pointer"
+                      title="Send Ticket / Feedback"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-1.5 flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 pt-1.5 border-t border-purple-500/10">
+                  <span className="font-mono font-medium text-emerald-600 dark:text-emerald-400">+1 (800) 785-PULSE</span>
+                  <span>Avg reply: &lt; 15 mins</span>
+                </div>
+              </div>
+            )}
             {contacts.length > 0 ? (
               contacts
                 .filter((m: any) => {

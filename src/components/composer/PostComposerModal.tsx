@@ -339,20 +339,20 @@ export function PostComposerModal({
 
   const effectiveChannels: ConnectedAccountItem[] = connectedAccounts;
 
+  const [content, setContent] = useState("");
+  const [media, setMedia] = useState<PreviewMediaItem[]>([]);
+  const [activePreviewId, setActivePreviewId] = useState<string>("sim-linkedin");
+
   const activePreviewChannel: ConnectedAccountItem =
     effectiveChannels.find((ch) => selectedAccountIds.includes(ch.id)) ||
     effectiveChannels[0] || {
-      id: "preview-channel",
-      provider: "facebook",
+      id: activePreviewId || "sim-linkedin",
+      provider: activePreviewId ? activePreviewId.replace("sim-", "") : "linkedin",
       displayName: activeBrand.name || "PulseSocial",
       username: activeBrand.slug || "pulsesocial",
       profileImageUrl: activeBrand.avatarUrl || "/icons/pulse-logo.svg",
       status: "DISCONNECTED",
     };
-
-  const [content, setContent] = useState("");
-  const [media, setMedia] = useState<PreviewMediaItem[]>([]);
-  const [activePreviewId, setActivePreviewId] = useState<string>("");
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
   const [youtubeTitle, setYoutubeTitle] = useState("");
   const [isShorts, setIsShorts] = useState(false);
@@ -921,6 +921,48 @@ export function PostComposerModal({
     }
   };
 
+  // Generate trending hashtags with real Gemini AI
+  const handleGenerateHashtagsWithAi = async () => {
+    setIsGeneratingAi(true);
+    try {
+      const topic = content.trim() || activeBrand.name || "social media marketing";
+      const res = await fetch("/api/ai/gemini/social-copy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: `Generate 5 to 8 high-engagement, trending hashtags for: "${topic}"`,
+          brandName: activeBrand.name || "PulseSocial",
+          industry: activeBrand.industry || "Social Media",
+          includeHashtags: true,
+          includeFirstComment: false,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || data.error || "Failed to generate hashtags.");
+      }
+
+      if (Array.isArray(data.hashtags) && data.hashtags.length > 0) {
+        const tagsStr = data.hashtags.join(" ");
+        setContent((prev) => (prev.trim() ? `${prev.trim()}\n\n${tagsStr}` : tagsStr));
+        toast({
+          title: "# Hashtags Added!",
+          message: `Inserted ${data.hashtags.length} trending hashtags generated with Gemini.`,
+          type: "success",
+        });
+      }
+    } catch (err: any) {
+      toast({
+        title: "Hashtag Error",
+        message: err.message || "Could not generate hashtags.",
+        type: "error",
+      });
+    } finally {
+      setIsGeneratingAi(false);
+    }
+  };
+
   // Filter emojis based on search
   const filteredEmojis = emojiSearch.trim()
     ? EMOJI_CATEGORIES.flatMap((c) => c.list).filter((_, idx) => idx % 2 === 0)
@@ -977,9 +1019,34 @@ export function PostComposerModal({
                 </button>
 
                 {effectiveChannels.length === 0 && (
-                  <span className="text-xs text-slate-500 italic">
-                    No social accounts connected yet. Click (+) to connect.
-                  </span>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {[
+                      { key: "linkedin", name: "LinkedIn", provider: "LINKEDIN" },
+                      { key: "instagram", name: "Instagram", provider: "INSTAGRAM" },
+                      { key: "x", name: "X (Twitter)", provider: "TWITTER" },
+                      { key: "facebook", name: "Facebook", provider: "FACEBOOK" },
+                      { key: "youtube", name: "YouTube", provider: "YOUTUBE" },
+                      { key: "threads", name: "Threads", provider: "THREADS" },
+                    ].map((p) => {
+                      const isSelected = activePreviewId === `sim-${p.key}` || (!activePreviewId && p.key === "linkedin");
+                      return (
+                        <button
+                          key={p.key}
+                          type="button"
+                          onClick={() => setActivePreviewId(`sim-${p.key}`)}
+                          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border transition cursor-pointer ${
+                            isSelected
+                              ? "bg-[#5846A8] text-white border-[#5846A8] shadow-2xs"
+                              : "bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200"
+                          }`}
+                          title={`Preview on ${p.name}`}
+                        >
+                          {renderPlatformIcon(p.provider, 12)}
+                          <span>{p.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 )}
 
                 {effectiveChannels.map((ch) => {
@@ -1046,16 +1113,30 @@ export function PostComposerModal({
                 )}
               </div>
 
-              {/* Zia Copilot Trigger Bar matching Zoho Social Screenshot */}
+              {/* Gemini Copilot & AI Trigger Bar matching User requirements */}
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 <button
                   type="button"
                   onClick={() => setIsZiaModalOpen(true)}
-                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-sky-400/80 bg-sky-50/60 hover:bg-sky-100/80 text-sky-700 dark:bg-sky-950/40 dark:border-sky-700 dark:text-sky-300 text-xs font-semibold transition active:scale-95 cursor-pointer shadow-2xs"
-                  title="Generate dynamic copy & images with Gemini AI Copilot"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-sky-400/80 bg-sky-50/80 hover:bg-sky-100 text-sky-700 dark:bg-sky-950/50 dark:border-sky-700 dark:text-sky-300 text-xs font-semibold transition active:scale-95 cursor-pointer shadow-2xs"
+                  title="Generate dynamic copy & images with Google Gemini AI Copilot"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
-                  <span>Compose with AI</span>
+                  <span>Gemini AI Copilot</span>
+                  <span className="text-[10px] bg-sky-200/80 dark:bg-sky-900/70 text-sky-800 dark:text-sky-200 px-1.5 py-0.2 rounded font-mono font-bold">
+                    Flash 3.1
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleGenerateHashtagsWithAi}
+                  disabled={isGeneratingAi}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium cursor-pointer shadow-2xs disabled:opacity-50 transition"
+                  title="Generate trending hashtags with Google Gemini"
+                >
+                  <Hash className="w-3.5 h-3.5 text-slate-500" />
+                  <span>+ Hashtags</span>
                 </button>
 
                 {content.trim() && (
@@ -2152,6 +2233,9 @@ export function PostComposerModal({
                 firstComment={attachedComment}
                 youtubeTitle={youtubeTitle}
                 isShorts={isShorts}
+                brandName={activeBrand.name || "Pulse Media Global"}
+                brandAvatar={activeBrand.avatarUrl || "/icons/pulse-logo.svg"}
+                brandHandle={activeBrand.slug || "pulsemedia"}
               />
             </div>
           </div>

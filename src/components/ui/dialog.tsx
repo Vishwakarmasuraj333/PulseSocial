@@ -28,10 +28,10 @@ export function Dialog({
   showCloseButton = true,
 }: DialogProps) {
   const isCurrentlyOpen = open !== undefined ? open : !!isOpen;
-  const handleClose = () => {
+  const handleClose = React.useCallback(() => {
     if (onClose) onClose();
     if (onOpenChange) onOpenChange(false);
-  };
+  }, [onClose, onOpenChange]);
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -45,7 +45,7 @@ export function Dialog({
       document.body.style.overflow = "unset";
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isCurrentlyOpen]);
+  }, [isCurrentlyOpen, handleClose]);
 
   if (!isCurrentlyOpen) return null;
 
@@ -54,7 +54,7 @@ export function Dialog({
       {/* Backdrop with smooth fade animation */}
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
-        onClick={onClose}
+        onClick={handleClose}
         aria-hidden="true"
       />
 

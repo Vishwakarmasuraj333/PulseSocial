@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -164,6 +164,11 @@ export default function PostsPage() {
   const [posts, setPosts] = useState<PostItem[]>([]);
   const [connectedChannels, setConnectedChannels] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const connectedChannelsRef = useRef(connectedChannels);
+
+  useEffect(() => {
+    connectedChannelsRef.current = connectedChannels;
+  }, [connectedChannels]);
 
   // Load backend posts & accounts dynamically
   const loadPostsAndChannels = async () => {
@@ -209,6 +214,7 @@ export default function PostsPage() {
       const newPost = e.detail;
       if (newPost) {
         const postStatus = newPost.status || "PUBLISHED";
+        const currentChannels = connectedChannelsRef.current;
         setPosts((prev) => [
           {
             id: newPost.id || `post-${Date.now()}`,
@@ -218,17 +224,17 @@ export default function PostsPage() {
             scheduledFor: newPost.scheduledFor,
             createdAt: newPost.createdAt || new Date().toISOString(),
             media: newPost.media || (newPost.mediaUrls ? newPost.mediaUrls.map((m: any, i: number) => ({ id: `m-${i}`, url: typeof m === 'string' ? m : m.url, mediaType: 'image' })) : []),
-            targets: newPost.targets || (connectedChannels.length > 0 ? [
+            targets: newPost.targets || (currentChannels.length > 0 ? [
               {
                 id: `t-${Date.now()}`,
-                socialAccountId: connectedChannels[0].id,
+                socialAccountId: currentChannels[0].id,
                 status: "SUCCESS",
                 socialAccount: {
-                  id: connectedChannels[0].id,
-                  provider: connectedChannels[0].provider,
-                  displayName: connectedChannels[0].displayName,
-                  username: connectedChannels[0].username || connectedChannels[0].displayName,
-                  avatarUrl: connectedChannels[0].profileImageUrl || "",
+                  id: currentChannels[0].id,
+                  provider: currentChannels[0].provider,
+                  displayName: currentChannels[0].displayName,
+                  username: currentChannels[0].username || currentChannels[0].displayName,
+                  avatarUrl: currentChannels[0].profileImageUrl || "",
                 },
               },
             ] : []),

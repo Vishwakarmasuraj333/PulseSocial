@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -98,7 +98,7 @@ export default function CalendarPage() {
   const [activeMenuPostId, setActiveMenuPostId] = useState<string | null>(null);
 
   // Fetch real posts and accounts from API
-  const loadPostsAndChannels = async () => {
+  const loadPostsAndChannels = useCallback(async () => {
     setIsLoading(true);
     try {
       const [postsRes, accRes] = await Promise.all([
@@ -128,7 +128,7 @@ export default function CalendarPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     loadPostsAndChannels();
@@ -138,7 +138,7 @@ export default function CalendarPage() {
     };
     window.addEventListener("pulsesocial_post_created", handleCreated);
     return () => window.removeEventListener("pulsesocial_post_created", handleCreated);
-  }, []);
+  }, [loadPostsAndChannels]);
 
   useEffect(() => {
     const handleGlobalClick = () => {

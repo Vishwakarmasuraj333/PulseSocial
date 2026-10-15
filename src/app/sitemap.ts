@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
+import { prisma } from "@/lib/prisma";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://pulsesocial1.vercel.app";
   const currentDate = new Date().toISOString();
 
@@ -22,10 +23,31 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/signup", priority: 0.9, changeFrequency: "monthly" as const },
   ];
 
-  return publicRoutes.map((route) => ({
+  const staticEntries: MetadataRoute.Sitemap = publicRoutes.map((route) => ({
     url: `${baseUrl}${route.path}`,
     lastModified: currentDate,
     changeFrequency: route.changeFrequency,
     priority: route.priority,
   }));
+
+  try {
+    const blogPosts = await prisma.blogPost.findMany({
+      select: {
+        slug: true,
+        updatedAt: true,
+      },
+    });
+
+    const blogEntries: MetadataRoute.Sitemap = blogPosts.map((post) => ({
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: post.updatedAt ? post.updatedAt.toISOString() : currentDate,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    }));
+
+    return [...staticEntries, ...blogEntries];
+  } catch (error) {
+    console.warn("Failed to fetch blog posts for sitemap:", error);
+    return staticEntries;
+  }
 }

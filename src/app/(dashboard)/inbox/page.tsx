@@ -92,8 +92,8 @@ export default function InboxPage() {
   useEffect(() => {
     inboxService.getConversations(activeTab === "all" ? undefined : activeTab).then((convs) => {
       setConversations(convs);
-      if (convs.length > 0 && !selectedConversation) {
-        setSelectedConversation(convs[0]);
+      if (convs.length > 0) {
+        setSelectedConversation((prev) => prev ?? convs[0]);
       }
     });
   }, [activeTab]);

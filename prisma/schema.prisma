@@ -79,6 +79,7 @@ model OrganizationMember {
   user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([organizationId, userId])
+  @@index([userId])
 }
 
 model Role {
@@ -209,6 +210,12 @@ model SocialPost {
   comments        SocialComment[]
   actions         SocialAction[]
   engagementSnapshots SocialEngagementSnapshot[]
+
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@index([creatorId])
+  @@index([scheduledFor])
+  @@index([createdAt])
 }
 
 model SocialPostTarget {
@@ -223,6 +230,10 @@ model SocialPostTarget {
 
   post            SocialPost    @relation(fields: [postId], references: [id], onDelete: Cascade)
   socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([socialAccountId])
+  @@index([status])
 }
 
 model PostMedia {
@@ -239,6 +250,8 @@ model PostMedia {
   orderIndex  Int        @default(0)
 
   post        SocialPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
 }
 
 model ScheduledPost {
@@ -250,6 +263,9 @@ model ScheduledPost {
   createdAt DateTime   @default(now())
 
   post      SocialPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([runAt, isLocked])
+  @@index([runAt])
 }
 
 model Draft {
@@ -263,6 +279,9 @@ model Draft {
   updatedAt      DateTime     @updatedAt
 
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([updatedAt])
 }
 
 model PublishingQueue {
@@ -288,6 +307,9 @@ model PublishingAttempt {
   attemptedAt DateTime   @default(now())
 
   post        SocialPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([attemptedAt])
 }
 
 model SocialComment {
@@ -465,6 +487,10 @@ model SocialNotification {
   isRead         Boolean  @default(false)
   metadata       String?
   createdAt      DateTime @default(now())
+
+  @@index([organizationId, isRead])
+  @@index([organizationId])
+  @@index([createdAt])
 }
 
 model SocialAnalytics {
@@ -486,6 +512,7 @@ model SocialAnalytics {
   socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
 
   @@unique([socialAccountId, metricDate])
+  @@index([metricDate])
 }
 
 model AnalyticsSnapshot {
@@ -554,6 +581,9 @@ model TeamInvitation {
   createdAt      DateTime     @default(now())
 
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([email])
 }
 
 model AuditLog {
@@ -570,6 +600,10 @@ model AuditLog {
 
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   user           User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([userId])
+  @@index([createdAt])
 }
 
 model WebhookEvent {
@@ -597,6 +631,9 @@ model MediaAsset {
   createdAt      DateTime     @default(now())
 
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([organizationId, folder])
 }
 
 model Tag {
@@ -664,6 +701,9 @@ model BlogPost {
   updatedAt   DateTime  @updatedAt
 
   category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([categoryId])
+  @@index([publishedAt])
 }
 
 model Feedback {
@@ -675,6 +715,10 @@ model Feedback {
   screenshotUrl  String?
   status         String    @default("NEW") // NEW, REVIEWED, RESOLVED
   createdAt      DateTime  @default(now())
+
+  @@index([organizationId])
+  @@index([userId])
+  @@index([createdAt])
 }
 
 model ContactRequest {
@@ -686,6 +730,9 @@ model ContactRequest {
   attachmentUrl String?
   status        String    @default("PENDING") // PENDING, REPLIED, CLOSED
   createdAt     DateTime  @default(now())
+
+  @@index([status])
+  @@index([createdAt])
 }
 
 model PricingPlan {

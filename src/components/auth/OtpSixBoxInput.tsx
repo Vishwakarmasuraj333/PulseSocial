@@ -30,14 +30,17 @@ export function OtpSixBoxInput({
     if (onChange) onChange(newDigits);
   };
 
+  const hasMountedRef = useRef(false);
+
   // Focus the first empty box or box 0 on mount
   useEffect(() => {
-    if (autoFocus && !disabled) {
+    if (!hasMountedRef.current && autoFocus && !disabled) {
+      hasMountedRef.current = true;
       const firstEmptyIdx = digits.findIndex((d) => !d);
       const targetIdx = firstEmptyIdx === -1 ? 0 : firstEmptyIdx;
       inputRefs.current[targetIdx]?.focus();
     }
-  }, [autoFocus, disabled]);
+  }, [autoFocus, disabled, digits]);
 
   const handleChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const rawVal = e.target.value;

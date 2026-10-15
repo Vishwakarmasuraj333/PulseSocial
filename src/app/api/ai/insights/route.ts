@@ -5,6 +5,12 @@ import { getSession } from "@/lib/auth/session";
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession();
+    if (!session?.id) {
+      return NextResponse.json(
+        { success: false, provider: "gemini", error: "UNAUTHORIZED", message: "Active session required." },
+        { status: 401 }
+      );
+    }
     const body = await req.json().catch(() => ({}));
     const { timeframe = "30d", question } = body;
 

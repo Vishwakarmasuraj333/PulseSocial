@@ -27,6 +27,30 @@ export async function POST(req: NextRequest) {
 
       const file = formData.get("file") as File | null;
       if (file && file.size > 0) {
+        // Enforce max 10MB for feedback attachments
+        const MAX_FEEDBACK_SIZE = 10 * 1024 * 1024;
+        if (file.size > MAX_FEEDBACK_SIZE) {
+          return NextResponse.json(
+            { error: "Attachment too large. Maximum allowed size is 10MB." },
+            { status: 400 }
+          );
+        }
+
+        // Enforce safe media and document MIME types
+        const allowedTypes = [
+          "image/jpeg",
+          "image/png",
+          "image/webp",
+          "image/gif",
+          "application/pdf",
+        ];
+        if (!allowedTypes.includes(file.type)) {
+          return NextResponse.json(
+            { error: "Invalid attachment type. Please upload a screenshot (JPG, PNG, WebP) or PDF." },
+            { status: 400 }
+          );
+        }
+
         attachmentName = file.name;
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Dialog } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/toast";
@@ -47,8 +47,23 @@ export function CanvaConnectModal({
   // Active Tab
   const [activeTab, setActiveTab] = useState<"designs" | "create" | "settings">("designs");
 
+  const fetchDesigns = useCallback(async () => {
+    try {
+      setLoadingDesigns(true);
+      const res = await fetch("/api/integrations/canva/designs");
+      if (res.ok) {
+        const data = await res.json();
+        setDesigns(data.designs || []);
+      }
+    } catch (err) {
+      console.error("Failed to fetch Canva designs:", err);
+    } finally {
+      setLoadingDesigns(false);
+    }
+  }, []);
+
   // Fetch status on open
-  const checkStatus = async () => {
+  const checkStatus = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch("/api/integrations/canva/status");
@@ -68,28 +83,13 @@ export function CanvaConnectModal({
     } finally {
       setLoading(false);
     }
-  };
-
-  const fetchDesigns = async () => {
-    try {
-      setLoadingDesigns(true);
-      const res = await fetch("/api/integrations/canva/designs");
-      if (res.ok) {
-        const data = await res.json();
-        setDesigns(data.designs || []);
-      }
-    } catch (err) {
-      console.error("Failed to fetch Canva designs:", err);
-    } finally {
-      setLoadingDesigns(false);
-    }
-  };
+  }, [fetchDesigns]);
 
   useEffect(() => {
     if (isOpen) {
       checkStatus();
     }
-  }, [isOpen]);
+  }, [isOpen, checkStatus]);
 
   // Listen for OAuth postMessage
   useEffect(() => {
@@ -114,7 +114,7 @@ export function CanvaConnectModal({
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, []);
+  }, [checkStatus, toast]);
 
   // Initiate OAuth flow
   const handleConnectCanva = async () => {

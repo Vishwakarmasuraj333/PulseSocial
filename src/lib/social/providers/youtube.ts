@@ -16,6 +16,7 @@ import {
   ExternalCommentData,
   ExternalPostData,
 } from "../types";
+import { isSafePublicUrl } from "@/lib/security/ssrf";
 
 export class YouTubeProvider implements SocialProvider {
   platform: SupportedPlatform = "youtube";
@@ -215,6 +216,11 @@ export class YouTubeProvider implements SocialProvider {
 
       // Upload actual video bytes to the resumable session
       try {
+        const ssrfCheck = isSafePublicUrl(video.url);
+        if (!ssrfCheck.isSafe) {
+          return { success: false, error: `SSRF Security Violation: Disallowed video URL (${ssrfCheck.reason})` };
+        }
+
         const videoStreamRes = await fetch(video.url);
         if (!videoStreamRes.ok) {
           return { success: false, error: `Could not fetch video file from ${video.url}` };

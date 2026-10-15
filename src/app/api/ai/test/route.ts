@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth/session";
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getSession();
+    if (!session?.id) {
+      return NextResponse.json(
+        { ok: false, error: "Unauthorized: Active session required." },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json().catch(() => ({}));
     const apiKey = (body.customApiKey || process.env.GEMINI_API_KEY || "").trim();
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
 import { PLATFORM_ACTION_CAPABILITIES, SupportedPlatform } from "@/lib/social/types";
@@ -110,14 +110,7 @@ export function PostEngagementDetailsModal({
   const [replyTexts, setReplyTexts] = useState<Record<string, string>>({});
   const [submittingReply, setSubmittingReply] = useState<Record<string, boolean>>({});
 
-  // Sync engagement when modal opens or post changes
-  useEffect(() => {
-    if (!isOpen || !post) return;
-
-    fetchInitialEngagement();
-  }, [isOpen, post?.id]);
-
-  const fetchInitialEngagement = async () => {
+  const fetchInitialEngagement = useCallback(async () => {
     if (!post) return;
     setIsSyncing(true);
     try {
@@ -147,7 +140,14 @@ export function PostEngagementDetailsModal({
     } finally {
       setIsSyncing(false);
     }
-  };
+  }, [post]);
+
+  // Sync engagement when modal opens or post changes
+  useEffect(() => {
+    if (!isOpen || !post) return;
+
+    fetchInitialEngagement();
+  }, [isOpen, post, fetchInitialEngagement]);
 
   const handleRefreshEngagement = async () => {
     if (!post || isSyncing) return;

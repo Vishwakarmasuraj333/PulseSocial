@@ -1,12 +1,26 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
+import type { Metadata } from "next";
 import { MarketingHeader } from "@/components/marketing/MarketingHeader";
 import { MarketingFooter } from "@/components/marketing/MarketingFooter";
-import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
 import { SURAJ_VISHWAKARMA_AVATAR } from "@/lib/assets/founder-image";
-import { Shield, Sparkles, Globe, Users, Zap, CheckCircle2, ArrowRight, Lock } from "lucide-react";
+import { Shield, Globe, Users, ArrowRight, Lock } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "About Us | PulseSocial — Unified Social Media Command Center",
+  description: "Learn about the mission, engineering philosophy, and security-first architecture behind PulseSocial.",
+  alternates: {
+    canonical: "/about",
+  },
+  openGraph: {
+    title: "About Us | PulseSocial",
+    description: "Learn about the mission, engineering philosophy, and security-first architecture behind PulseSocial.",
+    url: "/about",
+    siteName: "PulseSocial",
+    type: "website",
+  },
+};
 
 export default function AboutPage() {
   const values = [
@@ -82,10 +96,13 @@ export default function AboutPage() {
         <div className="mb-20 p-8 sm:p-12 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl">
           <div className="flex flex-col md:flex-row items-center gap-8 max-w-4xl mx-auto">
             <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-2xl overflow-hidden ring-4 ring-indigo-500/20 shadow-2xl shrink-0">
-              <img
+              <Image
                 src={SURAJ_VISHWAKARMA_AVATAR}
                 alt="Suraj Vishwakarma - Creator & Lead Developer of PulseSocial"
+                width={176}
+                height={176}
                 className="w-full h-full object-cover object-top"
+                priority
               />
             </div>
             <div className="space-y-3 text-center md:text-left">

@@ -18,6 +18,7 @@ import {
   ExternalInsightsData,
 } from "../types";
 import { SOCIAL_API_VERSIONS } from "../api-versions";
+import { isSafePublicUrl } from "@/lib/security/ssrf";
 
 export class LinkedInProvider implements SocialProvider {
   platform: SupportedPlatform = "linkedin";
@@ -264,6 +265,11 @@ export class LinkedInProvider implements SocialProvider {
   }
 
   private async uploadLinkedInImage(accessToken: string, ownerUrn: string, mediaUrl: string): Promise<string> {
+    const ssrfCheck = isSafePublicUrl(mediaUrl);
+    if (!ssrfCheck.isSafe) {
+      throw new Error(`SSRF Security Violation: Disallowed media URL (${ssrfCheck.reason})`);
+    }
+
     const mediaRes = await fetch(mediaUrl);
     if (!mediaRes.ok) {
       throw new Error(`Failed to fetch media file from ${mediaUrl} (HTTP ${mediaRes.status})`);
@@ -315,6 +321,11 @@ export class LinkedInProvider implements SocialProvider {
   }
 
   private async uploadLinkedInVideo(accessToken: string, ownerUrn: string, mediaUrl: string): Promise<string> {
+    const ssrfCheck = isSafePublicUrl(mediaUrl);
+    if (!ssrfCheck.isSafe) {
+      throw new Error(`SSRF Security Violation: Disallowed media URL (${ssrfCheck.reason})`);
+    }
+
     const mediaRes = await fetch(mediaUrl);
     if (!mediaRes.ok) {
       throw new Error(`Failed to fetch video file from ${mediaUrl} (HTTP ${mediaRes.status})`);

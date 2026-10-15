@@ -7,6 +7,12 @@ import { SYSTEM_PERSONA_PROMPT } from "@/lib/ai/prompts";
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession();
+    if (!session?.id) {
+      return NextResponse.json(
+        { success: false, provider: "gemini", error: "UNAUTHORIZED", message: "Active session required." },
+        { status: 401 }
+      );
+    }
     const body = await req.json().catch(() => ({}));
     const { messages = [], message, prompt } = body;
 

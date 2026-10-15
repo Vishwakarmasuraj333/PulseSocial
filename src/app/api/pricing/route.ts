@@ -37,7 +37,14 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json({ success: true, plans: mapped });
+    return NextResponse.json(
+      { success: true, plans: mapped },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+        },
+      }
+    );
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message || "Failed to fetch pricing plans" },

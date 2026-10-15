@@ -38,10 +38,9 @@ export async function GET(
     let proto = req.headers.get("x-forwarded-proto") || (host.includes("localhost") ? "http" : "https");
     if (host.includes("vercel.app")) {
       proto = "https";
-      host = "pulsesocial1.vercel.app";
     }
 
-    const appUrl = host ? `${proto}://${host}` : (process.env.NEXT_PUBLIC_APP_URL || url.origin);
+    const appUrl = host ? `${proto}://${host}` : (process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || url.origin);
     const cleanAppUrl = appUrl.replace(/\/+$/, "");
     const redirectUri = `${cleanAppUrl}/api/social/${platformKey}/callback`;
 

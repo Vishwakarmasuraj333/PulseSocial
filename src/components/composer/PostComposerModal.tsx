@@ -21,7 +21,6 @@ import {
   Smile,
   AlertTriangle,
   ChevronDown,
-  ChevronsRight,
   Folder,
   Cloud,
   Layers,
@@ -231,8 +230,6 @@ export function PostComposerModal({
   const [isCanvaModalOpen, setIsCanvaModalOpen] = useState(false);
   const [isCanvaConnected, setIsCanvaConnected] = useState(false);
   
-  const [showAltTextModal, setShowAltTextModal] = useState(false);
-  const [altText, setAltText] = useState("");
 
   // Dynamic Media Library and Cloud Picker states
   const [isMediaLibraryOpen, setIsMediaLibraryOpen] = useState(false);
@@ -1690,65 +1687,6 @@ export function PostComposerModal({
                 )}
               </div>
 
-              {/* ALT Text Accessibility Button */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setShowAltTextModal(!showAltTextModal)}
-                  className={`px-1.5 py-0.5 rounded text-[11px] font-bold border transition cursor-pointer ${
-                    altText.trim()
-                      ? "text-[#5846A8] border-[#5846A8] bg-purple-50 dark:bg-purple-950/40"
-                      : "text-slate-500 hover:text-slate-800 border-slate-200 dark:border-slate-700"
-                  }`}
-                  title="Add Alt Text for accessibility"
-                >
-                  ALT
-                </button>
-
-                {showAltTextModal && (
-                  <div className="absolute bottom-10 left-0 w-72 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 p-3 z-50 animate-in fade-in zoom-in-95 text-xs">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-bold text-slate-800 dark:text-white">Image Alt Text</span>
-                      <button onClick={() => setShowAltTextModal(false)} className="text-slate-400 hover:text-slate-600">
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                    <textarea
-                      value={altText}
-                      onChange={(e) => setAltText(e.target.value)}
-                      placeholder="Describe the image content for screen readers..."
-                      rows={3}
-                      className="w-full p-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 resize-none mb-2"
-                    />
-                    <div className="flex justify-end gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAltText("");
-                          setShowAltTextModal(false);
-                        }}
-                        className="px-2.5 py-1 text-slate-500 text-xs cursor-pointer"
-                      >
-                        Clear
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowAltTextModal(false);
-                          toast({
-                            title: "Alt Text Saved",
-                            message: "Accessibility alt text attached to media.",
-                            type: "success",
-                          });
-                        }}
-                        className="px-3 py-1 bg-[#5846A8] hover:bg-[#48388d] text-white font-semibold rounded-lg text-xs cursor-pointer shadow-xs"
-                      >
-                        Save
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
 
@@ -1891,16 +1829,6 @@ export function PostComposerModal({
           {/* ============================================================ */}
           <div className="lg:col-span-4 p-6 bg-slate-50/50 dark:bg-slate-900/40 flex flex-col justify-between overflow-y-auto max-h-[75vh]">
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-1.5">
-                  <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 tracking-tight">Post Preview</h3>
-                  <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-950/60 px-1.5 py-0.5 rounded">
-                    LIVE
-                  </span>
-                </div>
-                <ChevronsRight className="w-4 h-4 text-slate-400" />
-              </div>
-
               <PostPreview
                 accounts={effectiveChannels.filter((c) => selectedAccountIds.includes(c.id))}
                 activeAccountId={activePreviewId}

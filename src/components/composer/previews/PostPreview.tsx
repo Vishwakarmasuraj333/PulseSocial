@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import Image from "next/image";
-import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
 import { PreviewAccount, PreviewMediaItem, FacebookPostPreview } from "./FacebookPostPreview";
 import { InstagramPostPreview } from "./InstagramPostPreview";
 import { LinkedInPostPreview } from "./LinkedInPostPreview";
@@ -13,7 +11,6 @@ import { PinterestPostPreview } from "./PinterestPostPreview";
 import { ThreadsPostPreview } from "./ThreadsPostPreview";
 import { GoogleBusinessPostPreview } from "./GoogleBusinessPostPreview";
 import { MastodonPostPreview } from "./MastodonPostPreview";
-import { Plus } from "lucide-react";
 
 export type SupportedPlatformKey =
   | "linkedin"
@@ -145,92 +142,11 @@ export function PostPreview({
       username: cleanHandle,
       profileImageUrl: brandAvatar || "/icons/pulse-logo.svg",
       accountType: platformDef?.defaultHeadline || "Verified Channel",
-      isVerified: true,
     };
-  }, [matchingConnectedAccount, activePlatform, brandName, brandAvatar, brandHandle]);
-
-  const handlePlatformSelect = (key: SupportedPlatformKey) => {
-    setActivePlatform(key);
-    // If a connected account exists for this platform, notify parent
-    const match = (accounts || []).find((a) => {
-      const prov = (a.provider || "").toLowerCase();
-      if (key === "x") return prov.includes("x") || prov.includes("twitter");
-      if (key === "threads") return prov.includes("thread");
-      if (key === "google") return prov.includes("google");
-      return prov.includes(key);
-    });
-    if (match && onSelectAccount) {
-      onSelectAccount(match.id);
-    }
-  };
+  }, [matchingConnectedAccount, activePlatform, brandHandle, brandName, brandAvatar]);
 
   return (
     <div className="space-y-3">
-      {/* Platform Preview Selector Bar supporting ALL platforms */}
-      <div className="bg-slate-100/80 dark:bg-slate-900/80 p-1.5 rounded-xl border border-slate-200/70 dark:border-slate-800">
-        <div className="flex items-center gap-1 overflow-x-auto pb-0.5 scrollbar-thin">
-          {ALL_PREVIEW_PLATFORMS.map((plat) => {
-            const isSelected = activePlatform === plat.key;
-            const hasConnected = (accounts || []).some((a) => {
-              const prov = (a.provider || "").toLowerCase();
-              if (plat.key === "x") return prov.includes("x") || prov.includes("twitter");
-              if (plat.key === "threads") return prov.includes("thread");
-              if (plat.key === "google") return prov.includes("google");
-              return prov.includes(plat.key);
-            });
-
-            return (
-              <button
-                key={plat.key}
-                type="button"
-                onClick={() => handlePlatformSelect(plat.key)}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition cursor-pointer border ${
-                  isSelected
-                    ? "bg-[#5846A8] text-white border-[#5846A8] shadow-xs scale-[1.02]"
-                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200/80 dark:border-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-700"
-                }`}
-                title={`Preview on ${plat.label}${hasConnected ? " (Connected)" : " (Live Simulator)"}`}
-              >
-                {renderPlatformIcon(plat.provider, 13)}
-                <span>{plat.label}</span>
-                {hasConnected ? (
-                  <span
-                    className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"
-                    title="Connected Channel Active"
-                  />
-                ) : (
-                  <span
-                    className={`text-[9px] uppercase tracking-wider px-1 py-0.2 rounded font-mono ${
-                      isSelected ? "bg-white/20 text-white" : "text-slate-400"
-                    }`}
-                  >
-                    Sim
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Discreet helper bar when viewing simulated platform */}
-      {!matchingConnectedAccount && (
-        <div className="flex items-center justify-between px-2.5 py-1 rounded-lg bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 text-[11px] text-indigo-700 dark:text-indigo-300">
-          <span className="truncate">
-            Live {ALL_PREVIEW_PLATFORMS.find((p) => p.key === activePlatform)?.label} Preview &middot; Updates as you type
-          </span>
-          {onOpenConnectModal && (
-            <button
-              type="button"
-              onClick={onOpenConnectModal}
-              className="inline-flex items-center gap-1 text-[10.5px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline shrink-0 ml-2 cursor-pointer"
-            >
-              <Plus className="w-3 h-3" /> Connect Account
-            </button>
-          )}
-        </div>
-      )}
-
       {/* Dynamic Platform-Specific Live Preview Renderers */}
       {activePlatform === "linkedin" && (
         <LinkedInPostPreview
@@ -318,16 +234,15 @@ export function PostPreview({
   );
 }
 
-export type { PreviewAccount, PreviewMediaItem };
-export {
-  FacebookPostPreview,
-  InstagramPostPreview,
-  LinkedInPostPreview,
-  XPostPreview,
-  TikTokPostPreview,
-  YouTubePostPreview,
-  PinterestPostPreview,
-  ThreadsPostPreview,
-  GoogleBusinessPostPreview,
-  MastodonPostPreview,
-};
+export type { PreviewAccount, PreviewMediaItem } from "./FacebookPostPreview";
+export { FacebookPostPreview } from "./FacebookPostPreview";
+export { InstagramPostPreview } from "./InstagramPostPreview";
+export { LinkedInPostPreview } from "./LinkedInPostPreview";
+export { XPostPreview } from "./XPostPreview";
+export { TikTokPostPreview } from "./TikTokPostPreview";
+export { YouTubePostPreview } from "./YouTubePostPreview";
+export { PinterestPostPreview } from "./PinterestPostPreview";
+export { ThreadsPostPreview } from "./ThreadsPostPreview";
+export { GoogleBusinessPostPreview } from "./GoogleBusinessPostPreview";
+export { MastodonPostPreview } from "./MastodonPostPreview";
+

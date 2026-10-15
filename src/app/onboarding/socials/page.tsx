@@ -151,6 +151,14 @@ function SocialConnectInner() {
   const [searchQuery, setSearchQuery] = useState("");
   const [connectingPlatformId, setConnectingPlatformId] = useState<string | null>(null);
 
+  const [currentOrigin, setCurrentOrigin] = useState("https://pulsesocial-git-main-vishwakarmasuraj333s-projects.vercel.app");
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.origin) {
+      setCurrentOrigin(window.location.origin);
+    }
+  }, []);
+  const currentHost = currentOrigin.replace(/^https?:\/\//, "").replace(/\/+$/, "");
+
   const copyToClipboard = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
     setCopiedField(key);
@@ -187,10 +195,12 @@ function SocialConnectInner() {
 
       {/* Header Bar */}
       <div className="w-full max-w-6xl mx-auto flex items-center justify-between pb-8">
-        <PulseSocialLogo size="md" theme="light" variant="with-tagline" />
+        <PulseSocialLogo size="md" theme="dark" variant="with-tagline" />
         <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-800 text-xs text-slate-300 shadow-sm backdrop-blur-md">
           <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
-          <span className="font-medium text-purple-400">{connectedIds.length} Channels Connected</span>
+          <span className="font-medium text-purple-400">
+            {connectedIds.length} {connectedIds.length === 1 ? "Channel" : "Channels"} Connected
+          </span>
         </div>
       </div>
 
@@ -221,28 +231,13 @@ function SocialConnectInner() {
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
                     <h4 className="text-sm font-bold text-amber-300">
-                      Meta OAuth Configuration Required
+                      Channel Connection Notice
                     </h4>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-bold">
-                      App ID: 1427242679545054
-                    </span>
                   </div>
-                  <p className="text-xs text-slate-300 leading-relaxed max-w-3xl">
-                    <span className="font-semibold text-amber-300">Notice: </span>
+                  <p className="text-xs text-slate-200 leading-relaxed max-w-3xl">
                     {errorParam}
                   </p>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
-                    Meta requires App Domains (<code className="text-amber-200 font-mono">pulsesocial1.vercel.app</code>) and permissions to be enabled in your Meta Developer Console.
-                  </p>
                   <div className="flex flex-wrap items-center gap-2.5 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setIsGuideModalOpen(true)}
-                      className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition inline-flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <span>Meta Developer Setup Guide</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </button>
                     <button
                       type="button"
                       onClick={() => {
@@ -250,7 +245,7 @@ function SocialConnectInner() {
                       }}
                       className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition inline-flex items-center gap-1.5 cursor-pointer"
                     >
-                      <span>Skip &amp; Open Dashboard</span>
+                      <span>Continue to Dashboard</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -467,10 +462,10 @@ function SocialConnectInner() {
                   <div>
                     <label className="text-[10px] uppercase font-bold text-slate-400">App Domains</label>
                     <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/80 font-mono text-slate-200 mt-1">
-                      <span>pulsesocial1.vercel.app</span>
+                      <span>{currentHost}</span>
                       <button
                         type="button"
-                        onClick={() => copyToClipboard("pulsesocial1.vercel.app", "domain")}
+                        onClick={() => copyToClipboard(currentHost, "domain")}
                         className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold flex items-center gap-1 cursor-pointer"
                       >
                         {copiedField === "domain" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
@@ -482,10 +477,10 @@ function SocialConnectInner() {
                   <div>
                     <label className="text-[10px] uppercase font-bold text-slate-400">Privacy Policy URL</label>
                     <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/80 font-mono text-slate-200 mt-1">
-                      <span className="truncate mr-2">https://pulsesocial1.vercel.app/privacy</span>
+                      <span className="truncate mr-2">{currentOrigin}/privacy</span>
                       <button
                         type="button"
-                        onClick={() => copyToClipboard("https://pulsesocial1.vercel.app/privacy", "privacy_url")}
+                        onClick={() => copyToClipboard(`${currentOrigin}/privacy`, "privacy_url")}
                         className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold flex items-center gap-1 cursor-pointer"
                       >
                         {copiedField === "privacy_url" ? <Check className="w-3.5 h-3.5 text-purple-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -497,10 +492,10 @@ function SocialConnectInner() {
                   <div>
                     <label className="text-[10px] uppercase font-bold text-slate-400">Terms of Service URL</label>
                     <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/80 font-mono text-slate-200 mt-1">
-                      <span className="truncate mr-2">https://pulsesocial1.vercel.app/terms</span>
+                      <span className="truncate mr-2">{currentOrigin}/terms</span>
                       <button
                         type="button"
-                        onClick={() => copyToClipboard("https://pulsesocial1.vercel.app/terms", "terms_url")}
+                        onClick={() => copyToClipboard(`${currentOrigin}/terms`, "terms_url")}
                         className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold flex items-center gap-1 cursor-pointer"
                       >
                         {copiedField === "terms_url" ? <Check className="w-3.5 h-3.5 text-purple-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -512,10 +507,10 @@ function SocialConnectInner() {
                   <div>
                     <label className="text-[10px] uppercase font-bold text-slate-400">User Data Deletion Instructions URL</label>
                     <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/80 font-mono text-slate-200 mt-1">
-                      <span className="truncate mr-2">https://pulsesocial1.vercel.app/data-deletion</span>
+                      <span className="truncate mr-2">{currentOrigin}/data-deletion</span>
                       <button
                         type="button"
-                        onClick={() => copyToClipboard("https://pulsesocial1.vercel.app/data-deletion", "deletion_url")}
+                        onClick={() => copyToClipboard(`${currentOrigin}/data-deletion`, "deletion_url")}
                         className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold flex items-center gap-1 cursor-pointer"
                       >
                         {copiedField === "deletion_url" ? <Check className="w-3.5 h-3.5 text-purple-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -545,10 +540,10 @@ function SocialConnectInner() {
                   Scroll to bottom of Basic Settings, click <strong>+ Add Platform</strong>, select <strong>Website</strong>, and set <strong>Site URL</strong>:
                 </p>
                 <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/80 font-mono text-slate-200">
-                  <span>https://pulsesocial1.vercel.app</span>
+                  <span>{currentOrigin}</span>
                   <button
                     type="button"
-                    onClick={() => copyToClipboard("https://pulsesocial1.vercel.app", "site_url")}
+                    onClick={() => copyToClipboard(currentOrigin, "site_url")}
                     className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold flex items-center gap-1 cursor-pointer"
                   >
                     {copiedField === "site_url" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
@@ -570,20 +565,20 @@ function SocialConnectInner() {
                 </div>
                 <div className="space-y-1.5 font-mono text-[11px]">
                   <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/80 text-slate-200">
-                    <span className="truncate mr-2">https://pulsesocial1.vercel.app/api/social/facebook/callback</span>
+                    <span className="truncate mr-2">{currentOrigin}/api/social/facebook/callback</span>
                     <button
                       type="button"
-                      onClick={() => copyToClipboard("https://pulsesocial1.vercel.app/api/social/facebook/callback", "fb_cb")}
+                      onClick={() => copyToClipboard(`${currentOrigin}/api/social/facebook/callback`, "fb_cb")}
                       className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold flex items-center gap-1 cursor-pointer shrink-0"
                     >
                       {copiedField === "fb_cb" ? <Check className="w-3 h-3 text-purple-400" /> : <Copy className="w-3 h-3" />}
                     </button>
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/80 text-slate-200">
-                    <span className="truncate mr-2">https://pulsesocial1.vercel.app/api/social/instagram/callback</span>
+                    <span className="truncate mr-2">{currentOrigin}/api/social/instagram/callback</span>
                     <button
                       type="button"
-                      onClick={() => copyToClipboard("https://pulsesocial1.vercel.app/api/social/instagram/callback", "ig_cb")}
+                      onClick={() => copyToClipboard(`${currentOrigin}/api/social/instagram/callback`, "ig_cb")}
                       className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold flex items-center gap-1 cursor-pointer shrink-0"
                     >
                       {copiedField === "ig_cb" ? <Check className="w-3 h-3 text-purple-400" /> : <Copy className="w-3 h-3" />}

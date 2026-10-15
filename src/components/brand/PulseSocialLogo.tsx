@@ -123,13 +123,28 @@ export function PulseSocialLogo({
                   : "text-slate-900 dark:text-white"
               }`}
             >
-              Pulse<span className="text-[#6F52B5] dark:text-[#A78BDF]">Social</span>
+              Pulse
+              <span
+                className={
+                  theme === "dark"
+                    ? "text-[#A78BDF]"
+                    : theme === "light"
+                    ? "text-[#6F52B5]"
+                    : "text-[#6F52B5] dark:text-[#A78BDF]"
+                }
+              >
+                Social
+              </span>
             </span>
           </div>
           {variant === "with-tagline" && (
             <span
               className={`text-[10px] font-medium tracking-wide mt-0.5 ${
-                theme === "dark" ? "text-slate-400" : "text-slate-500"
+                theme === "dark"
+                  ? "text-slate-300"
+                  : theme === "light"
+                  ? "text-slate-500"
+                  : "text-slate-500 dark:text-slate-300"
               }`}
             >
               Enterprise Social Operations

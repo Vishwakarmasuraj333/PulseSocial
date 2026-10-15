@@ -29,14 +29,14 @@ export interface Brand {
 const DEFAULT_BRANDS: Brand[] = [
   {
     id: "brand-primary",
-    name: "Pulse Media Global",
-    slug: "pulse-media-global",
-    handle: "@pulsemedia",
+    name: "Suraj Vishwakarma's Workspace",
+    slug: "suraj-vishwakarma",
+    handle: "@surajvishwakarma",
     avatarUrl: "",
-    connectedAccountsCount: 0,
+    connectedAccountsCount: 2,
     socialAccounts: [],
     industry: "Digital Media & Technology",
-    color: "#2563eb",
+    color: "#5846A8",
     createdAt: "2026-01-15T10:00:00Z",
   },
 ];

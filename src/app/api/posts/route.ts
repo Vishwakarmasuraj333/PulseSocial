@@ -26,6 +26,10 @@ const CreatePostSchema = z.object({
       ])
     )
     .optional(),
+  firstComment: z.string().optional(),
+  location: z.string().optional(),
+  link: z.string().optional(),
+  targetAudience: z.string().optional(),
 });
 
 export async function GET(req: Request) {
@@ -107,6 +111,7 @@ export async function POST(req: Request) {
       status: explicitStatus,
       scheduledFor,
       mediaUrls,
+      firstComment,
     } = validated.data;
 
     const content = (rawContent || "").trim();
@@ -461,6 +466,33 @@ export async function POST(req: Request) {
                 responsePayload: JSON.stringify(result),
               },
             });
+
+            // Dispatch Auto First Comment if requested and supported
+            if (firstComment && typeof (provider as any).commentPost === "function") {
+              try {
+                const commentRes = await (provider as any).commentPost(decryptedAccess, {
+                  externalPostId: result.platformPostId,
+                  accountId: account.providerAccountId,
+                  content: firstComment,
+                });
+                if (commentRes && commentRes.success) {
+                  await prisma.socialComment.create({
+                    data: {
+                      socialAccountId: account.id,
+                      platformCommentId: commentRes.externalActionId || `comment-${Date.now()}`,
+                      platformPostId: result.platformPostId,
+                      postId: post.id,
+                      platform: account.provider,
+                      authorName: account.displayName,
+                      content: firstComment,
+                      postedAt: new Date(),
+                    },
+                  });
+                }
+              } catch (firstCommentErr) {
+                console.warn("[AutoFirstComment] Dispatch warning:", firstCommentErr);
+              }
+            }
           } else {
             // Section 8: Platform returned approval/permission or remote API error:
             failureCount++;

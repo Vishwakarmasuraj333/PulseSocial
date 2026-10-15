@@ -299,13 +299,15 @@ export default function SocialAccountDetailsPage() {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
               Audience Reach
             </span>
-            <div className="text-2xl font-black text-slate-900 dark:text-white">
+            <div className="text-xl font-black text-slate-900 dark:text-white">
               {typeof account.profile?.followersCount === "number"
                 ? account.profile.followersCount.toLocaleString()
-                : "—"}
+                : "Not exposed by API"}
             </div>
             <p className="text-[11px] text-slate-400">
-              Verified live followers retrieved via official provider API
+              {account.provider === "linkedin"
+                ? "Personal profile API restricts follower count retrieval. Available for Company Pages with r_organization_social permission."
+                : "Verified live followers retrieved via official provider API"}
             </p>
           </div>
 
@@ -313,13 +315,13 @@ export default function SocialAccountDetailsPage() {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
               Published Posts
             </span>
-            <div className="text-2xl font-black text-slate-900 dark:text-white">
+            <div className="text-xl font-black text-slate-900 dark:text-white">
               {typeof account.profile?.postsCount === "number"
                 ? account.profile.postsCount.toLocaleString()
-                : "—"}
+                : "Live via PulseSocial"}
             </div>
             <p className="text-[11px] text-slate-400">
-              Total historical media objects on account
+              Active published posts authored and tracked through official API
             </p>
           </div>
 
@@ -327,7 +329,7 @@ export default function SocialAccountDetailsPage() {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
               Token Validity
             </span>
-            <div className="text-2xl font-black text-slate-900 dark:text-white">
+            <div className="text-xl font-black text-slate-900 dark:text-white">
               {validityLabel}
             </div>
             <p className="text-[11px] text-slate-400">
@@ -338,10 +340,15 @@ export default function SocialAccountDetailsPage() {
 
         {/* Capabilities Matrix */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-xs space-y-4">
-          <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Layers className="w-4 h-4 text-indigo-600" />
-            <span>Platform Capabilities</span>
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Layers className="w-4 h-4 text-indigo-600" />
+              <span>Platform Capability Matrix (Real Official API)</span>
+            </h2>
+            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              API Version: 202503 (REST)
+            </span>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
             <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 space-y-2">
@@ -350,12 +357,12 @@ export default function SocialAccountDetailsPage() {
                   <Send className="w-3.5 h-3.5 text-indigo-600" />
                   Publishing
                 </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400">
-                  Ready
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">
+                  AVAILABLE ✅
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                Direct publishing, scheduling, and carousel distribution supported via official API.
+                Direct member publishing, commentary, and media attachments active via official REST Posts API (w_member_social).
               </p>
             </div>
 
@@ -363,14 +370,14 @@ export default function SocialAccountDetailsPage() {
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                   <BarChart3 className="w-3.5 h-3.5 text-indigo-600" />
-                  Analytics
+                  Live Social Actions & Metrics
                 </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400">
-                  Live API
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-400">
+                  PARTNER APPROVAL 🔒
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                Real-time reach, impression metrics, and engagement rate calculation.
+                GET partnerApiSocialActions requires LinkedIn Community Management API Partner approval (r_member_social). PulseSocial tracks internal post telemetry.
               </p>
             </div>
 
@@ -378,14 +385,14 @@ export default function SocialAccountDetailsPage() {
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                   <MessageSquare className="w-3.5 h-3.5 text-indigo-600" />
-                  Unified Inbox
+                  Direct Messages & Followers
                 </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400">
-                  Webhooks
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-400">
+                  RESTRICTED BY API 🔒
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                Inbound comments and reply streams ingested securely via verified webhooks.
+                Personal profile inbox and follower lists are restricted by platform security policies. Available for Company Pages and Enterprise integrations.
               </p>
             </div>
           </div>

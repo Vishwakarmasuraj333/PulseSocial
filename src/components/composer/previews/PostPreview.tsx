@@ -71,9 +71,9 @@ export function PostPreview({
   firstComment,
   youtubeTitle,
   isShorts,
-  brandName = "Pulse Media Global",
+  brandName = "Suraj Vishwakarma",
   brandAvatar = "/icons/pulse-logo.svg",
-  brandHandle = "@pulsemedia",
+  brandHandle = "@surajvishwakarma",
 }: PostPreviewProps) {
   // Determine starting platform based on connected accounts or default to linkedin
   const initialPlatform: SupportedPlatformKey = useMemo(() => {
@@ -133,12 +133,12 @@ export function PostPreview({
     }
 
     const platformDef = ALL_PREVIEW_PLATFORMS.find((p) => p.key === activePlatform);
-    const cleanHandle = brandHandle ? (brandHandle.startsWith("@") ? brandHandle : `@${brandHandle}`) : "@pulsemedia";
+    const cleanHandle = brandHandle ? (brandHandle.startsWith("@") ? brandHandle : `@${brandHandle}`) : "@surajvishwakarma";
 
     return {
       id: `sim-${activePlatform}`,
       provider: platformDef?.provider || "LINKEDIN",
-      displayName: brandName || "Pulse Media Global",
+      displayName: brandName || "Suraj Vishwakarma",
       username: cleanHandle,
       profileImageUrl: brandAvatar || "/icons/pulse-logo.svg",
       accountType: platformDef?.defaultHeadline || "Verified Channel",

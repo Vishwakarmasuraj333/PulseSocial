@@ -165,20 +165,20 @@ const TRENDING_HASHTAGS = [
 
 export const HASHTAG_CATEGORIES = [
   {
-    name: "🔥 Trending",
-    tags: ["#PulseSocial", "#Trending", "#ViralPost", "#ExplorePage", "#CreatorEconomy", "#Innovation", "#MustWatch"],
+    name: "🔥 Trending & Reach",
+    tags: ["#ProfessionalGrowth", "#Innovation", "#Leadership", "#BusinessStrategy", "#FutureOfWork", "#DigitalTransformation", "#Networking"],
   },
   {
     name: "🚀 Growth & Marketing",
-    tags: ["#DigitalMarketing", "#GrowthHacking", "#ContentStrategy", "#SocialMediaTips", "#BrandBuilding", "#LeadGen", "#AudienceEngagement"],
+    tags: ["#ContentStrategy", "#DigitalMarketing", "#BrandBuilding", "#AudienceEngagement", "#GrowthMindset", "#LeadGeneration"],
   },
   {
     name: "💻 Tech & AI",
-    tags: ["#ArtificialIntelligence", "#GeminiAI", "#TechNews", "#SaaS", "#WebDevelopment", "#MachineLearning", "#Automation"],
+    tags: ["#ArtificialIntelligence", "#TechTrends", "#SaaS", "#CloudComputing", "#MachineLearning", "#SoftwareEngineering", "#Automation"],
   },
   {
     name: "💼 Business & Leadership",
-    tags: ["#Entrepreneurship", "#StartupLife", "#Leadership", "#BusinessStrategy", "#Productivity", "#FounderMindset", "#SmallBusiness"],
+    tags: ["#Entrepreneurship", "#StartupLife", "#Productivity", "#Management", "#FounderJourney", "#GlobalBusiness"],
   },
 ];
 
@@ -415,14 +415,38 @@ export function PostComposerModal({
     }
   };
 
-  // Insert hashtag
+  // Insert hashtag safely
   const handleInsertHashtag = (tag: string) => {
-    setContent((prev) => (prev ? `${prev} ${tag}` : tag));
+    const clean = tag.startsWith("#") ? tag.trim() : `#${tag.trim()}`;
+    setContent((prev) => {
+      const words = prev.split(/\s+/);
+      if (words.includes(clean)) return prev;
+      return prev ? `${prev} ${clean}` : clean;
+    });
     toast({
       title: "Hashtag Added",
-      message: `${tag} added to post caption.`,
+      message: `${clean} added to post caption.`,
       type: "info",
     });
+  };
+
+  // Batch insert hashtags without toast spam
+  const handleBatchInsertHashtags = (tags: string[]) => {
+    let addedCount = 0;
+    setContent((prev) => {
+      const existing = prev.split(/\s+/);
+      const toAdd = tags.filter((t) => !existing.includes(t));
+      addedCount = toAdd.length;
+      if (toAdd.length === 0) return prev;
+      return prev ? `${prev} ${toAdd.join(" ")}` : toAdd.join(" ");
+    });
+    if (addedCount > 0) {
+      toast({
+        title: "Hashtags Added",
+        message: `Added ${addedCount} strategic hashtags to post caption.`,
+        type: "success",
+      });
+    }
   };
 
   // Upload local media file from Desktop (Multi-file & Video/Image support)
@@ -1104,6 +1128,53 @@ export function PostComposerModal({
                   </button>
                 </div>
               )}
+
+              {/* Attached First Comment Preview Box in Composer */}
+              {attachedComment && (
+                <div className="mt-3 p-3 bg-purple-50/80 dark:bg-purple-950/40 rounded-xl border border-purple-200 dark:border-purple-800/60 text-xs relative flex items-start justify-between gap-3 animate-in fade-in">
+                  <div className="flex items-start gap-2.5 min-w-0">
+                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <MessageCircle className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-slate-900 dark:text-white text-xs">
+                          Auto First Comment Attached
+                        </span>
+                        <span className="text-[10px] font-semibold px-2 py-0.2 rounded-full bg-purple-200/80 dark:bg-purple-900/60 text-[#5846A8] dark:text-purple-300">
+                          {activePreviewChannel.displayName}
+                        </span>
+                      </div>
+                      <p className="text-[11.5px] text-slate-700 dark:text-slate-300 line-clamp-2 mt-0.5 leading-snug">
+                        {attachedComment}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCommentText(attachedComment);
+                        setShowCommentPopup(true);
+                      }}
+                      className="px-2.5 py-1 text-[11px] font-bold text-[#5846A8] dark:text-purple-300 hover:bg-purple-100/60 dark:hover:bg-purple-900/40 rounded-lg transition cursor-pointer"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAttachedComment(null);
+                        setCommentText("");
+                      }}
+                      className="p-1 text-slate-400 hover:text-rose-500 rounded-lg transition cursor-pointer"
+                      title="Remove first comment"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Bottom Toolbar Icons matching Screenshot */}
@@ -1408,90 +1479,222 @@ export function PostComposerModal({
                 )}
               </div>
 
-              {/* First Comment */}
+              {/* First Comment - Substantial, Bold & Professional */}
               <div className="relative">
                 <button
                   type="button"
-                  onClick={() => setShowCommentPopup(!showCommentPopup)}
-                  className={`hover:text-[#5846A8] dark:hover:text-purple-400 transition p-1.5 rounded-lg cursor-pointer ${
-                    showCommentPopup || attachedComment ? "text-[#5846A8] dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50" : ""
+                  onClick={() => {
+                    if (!showCommentPopup && attachedComment) {
+                      setCommentText(attachedComment);
+                    }
+                    setShowCommentPopup(!showCommentPopup);
+                  }}
+                  className={`flex items-center gap-1.5 transition px-2.5 py-1.5 rounded-xl text-xs font-semibold cursor-pointer ${
+                    showCommentPopup || attachedComment
+                      ? "text-white bg-gradient-to-r from-violet-600 to-indigo-600 shadow-sm shadow-indigo-500/20"
+                      : "text-slate-600 dark:text-slate-300 hover:text-[#5846A8] hover:bg-purple-50 dark:hover:bg-purple-950/40"
                   }`}
                   title="Auto First Comment (Publish with post)"
                 >
                   <MessageCircle className="w-4 h-4" />
+                  <span className="hidden sm:inline">1st Comment</span>
+                  {attachedComment && (
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-white animate-pulse" />
+                  )}
                 </button>
 
                 {showCommentPopup && (
-                  <div className="absolute bottom-11 left-0 w-88 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-4 z-40 text-xs animate-in fade-in zoom-in-95">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                        <MessageCircle className="w-4 h-4 text-[#5846A8] dark:text-purple-400" />
-                        <span>Auto First Comment</span>
-                      </span>
-                      <button onClick={() => setShowCommentPopup(false)} className="text-slate-400 hover:text-slate-600">
+                  <div className="absolute bottom-12 left-0 w-[470px] max-w-[92vw] bg-white dark:bg-slate-900 rounded-2xl shadow-[0_20px_50px_rgba(88,70,168,0.22)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] border-2 border-slate-200 dark:border-slate-700/80 p-5 z-50 text-xs animate-in fade-in zoom-in-95">
+                    {/* Header */}
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-500/20 shrink-0">
+                          <MessageCircle className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-slate-900 dark:text-white text-sm">
+                              Auto First Comment
+                            </span>
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 font-bold text-[10px] border border-emerald-200 dark:border-emerald-800/60">
+                              ⚡ Instant Launch
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                            Drops automatically the second your post goes live on selected channels.
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setShowCommentPopup(false)}
+                        className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                      >
                         <X className="w-4 h-4" />
                       </button>
                     </div>
 
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-2.5 leading-snug">
-                      Boost post reach by placing links, calls-to-action, or extra hashtags in the first comment.
-                    </p>
+                    {/* Real Dynamic Channel Info Banner */}
+                    <div className="mt-3 mb-2.5 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-850/80 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="relative w-7 h-7 rounded-full bg-slate-200 overflow-hidden shrink-0 border border-slate-300">
+                          {activePreviewChannel.profileImageUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={activePreviewChannel.profileImageUrl}
+                              alt={activePreviewChannel.displayName}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="w-full h-full flex items-center justify-center text-xs font-bold text-slate-700">
+                              {activePreviewChannel.displayName.charAt(0)}
+                            </span>
+                          )}
+                        </div>
+                        <div className="min-w-0 text-[11px]">
+                          <span className="text-slate-500 dark:text-slate-400 block text-[10px]">
+                            Publishing comment as:
+                          </span>
+                          <span className="font-bold text-slate-900 dark:text-white truncate block">
+                            {activePreviewChannel.displayName}
+                          </span>
+                        </div>
+                      </div>
+                      <span className="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-bold text-[10px] uppercase tracking-wider shrink-0">
+                        {activePreviewChannel.provider || "LinkedIn"}
+                      </span>
+                    </div>
 
+                    {/* Textarea */}
                     <textarea
                       value={commentText}
                       onChange={(e) => setCommentText(e.target.value)}
-                      placeholder={`e.g. Check out our latest products at link in bio! #${activeBrand.name.replace(/[^a-zA-Z0-9]/g, "")} #Trending`}
+                      placeholder={`e.g. 🔗 Check out the full breakdown and resources at https://${activeBrand.slug || "website"}.com\n\n💬 What are your thoughts on this? Drop a comment below!`}
                       rows={4}
-                      className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500/40 text-slate-900 dark:text-white mb-2 resize-none leading-relaxed"
+                      maxLength={2200}
+                      className="w-full p-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 dark:text-white mb-2.5 resize-none leading-relaxed transition"
                     />
 
-                    {/* Quick chips */}
-                    <div className="flex flex-wrap items-center gap-1.5 mb-3">
-                      <button
-                        type="button"
-                        onClick={() => setCommentText((prev) => `${prev ? prev + " " : ""}#${activeBrand.name.replace(/\s+/g, "")} #Trending #PulseSocial`)}
-                        className="px-2 py-0.5 rounded-full bg-purple-50 hover:bg-purple-100 text-[#5846A8] text-[10px] font-semibold border border-purple-200 cursor-pointer"
-                      >
-                        + Add Hashtags
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setCommentText((prev) => `${prev ? prev + " " : ""}🔗 Link in bio: https://${activeBrand.slug || "brand"}.com`)}
-                        className="px-2 py-0.5 rounded-full bg-purple-50 hover:bg-purple-100 text-[#5846A8] text-[10px] font-semibold border border-purple-200 cursor-pointer"
-                      >
-                        + Link in Bio
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setCommentText((prev) => `${prev ? prev + " " : ""}💬 Drop your thoughts below!`)}
-                        className="px-2 py-0.5 rounded-full bg-purple-50 hover:bg-purple-100 text-[#5846A8] text-[10px] font-semibold border border-purple-200 cursor-pointer"
-                      >
-                        + Ask Question
-                      </button>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
-                      <span className="text-[10px] text-slate-400 font-mono">
-                        {commentText.length} / 2200 chars
-                      </span>
-                      <div className="flex gap-2">
+                    {/* Rich Preset Chips */}
+                    <div className="space-y-1.5 mb-3.5">
+                      <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                        Smart Quick Presets:
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1.5">
                         <button
                           type="button"
-                          onClick={() => {
-                            setCommentText("");
-                            setAttachedComment(null);
-                            setShowCommentPopup(false);
-                          }}
-                          className="px-3 py-1.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold cursor-pointer"
+                          onClick={() =>
+                            setCommentText((prev) =>
+                              `${prev ? prev + "\n\n" : ""}🔗 Resource link: https://${activeBrand.slug || "website"}.com/resources — Explore the full story & guide!`
+                            )
+                          }
+                          className="px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-[#5846A8] dark:text-purple-300 text-[10.5px] font-bold border border-purple-200 dark:border-purple-800 transition cursor-pointer active:scale-95"
                         >
-                          Clear
+                          + Link in Bio
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCommentText((prev) =>
+                              `${prev ? prev + "\n\n" : ""}💬 What is your perspective on this? Drop your thoughts or questions below 👇`
+                            )
+                          }
+                          className="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 text-[10.5px] font-bold border border-indigo-200 dark:border-indigo-800 transition cursor-pointer active:scale-95"
+                        >
+                          + Ask Question
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCommentText((prev) =>
+                              `${prev ? prev + " " : ""}#ProfessionalGrowth #Innovation #Leadership #BusinessStrategy #Networking`
+                            )
+                          }
+                          className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 text-[10.5px] font-bold border border-emerald-200 dark:border-emerald-800 transition cursor-pointer active:scale-95"
+                        >
+                          + Add Hashtags
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCommentText((prev) =>
+                              `${prev ? prev + "\n\n" : ""}📌 Key Highlights:\n1. Core Takeaway\n2. Next Action Step`
+                            )
+                          }
+                          className="px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-700 dark:text-amber-300 text-[10.5px] font-bold border border-amber-200 dark:border-amber-800 transition cursor-pointer active:scale-95"
+                        >
+                          + Key Points
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Progress Bar & Character Counter Gauge */}
+                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800 mb-3">
+                      <div className="flex items-center justify-between text-[11px] mb-1.5 font-medium">
+                        <span className="text-slate-500 dark:text-slate-400">
+                          {commentText.length > 0 && commentText.length < 350 ? (
+                            <span className="text-emerald-600 dark:text-emerald-400 font-bold">
+                              ● Optimal Engagement Length
+                            </span>
+                          ) : commentText.length >= 350 && commentText.length < 1800 ? (
+                            <span className="text-indigo-600 dark:text-indigo-400 font-bold">
+                              ● Detailed First Comment
+                            </span>
+                          ) : commentText.length >= 1800 ? (
+                            <span className="text-amber-600 dark:text-amber-400 font-bold">
+                              ● Approaching Character Limit
+                            </span>
+                          ) : (
+                            <span>0 characters</span>
+                          )}
+                        </span>
+                        <span className="font-mono text-slate-500 dark:text-slate-400">
+                          <strong>{commentText.length}</strong> / 2,200 chars
+                        </span>
+                      </div>
+                      <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                        <div
+                          className={`h-full transition-all duration-200 ${
+                            commentText.length > 2000
+                              ? "bg-rose-500"
+                              : commentText.length > 1500
+                              ? "bg-amber-500"
+                              : "bg-gradient-to-r from-violet-600 to-indigo-600"
+                          }`}
+                          style={{
+                            width: `${Math.min(100, (commentText.length / 2200) * 100)}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div className="flex items-center justify-between pt-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCommentText("");
+                          setAttachedComment(null);
+                        }}
+                        className="px-3 py-1.5 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs font-semibold transition cursor-pointer"
+                      >
+                        Clear
+                      </button>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setShowCommentPopup(false)}
+                          className="px-3.5 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold transition cursor-pointer"
+                        >
+                          Cancel
                         </button>
                         <button
                           type="button"
                           onClick={handleSaveComment}
-                          className="px-4 py-1.5 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white font-bold text-xs shadow-sm cursor-pointer"
+                          className="px-5 py-2 rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/25 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
                         >
-                          Save Comment
+                          <Check className="w-3.5 h-3.5" />
+                          <span>Save Comment</span>
                         </button>
                       </div>
                     </div>
@@ -1584,8 +1787,8 @@ export function PostComposerModal({
                       <button
                         type="button"
                         onClick={() => {
-                          const topTags = HASHTAG_CATEGORIES[activeHashtagCategory].tags.slice(0, 4);
-                          topTags.forEach((t) => handleInsertHashtag(t));
+                          const topTags = HASHTAG_CATEGORIES[activeHashtagCategory].tags.slice(0, 5);
+                          handleBatchInsertHashtags(topTags);
                           setShowHashtagPopup(false);
                         }}
                         className="text-[#5846A8] dark:text-purple-400 font-bold text-[11px] hover:underline cursor-pointer"
@@ -1841,9 +2044,9 @@ export function PostComposerModal({
                 firstComment={attachedComment}
                 youtubeTitle={youtubeTitle}
                 isShorts={isShorts}
-                brandName={activeBrand.name || "Pulse Media Global"}
-                brandAvatar={activeBrand.avatarUrl || "/icons/pulse-logo.svg"}
-                brandHandle={activeBrand.slug || "pulsemedia"}
+                brandName={activePreviewChannel.displayName || activeBrand.name || "Suraj Vishwakarma"}
+                brandAvatar={activePreviewChannel.profileImageUrl || activeBrand.avatarUrl || "/icons/pulse-logo.svg"}
+                brandHandle={activePreviewChannel.username || activeBrand.slug || "surajvishwakarma"}
               />
             </div>
           </div>

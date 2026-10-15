@@ -22,15 +22,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Message must be at least 10 characters long." }, { status: 400 });
     }
 
-    // Save contact inquiry to database
-    const contact = await (prisma as any).contactRequest.create({
+    // Format category prefix in subject if not already present
+    const formattedSubject = subject.trim().startsWith("[")
+      ? subject.trim()
+      : `[${category.toUpperCase()}] ${subject.trim()}`;
+
+    // Save contact inquiry to database using valid schema fields
+    const contact = await prisma.contactRequest.create({
       data: {
         name: name.trim(),
         email: email.trim().toLowerCase(),
-        subject: subject.trim(),
+        subject: formattedSubject,
         message: message.trim(),
-        category: category.toUpperCase(),
-        status: "NEW",
+        status: "PENDING",
       },
     });
 
@@ -41,7 +45,7 @@ export async function POST(req: NextRequest) {
           action: "CONTACT_REQUEST_SUBMITTED",
           resourceType: "ContactRequest",
           resourceId: contact.id,
-          details: JSON.stringify({ email: contact.email, subject: contact.subject, category: contact.category }),
+          details: JSON.stringify({ email: contact.email, subject: contact.subject, category }),
           ipAddress: req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "127.0.0.1",
           userAgent: req.headers.get("user-agent") || undefined,
         },

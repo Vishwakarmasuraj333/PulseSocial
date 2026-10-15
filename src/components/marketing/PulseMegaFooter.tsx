@@ -9,8 +9,9 @@ import {
   InstagramIcon,
   YouTubeIcon,
 } from "@/components/icons/PlatformIcons";
-import { Search, Globe, ShieldCheck, Mail, ArrowUpRight, CheckCircle2, Phone, MapPin } from "lucide-react";
+import { Search, Globe, ShieldCheck, Mail, ArrowUpRight, CheckCircle2, Phone, MapPin, Headphones } from "lucide-react";
 import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
+import { CONTACT_CONFIG } from "@/lib/constants/contact";
 
 export function PulseMegaFooter() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -145,8 +146,8 @@ export function PulseMegaFooter() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[11px] font-semibold mb-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>24/7 Global Support &amp; Customer Advisory</span>
+                <Headphones className="w-3.5 h-3.5" />
+                <span>Support &amp; Customer Advisory</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
                 Get in Touch with PulseSocial Specialists
@@ -164,7 +165,7 @@ export function PulseMegaFooter() {
                 <ArrowUpRight className="w-3.5 h-3.5" />
               </Link>
               <a
-                href="tel:+18007857362"
+                href={`tel:${CONTACT_CONFIG.phone.tel}`}
                 className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition flex items-center gap-1.5"
               >
                 <Phone className="w-3.5 h-3.5 text-emerald-400" />
@@ -181,21 +182,20 @@ export function PulseMegaFooter() {
                   <Phone className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">Toll-Free Helpline</h4>
-                  <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    Live 24/7
+                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">{CONTACT_CONFIG.phone.label}</h4>
+                  <span className="text-[10px] text-slate-400 font-semibold">
+                    Mon – Fri Support
                   </span>
                 </div>
               </div>
               <a
-                href="tel:+18007857362"
+                href={`tel:${CONTACT_CONFIG.phone.tel}`}
                 className="text-xs font-bold text-white hover:text-purple-300 transition block font-mono"
               >
-                +1 (800) 785-PULSE
+                {CONTACT_CONFIG.phone.display}
               </a>
               <p className="text-[10px] text-slate-400 mt-0.5">
-                +1 (800) 785-7362 &bull; Direct phone assistance
+                {CONTACT_CONFIG.phone.hours}
               </p>
             </div>
 
@@ -207,14 +207,14 @@ export function PulseMegaFooter() {
                 </div>
                 <div>
                   <h4 className="text-xs font-bold text-white uppercase tracking-wider">Support Desk</h4>
-                  <span className="text-[10px] text-purple-400 font-semibold">Response &lt; 15 mins</span>
+                  <span className="text-[10px] text-purple-400 font-semibold">{CONTACT_CONFIG.sla.standard}</span>
                 </div>
               </div>
               <a
-                href="mailto:support@pulsesocial.io"
+                href={`mailto:${CONTACT_CONFIG.emails.support}`}
                 className="text-xs font-bold text-white hover:text-purple-300 transition block underline underline-offset-2"
               >
-                support@pulsesocial.io
+                {CONTACT_CONFIG.emails.support}
               </a>
               <p className="text-[10px] text-slate-400 mt-0.5">
                 Publishing, OAuth &amp; workspace troubleshooting
@@ -233,10 +233,10 @@ export function PulseMegaFooter() {
                 </div>
               </div>
               <a
-                href="mailto:sales@pulsesocial.io"
+                href={`mailto:${CONTACT_CONFIG.emails.sales}`}
                 className="text-xs font-bold text-white hover:text-purple-300 transition block underline underline-offset-2"
               >
-                sales@pulsesocial.io
+                {CONTACT_CONFIG.emails.sales}
               </a>
               <p className="text-[10px] text-slate-400 mt-0.5">
                 Custom agency pricing, SLAs &amp; procurement
@@ -251,14 +251,14 @@ export function PulseMegaFooter() {
                 </div>
                 <div>
                   <h4 className="text-xs font-bold text-white uppercase tracking-wider">Global HQ</h4>
-                  <span className="text-[10px] text-cyan-400 font-semibold">San Francisco, CA</span>
+                  <span className="text-[10px] text-cyan-400 font-semibold">{CONTACT_CONFIG.headquarters.city}, {CONTACT_CONFIG.headquarters.state}</span>
                 </div>
               </div>
               <p className="text-xs font-medium text-slate-200">
-                450 Mission St, Suite 1400
+                {CONTACT_CONFIG.headquarters.address}
               </p>
               <p className="text-[10px] text-slate-400 mt-0.5">
-                San Francisco, CA 94105, United States
+                {CONTACT_CONFIG.headquarters.city}, {CONTACT_CONFIG.headquarters.state} {CONTACT_CONFIG.headquarters.postalCode}, {CONTACT_CONFIG.headquarters.country}
               </p>
             </div>
           </div>
@@ -294,10 +294,10 @@ export function PulseMegaFooter() {
               <Mail className="w-4 h-4 text-purple-400" />
               <span className="text-slate-400">Support:</span>
               <a
-                href="mailto:support@pulsesocial.io"
+                href={`mailto:${CONTACT_CONFIG.emails.support}`}
                 className="hover:text-white transition-colors underline underline-offset-2 font-medium"
               >
-                support@pulsesocial.io
+                {CONTACT_CONFIG.emails.support}
               </a>
             </div>
 
@@ -305,16 +305,16 @@ export function PulseMegaFooter() {
               <Phone className="w-4 h-4 text-emerald-400" />
               <span className="text-slate-400">Helpline:</span>
               <a
-                href="tel:+18007857362"
-                className="hover:text-white transition-colors font-medium"
+                href={`tel:${CONTACT_CONFIG.phone.tel}`}
+                className="hover:text-white transition-colors font-medium font-mono"
               >
-                +1 (800) 785-PULSE (+1 800-785-7362)
+                {CONTACT_CONFIG.phone.display}
               </a>
             </div>
 
             <div className="flex items-center gap-2 text-slate-400">
               <MapPin className="w-4 h-4 text-purple-400" />
-              <span>450 Mission St, Suite 1400, San Francisco, CA 94105</span>
+              <span>{CONTACT_CONFIG.headquarters.display}</span>
             </div>
           </div>
 

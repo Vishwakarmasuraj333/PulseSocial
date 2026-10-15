@@ -119,6 +119,7 @@ export async function GET(
 
     // Persist and sync every authorized page, organization, or account
     for (const accountInfo of accounts) {
+      const accountProvider = (accountInfo.platform || platformKey) as SupportedPlatform;
       const specificAccessToken: string =
         (typeof accountInfo.metadata?.pageAccessToken === "string"
           ? accountInfo.metadata.pageAccessToken
@@ -131,7 +132,7 @@ export async function GET(
         where: {
           organizationId_provider_providerAccountId: {
             organizationId: orgId,
-            provider: platformKey,
+            provider: accountProvider,
             providerAccountId: accountInfo.providerAccountId,
           },
         },
@@ -150,7 +151,7 @@ export async function GET(
         },
         create: {
           organizationId: orgId,
-          provider: platformKey,
+          provider: accountProvider,
           providerAccountId: accountInfo.providerAccountId,
           displayName: accountInfo.displayName,
           username: accountInfo.username,

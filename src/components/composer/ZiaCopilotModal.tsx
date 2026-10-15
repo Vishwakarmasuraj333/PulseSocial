@@ -26,7 +26,7 @@ interface ZiaCopilotModalProps {
 export function ZiaCopilotModal({
   isOpen,
   onClose,
-  brandName = "Brownmonkeytv devloper",
+  brandName = "Pulse Workspace",
   onApply,
 }: ZiaCopilotModalProps) {
   const { toast } = useToast();

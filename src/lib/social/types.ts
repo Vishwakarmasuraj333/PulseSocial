@@ -227,6 +227,7 @@ export interface SocialAccountInfo {
   username?: string;
   profileImageUrl?: string;
   accountType?: string;
+  platform?: SupportedPlatform;
   metadata?: Record<string, unknown>;
 }
 

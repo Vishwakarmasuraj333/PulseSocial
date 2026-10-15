@@ -61,16 +61,49 @@ export async function GET(req: Request) {
         .slice(0, 2)
         .toUpperCase();
 
+      const rawPlatform = parsedDetails.platform || parsedDetails.provider;
+      const detectedPlatform =
+        rawPlatform ||
+        (log.action.includes("GOOGLE")
+          ? "google"
+          : log.action.includes("LINKEDIN")
+          ? "linkedin"
+          : log.action.includes("FACEBOOK")
+          ? "facebook"
+          : log.action.includes("INSTAGRAM")
+          ? "instagram"
+          : log.action.includes("TWITTER") || log.action.includes("X_")
+          ? "x"
+          : undefined);
+
+      let cleanTitle = log.action.replace(/_/g, " ");
+      let cleanDesc = parsedDetails.description || parsedDetails.message;
+
+      if (!cleanDesc) {
+        if (log.action === "OAUTH_CONNECTED") {
+          cleanTitle = `${(detectedPlatform || "Social").toUpperCase()} Connected`;
+          cleanDesc = `Successfully authenticated and linked ${detectedPlatform || "social"} account`;
+        } else if (log.action === "SOCIAL_ACCOUNT_SYNCED") {
+          cleanTitle = `${(detectedPlatform || "Social").toUpperCase()} Synced`;
+          cleanDesc = `Synchronized profile, metrics, and channels`;
+        } else if (log.action === "GOOGLE_OAUTH_LOGIN") {
+          cleanTitle = "Google OAuth Login";
+          cleanDesc = `Authenticated via Google SSO (${userName})`;
+        } else if (log.resourceType === "SocialAccount") {
+          cleanDesc = `${(detectedPlatform || "Social").toUpperCase()} channel configured`;
+        } else if (log.resourceType === "User") {
+          cleanDesc = `User authentication activity (${userName})`;
+        } else {
+          cleanDesc = `Action completed on ${log.resourceType || "workspace"}`;
+        }
+      }
+
       return {
         id: log.id,
         type,
         action: log.action,
-        title: log.action.replace(/_/g, " "),
-        description:
-          parsedDetails.description ||
-          parsedDetails.message ||
-          `${log.resourceType} ${log.resourceId || ""}`.trim() ||
-          `Action performed on ${log.resourceType}`,
+        title: cleanTitle,
+        description: cleanDesc,
         timestamp: new Date(log.createdAt).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -81,7 +114,7 @@ export async function GET(req: Request) {
           avatarInitials: userInitials,
           avatarUrl: log.user?.avatarUrl,
         },
-        platform: parsedDetails.platform || parsedDetails.provider || undefined,
+        platform: detectedPlatform,
         status: log.action.includes("FAILED") || log.action.includes("ERROR")
           ? ("WARNING" as const)
           : ("SUCCESS" as const),

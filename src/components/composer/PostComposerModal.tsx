@@ -7,12 +7,10 @@ import { useToast } from "@/components/ui/toast";
 import { useBrand } from "@/context/BrandContext";
 import { UniversalSocialConnectModal } from "@/components/social/UniversalSocialConnectModal";
 import { CanvaConnectModal } from "@/components/composer/CanvaConnectModal";
-import { renderPlatformIcon, CanvaIcon, GeminiIcon } from "@/components/icons/PlatformIcons";
+import { renderPlatformIcon, CanvaIcon } from "@/components/icons/PlatformIcons";
 import {
   X,
   Plus,
-  Sparkles,
-  Wand2,
   RefreshCw,
   Image as ImageIcon,
   MapPin,
@@ -40,7 +38,6 @@ import {
 } from "lucide-react";
 import { PostPreview, PreviewMediaItem } from "@/components/composer/previews/PostPreview";
 import { RealLocationMapModal, LocationData } from "./RealLocationMapModal";
-import { ZiaCopilotModal } from "./ZiaCopilotModal";
 
 interface PostComposerModalProps {
   isOpen: boolean;
@@ -213,16 +210,7 @@ interface ConnectedAccountItem {
   status: string;
 }
 
-const DEFAULT_REAL_ACCOUNTS: ConnectedAccountItem[] = [
-  {
-    id: "fb-bm-1",
-    provider: "facebook",
-    displayName: "Brownmonkeytv devloper",
-    username: "BrownMonkeyTV",
-    profileImageUrl: "/images/brown_monkey_avatar.jpg",
-    status: "CONNECTED",
-  },
-];
+const DEFAULT_REAL_ACCOUNTS: ConnectedAccountItem[] = [];
 
 export function PostComposerModal({
   isOpen,
@@ -236,25 +224,14 @@ export function PostComposerModal({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const desktopFileInputRef = useRef<HTMLInputElement>(null);
 
-  const [connectedAccounts, setConnectedAccounts] = useState<ConnectedAccountItem[]>(DEFAULT_REAL_ACCOUNTS);
-  const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>(["fb-bm-1"]);
+  const [connectedAccounts, setConnectedAccounts] = useState<ConnectedAccountItem[]>([]);
+  const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([]);
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const [isCanvaModalOpen, setIsCanvaModalOpen] = useState(false);
   const [isCanvaConnected, setIsCanvaConnected] = useState(false);
   
-  // 3-Step Zia / Gemini AI Copilot state matching user screenshot
-  const [isZiaModalOpen, setIsZiaModalOpen] = useState(false);
   const [showAltTextModal, setShowAltTextModal] = useState(false);
   const [altText, setAltText] = useState("");
-
-  // Inline Gemini AI Copilot state
-  const [isGeminiInlineOpen, setIsGeminiInlineOpen] = useState(false);
-  const [aiPrompt, setAiPrompt] = useState("");
-  const [aiTone, setAiTone] = useState("Engaging & Viral");
-  const [aiIncludeHashtags, setAiIncludeHashtags] = useState(true);
-  const [aiIncludeFirstComment, setAiIncludeFirstComment] = useState(true);
-  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
-  const [aiGeneratedAlternatives, setAiGeneratedAlternatives] = useState<string[]>([]);
 
   // Dynamic Media Library and Cloud Picker states
   const [isMediaLibraryOpen, setIsMediaLibraryOpen] = useState(false);
@@ -265,16 +242,37 @@ export function PostComposerModal({
 
   const fetchChannels = async () => {
     try {
-      const res = await fetch("/api/social/connections");
-      if (res.ok) {
-        const data = await res.json();
+      const [accRes, connRes] = await Promise.all([
+        fetch("/api/social/accounts"),
+        fetch("/api/social/connections"),
+      ]);
+
+      if (accRes.ok) {
+        const data = await accRes.json();
+        if (Array.isArray(data.accounts) && data.accounts.length > 0) {
+          const mapped: ConnectedAccountItem[] = data.accounts.map((c: any) => ({
+            id: c.id,
+            provider: c.provider,
+            displayName: c.displayName,
+            username: c.username || c.displayName,
+            profileImageUrl: c.profileImageUrl || "",
+            status: c.status || "CONNECTED",
+          }));
+          setConnectedAccounts(mapped);
+          setSelectedAccountIds(mapped.map((m) => m.id));
+          return;
+        }
+      }
+
+      if (connRes.ok) {
+        const data = await connRes.json();
         if (Array.isArray(data.connections) && data.connections.length > 0) {
           const mapped: ConnectedAccountItem[] = data.connections.map((c: any) => ({
             id: c.id,
             provider: c.provider,
             displayName: c.displayName,
             username: c.username,
-            profileImageUrl: c.avatarUrl || c.profileImageUrl || "/images/brown_monkey_avatar.jpg",
+            profileImageUrl: c.avatarUrl || c.profileImageUrl || "",
             status: c.status || "CONNECTED",
           }));
           setConnectedAccounts(mapped);
@@ -300,11 +298,11 @@ export function PostComposerModal({
         }
       }
 
-      setConnectedAccounts(DEFAULT_REAL_ACCOUNTS);
-      setSelectedAccountIds(["fb-bm-1"]);
+      setConnectedAccounts([]);
+      setSelectedAccountIds([]);
     } catch {
-      setConnectedAccounts(DEFAULT_REAL_ACCOUNTS);
-      setSelectedAccountIds(["fb-bm-1"]);
+      setConnectedAccounts([]);
+      setSelectedAccountIds([]);
     }
   };
 
@@ -587,46 +585,35 @@ export function PostComposerModal({
       return;
     }
 
+    const validTargetIds = selectedAccountIds.filter(
+      (id) => !id.startsWith("channel-") && id !== "default-channel" && id !== "preview-channel"
+    );
+
     setIsSubmitting(true);
     try {
-      const draftPost = {
-        id: `draft-${Date.now()}`,
-        content,
-        status: "DRAFT" as const,
-        createdAt: new Date().toISOString(),
-        media: media.map((m, i) => ({
-          id: `m-draft-${Date.now()}-${i}`,
-          url: m.url,
-          mediaType: m.type === "video" ? "video" : "image",
-        })),
-        targets: [
-          {
-            id: `t-${Date.now()}`,
-            socialAccountId: "fb-bm-1",
-            status: "DRAFT",
-            socialAccount: {
-              id: "fb-bm-1",
-              provider: "facebook",
-              displayName: "Brownmonkeytv devloper",
-              username: "BrownMonkeyTV",
-              avatarUrl: "/images/brown_monkey_avatar.jpg",
-            },
-          },
-        ],
-        likes: 0,
-        comments: 0,
-        author: { id: "u-suraj", name: "Suraj Vishwakarma" },
-      };
+      const res = await fetch("/api/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content,
+          mediaUrls: media.map((m) => ({ url: m.url, type: m.type === "video" ? "VIDEO" : "IMAGE" })),
+          targetAccountIds: validTargetIds.length > 0 ? validTargetIds : (connectedAccounts.length > 0 ? [connectedAccounts[0].id] : []),
+          action: "DRAFT",
+          location: selectedLocation || undefined,
+          firstComment: attachedComment || undefined,
+          targetAudience: selectedCountry || undefined,
+          link: attachedUrlData?.url || undefined,
+        }),
+      });
 
-      try {
-        const stored = localStorage.getItem("pulsesocial_user_created_posts");
-        const list = stored ? JSON.parse(stored) : [];
-        list.unshift(draftPost);
-        localStorage.setItem("pulsesocial_user_created_posts", JSON.stringify(list));
-      } catch {}
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to save draft to database.");
+      }
 
+      const resData = await res.json();
       if (typeof window !== "undefined") {
-        window.dispatchEvent(new CustomEvent("pulsesocial_post_created", { detail: draftPost }));
+        window.dispatchEvent(new CustomEvent("pulsesocial_post_created", { detail: resData.post }));
       }
 
       toast({
@@ -642,6 +629,12 @@ export function PostComposerModal({
       setAttachedComment(null);
       onClose();
       if (onSuccess) onSuccess();
+    } catch (err: any) {
+      toast({
+        title: "Draft Error",
+        message: err?.message || "Failed to save post draft.",
+        type: "error",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -657,98 +650,85 @@ export function PostComposerModal({
       return;
     }
 
+    // Pre-flight validation: check for blob URLs
+    const hasBlobUrls = media.some((m) => m.url.startsWith("blob:"));
+    if (hasBlobUrls) {
+      toast({
+        title: "Uploads in Progress",
+        message: "Media files are still uploading or need a public URL. Please wait for upload to complete.",
+        type: "warning",
+      });
+      return;
+    }
+
     const validTargetIds = selectedAccountIds.filter(
       (id) => !id.startsWith("channel-") && id !== "default-channel" && id !== "preview-channel"
     );
 
+    if (validTargetIds.length === 0 && connectedAccounts.length === 0) {
+      toast({
+        title: "No Account Selected",
+        message: "Please connect and select at least one social account to publish to.",
+        type: "error",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      let createdPostData: any = null;
-      try {
-        const res = await fetch("/api/posts", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            content,
-            mediaUrls: media.map((m) => ({ url: m.url, type: m.type === "video" ? "VIDEO" : "IMAGE" })),
-            targetAccountIds: validTargetIds.length > 0 ? validTargetIds : ["fb-bm-1"],
-            action:
-              sendForApproval
-                ? "DRAFT"
-                : publishingOption === "schedule"
-                ? "SCHEDULE"
-                : publishingOption === "queue"
-                ? "QUEUE"
-                : "PUBLISH_NOW",
-            scheduledFor: publishingOption === "schedule" ? `${scheduledDate}T${scheduledTime}:00Z` : undefined,
-            location: selectedLocation || undefined,
-            firstComment: attachedComment || undefined,
-            targetAudience: selectedCountry || undefined,
-            link: attachedUrlData?.url || undefined,
-          }),
+      const res = await fetch("/api/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content,
+          mediaUrls: media.map((m) => ({ url: m.url, type: m.type === "video" ? "VIDEO" : "IMAGE" })),
+          targetAccountIds: validTargetIds.length > 0 ? validTargetIds : (connectedAccounts.length > 0 ? [connectedAccounts[0].id] : []),
+          action:
+            sendForApproval
+              ? "DRAFT"
+              : publishingOption === "schedule"
+              ? "SCHEDULE"
+              : publishingOption === "queue"
+              ? "QUEUE"
+              : "PUBLISH_NOW",
+          scheduledFor: publishingOption === "schedule" ? `${scheduledDate}T${scheduledTime}:00Z` : undefined,
+          location: selectedLocation || undefined,
+          firstComment: attachedComment || undefined,
+          targetAudience: selectedCountry || undefined,
+          link: attachedUrlData?.url || undefined,
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        const errorMessage = errData.error || errData.allErrors?.[0] || "Failed to publish post to social networks.";
+        toast({
+          title: "Publishing Error",
+          message: errorMessage,
+          type: "error",
         });
+        return;
+      }
 
-        if (res.ok) {
-          const resData = await res.json().catch(() => ({}));
-          if (resData.post) {
-            createdPostData = resData.post;
-          }
-        }
-      } catch {}
-
-      const postStatus = sendForApproval
-        ? ("PENDING_APPROVAL" as const)
-        : publishingOption === "schedule"
-        ? ("SCHEDULED" as const)
-        : ("PUBLISHED" as const);
-
-      const publishedPost = createdPostData || {
-        id: `post-${Date.now()}`,
-        content,
-        status: postStatus,
-        publishedAt: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        scheduledFor: publishingOption === "schedule" ? `${scheduledDate}T${scheduledTime}:00Z` : undefined,
-        media: media.map((m, i) => ({
-          id: `m-${Date.now()}-${i}`,
-          url: m.url,
-          mediaType: m.type === "video" ? "video" : "image",
-        })),
-        targets: [
-          {
-            id: `t-${Date.now()}`,
-            socialAccountId: "fb-bm-1",
-            status: "SUCCESS",
-            socialAccount: {
-              id: "fb-bm-1",
-              provider: "facebook",
-              displayName: "Brownmonkeytv devloper",
-              username: "BrownMonkeyTV",
-              avatarUrl: "/images/brown_monkey_avatar.jpg",
-            },
-          },
-        ],
-        likes: 0,
-        comments: 0,
-        author: { id: "u-suraj", name: "Suraj Vishwakarma" },
-      };
-
-      try {
-        const stored = localStorage.getItem("pulsesocial_user_created_posts");
-        const list = stored ? JSON.parse(stored) : [];
-        list.unshift(publishedPost);
-        localStorage.setItem("pulsesocial_user_created_posts", JSON.stringify(list));
-      } catch {}
+      const resData = await res.json();
+      if (!resData.post && !resData.success) {
+        toast({
+          title: "Publishing Rejected",
+          message: resData.error || "Remote platform API rejected publication.",
+          type: "error",
+        });
+        return;
+      }
 
       if (typeof window !== "undefined") {
-        window.dispatchEvent(new CustomEvent("pulsesocial_post_created", { detail: publishedPost }));
+        window.dispatchEvent(new CustomEvent("pulsesocial_post_created", { detail: resData.post }));
       }
 
       const destinationNames =
-        effectiveChannels
+        connectedAccounts
           .filter((ch) => selectedAccountIds.includes(ch.id))
-          .map((ch) => ch.displayName)
-          .join(", ") || "Facebook Page (Brownmonkeytv devloper)";
+          .map((ch) => `${ch.displayName} (${ch.provider})`)
+          .join(", ") || (connectedAccounts[0]?.displayName ? `${connectedAccounts[0].displayName} (${connectedAccounts[0].provider})` : "your connected channels");
 
       toast({
         title:
@@ -759,10 +739,10 @@ export function PostComposerModal({
             : publishingOption === "queue"
             ? "Added to Queue!"
             : "Post Published!",
-        message: sendForApproval
-          ? "Sent to workspace approvers for review."
+        message: resData.partialWarning
+          ? `Dispatched with notice: ${resData.partialWarning}`
           : `Successfully dispatched to ${destinationNames}.`,
-        type: "success",
+        type: resData.partialWarning ? "warning" : "success",
       });
 
       setContent("");
@@ -774,8 +754,8 @@ export function PostComposerModal({
       if (onSuccess) onSuccess();
     } catch (err: unknown) {
       toast({
-        title: "Publishing Failed",
-        message: (err as Error).message || "Could not publish post.",
+        title: "Network Error",
+        message: (err as Error).message || "An unexpected error occurred while communicating with the server.",
         type: "error",
       });
     } finally {
@@ -801,167 +781,7 @@ export function PostComposerModal({
     });
   };
 
-  // Inline Gemini AI Copilot generator
-  const handleGenerateAiCopy = async () => {
-    if (!aiPrompt.trim()) {
-      toast({
-        title: "Prompt Needed",
-        message: "Please enter a topic or announcement for Gemini to write about.",
-        type: "warning",
-      });
-      return;
-    }
 
-    setIsGeneratingAi(true);
-    try {
-      const res = await fetch("/api/ai/gemini/social-copy", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: aiPrompt.trim(),
-          brandName: activeBrand.name || "PulseSocial",
-          industry: activeBrand.industry || "Social Media",
-          tone: aiTone,
-          platform: activePreviewChannel.provider || "Instagram",
-          model: "gemini-3.1-flash-lite",
-          includeHashtags: aiIncludeHashtags,
-          includeFirstComment: aiIncludeFirstComment,
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || data.error || "Gemini generation failed.");
-      }
-
-      let fullCaption = data.primaryCaption || "";
-      if (aiIncludeHashtags && Array.isArray(data.hashtags) && data.hashtags.length > 0) {
-        const tagsStr = data.hashtags.join(" ");
-        if (!fullCaption.includes(data.hashtags[0])) {
-          fullCaption = `${fullCaption.trim()}\n\n${tagsStr}`;
-        }
-      }
-
-      setContent(fullCaption);
-
-      if (aiIncludeFirstComment && data.firstComment) {
-        setAttachedComment(data.firstComment);
-        setCommentText(data.firstComment);
-      }
-
-      if (Array.isArray(data.alternatives) && data.alternatives.length > 0) {
-        setAiGeneratedAlternatives(data.alternatives);
-      }
-
-      toast({
-        title: "✨ Content Generated!",
-        message: "Gemini successfully created your publication-ready post.",
-        type: "success",
-      });
-    } catch (err: any) {
-      toast({
-        title: "AI Generation Error",
-        message: err.message || "Failed to generate copy. Please try again.",
-        type: "error",
-      });
-    } finally {
-      setIsGeneratingAi(false);
-    }
-  };
-
-  // Polish existing drafted text with Gemini
-  const handlePolishContentWithAi = async () => {
-    if (!content.trim()) {
-      toast({
-        title: "Content Needed",
-        message: "Write some text in the post caption first to polish it.",
-        type: "warning",
-      });
-      return;
-    }
-
-    setIsGeneratingAi(true);
-    try {
-      const res = await fetch("/api/ai/gemini/social-copy", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: `Rewrite, polish and optimize this caption for maximum viral social reach: "${content.trim()}"`,
-          brandName: activeBrand.name || "PulseSocial",
-          industry: activeBrand.industry || "Social Media",
-          tone: aiTone,
-          platform: activePreviewChannel.provider || "Instagram",
-          model: "gemini-3.1-flash-lite",
-          includeHashtags: false,
-          includeFirstComment: false,
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || data.error || "Polishing failed.");
-      }
-
-      if (data.primaryCaption) {
-        setContent(data.primaryCaption);
-        toast({
-          title: "💎 Content Polished!",
-          message: "Gemini refined your caption for maximum engagement.",
-          type: "success",
-        });
-      }
-    } catch (err: any) {
-      toast({
-        title: "Polishing Error",
-        message: err.message || "Could not polish content.",
-        type: "error",
-      });
-    } finally {
-      setIsGeneratingAi(false);
-    }
-  };
-
-  // Generate trending hashtags with real Gemini AI
-  const handleGenerateHashtagsWithAi = async () => {
-    setIsGeneratingAi(true);
-    try {
-      const topic = content.trim() || activeBrand.name || "social media marketing";
-      const res = await fetch("/api/ai/gemini/social-copy", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: `Generate 5 to 8 high-engagement, trending hashtags for: "${topic}"`,
-          brandName: activeBrand.name || "PulseSocial",
-          industry: activeBrand.industry || "Social Media",
-          includeHashtags: true,
-          includeFirstComment: false,
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || data.error || "Failed to generate hashtags.");
-      }
-
-      if (Array.isArray(data.hashtags) && data.hashtags.length > 0) {
-        const tagsStr = data.hashtags.join(" ");
-        setContent((prev) => (prev.trim() ? `${prev.trim()}\n\n${tagsStr}` : tagsStr));
-        toast({
-          title: "# Hashtags Added!",
-          message: `Inserted ${data.hashtags.length} trending hashtags generated with Gemini.`,
-          type: "success",
-        });
-      }
-    } catch (err: any) {
-      toast({
-        title: "Hashtag Error",
-        message: err.message || "Could not generate hashtags.",
-        type: "error",
-      });
-    } finally {
-      setIsGeneratingAi(false);
-    }
-  };
 
   // Filter emojis based on search
   const filteredEmojis = emojiSearch.trim()
@@ -1113,177 +933,7 @@ export function PostComposerModal({
                 )}
               </div>
 
-              {/* Gemini Copilot & AI Trigger Bar matching User requirements */}
-              <div className="flex flex-wrap items-center gap-2 mb-3">
-                <button
-                  type="button"
-                  onClick={() => setIsZiaModalOpen(true)}
-                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-sky-400/80 bg-sky-50/80 hover:bg-sky-100 text-sky-700 dark:bg-sky-950/50 dark:border-sky-700 dark:text-sky-300 text-xs font-semibold transition active:scale-95 cursor-pointer shadow-2xs"
-                  title="Generate dynamic copy & images with Google Gemini AI Copilot"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
-                  <span>Gemini AI Copilot</span>
-                  <span className="text-[10px] bg-sky-200/80 dark:bg-sky-900/70 text-sky-800 dark:text-sky-200 px-1.5 py-0.2 rounded font-mono font-bold">
-                    Flash 3.1
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleGenerateHashtagsWithAi}
-                  disabled={isGeneratingAi}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium cursor-pointer shadow-2xs disabled:opacity-50 transition"
-                  title="Generate trending hashtags with Google Gemini"
-                >
-                  <Hash className="w-3.5 h-3.5 text-slate-500" />
-                  <span>+ Hashtags</span>
-                </button>
-
-                {content.trim() && (
-                  <button
-                    type="button"
-                    onClick={handlePolishContentWithAi}
-                    disabled={isGeneratingAi}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-slate-800 text-[#5846A8] dark:text-purple-300 border border-purple-200 dark:border-purple-800 hover:bg-purple-50 transition cursor-pointer disabled:opacity-50"
-                    title="Let Gemini refine and polish your drafted text"
-                  >
-                    <Wand2 className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                    <span>{isGeneratingAi ? "Refining..." : "Polish Draft"}</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Seamless Inline Gemini Copilot Panel */}
-              {isGeminiInlineOpen && (
-                <div className="mb-4 p-4 rounded-2xl bg-gradient-to-br from-blue-50/90 via-indigo-50/50 to-purple-50/60 dark:from-slate-900/90 dark:via-blue-950/30 dark:to-purple-950/30 border border-blue-200/90 dark:border-blue-900/60 shadow-md space-y-3 animate-in fade-in zoom-in-98 duration-150">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-xs">
-                        <Sparkles className="w-3.5 h-3.5" />
-                      </div>
-                      <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
-                        Gemini AI Copilot
-                      </span>
-                      <span className="text-[10px] text-blue-600 dark:text-blue-400 font-mono font-medium">
-                        gemini-3.1-flash-lite · active
-                      </span>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => setIsGeminiInlineOpen(false)}
-                      className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs p-1"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  {/* Prompt Input */}
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={aiPrompt}
-                      onChange={(e) => setAiPrompt(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !isGeneratingAi) {
-                          e.preventDefault();
-                          handleGenerateAiCopy();
-                        }
-                      }}
-                      placeholder="What should Gemini write about? e.g. Launching 30% discount on summer collection..."
-                      className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-slate-800 dark:text-white placeholder:text-slate-400 shadow-xs"
-                    />
-                  </div>
-
-                  {/* Controls Row */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <label className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 text-[11px] font-medium cursor-pointer">
-                        <span>Tone:</span>
-                        <select
-                          value={aiTone}
-                          onChange={(e) => setAiTone(e.target.value)}
-                          className="px-2 py-1 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer"
-                        >
-                          <option value="Engaging & Viral">Engaging & Viral</option>
-                          <option value="Professional">Professional</option>
-                          <option value="Casual & Fun">Casual & Fun</option>
-                          <option value="Inspirational">Inspirational</option>
-                          <option value="Promotional">Promotional</option>
-                          <option value="Thought Leadership">Thought Leadership</option>
-                        </select>
-                      </label>
-
-                      <label className="flex items-center gap-1.5 text-[11px] text-slate-600 dark:text-slate-300 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={aiIncludeHashtags}
-                          onChange={(e) => setAiIncludeHashtags(e.target.checked)}
-                          className="rounded text-blue-600 focus:ring-blue-500 w-3.5 h-3.5 cursor-pointer"
-                        />
-                        <span>Include Hashtags</span>
-                      </label>
-
-                      <label className="flex items-center gap-1.5 text-[11px] text-slate-600 dark:text-slate-300 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={aiIncludeFirstComment}
-                          onChange={(e) => setAiIncludeFirstComment(e.target.checked)}
-                          className="rounded text-blue-600 focus:ring-blue-500 w-3.5 h-3.5 cursor-pointer"
-                        />
-                        <span>Auto First Comment</span>
-                      </label>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={handleGenerateAiCopy}
-                      disabled={isGeneratingAi || !aiPrompt.trim()}
-                      className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-blue-500/20 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5"
-                    >
-                      {isGeneratingAi ? (
-                        <>
-                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                          <span>Generating...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="w-3.5 h-3.5" />
-                          <span>Generate Copy</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  {/* Alternative variations if returned */}
-                  {aiGeneratedAlternatives.length > 0 && (
-                    <div className="pt-2 border-t border-blue-200/50 dark:border-slate-800/80">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1.5">
-                        Alternative Hooks (Click to use):
-                      </span>
-                      <div className="flex flex-col gap-1.5 max-h-32 overflow-y-auto pr-1">
-                        {aiGeneratedAlternatives.map((alt, altIdx) => (
-                          <button
-                            key={altIdx}
-                            type="button"
-                            onClick={() => {
-                              setContent(alt);
-                              toast({
-                                title: "Alternative Applied",
-                                message: `Swapped caption with hook #${altIdx + 1}.`,
-                                type: "success",
-                              });
-                            }}
-                            className="text-left text-[11px] p-2 rounded-lg bg-white/80 dark:bg-slate-950/80 hover:bg-white dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 line-clamp-2 transition cursor-pointer hover:border-blue-400"
-                          >
-                            &ldquo;{alt}&rdquo;
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
+              {/* Content drafting area */}
 
               {/* Tagged Location Badge */}
               {selectedLocation && (
@@ -1332,7 +982,7 @@ export function PostComposerModal({
                 ref={textareaRef}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="What would you like to share today? Enter post caption or click Create with Gemini AI..."
+                placeholder="Write your post caption here... You can add emojis, links, and hashtags."
                 rows={6}
                 className="w-full text-sm placeholder:text-slate-400 bg-transparent resize-none focus:outline-none border-none p-0 text-slate-800 dark:text-slate-100 leading-relaxed font-normal"
               />
@@ -2493,27 +2143,6 @@ export function PostComposerModal({
       onSelectLocation={handleSelectLocationData}
     />
 
-    {/* 3-Step Zia / Gemini AI Copilot Modal matching user screenshot */}
-    {isZiaModalOpen && (
-      <ZiaCopilotModal
-        isOpen={isZiaModalOpen}
-        onClose={() => setIsZiaModalOpen(false)}
-        brandName={activeBrand.name || "Brownmonkeytv devloper"}
-        onApply={({ caption, imageUrl }) => {
-          setContent(caption);
-          if (imageUrl) {
-            setMedia([
-              {
-                id: `ai-img-${Date.now()}`,
-                url: imageUrl,
-                type: "image",
-                name: "AI Suggested Media",
-              },
-            ]);
-          }
-        }}
-      />
-    )}
   </>
   );
 }

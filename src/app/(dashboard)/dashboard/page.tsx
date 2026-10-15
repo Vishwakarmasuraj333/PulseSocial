@@ -518,10 +518,6 @@ export default function DashboardPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/80 px-2 py-0.5 rounded-full border border-purple-200 dark:border-purple-800">
-                            <Sparkles className="w-3 h-3 text-purple-600 animate-pulse" />
-                            <span>✨ Gemini AI</span>
-                          </span>
                           <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
                             livePosts[0]?.status === "PUBLISHED"
                               ? "text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800"
@@ -679,24 +675,60 @@ export default function DashboardPage() {
               {/* Real activity records */}
               <div className="space-y-3 pt-1">
                 {liveAuditEvents.length > 0 ? (
-                  liveAuditEvents.map((evt) => (
-                    <div key={evt.id} className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-[#F5F3FF]/50 dark:hover:bg-slate-850 transition">
-                      <div className="w-6 h-6 rounded-full bg-[#5846A8] text-white flex items-center justify-center font-bold text-[9px] shrink-0 mt-0.5">
-                        {evt.user?.avatarInitials || "S"}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">
-                            {evt.title}
-                          </p>
-                          <span className="text-[9px] text-slate-400 shrink-0 ml-1">{evt.timestamp}</span>
+                  liveAuditEvents.map((evt) => {
+                    const platform =
+                      evt.platform ||
+                      (evt.title?.toLowerCase().includes("linkedin") || evt.description?.toLowerCase().includes("linkedin")
+                        ? "linkedin"
+                        : evt.title?.toLowerCase().includes("google") || evt.description?.toLowerCase().includes("google")
+                        ? "google"
+                        : evt.title?.toLowerCase().includes("facebook")
+                        ? "facebook"
+                        : undefined);
+
+                    const cleanTitle = evt.title
+                      ? evt.title
+                          .replace(/OAUTH CONNECTED/i, "LinkedIn Connected")
+                          .replace(/SOCIAL ACCOUNT SYNCED/i, "LinkedIn Account Synced")
+                          .replace(/GOOGLE OAUTH LOGIN/i, "Google OAuth Login")
+                      : "Activity Event";
+
+                    const cleanDescription = evt.description
+                      ? evt.description
+                          .replace(/SocialAccount\s+[a-z0-9]+/i, "LinkedIn channel (@itxsurajofficial@gmail.com)")
+                          .replace(/User\s+[a-z0-9]+/i, "User signed in")
+                      : "Workspace activity logged";
+
+                    return (
+                      <div
+                        key={evt.id}
+                        className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-[#F5F3FF]/50 dark:hover:bg-slate-850 transition"
+                      >
+                        <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                          {platform ? (
+                            renderPlatformIcon(platform, 24)
+                          ) : (
+                            <div className="w-full h-full bg-[#5846A8] text-white flex items-center justify-center font-bold text-[9px]">
+                              {evt.user?.avatarInitials || "S"}
+                            </div>
+                          )}
                         </div>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
-                          {evt.description}
-                        </p>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">
+                              {cleanTitle}
+                            </p>
+                            <span className="text-[9px] text-slate-400 shrink-0 ml-1">
+                              {evt.timestamp}
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
+                            {cleanDescription}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <div className="p-6 text-center text-slate-400 dark:text-slate-500 space-y-1.5">
                     <Activity className="w-6 h-6 mx-auto text-slate-300 dark:text-slate-600" />

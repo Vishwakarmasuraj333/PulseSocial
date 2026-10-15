@@ -85,232 +85,6 @@ interface PostItem {
   };
 }
 
-// Real pre-seeded posts from BrownMonkeyTV devloper matching user's exact Zoho Social feed
-const INITIAL_REAL_POSTS: PostItem[] = [
-  {
-    id: "post-boy-1",
-    content: "hii am",
-    status: "PUBLISHED",
-    publishedAt: "2026-10-14T14:17:00Z",
-    createdAt: "2026-10-14T14:17:00Z",
-    media: [
-      {
-        id: "m-boy-1",
-        url: "/images/boy_white_jacket.jpg",
-        mediaType: "image",
-      },
-    ],
-    targets: [
-      {
-        id: "t-fb-2",
-        socialAccountId: "fb-bm-1",
-        status: "SUCCESS",
-        socialAccount: {
-          id: "fb-bm-1",
-          provider: "facebook",
-          displayName: "Brownmonkeytv devloper",
-          username: "BrownMonkeyTV",
-          avatarUrl: "/images/brown_monkey_avatar.jpg",
-        },
-      },
-    ],
-    likes: 1,
-    comments: 0,
-    author: { id: "u-suraj", name: "Suraj Vishwakarma" },
-  },
-  {
-    id: "post-shiv-1",
-    content: '"Capturing moments with Shiv 📷 #Memories #Shiv #Photography"',
-    status: "PUBLISHED",
-    publishedAt: "2026-10-14T14:10:00Z",
-    createdAt: "2026-10-14T14:10:00Z",
-    media: [
-      {
-        id: "m-shiv-1",
-        url: "/images/shiv_artwork.jpg",
-        mediaType: "image",
-      },
-    ],
-    targets: [
-      {
-        id: "t-fb-1",
-        socialAccountId: "fb-bm-1",
-        status: "SUCCESS",
-        socialAccount: {
-          id: "fb-bm-1",
-          provider: "facebook",
-          displayName: "Brownmonkeytv devloper",
-          username: "BrownMonkeyTV",
-          avatarUrl: "/images/brown_monkey_avatar.jpg",
-        },
-      },
-    ],
-    likes: 0,
-    comments: 0,
-    author: { id: "u-suraj", name: "Suraj Vishwakarma" },
-  },
-  {
-    id: "post-office-1",
-    content:
-      "🎬 Title\n\nOffice Mein Pyaar ❤️🐒 | Bittu ❤️ Uma | BrownMonkeyTV | Cute Office Love Story\n\n📱 Caption\n\nOffice ka kaam tha… par dil Uma pe aa gaya ❤️🐒😍\nBittu & Uma ki cute office love story! 💕✨\n\n🔥 Hashtags\n\n#BrownMonkeyTV #BittuUma #MonkeyLove #OfficeLove #CuteCouple LoveStory BrownMonkey MonkeyCouple RomanticVideo ViralShorts YouTubeShorts Shorts Trending ViralVideo AIAnimation",
-    status: "PUBLISHED",
-    publishedAt: "2026-08-18T21:21:00Z",
-    createdAt: "2026-08-18T21:21:00Z",
-    media: [
-      {
-        id: "m-office-1",
-        url: "/images/office_love_thumbnail_real.jpg",
-        mediaType: "video",
-      },
-    ],
-    targets: [
-      {
-        id: "t-fb-3",
-        socialAccountId: "fb-bm-1",
-        status: "SUCCESS",
-        socialAccount: {
-          id: "fb-bm-1",
-          provider: "facebook",
-          displayName: "Brownmonkeytv devloper",
-          username: "BrownMonkeyTV",
-          avatarUrl: "/images/brown_monkey_avatar.jpg",
-        },
-      },
-    ],
-    likes: 2,
-    comments: 0,
-    author: { id: "u-suraj", name: "Suraj Vishwakarma" },
-  },
-  {
-    id: "post-chocolate-1",
-    content:
-      "❤️ Thodi si fight... thoda sa pyaar... aur chocolate se sab theek! 😂🍫 #BrownMonkeyTV #MonkeyCouple #CuteComedy #FunnyCartoon CoupleGoals PixarStyle AnimationShorts YouTubeShorts Reels Viral Trending LoveComedy FunnyVideos 🐵💕",
-    status: "PUBLISHED",
-    publishedAt: "2026-08-07T08:03:00Z",
-    createdAt: "2026-08-07T08:03:00Z",
-    media: [
-      {
-        id: "m-choc-1",
-        url: "/images/monkey_chocolate.jpg",
-        mediaType: "video",
-      },
-    ],
-    targets: [
-      {
-        id: "t-fb-4",
-        socialAccountId: "fb-bm-1",
-        status: "SUCCESS",
-        socialAccount: {
-          id: "fb-bm-1",
-          provider: "facebook",
-          displayName: "Brownmonkeytv devloper",
-          username: "BrownMonkeyTV",
-          avatarUrl: "/images/brown_monkey_avatar.jpg",
-        },
-      },
-    ],
-    likes: 2,
-    comments: 1,
-    author: { id: "u-suraj", name: "Suraj Vishwakarma" },
-  },
-  {
-    id: "post-hygiene-1",
-    content:
-      "🐵❤️ Office se ghar aaya tha love lene… Uma ne pehle hygiene lesson de diya! 😂🧼 #BrownMonkeyTV #MonkeyComedy #FunnyCartoon #CartoonShorts #ViralReels AnimationShorts CuteCouple FunnyVideos YouTubeShorts TikTokTrend ReelsTrend 🐵✨",
-    status: "PUBLISHED",
-    publishedAt: "2026-08-06T23:07:00Z",
-    createdAt: "2026-08-06T23:07:00Z",
-    media: [
-      {
-        id: "m-hyg-1",
-        url: "/images/brown_monkey_avatar.jpg",
-        mediaType: "video",
-      },
-    ],
-    targets: [
-      {
-        id: "t-fb-5",
-        socialAccountId: "fb-bm-1",
-        status: "SUCCESS",
-        socialAccount: {
-          id: "fb-bm-1",
-          provider: "facebook",
-          displayName: "Brownmonkeytv devloper",
-          username: "BrownMonkeyTV",
-          avatarUrl: "/images/brown_monkey_avatar.jpg",
-        },
-      },
-    ],
-    likes: 5,
-    comments: 0,
-    author: { id: "u-suraj", name: "Suraj Vishwakarma" },
-  },
-  {
-    id: "post-2min-1",
-    content:
-      "Jab 2 minute bolkar 5 ghante baad ghar aao! 🐵🍌 #BrownMonkeyTV #FunnyMonkey #MonkeyComedy #CartoonShorts TikTokTrend ViralReels FunnyVideos PixarStyle Animation Comedy Shorts Reels FYP Trending ViralVideo",
-    status: "PUBLISHED",
-    publishedAt: "2026-08-06T22:55:00Z",
-    createdAt: "2026-08-06T22:55:00Z",
-    media: [
-      {
-        id: "m-2min-1",
-        url: "/images/brown_monkey_avatar.jpg",
-        mediaType: "video",
-      },
-    ],
-    targets: [
-      {
-        id: "t-fb-6",
-        socialAccountId: "fb-bm-1",
-        status: "SUCCESS",
-        socialAccount: {
-          id: "fb-bm-1",
-          provider: "facebook",
-          displayName: "Brownmonkeytv devloper",
-          username: "BrownMonkeyTV",
-          avatarUrl: "/images/brown_monkey_avatar.jpg",
-        },
-      },
-    ],
-    likes: 4,
-    comments: 1,
-    author: { id: "u-suraj", name: "Suraj Vishwakarma" },
-  },
-  {
-    id: "post-surprise-1",
-    content:
-      "Bittu ko mila ek cute surprise, aur Brown Monkey bas dekhte reh gaya! 🤣💘 Office + Coding + Comedy = Perfect Entertainment 😂 #BrownMonkeyTV #OfficeComedy #Funny #LoveComedy #CodingLife #ProgrammerMemes #ComedyReels #Bittu #MonkeyComedy #Shorts #Viral #Entertainment",
-    status: "PUBLISHED",
-    publishedAt: "2026-08-05T22:17:00Z",
-    createdAt: "2026-08-05T22:17:00Z",
-    media: [
-      {
-        id: "m-surp-1",
-        url: "/images/brown_monkey_avatar.jpg",
-        mediaType: "video",
-      },
-    ],
-    targets: [
-      {
-        id: "t-fb-7",
-        socialAccountId: "fb-bm-1",
-        status: "SUCCESS",
-        socialAccount: {
-          id: "fb-bm-1",
-          provider: "facebook",
-          displayName: "Brownmonkeytv devloper",
-          username: "BrownMonkeyTV",
-          avatarUrl: "/images/brown_monkey_avatar.jpg",
-        },
-      },
-    ],
-    likes: 3,
-    comments: 0,
-    author: { id: "u-suraj", name: "Suraj Vishwakarma" },
-  },
-];
-
 export default function PostsPage() {
   const { toast } = useToast();
   const { activeBrand } = useBrand();
@@ -339,8 +113,8 @@ export default function PostsPage() {
     else if (filter === "unpublished") setSidebarTab("unpublished");
   }, [searchParams]);
 
-  // Channel & filter controls
-  const [selectedChannel, setSelectedChannel] = useState<string>("facebook");
+  // Channel & filter controls (defaults to 'all' for dynamic multi-platform view)
+  const [selectedChannel, setSelectedChannel] = useState<string>("all");
   const [filterByType, setFilterByType] = useState<"posts" | "reels" | "stories">("posts");
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
   const [sortBy, setSortBy] = useState<"date" | "likes" | "comments">("date");
@@ -361,61 +135,44 @@ export default function PostsPage() {
   const [activeActionMenuPostId, setActiveActionMenuPostId] = useState<string | null>(null);
   const [selectedPostIds, setSelectedPostIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [posts, setPosts] = useState<PostItem[]>(INITIAL_REAL_POSTS);
-  const [connectedChannels, setConnectedChannels] = useState<any[]>([
-    {
-      id: "ch-fb-default",
-      provider: "facebook",
-      displayName: "Brownmonkeytv devloper",
-      username: "BrownMonkeyTV",
-      avatarUrl: "/images/brown_monkey_avatar.jpg",
-    },
-  ]);
+  const [posts, setPosts] = useState<PostItem[]>([]);
+  const [connectedChannels, setConnectedChannels] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Load backend posts & merge with initial real posts
+  // Load backend posts & accounts dynamically
   const loadPostsAndChannels = async () => {
-    // 1. Load user created posts from localStorage
     try {
-      const stored = localStorage.getItem("pulsesocial_user_created_posts");
-      if (stored) {
-        const localList = JSON.parse(stored);
-        if (Array.isArray(localList) && localList.length > 0) {
-          setPosts((prev) => {
-            const currentIds = new Set(prev.map((p) => p.id));
-            const newItems = localList.filter((p: any) => !currentIds.has(p.id));
-            return [...newItems, ...prev];
-          });
-        }
-      }
-    } catch {}
-
-    // 2. Fetch server posts & accounts
-    try {
+      setIsLoading(true);
       const [postsRes, accRes] = await Promise.all([
         fetch("/api/posts"),
         fetch("/api/social/accounts"),
       ]);
 
+      let loadedPosts: PostItem[] = [];
       if (postsRes.ok) {
         const data = await postsRes.json();
-        if (Array.isArray(data.posts) && data.posts.length > 0) {
-          setPosts((prev) => {
-            const dbIds = new Set(data.posts.map((p: any) => p.id));
-            const existingRemaining = prev.filter((p) => !dbIds.has(p.id));
-            return [...data.posts, ...existingRemaining];
-          });
+        if (Array.isArray(data.posts)) {
+          loadedPosts = data.posts;
         }
       }
 
+      // Ensure any legacy fake posts in localStorage are removed
+      try {
+        localStorage.removeItem("pulsesocial_user_created_posts");
+      } catch {}
+
+      setPosts(loadedPosts);
+
       if (accRes.ok) {
         const aData = await accRes.json();
-        if (Array.isArray(aData.accounts) && aData.accounts.length > 0) {
+        if (Array.isArray(aData.accounts)) {
           setConnectedChannels(aData.accounts);
         }
       }
-    } catch {
-      // Keep rich initial data
+    } catch (err) {
+      console.warn("Posts loading warning:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -435,20 +192,20 @@ export default function PostsPage() {
             scheduledFor: newPost.scheduledFor,
             createdAt: newPost.createdAt || new Date().toISOString(),
             media: newPost.media || (newPost.mediaUrls ? newPost.mediaUrls.map((m: any, i: number) => ({ id: `m-${i}`, url: typeof m === 'string' ? m : m.url, mediaType: 'image' })) : []),
-            targets: newPost.targets || [
+            targets: newPost.targets || (connectedChannels.length > 0 ? [
               {
                 id: `t-${Date.now()}`,
-                socialAccountId: "fb-bm-1",
+                socialAccountId: connectedChannels[0].id,
                 status: "SUCCESS",
                 socialAccount: {
-                  id: "fb-bm-1",
-                  provider: "facebook",
-                  displayName: "Brownmonkeytv devloper",
-                  username: "BrownMonkeyTV",
-                  avatarUrl: "/images/brown_monkey_avatar.jpg",
+                  id: connectedChannels[0].id,
+                  provider: connectedChannels[0].provider,
+                  displayName: connectedChannels[0].displayName,
+                  username: connectedChannels[0].username || connectedChannels[0].displayName,
+                  avatarUrl: connectedChannels[0].profileImageUrl || "",
                 },
               },
-            ],
+            ] : []),
             likes: newPost.likes || 0,
             comments: newPost.comments || 0,
             author: newPost.author || { id: "u-suraj", name: "Suraj Vishwakarma" },
@@ -912,35 +669,41 @@ export default function PostsPage() {
                 )}
               </button>
 
-              {/* Connected Facebook Page Avatar Tab matching Screenshot */}
-              <button
-                type="button"
-                onClick={() => setSelectedChannel("facebook")}
-                className={`pb-2.5 flex items-center gap-2 text-xs font-bold transition cursor-pointer relative ${
-                  selectedChannel === "facebook"
-                    ? "text-blue-600"
-                    : "text-slate-500 hover:text-slate-800 opacity-80"
-                }`}
-              >
-                <div className="relative w-6 h-6 rounded-full overflow-hidden border border-slate-200 bg-slate-100">
-                  <Image
-                    src="/images/brown_monkey_avatar.jpg"
-                    alt="Brownmonkeytv devloper"
-                    fill
-                    className="object-cover"
-                    onError={(e: any) => {
-                      e.target.src = "/icons/pulse-logo.svg";
-                    }}
-                  />
-                  <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[8px] font-bold">
-                    f
-                  </div>
-                </div>
-                <span>Brownmonkeytv devloper</span>
-                {selectedChannel === "facebook" && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#f97316]" />
-                )}
-              </button>
+              {/* Dynamically Render Real Connected Channels Tabs */}
+              {connectedChannels.map((channel) => {
+                const isSelected = selectedChannel === channel.provider || selectedChannel === channel.id;
+                return (
+                  <button
+                    key={channel.id || channel.provider}
+                    type="button"
+                    onClick={() => setSelectedChannel(channel.provider)}
+                    className={`pb-2.5 flex items-center gap-2 text-xs font-bold transition cursor-pointer relative ${
+                      isSelected
+                        ? "text-[#5846A8] dark:text-purple-400"
+                        : "text-slate-500 hover:text-slate-800 opacity-80"
+                    }`}
+                  >
+                    <div className="relative w-6 h-6 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-2xs">
+                      {channel.profileImageUrl ? (
+                        <img
+                          src={channel.profileImageUrl}
+                          alt={channel.displayName}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        renderPlatformIcon(channel.provider, 16)
+                      )}
+                      <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-white dark:bg-slate-900 ring-1 ring-white dark:ring-slate-900 flex items-center justify-center">
+                        {renderPlatformIcon(channel.provider, 11)}
+                      </div>
+                    </div>
+                    <span>{channel.displayName || channel.provider}</span>
+                    {isSelected && (
+                      <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#5846A8]" />
+                    )}
+                  </button>
+                );
+              })}
 
               {/* Connect More Channels Button */}
               <button
@@ -1329,9 +1092,12 @@ export default function PostsPage() {
 
                           {/* Published By */}
                           <td className="py-4 px-4 align-top whitespace-nowrap">
-                            <div className="flex items-center gap-2" title="via Facebook">
-                              <div className="w-7 h-7 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 font-bold text-xs shadow-2xs">
-                                f
+                            <div
+                              className="flex items-center gap-2"
+                              title={`via ${post.targets?.[0]?.socialAccount?.provider || (connectedChannels[0]?.provider || "Social Network")}`}
+                            >
+                              <div className="w-7 h-7 rounded-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-2xs overflow-hidden">
+                                {renderPlatformIcon(post.targets?.[0]?.socialAccount?.provider || (connectedChannels[0]?.provider || "linkedin"), 16)}
                               </div>
                             </div>
                           </td>
@@ -1423,13 +1189,45 @@ export default function PostsPage() {
                   ) : (
                     <tr>
                       <td colSpan={6} className="py-16 text-center text-slate-400">
-                        <FileText className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                        <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-                          No posts found in this view
-                        </p>
-                        <p className="text-[11px] text-slate-400 mt-1">
-                          Click &ldquo;New Post&rdquo; to create and publish content to your channels.
-                        </p>
+                        {connectedChannels.length > 0 ? (
+                          <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
+                            <div className="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 flex items-center justify-center mb-3 shadow-xs overflow-hidden">
+                              {renderPlatformIcon(connectedChannels[0]?.provider || "linkedin", 24)}
+                            </div>
+                            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                              No posts published yet on {connectedChannels[0]?.displayName || "connected channel"}
+                            </p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-4 leading-relaxed">
+                              Your {connectedChannels[0]?.provider?.toUpperCase()} channel is connected and ready. Click below to compose and broadcast your first post!
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => setIsComposerOpen(true)}
+                              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                            >
+                              <Plus className="w-4 h-4" />
+                              <span>Create First Post</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
+                            <FileText className="w-10 h-10 text-slate-300 dark:text-slate-600 mb-2" />
+                            <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                              No posts found
+                            </p>
+                            <p className="text-xs text-slate-400 mt-1 mb-4">
+                              Connect a social network or click &ldquo;New Post&rdquo; to publish content to your channels.
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => setIsComposerOpen(true)}
+                              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                            >
+                              <Plus className="w-4 h-4" />
+                              <span>New Post</span>
+                            </button>
+                          </div>
+                        )}
                       </td>
                     </tr>
                   )}

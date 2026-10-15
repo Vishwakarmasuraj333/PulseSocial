@@ -11,6 +11,7 @@ import { runAuditScreenFixesTests } from "./integration/audit-screen-fixes.test"
 import { runProductionAuditMasterTests } from "./integration/production-audit-master.test";
 import { runSocialMetricsNullTest } from "./unit/social-metrics-null.test";
 import { runWebhooksAndSsrfTests } from "./unit/webhooks-and-ssrf.test";
+import { runMetaApiIntegrationTests } from "./integration/meta-api.test";
 import { prisma } from "../src/lib/prisma";
 
 async function main() {
@@ -20,7 +21,7 @@ async function main() {
 
   const startTime = Date.now();
   let passedSuites = 0;
-  const totalSuites = 13;
+  const totalSuites = 14;
 
   const baseUrl = process.env.BASE_URL || (process.env.APP_URL || "https://pulsesocial1.vercel.app");
   process.env.BASE_URL = baseUrl;
@@ -61,6 +62,10 @@ async function main() {
 
     // Suite 8: Webhook Signatures & SSRF Security
     await runWebhooksAndSsrfTests();
+    passedSuites++;
+
+    // Suite 9: Meta Graph API & Instagram Container Workflow
+    await runMetaApiIntegrationTests();
     passedSuites++;
 
     // HTTP Integration Suites (6, 7, 9, 10)

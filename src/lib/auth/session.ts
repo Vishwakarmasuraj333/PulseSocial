@@ -50,13 +50,29 @@ export async function getSession(): Promise<SessionUser | null> {
     if (!token) return null;
 
     const { payload } = await jwtVerify(token, JWT_SECRET);
+    const userId = payload.sub as string;
+    let activeOrgId = (payload.activeOrgId as string) || undefined;
+    let role = (payload.role as string) || undefined;
+
+    // Fallback: If activeOrgId is not set in JWT, resolve from user's primary membership
+    if (!activeOrgId && userId) {
+      const membership = await prisma.organizationMember.findFirst({
+        where: { userId },
+        orderBy: { createdAt: "asc" },
+      });
+      if (membership) {
+        activeOrgId = membership.organizationId;
+        role = membership.role;
+      }
+    }
+
     return {
-      id: payload.sub as string,
+      id: userId,
       email: payload.email as string,
       name: (payload.name as string) || null,
       emailVerified: Boolean(payload.emailVerified),
-      activeOrgId: (payload.activeOrgId as string) || undefined,
-      role: (payload.role as string) || undefined,
+      activeOrgId,
+      role,
     };
   } catch {
     return null;

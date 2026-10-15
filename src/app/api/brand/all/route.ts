@@ -14,6 +14,16 @@ export async function GET() {
       include: {
         organization: {
           include: {
+            socialAccounts: {
+              select: {
+                id: true,
+                provider: true,
+                displayName: true,
+                username: true,
+                profileImageUrl: true,
+                status: true,
+              },
+            },
             _count: {
               select: {
                 socialAccounts: true,
@@ -40,7 +50,8 @@ export async function GET() {
         timezone: org.timezone || "Asia/Kolkata",
         description: org.description || "",
         role: m.role,
-        connectedAccountsCount: org._count?.socialAccounts || 0,
+        connectedAccountsCount: org.socialAccounts?.length || org._count?.socialAccounts || 0,
+        socialAccounts: org.socialAccounts || [],
         postsCount: org._count?.posts || 0,
         membersCount: org._count?.members || 0,
         createdAt: org.createdAt.toISOString(),

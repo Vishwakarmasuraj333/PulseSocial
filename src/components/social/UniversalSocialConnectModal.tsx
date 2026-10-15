@@ -348,12 +348,9 @@ export function UniversalSocialConnectModal({
       setPendingAuthUrl(data.authUrl);
       setIsOAuthWaiting(true);
 
-      // Open official provider full page in new tab
-      const newTab = window.open(data.authUrl, "_blank");
-      if (!newTab || newTab.closed || typeof newTab.closed === "undefined") {
-        window.location.href = data.authUrl;
-        return;
-      }
+      // Redirect to provider official authorization page in the same tab
+      window.location.href = data.authUrl;
+      return;
     } catch (err: unknown) {
       setOauthError((err as Error).message || "Unable to initiate authorization.");
     } finally {

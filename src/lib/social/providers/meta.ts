@@ -31,10 +31,23 @@ export class MetaProvider implements SocialProvider {
     this.iconName = platform;
   }
 
+  private getApiVersion(): string {
+    return process.env.META_API_VERSION || SOCIAL_API_VERSIONS.META_GRAPH || "v20.0";
+  }
+
+  private getAppCredentials(): { appId: string; appSecret: string } {
+    const appId = process.env.META_APP_ID?.trim();
+    const appSecret = process.env.META_APP_SECRET?.trim();
+    if (!appId || !appSecret) {
+      throw new Error(this.getMissingConfigMessage());
+    }
+    return { appId, appSecret };
+  }
+
   isConfigured(): boolean {
     return Boolean(
-      (process.env.META_APP_ID || "1427242679545054") &&
-      (process.env.META_APP_SECRET || "e3b5c0a667fce83937f96ac464060b97")
+      process.env.META_APP_ID?.trim() &&
+      process.env.META_APP_SECRET?.trim()
     );
   }
 
@@ -42,9 +55,25 @@ export class MetaProvider implements SocialProvider {
     return `${this.displayName} integration is not configured yet. Configure META_APP_ID and META_APP_SECRET in your environment to enable this connection.`;
   }
 
+  parseGraphApiError(data: any): string {
+    const errCode = data?.error?.code;
+    const isToken = errCode === 190 || errCode === 102;
+    const isPermission = errCode === 200 || errCode === 10 || errCode === 283;
+    const isPolicy = errCode === 368;
+
+    if (isToken) return "Facebook/Instagram access token has expired or was revoked. Please reauthorize your account.";
+    if (isPermission) return "Publish permission denied. Verify that required scopes ('pages_manage_posts' or 'instagram_content_publish') are granted.";
+    if (isPolicy) return "Temporarily restricted by Meta platform policy. Please try again later.";
+    return data?.error?.message || "Meta Graph API request failed.";
+  }
+
+  getAuthUrl(state: string, redirectUri: string): string {
+    return this.getAuthorizationUrl(state, redirectUri);
+  }
+
   getAuthorizationUrl(state: string, redirectUri: string, codeVerifier?: string, options?: Record<string, any>): string {
-    const appId = process.env.META_APP_ID || "1427242679545054";
-    if (!appId) throw new Error(this.getMissingConfigMessage());
+    const { appId } = this.getAppCredentials();
+    const version = this.getApiVersion();
     const tier = options?.tier || "full";
 
     let scopes: string;
@@ -68,13 +97,10 @@ export class MetaProvider implements SocialProvider {
     } else {
       // Facebook
       if (tier === "basic") {
-        // Guaranteed valid: public_profile requires zero Meta app review or special use-cases
         scopes = "public_profile";
       } else if (tier === "standard") {
-        // Standard Page read without requiring pages_manage_posts permission approval
         scopes = "public_profile,pages_show_list,pages_read_engagement";
       } else {
-        // Full Page publishing
         scopes = "public_profile,pages_show_list,pages_read_engagement,pages_manage_posts";
       }
     }
@@ -88,13 +114,12 @@ export class MetaProvider implements SocialProvider {
       auth_type: "rerequest",
     });
 
-    return `https://www.facebook.com/v20.0/dialog/oauth?${params.toString()}`;
+    return `https://www.facebook.com/${version}/dialog/oauth?${params.toString()}`;
   }
 
   async exchangeCode(code: string, redirectUri: string): Promise<OAuthTokenResult> {
-    const appId = process.env.META_APP_ID || "1427242679545054";
-    const appSecret = process.env.META_APP_SECRET || "e3b5c0a667fce83937f96ac464060b97";
-    if (!appId || !appSecret) throw new Error(this.getMissingConfigMessage());
+    const { appId, appSecret } = this.getAppCredentials();
+    const version = this.getApiVersion();
 
     const params = new URLSearchParams({
       client_id: appId,
@@ -103,14 +128,17 @@ export class MetaProvider implements SocialProvider {
       code,
     });
 
-    const res = await fetch(`https://graph.facebook.com/v20.0/oauth/access_token?${params.toString()}`);
+    const res = await fetch(`https://graph.facebook.com/${version}/oauth/access_token?${params.toString()}`);
     if (!res.ok) {
-      const err = await res.json();
+      const err = await res.json().catch(() => ({}));
       throw new Error(err.error?.message || "Failed to exchange authorization code with Meta Graph API");
     }
 
     const data = await res.json();
     const shortLivedToken = data.access_token;
+    if (!shortLivedToken || typeof shortLivedToken !== "string") {
+      throw new Error("Meta OAuth exchange did not return a valid short-lived access token.");
+    }
 
     // Exchange for long-lived 60-day token
     const exchangeParams = new URLSearchParams({
@@ -120,24 +148,57 @@ export class MetaProvider implements SocialProvider {
       fb_exchange_token: shortLivedToken,
     });
 
-    const longLivedRes = await fetch(`https://graph.facebook.com/v20.0/oauth/access_token?${exchangeParams.toString()}`);
+    const longLivedRes = await fetch(`https://graph.facebook.com/${version}/oauth/access_token?${exchangeParams.toString()}`);
     const longLivedData = longLivedRes.ok ? await longLivedRes.json().catch(() => data) : data;
     const finalToken = longLivedData?.access_token || shortLivedToken;
-    if (!finalToken || typeof finalToken !== "string" || finalToken.trim() === "") {
-      throw new Error("Meta OAuth exchange did not return a valid access token.");
+
+    // Inspect /me/permissions to validate exact granted and declined permissions
+    let grantedPermissions: string[] = [];
+    let declinedPermissions: string[] = [];
+
+    try {
+      const permRes = await fetch(`https://graph.facebook.com/${version}/me/permissions`, {
+        headers: {
+          Authorization: `Bearer ${finalToken}`,
+          Accept: "application/json",
+        },
+      });
+      if (permRes.ok) {
+        const permData = await permRes.json();
+        if (Array.isArray(permData?.data)) {
+          for (const item of permData.data) {
+            if (item.status === "granted") {
+              grantedPermissions.push(item.permission);
+            } else if (item.status === "declined") {
+              declinedPermissions.push(item.permission);
+            }
+          }
+        }
+      }
+    } catch {
+      grantedPermissions = ["public_profile", "pages_show_list", "pages_read_engagement"];
     }
+
+    const calculatedExpiresIn = typeof longLivedData?.expires_in === "number"
+      ? longLivedData.expires_in
+      : (typeof data.expires_in === "number" ? data.expires_in : 5184000);
 
     return {
       accessToken: finalToken,
-      expiresIn: longLivedData?.expires_in || 5184000, // 60 days in seconds
-      scopes: ["pages_manage_posts", "instagram_content_publish", "instagram_basic"],
-      metadata: { tokenType: "Bearer" },
+      expiresIn: calculatedExpiresIn,
+      scopes: grantedPermissions.length > 0 ? grantedPermissions : ["public_profile", "pages_show_list"],
+      metadata: {
+        tokenType: "Bearer",
+        grantedPermissions,
+        declinedPermissions,
+        isLongLived: Boolean(longLivedRes.ok),
+      },
     };
   }
 
   async refreshToken(currentAccessToken: string): Promise<OAuthTokenResult> {
-    const appId = process.env.META_APP_ID || "1427242679545054";
-    const appSecret = process.env.META_APP_SECRET || "e3b5c0a667fce83937f96ac464060b97";
+    const { appId, appSecret } = this.getAppCredentials();
+    const version = this.getApiVersion();
 
     const exchangeParams = new URLSearchParams({
       grant_type: "fb_exchange_token",
@@ -146,7 +207,7 @@ export class MetaProvider implements SocialProvider {
       fb_exchange_token: currentAccessToken,
     });
 
-    const res = await fetch(`https://graph.facebook.com/v20.0/oauth/access_token?${exchangeParams.toString()}`);
+    const res = await fetch(`https://graph.facebook.com/${version}/oauth/access_token?${exchangeParams.toString()}`);
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error?.message || "Failed to refresh Meta access token");
@@ -166,78 +227,83 @@ export class MetaProvider implements SocialProvider {
       throw new Error("Missing valid authorization token for Meta Graph API");
     }
 
-    const res = await fetch(
-      `https://graph.facebook.com/v20.0/me/accounts?fields=id,name,picture{url},access_token,instagram_business_account{id,username,profile_picture_url}`,
-      {
+    const version = this.getApiVersion();
+    const accounts: SocialAccountInfo[] = [];
+    const seenAccountIds = new Set<string>();
+
+    let nextUrl: string | null = `https://graph.facebook.com/${version}/me/accounts?fields=id,name,picture{url},access_token,tasks,instagram_business_account{id,username,profile_picture_url,name}&limit=50`;
+    let pageCount = 0;
+
+    // Follow pagination up to 5 pages (up to 250 accounts max)
+    while (nextUrl && pageCount < 5) {
+      pageCount++;
+      const currentUrl: string = nextUrl;
+      const res: Response = await fetch(currentUrl, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           Accept: "application/json",
         },
-      }
-    );
+      });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error?.message || "Failed to fetch accounts from Meta");
-    }
-
-    const data = await res.json();
-    const accounts: SocialAccountInfo[] = [];
-
-    for (const page of data.data || []) {
-      if (this.platform === "facebook") {
-        accounts.push({
-          providerAccountId: page.id,
-          displayName: page.name,
-          profileImageUrl: page.picture?.data?.url,
-          accountType: "PAGE",
-          metadata: { pageAccessToken: page.access_token },
-        });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error?.message || "Failed to fetch accounts from Meta Graph API");
       }
 
-      if (this.platform === "instagram" && page.instagram_business_account) {
-        const ig = page.instagram_business_account;
-        accounts.push({
-          providerAccountId: ig.id,
-          displayName: ig.username || page.name,
-          username: ig.username,
-          profileImageUrl: ig.profile_picture_url || page.picture?.data?.url,
-          accountType: "BUSINESS",
-          metadata: { pageId: page.id, pageAccessToken: page.access_token },
-        });
-      }
-    }
+      const data: any = await res.json();
 
-    // Fallback: If no Facebook Pages found, link the authenticated personal Facebook profile
-    if (accounts.length === 0 && this.platform === "facebook") {
-      try {
-        const meRes = await fetch(
-          `https://graph.facebook.com/v20.0/me?fields=id,name,picture{url},email`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              Accept: "application/json",
+      for (const page of data.data || []) {
+        // 1. Facebook Page (if platform is facebook or both)
+        if (this.platform === "facebook" && !seenAccountIds.has(`fb_${page.id}`)) {
+          seenAccountIds.add(`fb_${page.id}`);
+          accounts.push({
+            providerAccountId: page.id,
+            displayName: page.name,
+            profileImageUrl: page.picture?.data?.url,
+            accountType: "PAGE",
+            platform: "facebook",
+            metadata: {
+              pageId: page.id,
+              pageName: page.name,
+              pageAccessToken: page.access_token,
+              tasks: page.tasks || [],
             },
-          }
-        );
-        if (meRes.ok) {
-          const meData = await meRes.json();
-          if (meData?.id) {
-            accounts.push({
-              providerAccountId: meData.id,
-              displayName: meData.name || "Facebook User",
-              profileImageUrl: meData.picture?.data?.url,
-              accountType: "PROFILE",
-              metadata: { isPersonalProfile: true },
-            });
+          });
+        }
+
+        // 2. Linked Instagram Professional/Business account
+        if (page.instagram_business_account && page.instagram_business_account.id) {
+          const ig = page.instagram_business_account;
+          const igKey = `ig_${ig.id}`;
+          if (!seenAccountIds.has(igKey)) {
+            seenAccountIds.add(igKey);
+            // Include in discovery if platform is instagram OR if discovering all linked accounts
+            if (this.platform === "instagram" || this.platform === "facebook") {
+              accounts.push({
+                providerAccountId: ig.id,
+                displayName: ig.username || ig.name || page.name,
+                username: ig.username || undefined,
+                profileImageUrl: ig.profile_picture_url || page.picture?.data?.url,
+                accountType: "BUSINESS",
+                platform: "instagram",
+                metadata: {
+                  igUserId: ig.id,
+                  linkedPageId: page.id,
+                  linkedPageName: page.name,
+                  pageAccessToken: page.access_token,
+                },
+              });
+            }
           }
         }
-      } catch {}
+      }
+
+      nextUrl = data.paging?.next || null;
     }
 
-    if (this.platform === "instagram" && accounts.length === 0) {
+    if (this.platform === "instagram" && accounts.filter((a) => a.platform === "instagram").length === 0) {
       throw new Error(
-        "No linked Instagram Business accounts found. Ensure your Instagram account is switched to a Professional/Business account and connected to your Facebook Page in Meta Business Suite."
+        "No linked Instagram Professional or Business accounts found. In Meta Business Suite, switch your Instagram account to a Professional/Business account and link it to your Facebook Page."
       );
     }
 
@@ -249,10 +315,11 @@ export class MetaProvider implements SocialProvider {
       return { followersCount: null, followingCount: null, postsCount: null };
     }
 
+    const version = this.getApiVersion();
     try {
       if (this.platform === "instagram") {
         const res = await fetch(
-          `https://graph.facebook.com/v20.0/${accountId}?fields=biography,followers_count,follows_count,media_count,website,profile_picture_url`,
+          `https://graph.facebook.com/${version}/${accountId}?fields=biography,followers_count,follows_count,media_count,website,profile_picture_url`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -272,7 +339,7 @@ export class MetaProvider implements SocialProvider {
         };
       } else {
         const res = await fetch(
-          `https://graph.facebook.com/v20.0/${accountId}?fields=fan_count,followers_count,about,website`,
+          `https://graph.facebook.com/${version}/${accountId}?fields=fan_count,followers_count,about,website`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -296,52 +363,155 @@ export class MetaProvider implements SocialProvider {
     }
   }
 
+  async waitForContainerReady(
+    creationId: string,
+    accessToken: string,
+    maxAttempts = 10,
+    initialDelayMs = 1500
+  ): Promise<{ ready: boolean; error?: string; code?: string; rawResponse?: any }> {
+    const version = this.getApiVersion();
+    let attempts = 0;
+    let delayMs = initialDelayMs;
+
+    while (attempts < maxAttempts) {
+      await new Promise((r) => setTimeout(r, delayMs));
+      attempts++;
+      delayMs = Math.min(delayMs * 1.2, 4000);
+
+      const statusRes = await fetch(
+        `https://graph.facebook.com/${version}/${creationId}?fields=status_code,status&access_token=${accessToken}`
+      );
+      const statusData = await statusRes.json().catch(() => ({}));
+
+      if (statusData.status_code === "FINISHED") {
+        return { ready: true, rawResponse: statusData };
+      } else if (statusData.status_code === "ERROR") {
+        return {
+          ready: false,
+          code: "MEDIA_PROCESSING_FAILED",
+          error: statusData.status || "Instagram media processing failed. Check that the image meets Instagram aspect ratio (between 4:5 and 1.91:1) and dimensions.",
+          rawResponse: statusData,
+        };
+      } else if (statusData.status_code === "EXPIRED") {
+        return {
+          ready: false,
+          code: "CONTAINER_EXPIRED",
+          error: "Instagram media container expired before it could be published. Please retry.",
+          rawResponse: statusData,
+        };
+      }
+    }
+
+    return {
+      ready: false,
+      code: "PROCESSING_TIMEOUT",
+      error: "Instagram media processing timed out before publication could complete. Please retry in a few moments.",
+    };
+  }
+
   async publishPost(accessToken: string, post: PublishPostPayload): Promise<PublishResult> {
-    const version = SOCIAL_API_VERSIONS.META_GRAPH;
+    const version = this.getApiVersion();
+    const targetAccountId = post.targetAccountId || "me";
+
     try {
       if (this.platform === "facebook") {
-        const body = new URLSearchParams({
-          message: post.content,
-          access_token: accessToken,
-        });
+        const hasMedia = post.mediaUrls && post.mediaUrls.length > 0;
+        const firstMedia = hasMedia ? post.mediaUrls![0] : null;
 
-        if (post.mediaUrls && post.mediaUrls.length > 0) {
-          body.append("link", post.mediaUrls[0].url);
+        // If media URL is present, validate that it is an accessible HTTP/HTTPS URL
+        if (firstMedia?.url) {
+          if (firstMedia.url.startsWith("blob:") || firstMedia.url.startsWith("data:") || firstMedia.url.startsWith("file:")) {
+            return {
+              success: false,
+              code: "INVALID_MEDIA_URL",
+              error: "Cannot publish browser local or blob media to Meta. Ensure media is uploaded to a public HTTPS URL first.",
+            };
+          }
         }
 
-        const res = await fetch(`https://graph.facebook.com/${version}/${post.targetAccountId || "me"}/feed`, {
-          method: "POST",
-          body,
-        });
+        let endpoint: string;
+        let body: URLSearchParams;
 
+        if (firstMedia && firstMedia.type === "VIDEO") {
+          // Video post
+          endpoint = `https://graph.facebook.com/${version}/${targetAccountId}/videos`;
+          body = new URLSearchParams({
+            description: post.content || "",
+            file_url: firstMedia.url,
+            access_token: accessToken,
+          });
+        } else if (firstMedia) {
+          // Native Photo post
+          endpoint = `https://graph.facebook.com/${version}/${targetAccountId}/photos`;
+          body = new URLSearchParams({
+            caption: post.content || "",
+            url: firstMedia.url,
+            published: "true",
+            access_token: accessToken,
+          });
+        } else {
+          // Standard text / link post
+          endpoint = `https://graph.facebook.com/${version}/${targetAccountId}/feed`;
+          body = new URLSearchParams({
+            message: post.content || "",
+            access_token: accessToken,
+          });
+        }
+
+        const res = await fetch(endpoint, { method: "POST", body });
         const data = await res.json().catch(() => ({}));
-        if (!res.ok || !data.id) {
+
+        if (!res.ok || (!data.id && !data.post_id)) {
           const errCode = data.error?.code;
           const isToken = errCode === 190 || errCode === 102;
-          const isPermission = errCode === 200 || errCode === 10;
+          const isPermission = errCode === 200 || errCode === 10 || errCode === 283;
+          const isPolicy = errCode === 368;
+
+          let safeError = data.error?.message || "Failed to publish to Facebook Page";
+          if (isToken) safeError = "Facebook OAuth token expired or revoked. Please reauthorize your Facebook Page.";
+          else if (isPermission) safeError = "Facebook Page publish permission denied. Verify that 'pages_manage_posts' is granted on the Page.";
+          else if (isPolicy) safeError = "Temporarily restricted by Meta policy. Please try again later.";
+
           return {
             success: false,
-            code: isToken ? "TOKEN_EXPIRED" : isPermission ? "PERMISSION_DENIED" : "GRAPH_API_ERROR",
+            code: isToken ? "TOKEN_EXPIRED" : isPermission ? "PERMISSION_DENIED" : isPolicy ? "POLICY_BLOCKED" : "GRAPH_API_ERROR",
             requiresReauth: isToken,
             requiresApproval: isPermission,
-            error: data.error?.message || "Failed to publish to Facebook Page",
+            error: safeError,
+            rawResponse: data,
           };
         }
-        return { success: true, platformPostId: data.id, publishedUrl: `https://facebook.com/${data.id}` };
+
+        const platformPostId = data.post_id || data.id;
+        return {
+          success: true,
+          platformPostId,
+          publishedUrl: `https://facebook.com/${platformPostId}`,
+          rawResponse: data,
+        };
       } else {
-        // Instagram Content Publishing: Step 1 Create Container, Step 2 Processing Check, Step 3 Publish
+        // Instagram Content Publishing: Official 2-step media container workflow
         if (!post.mediaUrls || post.mediaUrls.length === 0) {
           return {
             success: false,
             code: "INVALID_MEDIA",
-            error: "Instagram requires at least one image or video to publish a post.",
+            error: "Instagram Graph API requires at least one image or video to publish a post.",
           };
         }
 
         const firstMedia = post.mediaUrls[0];
-        const containerUrl = `https://graph.facebook.com/${version}/${post.targetAccountId}/media`;
+        if (firstMedia.url.startsWith("blob:") || firstMedia.url.startsWith("data:") || firstMedia.url.startsWith("file:")) {
+          return {
+            success: false,
+            code: "INVALID_MEDIA_URL",
+            error: "Cannot publish browser local or blob media to Instagram. Ensure media is uploaded to a public HTTPS URL first.",
+          };
+        }
+
+        // Step 1: Create media container
+        const containerUrl = `https://graph.facebook.com/${version}/${targetAccountId}/media`;
         const containerParams = new URLSearchParams({
-          caption: post.content,
+          caption: post.content || "",
           access_token: accessToken,
           ...(firstMedia.type === "VIDEO"
             ? { media_type: "REELS", video_url: firstMedia.url }
@@ -350,53 +520,86 @@ export class MetaProvider implements SocialProvider {
 
         const containerRes = await fetch(containerUrl, { method: "POST", body: containerParams });
         const containerData = await containerRes.json().catch(() => ({}));
+
         if (!containerRes.ok || !containerData.id) {
           const errCode = containerData.error?.code;
-          const isToken = errCode === 190;
+          const isToken = errCode === 190 || errCode === 102;
+          const isPermission = errCode === 200 || errCode === 10;
+          let safeError = containerData.error?.message || "Failed to create Instagram media container";
+          if (isToken) safeError = "Instagram access token expired. Please reauthorize your Instagram account.";
+          else if (errCode === 2207027 || errCode === 2207001) safeError = "Instagram rejected media format. Image must be JPEG/PNG and publicly accessible via HTTPS.";
+
           return {
             success: false,
-            code: isToken ? "TOKEN_EXPIRED" : "CONTAINER_CREATION_FAILED",
+            code: isToken ? "TOKEN_EXPIRED" : isPermission ? "PERMISSION_DENIED" : "CONTAINER_CREATION_FAILED",
             requiresReauth: isToken,
-            error: containerData.error?.message || "Failed to create Instagram media container",
+            requiresApproval: isPermission,
+            error: safeError,
+            rawResponse: containerData,
           };
         }
 
         const creationId = containerData.id;
 
-        // For video / Reels, verify status before publishing
-        if (firstMedia.type === "VIDEO") {
-          let ready = false;
-          let checkCount = 0;
-          while (!ready && checkCount < 6) {
-            await new Promise((r) => setTimeout(r, 2000));
-            const statusRes = await fetch(
-              `https://graph.facebook.com/${version}/${creationId}?fields=status_code,status&access_token=${accessToken}`
-            );
-            const statusData = await statusRes.json().catch(() => ({}));
-            if (statusData.status_code === "FINISHED") {
-              ready = true;
-            } else if (statusData.status_code === "ERROR") {
-              return {
-                success: false,
-                code: "VIDEO_PROCESSING_FAILED",
-                error: "Instagram video processing failed before publishing could complete.",
-              };
-            }
-            checkCount++;
+        // Step 2: Bounded polling for container readiness with progressive backoff
+        let ready = false;
+        let attempts = 0;
+        const maxAttempts = 10;
+        let delayMs = 1500;
+
+        while (!ready && attempts < maxAttempts) {
+          await new Promise((r) => setTimeout(r, delayMs));
+          attempts++;
+          delayMs = Math.min(delayMs * 1.2, 4000);
+
+          const statusRes = await fetch(
+            `https://graph.facebook.com/${version}/${creationId}?fields=status_code,status&access_token=${accessToken}`
+          );
+          const statusData = await statusRes.json().catch(() => ({}));
+
+          if (statusData.status_code === "FINISHED") {
+            ready = true;
+          } else if (statusData.status_code === "ERROR") {
+            return {
+              success: false,
+              code: "MEDIA_PROCESSING_FAILED",
+              error: statusData.status || "Instagram media processing failed. Check that the image meets Instagram aspect ratio (between 4:5 and 1.91:1) and dimensions.",
+              rawResponse: statusData,
+            };
+          } else if (statusData.status_code === "EXPIRED") {
+            return {
+              success: false,
+              code: "CONTAINER_EXPIRED",
+              error: "Instagram media container expired before it could be published. Please retry.",
+              rawResponse: statusData,
+            };
           }
         }
 
-        // Step 2 / 3: Publish container
-        const publishRes = await fetch(`https://graph.facebook.com/${version}/${post.targetAccountId}/media_publish`, {
+        if (!ready) {
+          return {
+            success: false,
+            code: "PROCESSING_TIMEOUT",
+            error: "Instagram media processing timed out before publication could complete. Please retry in a few moments.",
+          };
+        }
+
+        // Step 3: Publish container
+        const publishRes = await fetch(`https://graph.facebook.com/${version}/${targetAccountId}/media_publish`, {
           method: "POST",
-          body: new URLSearchParams({ creation_id: creationId, access_token: accessToken }),
+          body: new URLSearchParams({
+            creation_id: creationId,
+            access_token: accessToken,
+          }),
         });
+
         const publishData = await publishRes.json().catch(() => ({}));
         if (!publishRes.ok || !publishData.id) {
           return {
             success: false,
             code: "PUBLISH_FAILED",
             error: publishData.error?.message || "Failed to publish Instagram media container",
+            rawResponse: publishData,
           };
         }
 
@@ -404,6 +607,7 @@ export class MetaProvider implements SocialProvider {
           success: true,
           platformPostId: publishData.id,
           publishedUrl: `https://instagram.com/p/${publishData.id}`,
+          rawResponse: publishData,
         };
       }
     } catch (err: unknown) {

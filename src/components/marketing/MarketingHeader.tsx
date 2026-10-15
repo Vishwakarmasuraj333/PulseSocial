@@ -18,6 +18,7 @@ import {
   Calendar,
   MessageSquare,
   LayoutDashboard,
+  LogOut,
 } from "lucide-react";
 import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
 
@@ -37,6 +38,20 @@ export function MarketingHeader() {
   const resourcesRef = useRef<HTMLDivElement>(null);
 
   const checkAuth = () => {
+    // Instant client check
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("pulsesocial_active_user");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && parsed.email) {
+            setIsLoggedIn(true);
+            setCurrentUser(parsed);
+          }
+        }
+      } catch {}
+    }
+
     fetch("/api/auth/me", { cache: "no-store", credentials: "include" })
       .then((res) => {
         if (res.ok) return res.json();
@@ -46,14 +61,19 @@ export function MarketingHeader() {
         if (data?.user && typeof data.user.id === "string" && data.user.id.length > 0) {
           setIsLoggedIn(true);
           setCurrentUser(data.user);
+          try {
+            localStorage.setItem("pulsesocial_active_user", JSON.stringify(data.user));
+          } catch {}
         } else {
           setIsLoggedIn(false);
           setCurrentUser(null);
+          try {
+            localStorage.removeItem("pulsesocial_active_user");
+          } catch {}
         }
       })
       .catch(() => {
-        setIsLoggedIn(false);
-        setCurrentUser(null);
+        // Fallback to existing state
       });
   };
 
@@ -250,7 +270,7 @@ export function MarketingHeader() {
                 href="/login"
                 className="px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 rounded-xl transition duration-150"
               >
-                Sign In
+                Log In
               </Link>
               <Link
                 href="/signup"
@@ -323,7 +343,7 @@ export function MarketingHeader() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="w-full py-2.5 text-center text-xs font-bold rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
                 >
-                  Sign In
+                  Log In
                 </Link>
                 <Link
                   href="/signup"

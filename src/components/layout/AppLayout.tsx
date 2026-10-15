@@ -55,6 +55,7 @@ import {
   Zap,
 } from "lucide-react";
 import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
+import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
 import { PostComposerModal } from "@/components/composer/PostComposerModal";
 import { CommandPalette } from "@/components/layout/CommandPalette";
 import { UniversalSocialConnectModal } from "@/components/social/UniversalSocialConnectModal";
@@ -588,24 +589,50 @@ export function AppLayout({ children }: AppLayoutProps) {
         {isSidebarOpen && (
           <div className="p-3 mx-3 mt-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-7 h-7 rounded-lg bg-[#5846A8] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs overflow-hidden">
-                {activeBrand?.avatarUrl ? (
-                  <img
-                    src={activeBrand.avatarUrl}
-                    alt={activeBrand.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  (activeBrand?.name || "P").charAt(0).toUpperCase()
+              <div className="relative w-8 h-8 rounded-lg bg-[#5846A8] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs overflow-visible">
+                <div className="w-full h-full rounded-lg overflow-hidden flex items-center justify-center">
+                  {activeBrand?.avatarUrl ? (
+                    <img
+                      src={activeBrand.avatarUrl}
+                      alt={activeBrand.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    (activeBrand?.name || "P").charAt(0).toUpperCase()
+                  )}
+                </div>
+                {connectedAccounts.length > 0 && (
+                  <div
+                    className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-white dark:bg-slate-900 ring-1 ring-white dark:ring-slate-900 flex items-center justify-center shadow-xs overflow-hidden"
+                    title={`${connectedAccounts[0]?.displayName} (${connectedAccounts[0]?.provider})`}
+                  >
+                    {renderPlatformIcon(connectedAccounts[0]?.provider, 14)}
+                  </div>
                 )}
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
                   {activeBrand?.name || "Pulse Workspace"}
                 </p>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
-                  {connectedAccounts.length} Connected {connectedAccounts.length === 1 ? "Channel" : "Channels"}
-                </p>
+                {connectedAccounts.length > 0 ? (
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-50 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 truncate max-w-[125px]">
+                      <span className="w-3 h-3 shrink-0 flex items-center justify-center">
+                        {renderPlatformIcon(connectedAccounts[0]?.provider, 12)}
+                      </span>
+                      <span className="truncate">{connectedAccounts[0]?.displayName || "Active"}</span>
+                    </span>
+                    {connectedAccounts.length > 1 && (
+                      <span className="text-[9px] text-slate-400 font-bold shrink-0">
+                        +{connectedAccounts.length - 1}
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                    0 Connected Channels
+                  </p>
+                )}
               </div>
             </div>
             <button
@@ -745,11 +772,21 @@ export function AppLayout({ children }: AppLayoutProps) {
                 <span className="max-w-[120px] sm:max-w-[180px] truncate">
                   {activeBrand?.name || "Pulse Workspace"}
                 </span>
+                {connectedAccounts.length > 0 && (
+                  <span
+                    className="flex items-center gap-1 pl-1.5 border-l border-slate-200 dark:border-slate-750"
+                    title={`${connectedAccounts[0]?.displayName} (${connectedAccounts[0]?.provider})`}
+                  >
+                    <span className="w-4 h-4 rounded-full overflow-hidden shrink-0">
+                      {renderPlatformIcon(connectedAccounts[0]?.provider, 16)}
+                    </span>
+                  </span>
+                )}
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
               </button>
 
               {isBrandMenuOpen && (
-                <div className="absolute left-0 mt-2 w-64 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="absolute left-0 mt-2 w-72 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
                   <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     Workspaces & Brands
                   </div>
@@ -774,9 +811,9 @@ export function AppLayout({ children }: AppLayoutProps) {
                               type: "info",
                             });
                           }}
-                          className="flex items-center gap-2 truncate flex-1 text-left cursor-pointer"
+                          className="flex items-start gap-2.5 truncate flex-1 text-left cursor-pointer"
                         >
-                          <div className="w-6 h-6 rounded-md bg-[#5846A8] text-white flex items-center justify-center text-[10px] font-bold shrink-0 overflow-hidden shadow-2xs">
+                          <div className="w-6 h-6 rounded-md bg-[#5846A8] text-white flex items-center justify-center text-[10px] font-bold shrink-0 overflow-hidden shadow-2xs mt-0.5">
                             {b.avatarUrl ? (
                               <img
                                 src={b.avatarUrl}
@@ -787,7 +824,49 @@ export function AppLayout({ children }: AppLayoutProps) {
                               b.name.charAt(0).toUpperCase()
                             )}
                           </div>
-                          <span className="truncate">{b.name}</span>
+                          <div className="min-w-0 flex-1">
+                            <span className="truncate block font-semibold">{b.name}</span>
+                            {/* Connected Social Channel Badges */}
+                            {b.socialAccounts && b.socialAccounts.length > 0 ? (
+                              <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                                {b.socialAccounts.map((acc) => (
+                                  <span
+                                    key={acc.id}
+                                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 shadow-2xs"
+                                    title={`${acc.displayName} (${acc.provider})`}
+                                  >
+                                    <span className="w-3 h-3 flex items-center justify-center shrink-0">
+                                      {renderPlatformIcon(acc.provider, 12)}
+                                    </span>
+                                    <span className="truncate max-w-[90px]">
+                                      {acc.displayName || acc.provider}
+                                    </span>
+                                  </span>
+                                ))}
+                              </div>
+                            ) : b.id === activeBrand.id && connectedAccounts.length > 0 ? (
+                              <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                                {connectedAccounts.map((acc) => (
+                                  <span
+                                    key={acc.id}
+                                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 shadow-2xs"
+                                    title={`${acc.displayName} (${acc.provider})`}
+                                  >
+                                    <span className="w-3 h-3 flex items-center justify-center shrink-0">
+                                      {renderPlatformIcon(acc.provider, 12)}
+                                    </span>
+                                    <span className="truncate max-w-[90px]">
+                                      {acc.displayName || acc.provider}
+                                    </span>
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-[10px] text-slate-400 font-normal">
+                                0 channels connected
+                              </span>
+                            )}
+                          </div>
                         </button>
                       </div>
                     ))}
@@ -834,11 +913,40 @@ export function AppLayout({ children }: AppLayoutProps) {
             {/* Connected Social Channels Badge */}
             <Link
               href="/social-accounts"
-              className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-50 dark:bg-purple-950/50 text-[#5846A8] dark:text-purple-300 border border-purple-100 dark:border-purple-900 transition hover:bg-purple-100/60"
+              className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-50 dark:bg-purple-950/50 text-[#5846A8] dark:text-purple-300 border border-purple-200 dark:border-purple-800 transition hover:bg-purple-100/60 hover:border-purple-300 shadow-2xs"
               title="Manage Connected Channels"
             >
-              <span className={`w-2 h-2 rounded-full ${connectedAccounts.length > 0 ? "bg-[#8B6BD6] animate-pulse" : "bg-slate-300"}`} />
-              <span>{connectedAccounts.length} Connected</span>
+              {connectedAccounts.length > 0 ? (
+                <>
+                  <div className="flex items-center -space-x-1">
+                    {connectedAccounts.slice(0, 3).map((acc) => (
+                      <div
+                        key={acc.id}
+                        className="w-4 h-4 rounded-full ring-1 ring-white dark:ring-slate-900 overflow-hidden shrink-0"
+                        title={`${acc.displayName} on ${acc.provider}`}
+                      >
+                        {renderPlatformIcon(acc.provider, 16)}
+                      </div>
+                    ))}
+                  </div>
+                  <span className="flex items-center gap-1 font-bold">
+                    <span>
+                      {connectedAccounts[0]?.provider === "linkedin"
+                        ? "LinkedIn"
+                        : connectedAccounts[0]?.provider?.toUpperCase()}
+                    </span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  </span>
+                  <span className="text-[10px] opacity-75 font-normal">
+                    • {connectedAccounts.length} Connected
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-slate-300" />
+                  <span>0 Connected</span>
+                </>
+              )}
             </Link>
 
             {/* + New Post Purple Button */}
@@ -953,7 +1061,52 @@ export function AppLayout({ children }: AppLayoutProps) {
                         </span>
                       )}
                     </div>
+                    {/* Google Login indicator */}
+                    <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-purple-100/70 dark:border-slate-700/60 text-[10px] text-slate-600 dark:text-slate-400">
+                      <div className="w-3.5 h-3.5 shrink-0">
+                        {renderPlatformIcon("google", 14)}
+                      </div>
+                      <span>Logged in via Google SSO</span>
+                    </div>
                   </div>
+
+                  {/* Connected Social Channels in Active Workspace */}
+                  {connectedAccounts.length > 0 && (
+                    <div className="px-2 py-2 mb-1 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                          Connected Channels
+                        </span>
+                        <Link
+                          href="/social-accounts"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="text-[9px] font-bold text-[#5846A8] dark:text-purple-400 hover:underline"
+                        >
+                          Manage
+                        </Link>
+                      </div>
+                      <div className="space-y-1">
+                        {connectedAccounts.map((acc) => (
+                          <div
+                            key={acc.id}
+                            className="flex items-center justify-between p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 shadow-2xs"
+                          >
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <div className="w-4 h-4 rounded-full overflow-hidden shrink-0">
+                                {renderPlatformIcon(acc.provider, 16)}
+                              </div>
+                              <span className="truncate max-w-[110px] font-semibold text-slate-800 dark:text-slate-200 text-[11px]">
+                                {acc.displayName || acc.provider}
+                              </span>
+                            </div>
+                            <span className="text-[8px] font-bold px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shrink-0">
+                              ACTIVE
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="space-y-0.5">
                     <Link

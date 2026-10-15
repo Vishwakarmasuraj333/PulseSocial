@@ -2,6 +2,14 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 
+export interface BrandSocialAccount {
+  id: string;
+  provider: string;
+  displayName: string;
+  username?: string | null;
+  profileImageUrl?: string | null;
+}
+
 export interface Brand {
   id: string;
   name: string;
@@ -9,6 +17,7 @@ export interface Brand {
   handle: string;
   avatarUrl: string;
   connectedAccountsCount: number;
+  socialAccounts?: BrandSocialAccount[];
   industry: string;
   color?: string;
   description?: string;
@@ -25,6 +34,7 @@ const DEFAULT_BRANDS: Brand[] = [
     handle: "@pulsemedia",
     avatarUrl: "",
     connectedAccountsCount: 0,
+    socialAccounts: [],
     industry: "Digital Media & Technology",
     color: "#2563eb",
     createdAt: "2026-01-15T10:00:00Z",
@@ -65,6 +75,7 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
             avatarUrl: b.avatarUrl || b.logoUrl || "",
             coverUrl: b.coverUrl || "",
             connectedAccountsCount: b.connectedAccountsCount || 0,
+            socialAccounts: b.socialAccounts || [],
             industry: b.description || "Digital Media & Tech",
             description: b.description || "",
             timezone: b.timezone || "Asia/Kolkata",

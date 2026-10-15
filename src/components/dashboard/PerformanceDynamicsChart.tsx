@@ -290,16 +290,36 @@ export function PerformanceDynamicsChart({ dateRange }: PerformanceDynamicsChart
               </BarChart>
             )}
           </ResponsiveContainer>
+        ) : hasAccounts ? (
+          <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center rounded-2xl border border-dashed border-purple-200 dark:border-purple-900/60 bg-purple-50/30 dark:bg-purple-950/20">
+            <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 shadow-xs flex items-center justify-center mb-3 ring-1 ring-purple-100 dark:ring-purple-900 overflow-hidden">
+              {renderPlatformIcon(connectedProviders[0] || "linkedin", 26)}
+            </div>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+              <span>{connectedProviders[0] ? (connectedProviders[0].charAt(0).toUpperCase() + connectedProviders[0].slice(1)) : "Social Account"} Connected & Active</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mt-1 mb-4 leading-relaxed">
+              Your channel is authenticated. Reach, impressions, and engagement trajectory will render here as you broadcast posts and sync interactions.
+            </p>
+            <Link
+              href="/posts"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white text-xs font-bold transition shadow-xs cursor-pointer active:scale-95"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create First Post</span>
+            </Link>
+          </div>
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/30">
             <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3 shadow-2xs">
               <BarChart2 className="w-6 h-6" />
             </div>
             <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-              Connect an account to see data
+              Connect a Social Channel to see data
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mt-1 mb-4 leading-relaxed">
-              No analytics stream is active. Link your Facebook, Instagram, LinkedIn, or other channels to synchronize authentic performance metrics.
+              No analytics stream is active. Link your LinkedIn, Facebook, Instagram, or other channels to synchronize authentic performance metrics.
             </p>
             <Link
               href="/social-accounts"

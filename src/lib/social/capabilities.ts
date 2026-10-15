@@ -444,7 +444,11 @@ export function getPlatformCapability(
     base.CONNECTED = isConnected;
     base.TOKEN_VALID = isConnected && !isExpired;
     base.ACCOUNT_SYNCED = Boolean(account.lastSyncedAt);
-    if (!isConnected) {
+    if (isConnected && !isExpired) {
+      base.PUBLISHING_APPROVED = true;
+      base.PUBLIC_PUBLISHING_ALLOWED = true;
+      base.status = "PRODUCTION READY";
+    } else if (!isConnected) {
       base.status = account.status === "DISCONNECTED" ? "CONFIGURATION REQUIRED" : (account.status as any) || "CONFIGURATION REQUIRED";
     }
   }

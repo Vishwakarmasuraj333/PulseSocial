@@ -35,6 +35,7 @@ import {
   Copy,
   Info,
   Link as LinkIcon,
+  Loader2,
 } from "lucide-react";
 import { PostPreview, PreviewMediaItem } from "@/components/composer/previews/PostPreview";
 import { RealLocationMapModal, LocationData } from "./RealLocationMapModal";
@@ -435,44 +436,67 @@ export function PostComposerModal({
     setIsUploadingMedia(true);
     setShowMediaMenu(false);
 
-    const uploadedList: PreviewMediaItem[] = [];
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const isVideo = file.type.startsWith("video/") || Boolean(file.name.match(/\.(mp4|webm|mov|mkv)$/i));
+        const localUrl = URL.createObjectURL(file);
+        const tempId = `media-${Date.now()}-${i}`;
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const isVideo = file.type.startsWith("video/") || Boolean(file.name.match(/\.(mp4|webm|mov|mkv)$/i));
-      const localUrl = URL.createObjectURL(file);
-      const tempId = `media-${Date.now()}-${i}`;
+        // Immediately show thumbnail with uploading indicator
+        setMedia((prev) => [
+          ...prev,
+          {
+            id: tempId,
+            url: localUrl,
+            type: isVideo ? "video" : "image",
+            name: file.name,
+          },
+        ]);
 
-      uploadedList.push({
-        id: tempId,
-        url: localUrl,
-        type: isVideo ? "video" : "image",
-        name: file.name,
-      });
+        const formData = new FormData();
+        formData.append("file", file);
 
-      // Background upload to server
-      const formData = new FormData();
-      formData.append("file", file);
-      fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      })
-        .then((res) => (res.ok ? res.json() : null))
-        .then((data) => {
-          if (data?.url) {
+        try {
+          const res = await fetch("/api/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await res.json().catch(() => ({}));
+
+          if (res.ok && data?.url) {
             setMedia((prev) =>
               prev.map((m) => (m.id === tempId ? { ...m, url: data.url } : m))
             );
+            toast({
+              title: "Media Ready",
+              message: `${file.name} uploaded successfully and ready to publish.`,
+              type: "success",
+            });
+          } else {
+            // Remove the failed local blob item so the user isn't stuck with an unpublishable blob
+            setMedia((prev) => prev.filter((m) => m.id !== tempId));
+            toast({
+              title: "Upload Failed",
+              message: data?.error || `Could not upload ${file.name}. (Status ${res.status})`,
+              type: "error",
+            });
           }
-        })
-        .catch(() => {});
-    }
-
-    setMedia((prev) => [...prev, ...uploadedList]);
-    setIsUploadingMedia(false);
-
-    if (desktopFileInputRef.current) {
-      desktopFileInputRef.current.value = "";
+        } catch (uploadErr: any) {
+          setMedia((prev) => prev.filter((m) => m.id !== tempId));
+          toast({
+            title: "Upload Error",
+            message: uploadErr?.message || `Network error uploading ${file.name}.`,
+            type: "error",
+          });
+        }
+      }
+    } finally {
+      setIsUploadingMedia(false);
+      if (desktopFileInputRef.current) {
+        desktopFileInputRef.current.value = "";
+      }
     }
   };
 
@@ -650,12 +674,12 @@ export function PostComposerModal({
       return;
     }
 
-    // Pre-flight validation: check for blob URLs
+    // Pre-flight validation: check for blob URLs and active uploads
     const hasBlobUrls = media.some((m) => m.url.startsWith("blob:"));
-    if (hasBlobUrls) {
+    if (isUploadingMedia || hasBlobUrls) {
       toast({
-        title: "Uploads in Progress",
-        message: "Media files are still uploading or need a public URL. Please wait for upload to complete.",
+        title: "Media Upload in Progress",
+        message: "Please wait for your media file to finish uploading before publishing.",
         type: "warning",
       });
       return;
@@ -1009,10 +1033,16 @@ export function PostComposerModal({
                         ) : (
                           <Image src={item.url} alt="Attached" fill className="object-cover" unoptimized />
                         )}
+                        {item.url.startsWith("blob:") && (
+                          <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-1 z-10">
+                            <Loader2 className="w-4 h-4 text-white animate-spin" />
+                            <span className="text-[9px] text-white font-semibold">Uploading...</span>
+                          </div>
+                        )}
                         <button
                           type="button"
                           onClick={() => handleRemoveMedia(idx)}
-                          className="absolute top-1 right-1 bg-black/80 hover:bg-rose-600 text-white rounded-full p-1 transition shadow cursor-pointer"
+                          className="absolute top-1 right-1 bg-black/80 hover:bg-rose-600 text-white rounded-full p-1 transition shadow cursor-pointer z-20"
                           title="Remove media"
                         >
                           <X className="w-3 h-3" />
@@ -1912,22 +1942,34 @@ export function PostComposerModal({
               onClick={handlePublish}
               disabled={
                 isSubmitting ||
+                isUploadingMedia ||
+                media.some((m) => m.url.startsWith("blob:")) ||
                 (!content.trim() && media.length === 0 && !attachedUrlData) ||
                 selectedAccountIds.length === 0
               }
-              className="px-6 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="px-6 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
             >
-              {isSubmitting
-                ? "Processing..."
-                : sendForApproval
-                ? "Send for Approval"
-                : publishingOption === "schedule"
-                ? "Schedule Post"
-                : publishingOption === "queue"
-                ? "Add to Queue"
-                : publishingOption === "smartq"
-                ? "Schedule in SmartQ"
-                : "Post Now"}
+              {isUploadingMedia ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Uploading Media...</span>
+                </>
+              ) : isSubmitting ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Processing...</span>
+                </>
+              ) : sendForApproval ? (
+                "Send for Approval"
+              ) : publishingOption === "schedule" ? (
+                "Schedule Post"
+              ) : publishingOption === "queue" ? (
+                "Add to Queue"
+              ) : publishingOption === "smartq" ? (
+                "Schedule in SmartQ"
+              ) : (
+                "Post Now"
+              )}
             </button>
           </div>
         </div>

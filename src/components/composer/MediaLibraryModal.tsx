@@ -73,26 +73,58 @@ export function MediaLibraryModal({
     onClose();
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const tempId = `m_${Date.now()}`;
     const previewUrl = URL.createObjectURL(file);
     const newItem: MediaItem = {
-      id: `m_${Date.now()}`,
+      id: tempId,
       title: file.name,
       url: previewUrl,
       type: file.type.startsWith("video") ? "video" : "image",
       size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-      dimensions: "Uploaded File",
+      dimensions: "Uploading...",
     };
 
     setItems((prev) => [newItem, ...prev]);
-    toast({
-      title: "Uploaded to Library",
-      message: `${file.name} saved to Media Library.`,
-      type: "success",
-    });
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data?.url) {
+        setItems((prev) =>
+          prev.map((it) =>
+            it.id === tempId ? { ...it, url: data.url, dimensions: "Uploaded File" } : it
+          )
+        );
+        toast({
+          title: "Uploaded to Library",
+          message: `${file.name} saved to Media Library.`,
+          type: "success",
+        });
+      } else {
+        setItems((prev) => prev.filter((it) => it.id !== tempId));
+        toast({
+          title: "Upload Failed",
+          message: data?.error || "Could not upload file to library.",
+          type: "error",
+        });
+      }
+    } catch {
+      setItems((prev) => prev.filter((it) => it.id !== tempId));
+      toast({
+        title: "Upload Error",
+        message: "Failed to upload file to library.",
+        type: "error",
+      });
+    }
   };
 
   return (

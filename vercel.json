@@ -2,11 +2,11 @@
   "crons": [
     {
       "path": "/api/cron/publisher",
-      "schedule": "* * * * *"
+      "schedule": "0 0 * * *"
     },
     {
       "path": "/api/cron/social-engagement",
-      "schedule": "*/10 * * * *"
+      "schedule": "0 12 * * *"
     }
   ]
 }

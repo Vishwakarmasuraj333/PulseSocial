@@ -11,7 +11,8 @@
     "test": "node ./node_modules/tsx/dist/cli.mjs tests/run-all-tests.ts",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
-    "db:seed": "npx tsx prisma/seed.ts"
+    "db:seed": "npx tsx prisma/seed.ts",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@google/genai": "^2.27.0",

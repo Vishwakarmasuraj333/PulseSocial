@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createAndSendOTP } from "@/lib/email/otp";
+import { logAudit } from "@/lib/audit/logger";
 
 export async function POST(req: Request) {
   try {
@@ -31,6 +32,16 @@ export async function POST(req: Request) {
 
     // Generate and send 5-minute recovery OTP via Gmail SMTP
     await createAndSendOTP(user.id, user.email, false);
+
+    try {
+      await logAudit({
+        userId: user.id,
+        action: "PASSWORD_RESET_REQUESTED",
+        resourceType: "User",
+        resourceId: user.id,
+        details: { email: user.email },
+      });
+    } catch {}
 
     return NextResponse.json({
       success: true,

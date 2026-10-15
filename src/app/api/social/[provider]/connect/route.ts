@@ -6,6 +6,7 @@ import { getSocialProvider } from "@/lib/social/registry";
 import { SupportedPlatform } from "@/lib/social/types";
 import { prisma } from "@/lib/prisma";
 import { encryptToken } from "@/lib/security/encryption";
+import { logAudit } from "@/lib/audit/logger";
 
 export async function GET(
   req: Request,
@@ -180,6 +181,16 @@ export async function GET(
     // Direct redirection to official third-party authorization consent screen
     const tier = url.searchParams.get("tier") || "full";
     const authUrl = socialProvider.getAuthorizationUrl(state, redirectUri, codeVerifier, { tier });
+
+    try {
+      await logAudit({
+        organizationId: orgId,
+        userId: session.id,
+        action: "OAUTH_INITIATED",
+        resourceType: "SocialAccount",
+        details: { platform: platformKey, tier },
+      });
+    } catch {}
 
     if (wantsJson) {
       return NextResponse.json({

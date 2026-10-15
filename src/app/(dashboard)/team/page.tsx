@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
-import { Users, Plus, ShieldCheck, Mail, CheckCircle2 } from "lucide-react";
+import { Users, Plus, ShieldCheck, Mail, CheckCircle2, Loader2 } from "lucide-react";
 
 export default function TeamPage() {
   const { toast } = useToast();
@@ -18,27 +18,47 @@ export default function TeamPage() {
   const [inviteRole, setInviteRole] = useState("Brand Admin");
   const [isApprover, setIsApprover] = useState(true);
   const [isSending, setIsSending] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [members, setMembers] = useState<any[]>([]);
 
-  const [members, setMembers] = useState([
-    {
-      id: "1",
-      name: "Suraj Admin",
-      email: "admin@pulsesocial.io",
-      role: "OWNER",
-      channels: "All Channels",
-      isApprover: true,
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    },
-    {
-      id: "2",
-      name: "Alex Designer",
-      email: "alex@acme.com",
-      role: "Brand Admin",
-      channels: "Instagram Profile, Facebook Page",
-      isApprover: false,
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-    },
-  ]);
+  const fetchTeam = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch("/api/team");
+      if (res.ok) {
+        const data = await res.json();
+        const active = (data.activeMembers || []).map((m: any) => ({
+          id: m.id,
+          name: m.name || m.email.split("@")[0],
+          email: m.email,
+          role: m.role,
+          channels: m.channelsAccess === "ALL" ? "All Channels" : m.channelsAccess,
+          isApprover: m.isApprover,
+          avatar: m.avatar || "",
+          status: "ACTIVE",
+        }));
+        const pending = (data.pendingInvites || []).map((inv: any) => ({
+          id: inv.id,
+          name: inv.email.split("@")[0],
+          email: inv.email,
+          role: inv.role,
+          channels: inv.channelsAccess === "ALL" ? "All Channels" : inv.channelsAccess,
+          isApprover: inv.isApprover,
+          avatar: "",
+          status: "INVITED",
+        }));
+        setMembers([...active, ...pending]);
+      }
+    } catch {
+      toast({ title: "Error", message: "Failed to load team members", type: "error" });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    fetchTeam();
+  }, [fetchTeam]);
 
   const handleSendInvite = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,21 +86,9 @@ export default function TeamPage() {
         type: "success",
       });
 
-      setMembers((prev) => [
-        ...prev,
-        {
-          id: String(Date.now()),
-          name: inviteEmail.split("@")[0],
-          email: inviteEmail,
-          role: inviteRole,
-          channels: "All Channels",
-          isApprover,
-          avatar: "",
-        },
-      ]);
-
       setIsInviteOpen(false);
       setInviteEmail("");
+      fetchTeam();
     } catch (err: unknown) {
       toast({ title: "Error", message: (err as Error).message, type: "error" });
     } finally {
@@ -109,65 +117,79 @@ export default function TeamPage() {
           </Button>
         </div>
 
-        {/* Mobile Cards View (<md) */}
-        <div className="md:hidden space-y-3">
-          {members.map((m) => (
-            <Card key={m.id} className="p-4 border border-slate-200/80 dark:border-slate-800 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-200 shrink-0">
-                    {m.avatar ? (
-                      <Image
-                        src={m.avatar}
-                        alt={m.name}
-                        width={36}
-                        height={36}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center font-bold text-slate-600">
-                        {m.name.charAt(0)}
+        {/* Loading Indicator */}
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center p-12 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl">
+            <Loader2 className="w-6 h-6 animate-spin text-indigo-600 mb-2" />
+            <p className="text-xs text-slate-500">Loading team governance...</p>
+          </div>
+        ) : members.length === 0 ? (
+          <div className="text-center p-12 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl">
+            <Users className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">No team members yet</p>
+            <p className="text-xs text-slate-500 mt-1">Invite your teammates to collaborate on this workspace.</p>
+          </div>
+        ) : (
+          <>
+            {/* Mobile Cards View (<md) */}
+            <div className="md:hidden space-y-3">
+              {members.map((m) => (
+                <Card key={m.id} className="p-4 border border-slate-200/80 dark:border-slate-800 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-200 shrink-0">
+                        {m.avatar ? (
+                          <Image
+                            src={m.avatar}
+                            alt={m.name}
+                            width={36}
+                            height={36}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center font-bold text-slate-600">
+                            {m.name.charAt(0)}
+                          </div>
+                        )}
                       </div>
+                      <div>
+                        <p className="font-bold text-slate-900 dark:text-white text-xs">{m.name}</p>
+                        <p className="text-[11px] text-slate-400">{m.email}</p>
+                      </div>
+                    </div>
+                    <Badge variant={m.role === "OWNER" ? "default" : "secondary"} className="text-[10px]">
+                      {m.role}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
+                    <span className="text-slate-500 dark:text-slate-400 text-[11px] font-medium">{m.channels}</span>
+                    {m.isApprover ? (
+                      <span className="inline-flex items-center gap-1 text-purple-600 font-semibold text-[11px]">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Approver
+                      </span>
+                    ) : (
+                      <span className="text-slate-400 text-[11px]">Standard</span>
                     )}
                   </div>
-                  <div>
-                    <p className="font-bold text-slate-900 dark:text-white text-xs">{m.name}</p>
-                    <p className="text-[11px] text-slate-400">{m.email}</p>
-                  </div>
-                </div>
-                <Badge variant={m.role === "OWNER" ? "default" : "secondary"} className="text-[10px]">
-                  {m.role}
-                </Badge>
-              </div>
-              <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
-                <span className="text-slate-500 dark:text-slate-400 text-[11px] font-medium">{m.channels}</span>
-                {m.isApprover ? (
-                  <span className="inline-flex items-center gap-1 text-purple-600 font-semibold text-[11px]">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Approver
-                  </span>
-                ) : (
-                  <span className="text-slate-400 text-[11px]">Standard</span>
-                )}
-              </div>
-            </Card>
-          ))}
-        </div>
+                </Card>
+              ))}
+            </div>
 
-        {/* Desktop Team Table Card (>=md) */}
-        <Card className="hidden md:block overflow-hidden border-slate-200/80">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 text-slate-500 uppercase font-semibold">
-                  <th className="p-4">Member</th>
-                  <th className="p-4">Assigned Role</th>
-                  <th className="p-4">Channel Scope</th>
-                  <th className="p-4">Approver Privilege</th>
-                  <th className="p-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {members.map((m) => (
+            {/* Desktop Team Table Card (>=md) */}
+            <Card className="hidden md:block overflow-hidden border-slate-200/80">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 text-slate-500 uppercase font-semibold">
+                      <th className="p-4">Member</th>
+                      <th className="p-4">Assigned Role</th>
+                      <th className="p-4">Channel Scope</th>
+                      <th className="p-4">Approver Privilege</th>
+                      <th className="p-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {members.map((m) => (
                   <tr key={m.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
                     <td className="p-4 flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-200 shrink-0">
@@ -222,6 +244,8 @@ export default function TeamPage() {
             </table>
           </div>
         </Card>
+        </>
+        )}
 
         {/* Invite Modal matching Screenshot 3 */}
         <Dialog

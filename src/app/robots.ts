@@ -43,6 +43,7 @@ export default function robots(): MetadataRoute.Robots {
           "/snippets/",
           "/social-planner/",
           "/trigger-links/",
+          "/admin/",
         ],
       },
     ],

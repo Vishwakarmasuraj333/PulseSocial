@@ -28,6 +28,7 @@ const PROTECTED_PREFIXES = [
   "/drafts",
   "/social-accounts",
   "/ai-assistant",
+  "/admin",
 ];
 
 // Auth routes where authenticated users should be redirected to dashboard unless they ask to log out/switch

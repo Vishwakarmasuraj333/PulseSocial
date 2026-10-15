@@ -543,6 +543,25 @@ export function AppLayout({ children }: AppLayoutProps) {
         },
       ],
     },
+    ...(user?.role?.toUpperCase() === "OWNER" ||
+    user?.role?.toUpperCase() === "ADMIN" ||
+    ["admin@pulsesocial.io", "itsurya9930@gmail.com", "itxsurajofficial@gmail.com"].includes(
+      user?.email?.toLowerCase() || ""
+    )
+      ? [
+          {
+            title: "ADMINISTRATION",
+            items: [
+              {
+                label: "Admin Console",
+                href: "/admin",
+                icon: Shield,
+                match: (p: string) => p.startsWith("/admin"),
+              },
+            ],
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -1138,6 +1157,26 @@ export function AppLayout({ children }: AppLayoutProps) {
                       </span>
                       <span className="text-[10px] text-slate-400">{isDarkMode ? "On" : "Off"}</span>
                     </button>
+
+                    {(user?.role?.toUpperCase() === "OWNER" ||
+                      user?.role?.toUpperCase() === "ADMIN" ||
+                      ["admin@pulsesocial.io", "itsurya9930@gmail.com", "itxsurajofficial@gmail.com"].includes(
+                        user?.email?.toLowerCase() || ""
+                      )) && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="flex items-center justify-between px-3 py-2 rounded-lg bg-purple-50/80 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-900/60 transition text-[#5846A8] dark:text-purple-300 font-bold"
+                      >
+                        <span className="flex items-center gap-2.5">
+                          <Shield className="w-3.5 h-3.5 text-[#5846A8] dark:text-purple-400" />
+                          <span>Admin Console</span>
+                        </span>
+                        <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-[#5846A8] text-white">
+                          Admin
+                        </span>
+                      </Link>
+                    )}
                   </div>
 
                   <div className="pt-1 mt-1 border-t border-slate-100 dark:border-slate-800">

@@ -31,6 +31,13 @@ export async function POST(req: Request) {
     });
 
     if (!user || !user.passwordHash) {
+      try {
+        await logAudit({
+          action: "LOGIN_FAILED",
+          resourceType: "User",
+          details: { email: normalizedEmail, reason: "USER_NOT_FOUND_OR_NO_PASSWORD" },
+        });
+      } catch {}
       return NextResponse.json(
         { error: "Invalid email or password. Please try again.", code: "AUTH_INVALID_CREDENTIALS" },
         { status: 401 }
@@ -38,6 +45,15 @@ export async function POST(req: Request) {
     }
 
     if (user.status === "SUSPENDED") {
+      try {
+        await logAudit({
+          userId: user.id,
+          action: "LOGIN_BLOCKED_SUSPENDED",
+          resourceType: "User",
+          resourceId: user.id,
+          details: { email: user.email },
+        });
+      } catch {}
       return NextResponse.json(
         { error: "This account has been suspended. Please contact support.", code: "FORBIDDEN" },
         { status: 403 }
@@ -46,6 +62,15 @@ export async function POST(req: Request) {
 
     const isValid = await verifyPassword(password, user.passwordHash);
     if (!isValid) {
+      try {
+        await logAudit({
+          userId: user.id,
+          action: "LOGIN_FAILED",
+          resourceType: "User",
+          resourceId: user.id,
+          details: { email: user.email, reason: "INVALID_PASSWORD" },
+        });
+      } catch {}
       return NextResponse.json(
         { error: "Invalid email or password. Please try again.", code: "AUTH_INVALID_CREDENTIALS" },
         { status: 401 }

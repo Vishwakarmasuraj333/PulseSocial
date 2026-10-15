@@ -12,6 +12,7 @@ import { runProductionAuditMasterTests } from "./integration/production-audit-ma
 import { runSocialMetricsNullTest } from "./unit/social-metrics-null.test";
 import { runWebhooksAndSsrfTests } from "./unit/webhooks-and-ssrf.test";
 import { runMetaApiIntegrationTests } from "./integration/meta-api.test";
+import { runAdminAndActivityLoggingTests } from "./unit/admin-and-activity-logging.test";
 import { prisma } from "../src/lib/prisma";
 
 async function main() {
@@ -21,7 +22,7 @@ async function main() {
 
   const startTime = Date.now();
   let passedSuites = 0;
-  const totalSuites = 14;
+  const totalSuites = 15;
 
   const baseUrl = process.env.BASE_URL || (process.env.APP_URL || "https://pulsesocial1.vercel.app");
   process.env.BASE_URL = baseUrl;
@@ -68,7 +69,11 @@ async function main() {
     await runMetaApiIntegrationTests();
     passedSuites++;
 
-    // HTTP Integration Suites (6, 7, 9, 10)
+    // Suite 10: Admin Panel & Activity Logging Integrity
+    await runAdminAndActivityLoggingTests();
+    passedSuites++;
+
+    // HTTP Integration Suites
     if (isServerRunning) {
       // Suite 6: Auth End-to-End Flow
       await runAuthEndToEndTests();

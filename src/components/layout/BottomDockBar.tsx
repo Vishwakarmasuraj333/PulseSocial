@@ -28,6 +28,10 @@ import {
   Phone,
   Mail,
   Headphones,
+  Video,
+  PhoneCall,
+  Check,
+  Globe,
 } from "lucide-react";
 import { FeedbackModal } from "@/components/layout/FeedbackModal";
 import { PulseHelpGuidesModal } from "@/components/layout/PulseHelpGuidesModal";
@@ -101,6 +105,8 @@ export function BottomDockBar() {
   const [activeDrawer, setActiveDrawer] = useState<"pins" | "chats" | "contacts" | null>(null);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isMeetingOpen, setIsMeetingOpen] = useState(false);
+  const [copiedMeetingLink, setCopiedMeetingLink] = useState(false);
 
   // Dynamic Notes state (workspace isolated)
   const [notes, setNotes] = useState<NoteItem[]>([]);
@@ -411,6 +417,17 @@ export function BottomDockBar() {
             <span className="text-[10px] text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 hidden md:inline font-mono">
               Ctrl+K
             </span>
+          </button>
+
+          {/* Video Call */}
+          <button
+            type="button"
+            onClick={() => setIsMeetingOpen(true)}
+            title="Start or Join Team Video Call & Conference"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-purple-700 dark:text-purple-300 bg-purple-50 hover:bg-purple-100/80 dark:bg-purple-950/40 border border-purple-200/60 dark:border-purple-800/50 transition text-xs cursor-pointer font-semibold"
+          >
+            <Video className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+            <span className="hidden md:inline">Video Call</span>
           </button>
 
           {/* 6. Help */}
@@ -756,6 +773,14 @@ export function BottomDockBar() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setIsMeetingOpen(true)}
+                      className="p-1.5 rounded-lg bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 hover:bg-purple-100 transition cursor-pointer"
+                      title="Start Video Meeting"
+                    >
+                      <Video className="w-3.5 h-3.5" />
+                    </button>
                     <a
                       href="tel:+18007857362"
                       className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 hover:bg-emerald-100 transition cursor-pointer"
@@ -765,7 +790,7 @@ export function BottomDockBar() {
                     </a>
                     <a
                       href="mailto:support@pulsesocial.io"
-                      className="p-1.5 rounded-lg bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 hover:bg-purple-100 transition cursor-pointer"
+                      className="p-1.5 rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 hover:bg-blue-100 transition cursor-pointer"
                       title="Email Support Desk"
                     >
                       <Mail className="w-3.5 h-3.5" />
@@ -773,7 +798,7 @@ export function BottomDockBar() {
                     <button
                       type="button"
                       onClick={() => setIsFeedbackOpen(true)}
-                      className="p-1.5 rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 hover:bg-blue-100 transition cursor-pointer"
+                      className="p-1.5 rounded-lg bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer"
                       title="Send Ticket / Feedback"
                     >
                       <MessageSquare className="w-3.5 h-3.5" />
@@ -783,6 +808,20 @@ export function BottomDockBar() {
                 <div className="mt-1.5 flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 pt-1.5 border-t border-purple-500/10">
                   <span className="font-mono font-medium text-emerald-600 dark:text-emerald-400">+1 (800) 785-PULSE</span>
                   <span>Avg reply: &lt; 15 mins</span>
+                </div>
+                <div className="mt-1.5 pt-1.5 border-t border-purple-500/10 flex items-center justify-between text-[10px]">
+                  <span className="text-slate-400 font-semibold">Official Channels:</span>
+                  <div className="flex items-center gap-2">
+                    <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition font-medium">LinkedIn</a>
+                    <span>•</span>
+                    <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition font-medium">X</a>
+                    <span>•</span>
+                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition font-medium">Facebook</a>
+                    <span>•</span>
+                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-pink-600 transition font-medium">Instagram</a>
+                    <span>•</span>
+                    <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition font-medium">YouTube</a>
+                  </div>
                 </div>
               </div>
             )}

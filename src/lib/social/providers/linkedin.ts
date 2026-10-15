@@ -177,12 +177,33 @@ export class LinkedInProvider implements SocialProvider {
 
       if (post.mediaUrls && post.mediaUrls.length > 0) {
         const first = post.mediaUrls[0];
-        restPayload.content = {
-          article: {
-            source: first.url,
-            title: post.content.slice(0, 60) || "PulseSocial Shared Update",
-          },
-        };
+        const isVideo = first.type === "VIDEO" || Boolean(first.url.match(/\.(mp4|webm|mov|mkv)$/i));
+        const isImage = first.type === "IMAGE" || Boolean(first.url.match(/\.(jpg|jpeg|png|webp|gif|avif)$/i)) || first.url.includes("cloudinary.com");
+
+        if (isVideo) {
+          const videoUrn = await this.uploadLinkedInVideo(accessToken, authorUrn, first.url);
+          restPayload.content = {
+            media: {
+              id: videoUrn,
+              title: post.content.slice(0, 60) || "Video Visual",
+            },
+          };
+        } else if (isImage) {
+          const imageUrn = await this.uploadLinkedInImage(accessToken, authorUrn, first.url);
+          restPayload.content = {
+            media: {
+              id: imageUrn,
+              title: post.content.slice(0, 60) || "Image Visual",
+            },
+          };
+        } else {
+          restPayload.content = {
+            article: {
+              source: first.url,
+              title: post.content.slice(0, 60) || "PulseSocial Shared Update",
+            },
+          };
+        }
       }
 
       const res = await fetch("https://api.linkedin.com/rest/posts", {
@@ -240,6 +261,112 @@ export class LinkedInProvider implements SocialProvider {
         error: (err as Error).message || "LinkedIn API network failure",
       };
     }
+  }
+
+  private async uploadLinkedInImage(accessToken: string, ownerUrn: string, mediaUrl: string): Promise<string> {
+    const mediaRes = await fetch(mediaUrl);
+    if (!mediaRes.ok) {
+      throw new Error(`Failed to fetch media file from ${mediaUrl} (HTTP ${mediaRes.status})`);
+    }
+    const buffer = Buffer.from(await mediaRes.arrayBuffer());
+
+    const initRes = await fetch("https://api.linkedin.com/rest/images?action=initializeUpload", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "LinkedIn-Version": SOCIAL_API_VERSIONS.LINKEDIN_REST,
+        "X-Restli-Protocol-Version": SOCIAL_API_VERSIONS.LINKEDIN_RESTLI_PROTOCOL,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        initializeUploadRequest: {
+          owner: ownerUrn,
+        },
+      }),
+    });
+
+    if (!initRes.ok) {
+      const err = await initRes.json().catch(() => ({}));
+      throw new Error(err.message || `LinkedIn image upload initialization failed (HTTP ${initRes.status})`);
+    }
+
+    const initData = await initRes.json();
+    const uploadUrl = initData.value?.uploadUrl;
+    const imageUrn = initData.value?.image;
+
+    if (!uploadUrl || !imageUrn) {
+      throw new Error("LinkedIn did not return expected uploadUrl or image URN");
+    }
+
+    const putRes = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/octet-stream",
+      },
+      body: buffer,
+    });
+
+    if (!putRes.ok && putRes.status !== 200 && putRes.status !== 201) {
+      throw new Error(`Failed to transfer image bytes to LinkedIn (HTTP ${putRes.status})`);
+    }
+
+    return imageUrn;
+  }
+
+  private async uploadLinkedInVideo(accessToken: string, ownerUrn: string, mediaUrl: string): Promise<string> {
+    const mediaRes = await fetch(mediaUrl);
+    if (!mediaRes.ok) {
+      throw new Error(`Failed to fetch video file from ${mediaUrl} (HTTP ${mediaRes.status})`);
+    }
+    const buffer = Buffer.from(await mediaRes.arrayBuffer());
+
+    const initRes = await fetch("https://api.linkedin.com/rest/videos?action=initializeUpload", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "LinkedIn-Version": SOCIAL_API_VERSIONS.LINKEDIN_REST,
+        "X-Restli-Protocol-Version": SOCIAL_API_VERSIONS.LINKEDIN_RESTLI_PROTOCOL,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        initializeUploadRequest: {
+          owner: ownerUrn,
+          fileSizeBytes: buffer.length,
+          uploadCaptions: false,
+          uploadThumbnail: false,
+        },
+      }),
+    });
+
+    if (!initRes.ok) {
+      const err = await initRes.json().catch(() => ({}));
+      throw new Error(err.message || `LinkedIn video upload initialization failed (HTTP ${initRes.status})`);
+    }
+
+    const initData = await initRes.json();
+    const uploadInstructions = initData.value?.uploadInstructions;
+    const videoUrn = initData.value?.video;
+
+    if (!uploadInstructions || !videoUrn || !uploadInstructions[0]?.uploadUrl) {
+      throw new Error("LinkedIn did not return expected video uploadInstructions or video URN");
+    }
+
+    const uploadUrl = uploadInstructions[0].uploadUrl;
+    const putRes = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/octet-stream",
+      },
+      body: buffer,
+    });
+
+    if (!putRes.ok && putRes.status !== 200 && putRes.status !== 201) {
+      throw new Error(`Failed to transfer video bytes to LinkedIn (HTTP ${putRes.status})`);
+    }
+
+    return videoUrn;
   }
 
   async deletePost(accessToken: string, platformPostId: string): Promise<boolean> {

@@ -105,6 +105,17 @@ export class MetaProvider implements SocialProvider {
       }
     }
 
+    if (this.platform === "instagram") {
+      const igParams = new URLSearchParams({
+        client_id: appId,
+        redirect_uri: redirectUri,
+        state,
+        scope: scopes,
+        response_type: "code",
+      });
+      return `https://www.instagram.com/oauth/authorize?${igParams.toString()}`;
+    }
+
     const params = new URLSearchParams({
       client_id: appId,
       redirect_uri: redirectUri,

@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import { logAudit } from "@/lib/audit/logger";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { uploadBufferToCloudinary } from "@/lib/storage/cloudinary";
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,16 +30,12 @@ export async function POST(req: NextRequest) {
         attachmentName = file.name;
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
-        const ext = path.extname(file.name) || ".png";
-        const cleanName = file.name
-          .replace(ext, "")
-          .replace(/[^a-zA-Z0-9_-]/g, "_")
-          .toLowerCase();
-        const fileName = `${Date.now()}_${cleanName}${ext}`;
-        const feedbackDir = path.join(process.cwd(), "public", "uploads", "feedback");
-        await mkdir(feedbackDir, { recursive: true });
-        await writeFile(path.join(feedbackDir, fileName), buffer);
-        savedAttachmentUrl = `/uploads/feedback/${fileName}`;
+        const uploadResult = await uploadBufferToCloudinary(buffer, {
+          filename: file.name,
+          mimeType: file.type,
+          folder: "pulsesocial/feedback",
+        });
+        savedAttachmentUrl = uploadResult.url;
       }
     } else {
       const body = await req.json().catch(() => ({}));
@@ -59,16 +54,12 @@ export async function POST(req: NextRequest) {
         const matches = dataUrl.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
         if (matches && matches.length === 3) {
           const buffer = Buffer.from(matches[2], "base64");
-          const ext = path.extname(body.attachment.name || "") || ".png";
-          const cleanName = (body.attachment.name || "feedback_file")
-            .replace(ext, "")
-            .replace(/[^a-zA-Z0-9_-]/g, "_")
-            .toLowerCase();
-          const fileName = `${Date.now()}_${cleanName}${ext}`;
-          const feedbackDir = path.join(process.cwd(), "public", "uploads", "feedback");
-          await mkdir(feedbackDir, { recursive: true });
-          await writeFile(path.join(feedbackDir, fileName), buffer);
-          savedAttachmentUrl = `/uploads/feedback/${fileName}`;
+          const uploadResult = await uploadBufferToCloudinary(buffer, {
+            filename: body.attachment.name || "feedback_file",
+            mimeType: matches[1],
+            folder: "pulsesocial/feedback",
+          });
+          savedAttachmentUrl = uploadResult.url;
         }
       }
     }

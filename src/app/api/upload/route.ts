@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 import { getSession } from "@/lib/auth/session";
+import { uploadBufferToCloudinary } from "@/lib/storage/cloudinary";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {
@@ -45,7 +45,9 @@ export async function POST(req: Request) {
 
     if (!isImage && !isVideo) {
       return NextResponse.json(
-        { error: `Unsupported media format (${file.type || "unknown"}). Please upload JPG, PNG, WEBP, GIF, MP4, or WebM.` },
+        {
+          error: `Unsupported media format (${file.type || "unknown"}). Please upload JPG, PNG, WEBP, GIF, MP4, or WebM.`,
+        },
         { status: 400 }
       );
     }
@@ -62,34 +64,50 @@ export async function POST(req: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Sanitize filename
-    const ext = path.extname(file.name) || (isVideo ? ".mp4" : ".png");
-    const cleanName = file.name
-      .replace(ext, "")
-      .replace(/[^a-zA-Z0-9_-]/g, "_")
-      .toLowerCase();
-    const fileName = `${Date.now()}_${cleanName}${ext}`;
+    // Direct Cloudinary upload via streaming buffer (prevents serverless EROFS read-only disk error)
+    const uploadResult = await uploadBufferToCloudinary(buffer, {
+      filename: file.name,
+      mimeType: file.type,
+      folder: "pulsesocial/uploads",
+      resourceType: isVideo ? "video" : "image",
+    });
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadDir, { recursive: true });
-    const filePath = path.join(uploadDir, fileName);
-
-    await writeFile(filePath, buffer);
-
-    const publicUrl = `/uploads/${fileName}`;
+    // Optionally save to MediaAsset table for workspace asset library
+    if (session.activeOrgId) {
+      try {
+        await prisma.mediaAsset.create({
+          data: {
+            organizationId: session.activeOrgId,
+            fileName: file.name,
+            url: uploadResult.url,
+            fileType: isVideo ? "VIDEO" : "IMAGE",
+            mimeType: file.type,
+            sizeBytes: uploadResult.bytes || file.size,
+            folder: "uploads",
+          },
+        });
+      } catch (assetErr) {
+        // Non-blocking: ensure upload succeeds even if asset catalog indexing is optional
+        console.warn("Could not index media asset in workspace catalog:", assetErr);
+      }
+    }
 
     return NextResponse.json({
       success: true,
-      url: publicUrl,
-      fileName,
-      size: file.size,
+      url: uploadResult.url,
+      fileName: file.name,
+      size: uploadResult.bytes || file.size,
       mimeType: file.type,
       mediaType: isVideo ? "video" : "image",
+      publicId: uploadResult.publicId,
+      width: uploadResult.width,
+      height: uploadResult.height,
+      format: uploadResult.format,
     });
   } catch (error: unknown) {
-    console.error("Upload failed:", error);
+    console.error("Cloudinary upload failed:", error);
     return NextResponse.json(
-      { error: (error as Error).message || "Failed to upload file" },
+      { error: (error as Error).message || "Failed to upload file to Cloudinary" },
       { status: 500 }
     );
   }

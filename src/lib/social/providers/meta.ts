@@ -105,17 +105,22 @@ export class MetaProvider implements SocialProvider {
       }
     }
 
-    if (this.platform === "instagram") {
+    // Check if a dedicated Instagram App ID is configured
+    const dedicatedIgAppId = process.env.INSTAGRAM_APP_ID || process.env.INSTAGRAM_CLIENT_ID;
+
+    if (this.platform === "instagram" && dedicatedIgAppId) {
       const igParams = new URLSearchParams({
-        client_id: appId,
+        client_id: dedicatedIgAppId,
         redirect_uri: redirectUri,
         state,
-        scope: scopes,
+        scope: "user_profile,user_media",
         response_type: "code",
       });
-      return `https://www.instagram.com/oauth/authorize?${igParams.toString()}`;
+      return `https://api.instagram.com/oauth/authorize?${igParams.toString()}`;
     }
 
+    // Default Meta Graph API OAuth dialog for Facebook Pages and Instagram Professional/Creator accounts
+    // Note: Meta Graph API (publishing, insights, reels) requires authenticating via Facebook Login dialog
     const params = new URLSearchParams({
       client_id: appId,
       redirect_uri: redirectUri,

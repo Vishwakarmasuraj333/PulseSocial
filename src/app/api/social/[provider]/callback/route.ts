@@ -279,9 +279,10 @@ export async function GET(
   <script>
     try {
       if (window.opener && !window.opener.closed) {
+        var accountsList = ${JSON.stringify(connectedSocialAccounts)};
         window.opener.postMessage({
           type: "PULSESOCIAL_CHANNEL_CONNECTED",
-          account: connectedSocialAccounts[0] || {
+          account: accountsList[0] || {
             id: "",
             platform: "${platformKey}",
             displayName: ${JSON.stringify(primaryAccount.displayName)},
@@ -291,7 +292,7 @@ export async function GET(
             scopes: ${JSON.stringify(tokenResult.scopes || [])},
             metadata: ${JSON.stringify(primaryAccount.metadata || {})}
           },
-          accounts: ${JSON.stringify(connectedSocialAccounts)}
+          accounts: accountsList
         }, "*");
         setTimeout(function() { window.close(); }, 800);
       } else {

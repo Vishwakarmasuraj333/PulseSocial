@@ -25,10 +25,23 @@ export async function GET(
     const errorParam = url.searchParams.get("error") || url.searchParams.get("error_reason");
     const errorDesc = url.searchParams.get("error_description") || url.searchParams.get("error_message");
 
+    const rawKey = provider.toLowerCase();
+    const platformKey = (
+      rawKey === "google" || rawKey === "google-business"
+        ? "google_business"
+        : rawKey === "twitter"
+        ? "x"
+        : rawKey
+    ) as SupportedPlatform;
+
     if (errorParam) {
+      let friendlyError = errorDesc || errorParam;
+      if (rawKey === "linkedin" && (errorParam.includes("scope") || errorDesc?.toLowerCase().includes("scope"))) {
+        friendlyError = "LinkedIn OAuth Error: Required scopes are not enabled on your LinkedIn App. In LinkedIn Developer Portal -> Products tab, click 'Request access' for 'Share on LinkedIn' and 'Sign In with LinkedIn using OpenID Connect'.";
+      }
       return NextResponse.redirect(
         new URL(
-          `/onboarding/socials?error=${encodeURIComponent(errorDesc || errorParam)}`,
+          `/onboarding/socials?error=${encodeURIComponent(friendlyError)}`,
           req.url
         )
       );
@@ -40,15 +53,6 @@ export async function GET(
         new URL(`/onboarding/socials?error=${encodeURIComponent(reason)}`, req.url)
       );
     }
-
-    const rawKey = provider.toLowerCase();
-    const platformKey = (
-      rawKey === "google" || rawKey === "google-business"
-        ? "google_business"
-        : rawKey === "twitter"
-        ? "x"
-        : rawKey
-    ) as SupportedPlatform;
     const socialProvider = getSocialProvider(platformKey);
 
     // Retrieve active organization

@@ -35,7 +35,9 @@ export class LinkedInProvider implements SocialProvider {
   getAuthorizationUrl(state: string, redirectUri: string): string {
     if (!this.isConfigured()) throw new Error(this.getMissingConfigMessage());
 
-    const scopes = ["openid", "profile", "email", "w_member_social"].join(" ");
+    const scopes = process.env.LINKEDIN_OAUTH_SCOPES
+      ? process.env.LINKEDIN_OAUTH_SCOPES.split(" ").filter(Boolean).join(" ")
+      : ["openid", "profile", "email", "w_member_social"].join(" ");
     const params = new URLSearchParams({
       response_type: "code",
       client_id: process.env.LINKEDIN_CLIENT_ID!,

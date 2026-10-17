@@ -13,6 +13,10 @@ import { runSocialMetricsNullTest } from "./unit/social-metrics-null.test";
 import { runWebhooksAndSsrfTests } from "./unit/webhooks-and-ssrf.test";
 import { runMetaApiIntegrationTests } from "./integration/meta-api.test";
 import { runAdminAndActivityLoggingTests } from "./unit/admin-and-activity-logging.test";
+import { runStudioComposerAndHubUnitTests } from "./unit/studio-composer-and-hub.test";
+import { runFooterAndLinkedInPreviewUnitTests } from "./unit/footer-and-linkedin-preview.test";
+import { runHeaderAndDemoRemovalUnitTests } from "./unit/header-and-demo-removal.test";
+import { runPostsQueueSingleSidebarUnitTests } from "./unit/posts-queue-single-sidebar.test";
 import { prisma } from "../src/lib/prisma";
 
 async function main() {
@@ -22,7 +26,7 @@ async function main() {
 
   const startTime = Date.now();
   let passedSuites = 0;
-  const totalSuites = 15;
+  const totalSuites = 19;
 
   const baseUrl = process.env.BASE_URL || (process.env.APP_URL || "https://pulsesocial1.vercel.app");
   process.env.BASE_URL = baseUrl;
@@ -71,6 +75,22 @@ async function main() {
 
     // Suite 10: Admin Panel & Activity Logging Integrity
     await runAdminAndActivityLoggingTests();
+    passedSuites++;
+
+    // Suite 16: Studio Composer & Centralized Connections Hub Contracts
+    await runStudioComposerAndHubUnitTests();
+    passedSuites++;
+
+    // Suite 17: Complete Footer Audit & LinkedIn Preview Verification
+    await runFooterAndLinkedInPreviewUnitTests();
+    passedSuites++;
+
+    // Suite 18: Professional Header Redesign & Demo Removal Verification
+    await runHeaderAndDemoRemovalUnitTests();
+    passedSuites++;
+
+    // Suite 19: Posts & Queue Single Sidebar & Unified Workspace Verification
+    await runPostsQueueSingleSidebarUnitTests();
     passedSuites++;
 
     // HTTP Integration Suites

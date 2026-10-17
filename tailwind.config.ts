@@ -43,6 +43,26 @@ const config: Config = {
         border: "var(--border)",
         input: "var(--input)",
         ring: "var(--ring)",
+        slate: {
+          750: "#243044",
+          850: "#131c2e",
+        },
+        obsidian: {
+          DEFAULT: "#0D0D0E",
+          canvas: "#0D0D0E",
+          surface: "#17171A",
+          card: "#17171A",
+          popover: "#1C1C20",
+          border: "rgba(255, 255, 255, 0.07)",
+        },
+        warmAmber: {
+          DEFAULT: "#E08738",
+          primary: "#E08738",
+          hover: "#D97706",
+          gradient: "#F59E0B",
+          glow: "rgba(224, 135, 56, 0.35)",
+          subdued: "rgba(245, 158, 11, 0.12)",
+        },
         pulse: {
           DEFAULT: "#8B6BD6",
           primary: "#8B6BD6",

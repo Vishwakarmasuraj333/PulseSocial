@@ -616,7 +616,7 @@ export function RealLocationMapModal({
             <button
               type="button"
               onClick={handleConfirm}
-              className="px-5 py-1.5 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white text-xs font-bold shadow-md shadow-purple-900/20 transition cursor-pointer flex items-center gap-1.5 active:scale-95"
+              className="px-5 py-1.5 rounded-xl bg-gradient-to-r from-[#F59E0B] via-[#E08738] to-[#D97706] hover:brightness-105 text-slate-950 text-xs font-bold shadow-md shadow-amber-500/25 transition cursor-pointer flex items-center gap-1.5 active:scale-95"
             >
               <Check className="w-3.5 h-3.5" />
               <span>Attach Geotag Location</span>

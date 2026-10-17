@@ -13,15 +13,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-indigo-600 text-white shadow hover:bg-indigo-700 active:bg-indigo-800",
+          "bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 dark:bg-gradient-to-r dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:hover:brightness-105 dark:text-slate-950 font-bold dark:shadow-amber-500/25 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-200 cursor-pointer",
         destructive:
-          "bg-red-500 text-white shadow-sm hover:bg-red-600 active:bg-red-700",
+          "bg-red-500 text-white shadow-sm hover:bg-red-600 active:bg-red-700 hover:-translate-y-0.5 active:scale-95 transition-all duration-200 cursor-pointer",
         outline:
-          "border border-slate-200 bg-white text-slate-800 shadow-sm hover:bg-slate-50 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800",
+          "border border-slate-200 bg-white text-slate-800 shadow-2xs hover:bg-purple-50 hover:text-[#5846A8] hover:border-purple-200 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-white/5 dark:hover:text-[#FBBF24] dark:hover:border-amber-500/30 hover:-translate-y-0.5 active:scale-95 transition-all duration-200 cursor-pointer",
         secondary:
-          "bg-slate-100 text-slate-900 shadow-sm hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-100",
-        ghost: "hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-100",
-        link: "text-indigo-600 underline-offset-4 hover:underline",
+          "bg-purple-50 text-[#5846A8] border border-purple-200/80 shadow-2xs hover:bg-purple-100 dark:bg-amber-500/10 dark:text-[#FBBF24] dark:border-amber-500/30 dark:hover:bg-amber-500/20 hover:-translate-y-0.5 active:scale-95 transition-all duration-200 cursor-pointer",
+        ghost: "hover:bg-purple-50 hover:text-[#5846A8] dark:hover:bg-white/5 dark:hover:text-[#FBBF24] transition-all duration-200 cursor-pointer",
+        link: "text-[#5846A8] dark:text-[#FBBF24] underline-offset-4 hover:underline cursor-pointer",
       },
       size: {
         default: "h-9 px-4 py-2",

@@ -14,6 +14,8 @@ import {
   Sparkles,
   Lock,
 } from "lucide-react";
+import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
+import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
 
 interface SocialChannel {
   id: string;
@@ -284,6 +286,60 @@ export function PulseSocialSidebar() {
         "Boost, favorite & reply synchronization across federated instances",
       ],
     },
+    {
+      id: "snapchat",
+      name: "Snapchat",
+      tagline: "Spotlight Videos, Public Stories & Audience Reach",
+      color: "#FFFC00",
+      glow: "rgba(255, 252, 0, 0.45)",
+      logo: "/images/social/logos/snapchat-icon.svg",
+      badge: "Snap Kit Partner",
+      apiProtocol: "Snapchat Creative Kit & Marketing API v1",
+      latency: "15ms Gateway SLA",
+      uptime: "99.98% Uptime",
+      features: [
+        "Spotlight short-form video publishing with music tags",
+        "Public story broadcast and scheduled story rollouts",
+        "Subscriber growth, story view retention and completion rate",
+        "Bitmoji-integrated verified creator audience responses",
+      ],
+    },
+    {
+      id: "pinterest",
+      name: "Pinterest",
+      tagline: "Visual Pins, Destination Links & Rich Boards",
+      color: "#E60023",
+      glow: "rgba(230, 0, 35, 0.45)",
+      logo: "/images/social/logos/pinterest-icon.svg",
+      badge: "Pinterest API v5",
+      apiProtocol: "Pinterest Developer REST API v5",
+      latency: "16ms Gateway SLA",
+      uptime: "99.99% Uptime",
+      features: [
+        "Direct high-resolution Pin publishing with rich metadata",
+        "Targeted board selection and board section organizer",
+        "Outbound referral link tracking and SEO engagement velocity",
+        "Rich analytics for impressions, saves, and outbound clicks",
+      ],
+    },
+    {
+      id: "reddit",
+      name: "Reddit",
+      tagline: "Subreddit Submissions, Text Posts & Discussions",
+      color: "#FF4500",
+      glow: "rgba(255, 69, 0, 0.45)",
+      logo: "/images/social/logos/reddit-icon.svg",
+      badge: "Reddit API Ready",
+      apiProtocol: "Reddit OAuth 2.0 API & Subreddit Gateway",
+      latency: "14ms Gateway SLA",
+      uptime: "99.98% Uptime",
+      features: [
+        "Targeted subreddit posting with flair and spoiler tags",
+        "Community discussions, karma tracking and upvote monitoring",
+        "Scheduled AMA and announcement threads across multiple subreddits",
+        "Rich Markdown formatting with media attachments",
+      ],
+    },
   ];
 
   return (
@@ -295,16 +351,14 @@ export function PulseSocialSidebar() {
         <div className="fixed right-0 top-1/2 -translate-y-1/2 z-40 select-none">
           <button
             onClick={() => setIsOpen(true)}
-            className="flex items-center gap-2 pl-2.5 pr-2 py-3 rounded-l-2xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white border border-r-0 border-slate-200/90 dark:border-slate-800 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:pl-3 hover:shadow-2xl transition-all duration-300 group cursor-pointer"
+            className="flex items-center gap-2 pl-2.5 pr-2.5 py-2.5 rounded-l-2xl bg-white dark:bg-[#17171A] text-slate-800 dark:text-white border border-r-0 border-slate-200/90 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:pl-3.5 hover:shadow-2xl transition-all duration-300 group cursor-pointer"
             title="Open connected social channels dock"
             aria-label="Open connected channels"
           >
-            <ChevronLeft className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:-translate-x-0.5 transition-all" />
-            <div className="relative">
-              <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#1E3A8A] via-[#2E3788] to-[#4F46E5] flex items-center justify-center text-white font-black text-[11px] shadow-sm">
-                PS
-              </div>
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-purple-500 rounded-full border-2 border-white dark:border-slate-900 animate-pulse" />
+            <ChevronLeft className="w-4 h-4 text-slate-400 group-hover:text-[#5846A8] dark:group-hover:text-[#FBBF24] group-hover:-translate-x-0.5 transition-all" />
+            <div className="relative group-hover:scale-105 transition-transform">
+              <PulseSocialLogo size="sm" variant="icon" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white dark:border-[#17171A] animate-pulse" />
             </div>
           </button>
         </div>
@@ -334,10 +388,8 @@ export function PulseSocialSidebar() {
               {/* Header with PS Logo and Close */}
               <div className="flex items-center justify-between w-full px-1 pb-1.5 border-b border-slate-200/70 dark:border-slate-800/90">
                 <div className="relative">
-                  <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#1E3A8A] via-[#2E3788] to-[#4F46E5] flex items-center justify-center text-white font-black text-[10px] shadow-sm">
-                    PS
-                  </div>
-                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-purple-500 rounded-full border border-white dark:border-slate-900 animate-pulse" />
+                  <PulseSocialLogo size="xs" variant="icon" />
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full border border-white dark:border-slate-900 animate-pulse" />
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
@@ -369,13 +421,9 @@ export function PulseSocialSidebar() {
                           borderColor: isHovered ? ch.color : undefined,
                         }}
                       >
-                        <Image
-                          src={ch.logo}
-                          alt={ch.name}
-                          width={18}
-                          height={18}
-                          className="w-4.5 h-4.5 object-contain transition-transform duration-200 group-hover:scale-110"
-                        />
+                        <div className="w-5 h-5 flex items-center justify-center transition-transform duration-200 group-hover:scale-110 shrink-0">
+                          {renderPlatformIcon(ch.id, 18)}
+                        </div>
 
                         {isHovered && (
                           <span
@@ -445,13 +493,7 @@ export function PulseSocialSidebar() {
               <div className="flex items-center justify-between relative z-10">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md p-2 flex items-center justify-center border border-white/30 shadow-md">
-                    <Image
-                      src={activeModalChannel.logo}
-                      alt={activeModalChannel.name}
-                      width={32}
-                      height={32}
-                      className="w-8 h-8 object-contain"
-                    />
+                    {renderPlatformIcon(activeModalChannel.id, 28)}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">

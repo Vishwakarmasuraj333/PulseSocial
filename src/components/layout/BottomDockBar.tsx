@@ -320,7 +320,11 @@ export function BottomDockBar() {
       {/* ============================================================ */}
       {/* STICKY BOTTOM DOCK BAR: Positioned to the right of sidebar   */}
       {/* ============================================================ */}
-      <footer className="fixed bottom-0 lg:left-64 left-0 right-0 z-40 h-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/90 dark:border-slate-800 flex items-center justify-between px-4 text-xs select-none shadow-[0_-2px_12px_rgba(0,0,0,0.04)] font-sans transition-all duration-300">
+      <div
+        role="toolbar"
+        aria-label="Workspace Quick Dock"
+        className="fixed bottom-0 lg:left-64 left-0 right-0 z-30 h-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/90 dark:border-slate-800 flex items-center justify-between px-4 text-xs select-none shadow-[0_-2px_12px_rgba(0,0,0,0.04)] font-sans transition-all duration-300"
+      >
         
         {/* Left Action Items: Pins, Chats, Contacts */}
         <div className="flex items-center gap-1.5 sm:gap-2.5">
@@ -456,7 +460,7 @@ export function BottomDockBar() {
             <span>Feedback</span>
           </button>
         </div>
-      </footer>
+      </div>
 
       {/* ============================================================ */}
       {/* 1. MY PINS DRAWER (Fully Visible Beside Sidebar)             */}

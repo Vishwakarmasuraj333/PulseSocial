@@ -146,7 +146,7 @@ export class GoogleBusinessProvider implements SocialProvider {
         const isAuth = res.status === 401;
         return {
           success: false,
-          code: isForbidden ? "GBP_APPROVAL_REQUIRED" : isAuth ? "TOKEN_EXPIRED" : "GBP_API_ERROR",
+          code: isForbidden ? "GOOGLE_APPROVAL_REQUIRED" : isAuth ? "TOKEN_EXPIRED" : "GOOGLE_API_ERROR",
           requiresApproval: isForbidden,
           requiresReauth: isAuth,
           capabilityState: isForbidden ? "APPROVAL REQUIRED" : undefined,

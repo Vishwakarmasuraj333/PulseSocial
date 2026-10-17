@@ -372,11 +372,19 @@ export function renderPlatformIcon(
       return <XIcon size={size} className={cls} />;
     case "linkedin":
       return <LinkedInIcon size={size} className={cls} />;
+    case "twitter":
+      return <TwitterIcon size={size} className={cls} />;
+    case "x":
+      return <XIcon size={size} className={cls} />;
+    case "linkedin":
+      return <LinkedInIcon size={size} className={cls} />;
     case "instagram":
       return <InstagramIcon size={size} className={cls} />;
     case "google":
-    case "google_business":
       return <GoogleIcon size={size} className={cls} />;
+    case "google_business":
+    case "google_business_profile":
+      return <GoogleStorefrontIcon size={size} className={cls} />;
     case "youtube":
       return <YouTubeIcon size={size} className={cls} />;
     case "pinterest":
@@ -402,10 +410,14 @@ export function renderPlatformIcon(
     case "mastodon":
     case "lemon8":
     case "golden":
-      return <MastodonIcon size={size} className={cls} />;
-    case "google":
-    case "google_business":
-      return <GoogleBusinessIcon size={size} className={cls} />;
+      return <MastodonOfficialIcon size={size} className={cls} />;
+    case "shopify":
+      return <ShopifyIcon size={size} className={cls} />;
+    case "start_page":
+    case "startpage":
+      return <StartPageIcon size={size} className={cls} />;
+    case "discord":
+      return <DiscordIcon size={size} className={cls} />;
     default:
       return (
         <div
@@ -425,6 +437,90 @@ export function GoogleBusinessIcon({ className = "w-5 h-5", size }: IconProps) {
       <circle cx="12" cy="12" r="11.5" fill="#4285F4" stroke="#3367D6" strokeWidth="1" />
       <path
         d="M12 5C8.13 5 5 8.13 5 12c0 3.87 3.13 7 7 7 3.87 0 7-3.13 7-7 0-.54-.06-1.07-.18-1.57H12v3.14h4.05c-.35 1.15-1.28 2.01-2.45 2.29-.44.1-.9.14-1.6.14-2.21 0-4-1.79-4-4s1.79-4 4-4c1.08 0 2.06.43 2.77 1.13l2.22-2.22C16.5 7.42 14.39 6.5 12 6.5V5z"
+        fill="#FFFFFF"
+      />
+    </svg>
+  );
+}
+
+// Twitter (Bird Glyph)
+export function TwitterIcon({ className = "w-5 h-5", size }: IconProps) {
+  const s = size || 20;
+  return (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" className={className}>
+      <circle cx="12" cy="12" r="12" fill="#1DA1F2" />
+      <path
+        d="M17.5 8.1c-.4.2-.9.3-1.4.4.5-.3.9-.8 1.1-1.3-.5.3-1 .5-1.6.6-.5-.5-1.1-.8-1.9-.8-1.4 0-2.6 1.2-2.6 2.6 0 .2 0 .4.1.6-2.2-.1-4.1-1.2-5.4-2.8-.2.4-.3.8-.3 1.3 0 .9.5 1.7 1.2 2.1-.4 0-.8-.1-1.2-.3v.1c0 1.3.9 2.3 2.1 2.5-.2.1-.5.1-.7.1-.2 0-.3 0-.5-.1.3 1.1 1.4 1.9 2.6 1.9-1 .8-2.2 1.2-3.6 1.2-.2 0-.5 0-.7 0 1.3.8 2.8 1.3 4.4 1.3 5.3 0 8.2-4.4 8.2-8.2v-.4c.5-.3 1-.8 1.3-1.4z"
+        fill="#FFFFFF"
+      />
+    </svg>
+  );
+}
+
+// Mastodon (Official Indigo #6364FF Elephant Glyph)
+export function MastodonOfficialIcon({ className = "w-5 h-5", size }: IconProps) {
+  const s = size || 20;
+  return (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" className={className}>
+      <circle cx="12" cy="12" r="12" fill="#6364FF" />
+      <path
+        d="M17.2 11.4c-.1-1.8-.9-3.6-2.8-4-1.2-.3-2.6-.3-3.9-.3-1.4 0-2.8 0-4 .3-1.9.4-2.7 2.2-2.8 4-.1 1.3 0 2.6.2 3.8.3 1.5 1.7 2.7 3.3 2.9 1.1.1 2.1 0 3.2-.2v-1.2c-.8.1-1.7.2-2.5.1-.9-.1-1.4-.5-1.5-1.3h5.9c1.6 0 2.8-.6 3-2.2.1-.6.1-1.3.1-1.9zm-2.2 1.3h-1.6V9.4c0-.7-.3-1-1-1-.6 0-.9.3-.9 1v2.1h-1.5V9.4c0-.7-.3-1-.9-1-.7 0-1 .3-1 1v3.3H6.5v-3c0-1.4.7-2.1 2-2.1.8 0 1.5.4 1.8 1.1.3-.7 1-1.1 1.8-1.1 1.3 0 2 .7 2 2.1v3.3z"
+        fill="#FFFFFF"
+      />
+    </svg>
+  );
+}
+
+// Google Business Profile Storefront Glyph
+export function GoogleStorefrontIcon({ className = "w-5 h-5", size }: IconProps) {
+  const s = size || 20;
+  return (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" className={className}>
+      <circle cx="12" cy="12" r="12" fill="#4285F4" />
+      <path
+        d="M7 9.5l1-3h8l1 3v1c0 .6-.4 1-1 1s-1-.4-1-1v-.5c0 .6-.4 1-1 1s-1-.4-1-1v-.5c0 .6-.4 1-1 1s-1-.4-1-1v-.5c0 .6-.4 1-1 1s-1-.4-1-1v-.5c0 .6-.4 1-1 1s-1-.4-1-1v-1zm1.5 3.5v4.5h7V13h-7zm2 1.5h3v2h-3v-2z"
+        fill="#FFFFFF"
+      />
+    </svg>
+  );
+}
+
+// Shopify (Olive-Green #96BF48 Bag & 'S')
+export function ShopifyIcon({ className = "w-5 h-5", size }: IconProps) {
+  const s = size || 20;
+  return (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" className={className}>
+      <circle cx="12" cy="12" r="12" fill="#96BF48" />
+      <path
+        d="M14.2 7.2l-1.3-.3s-.3 0-.4.3l-.2.4s-.3-.3-.8-.3c-.8 0-1.2.7-1.3 1.3-.1.7.4 1.2 1 1.5.8.3 1.2.6 1.1 1.1-.1.5-.6.9-1.2.9-.6 0-1.1-.4-1.3-.7l-.4.7c.3.5 1 .9 1.8.9 1.1 0 1.8-.8 1.9-1.7.1-.9-.5-1.5-1.3-1.8-.7-.3-1-.6-.9-1 .1-.4.5-.7 1-.7.4 0 .7.2.9.4l.7-.7zm1.8 1.5l-3.2-.6-1 .2-1.9.4s-.7 5.2-.8 5.7c-.1.5.3.6.3.6l4.2.8 3.1-.7s.2-.4.1-.9l-.8-5.5zm-3.8-.4c-.1-.3 0-.7.3-.9.3-.2.8-.3 1.1-.3l.1.7-.6.2-.9.3z"
+        fill="#FFFFFF"
+      />
+    </svg>
+  );
+}
+
+// Start Page (Shareable Landing Page Mark)
+export function StartPageIcon({ className = "w-5 h-5", size }: IconProps) {
+  const s = size || 20;
+  return (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" className={className}>
+      <circle cx="12" cy="12" r="12" fill="#2563EB" />
+      <rect x="7" y="6" width="10" height="12" rx="1.5" stroke="#FFFFFF" strokeWidth="1.3" fill="none" />
+      <rect x="9" y="8" width="6" height="3" rx="0.5" fill="#FFFFFF" />
+      <line x1="9" y1="13" x2="15" y2="13" stroke="#FFFFFF" strokeWidth="1.2" strokeLinecap="round" />
+      <line x1="9" y1="15.5" x2="13" y2="15.5" stroke="#FFFFFF" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+// 21. Discord: Official Discord blurple circle with authentic white Clyde vector mark
+export function DiscordIcon({ className = "w-5 h-5", size }: IconProps) {
+  const s = size || 20;
+  return (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" className={className}>
+      <circle cx="12" cy="12" r="12" fill="#5865F2" />
+      <path
+        d="M16.92 7.74C15.99 7.31 14.98 7 13.93 6.82a.06.06 0 0 0-.05.02c-.13.23-.27.53-.37.76a11.26 11.26 0 0 0-3.36 0c-.1-.24-.25-.53-.38-.76a.06.06 0 0 0-.05-.02c-1.05.18-2.05.49-2.99.92a.05.05 0 0 0-.02.02c-1.9 2.85-2.43 5.62-2.17 8.36 0 .01.01.03.02.04 1.26.92 2.47 1.48 3.67 1.85.02.01.04 0 .05-.01.28-.39.53-.79.75-1.22.01-.03 0-.06-.03-.06-.4-.15-.78-.34-1.15-.55-.03-.01-.03-.06-.01-.08.08-.06.15-.12.23-.17.01-.01.03-.01.05-.01 2.41 1.1 5.01 1.1 7.39 0 .01 0 .03 0 .05.01.08.06.15.12.23.18.03.02.03.07-.01.08-.36.21-.75.4-1.15.55-.03.01-.04.04-.03.06.22.43.48.83.75 1.22.02.01.04.02.06.01 1.2-.37 2.42-.93 3.68-1.85.01-.01.02-.02.02-.04.31-3.17-.51-5.92-2.17-8.36 0-.01-.01-.02-.03-.02zM9.4 14.44c-.72 0-1.32-.66-1.32-1.48 0-.82.59-1.48 1.32-1.48.74 0 1.33.67 1.32 1.48 0 .82-.58 1.48-1.32 1.48zm5.2 0c-.72 0-1.32-.66-1.32-1.48 0-.82.59-1.48 1.32-1.48.74 0 1.33.67 1.32 1.48 0 .82-.58 1.48-1.32 1.48z"
         fill="#FFFFFF"
       />
     </svg>

@@ -36,7 +36,7 @@ const DEFAULT_BRANDS: Brand[] = [
     connectedAccountsCount: 2,
     socialAccounts: [],
     industry: "Digital Media & Technology",
-    color: "#5846A8",
+    color: "#E08738",
     createdAt: "2026-01-15T10:00:00Z",
   },
 ];
@@ -79,7 +79,7 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
             industry: b.description || "Digital Media & Tech",
             description: b.description || "",
             timezone: b.timezone || "Asia/Kolkata",
-            color: "#2563eb",
+            color: b.color || "#E08738",
             createdAt: b.createdAt || new Date().toISOString(),
           }));
 
@@ -118,7 +118,7 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
             industry: "Enterprise Media",
             description: "",
             timezone: org.timezone || "Asia/Kolkata",
-            color: "#2563eb",
+            color: org.color || "#E08738",
             createdAt: org.createdAt || new Date().toISOString(),
           };
 
@@ -189,7 +189,7 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
             avatarUrl: json.brand.avatarUrl || data.avatarUrl || "",
             connectedAccountsCount: 0,
             industry: data.industry || "Digital Media",
-            color: data.color || "#2563eb",
+            color: data.color || "#E08738",
             createdAt: json.brand.createdAt || new Date().toISOString(),
           };
 

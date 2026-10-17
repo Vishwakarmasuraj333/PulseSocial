@@ -1,658 +1,735 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
+import React, { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import {
   X,
   ExternalLink,
   Check,
-  ShieldCheck,
-  CheckCircle2,
   Loader2,
   AlertCircle,
-  RefreshCw,
-  Lock,
-  ArrowRight,
-  ShieldAlert,
-  Copy,
+  ArrowLeft,
+  Key,
+  ShieldCheck,
+  Radio,
 } from "lucide-react";
 import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
 import { useToast } from "@/components/ui/toast";
 import { useBrand } from "@/context/BrandContext";
 
-export interface ChannelTabConfig {
+export interface ChannelCardConfig {
   id: string;
   name: string;
-  connectTitle: string;
+  subtitle: string;
+  badge?: string;
+  learnMoreUrl?: string;
+  actionText: string;
   buttonLabel: string;
   buttonClass: string;
   realOAuthUrl: string;
-  scopes: { name: string; description: string }[];
   description: string;
 }
 
-export const BRAND_CHANNELS: ChannelTabConfig[] = [
+export const CHANNELS_CATALOG: ChannelCardConfig[] = [
   {
     id: "youtube",
     name: "YouTube",
-    connectTitle: "Connect your official YouTube channel.",
+    subtitle: "Channel",
+    badge: "Official",
+    actionText: "Connect",
     buttonLabel: "Continue with YouTube",
-    buttonClass: "bg-[#FF0000] hover:bg-[#E60000] text-white",
+    buttonClass: "bg-[#FF0000] hover:bg-[#D90000] text-white shadow-xs hover:shadow-red-500/30",
     realOAuthUrl: "/api/social/youtube/connect",
-    description: "Connect your YouTube channel to schedule video uploads, manage Shorts, and analyze channel metrics.",
-    scopes: [
-      { name: "youtube.readonly", description: "View your YouTube account, channel statistics, and subscribers" },
-      { name: "youtube.upload", description: "Manage and publish approved videos and shorts" },
-      { name: "userinfo.profile", description: "Associate your authenticated YouTube channel profile" },
-    ],
-  },
-  {
-    id: "facebook",
-    name: "Facebook",
-    connectTitle: "Connect your official Facebook Page.",
-    buttonLabel: "Continue with Facebook",
-    buttonClass: "bg-[#1877F2] hover:bg-blue-700 text-white",
-    realOAuthUrl: "/api/social/facebook/connect",
-    description: "Connect your Facebook Pages to publish posts, schedule stories, and track audience engagement.",
-    scopes: [
-      { name: "pages_show_list", description: "Show the list of Facebook Pages you manage" },
-      { name: "pages_read_engagement", description: "Read follower metrics, reach, and performance analytics" },
-      { name: "pages_manage_posts", description: "Publish and schedule approved posts, photos, and reels" },
-    ],
+    description:
+      "Connect your YouTube channel to schedule video uploads, manage Shorts, and analyze channel metrics.",
   },
   {
     id: "instagram",
     name: "Instagram",
-    connectTitle: "Connect your official Instagram Professional Account.",
+    subtitle: "Business or Creator accounts",
+    badge: "Meta Direct",
+    learnMoreUrl: "https://help.instagram.com",
+    actionText: "Connect",
     buttonLabel: "Continue with Instagram",
-    buttonClass: "bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] hover:opacity-95 text-white",
+    buttonClass: "bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] hover:opacity-95 text-white shadow-xs hover:shadow-pink-500/30",
     realOAuthUrl: "/api/social/instagram/connect",
-    description: "Connect your Instagram Professional Account for photo, reel, and carousel publishing.",
-    scopes: [
-      { name: "instagram_basic", description: "Read account profile, media objects, and basic details" },
-      { name: "instagram_content_publish", description: "Publish photos, reels, and stories automatically" },
-      { name: "instagram_manage_comments", description: "Moderate direct comments on published posts" },
-    ],
+    description:
+      "Connect your Instagram Professional or Creator account to publish photos, carousels, video Reels, and auto-first comments.",
+  },
+  {
+    id: "facebook",
+    name: "Facebook",
+    subtitle: "Page or Group",
+    badge: "Meta Direct",
+    actionText: "Connect",
+    buttonLabel: "Continue with Facebook",
+    buttonClass: "bg-[#1877F2] hover:bg-[#166fe5] text-white shadow-xs hover:shadow-blue-500/30",
+    realOAuthUrl: "/api/social/facebook/connect",
+    description:
+      "Connect your Facebook Business Pages or Groups to publish updates, albums, link previews, and Reels with reach analytics.",
+  },
+  {
+    id: "twitter",
+    name: "Twitter (X)",
+    subtitle: "Profile",
+    actionText: "Connect",
+    buttonLabel: "Continue with X",
+    buttonClass: "bg-black hover:bg-slate-900 text-white dark:bg-[#1DA1F2] dark:hover:bg-[#0c85d0] shadow-xs",
+    realOAuthUrl: "/api/social/x/connect",
+    description:
+      "Connect your X / Twitter profile to publish real-time tweets, multi-tweet threads, images, and videos with 280-char tracking.",
   },
   {
     id: "linkedin",
     name: "LinkedIn",
-    connectTitle: "Connect your official LinkedIn profile or Company Page.",
+    subtitle: "Page or Profile",
+    actionText: "Connect",
     buttonLabel: "Continue with LinkedIn",
-    buttonClass: "bg-[#0A66C2] hover:bg-blue-800 text-white",
+    buttonClass: "bg-[#0A66C2] hover:bg-[#084e96] text-white shadow-xs hover:shadow-blue-600/30",
     realOAuthUrl: "/api/social/linkedin/connect",
-    description: "Connect your LinkedIn profile or Company Page to share professional articles and updates.",
-    scopes: [
-      { name: "openid", description: "Authenticate your LinkedIn identity securely" },
-      { name: "profile", description: "Access your authorized name, profile photo, and headline" },
-      { name: "email", description: "Verify primary communication email address" },
-      { name: "w_member_social", description: "Publish posts, articles, and media on your behalf" },
-    ],
+    description:
+      "Connect your LinkedIn personal profile or company pages to publish thought-leadership articles, documents, and news.",
   },
   {
     id: "tiktok",
     name: "TikTok",
-    connectTitle: "Connect your official TikTok account.",
+    subtitle: "Business account",
+    learnMoreUrl: "https://support.tiktok.com/business",
+    actionText: "Connect",
     buttonLabel: "Continue with TikTok",
-    buttonClass: "bg-black hover:bg-slate-900 text-white",
+    buttonClass: "bg-black hover:bg-slate-900 text-white shadow-xs hover:shadow-slate-900/30",
     realOAuthUrl: "/api/social/tiktok/connect",
-    description: "Connect your TikTok account to manage and schedule short-form video publishing directly.",
-    scopes: [
-      { name: "user.info.basic", description: "Read your TikTok avatar, nickname, and account ID" },
-      { name: "video.upload", description: "Upload video content directly to your TikTok account" },
-      { name: "video.publish", description: "Publish verified videos to public feed" },
-    ],
-  },
-  {
-    id: "x",
-    name: "X (Twitter)",
-    connectTitle: "Connect your official X account.",
-    buttonLabel: "Continue with X",
-    buttonClass: "bg-black hover:bg-slate-900 text-white",
-    realOAuthUrl: "/api/social/x/connect",
-    description: "Connect your X profile to post updates, threads, and monitor mentions in real-time.",
-    scopes: [
-      { name: "tweet.read", description: "Read your timeline and published posts" },
-      { name: "tweet.write", description: "Post tweets, threads, and media on your behalf" },
-      { name: "users.read", description: "Read verified account follower count and profile" },
-      { name: "offline.access", description: "Maintain continuous token refresh for scheduled posts" },
-    ],
-  },
-  {
-    id: "google_business",
-    name: "Google Business Profile",
-    connectTitle: "Connect your official Google Business Profile.",
-    buttonLabel: "Continue with Google",
-    buttonClass: "bg-[#4285F4] hover:bg-blue-600 text-white",
-    realOAuthUrl: "/api/social/google_business/connect",
-    description: "Connect your Google Business listing to publish local customer posts, offers, and store updates.",
-    scopes: [
-      { name: "business.manage", description: "Manage listings, local customer posts, and business hours" },
-      { name: "userinfo.profile", description: "Identify verified business manager identity" },
-    ],
-  },
-  {
-    id: "mastodon",
-    name: "Mastodon",
-    connectTitle: "Connect your official Mastodon instance.",
-    buttonLabel: "Continue with Mastodon",
-    buttonClass: "bg-[#6364FF] hover:bg-[#5657E5] text-white",
-    realOAuthUrl: "/api/social/mastodon/connect",
-    description: "Connect your federated Mastodon instance to publish to the decentralized fediverse.",
-    scopes: [
-      { name: "read", description: "Read your public and private toots, mentions, and feeds" },
-      { name: "write", description: "Publish federated status updates, toots, and media" },
-      { name: "follow", description: "Manage follower relationships" },
-    ],
+    description:
+      "Connect your TikTok Business or Creator account to publish vertical video reels, schedule posts, and track viewer growth.",
   },
   {
     id: "snapchat",
     name: "Snapchat",
-    connectTitle: "Connect your official Snapchat Public Profile.",
+    subtitle: "Profile & Spotlight",
+    badge: "New",
+    actionText: "Connect",
     buttonLabel: "Continue with Snapchat",
-    buttonClass: "bg-[#FFFC00] hover:bg-[#F2EE00] text-black font-bold",
+    buttonClass: "bg-[#FFFC00] hover:bg-[#EBE800] text-slate-950 font-bold shadow-xs hover:shadow-yellow-500/30 border border-yellow-300",
     realOAuthUrl: "/api/social/snapchat/connect",
-    description: "Connect your Snapchat Public Profile to publish Stories, Spotlight videos, and track views.",
-    scopes: [
-      { name: "snap.profile", description: "Access display name, Bitmoji avatar, and profile handle" },
-      { name: "snap.story.write", description: "Schedule and auto-post Spotlight videos and story clips" },
-      { name: "snap.insights", description: "Track impressions, screenshot counts, and viewer reach" },
-    ],
+    description:
+      "Connect your Snapchat profile and public story accounts to publish spotlight videos, stories, and track subscriber growth.",
   },
   {
-    id: "threads",
-    name: "Threads",
-    connectTitle: "Connect your official Instagram Threads profile.",
-    buttonLabel: "Continue with Threads",
-    buttonClass: "bg-black hover:bg-slate-900 text-white font-semibold",
-    realOAuthUrl: "/api/social/threads/connect",
-    description: "Connect your Instagram Threads account for conversational microblogging and replies.",
-    scopes: [
-      { name: "threads_basic", description: "Access Threads username, follower metrics, and profile bio" },
-      { name: "threads_content_publish", description: "Post updates, images, and video threads to your feed" },
-      { name: "threads_read_replies", description: "Track conversation threads and reader comments" },
-    ],
+    id: "pinterest",
+    name: "Pinterest",
+    subtitle: "Business",
+    actionText: "Connect",
+    buttonLabel: "Continue with Pinterest",
+    buttonClass: "bg-[#E60023] hover:bg-[#CC001F] text-white shadow-xs hover:shadow-red-600/30",
+    realOAuthUrl: "/api/social/pinterest/connect",
+    description:
+      "Connect your Pinterest Business account to publish visual Pins, select targeted boards, and drive long-term organic traffic.",
   },
   {
     id: "whatsapp",
     name: "WhatsApp Business",
-    connectTitle: "Connect your verified WhatsApp Business Account (WABA).",
+    subtitle: "Platform Messaging",
+    badge: "Official",
+    actionText: "Connect",
     buttonLabel: "Continue with WhatsApp",
-    buttonClass: "bg-[#25D366] hover:bg-[#1EBE5D] text-white font-semibold",
+    buttonClass: "bg-[#25D366] hover:bg-[#1EBE5D] text-white shadow-xs hover:shadow-emerald-500/30",
     realOAuthUrl: "/api/social/whatsapp/connect",
-    description: "Connect your WhatsApp Business Cloud API to send broadcast messages and client updates.",
-    scopes: [
-      { name: "whatsapp_business_messaging", description: "Send verified announcements and customer updates" },
-      { name: "whatsapp_business_management", description: "Manage verified business profile information and catalogs" },
-    ],
+    description:
+      "Connect your WhatsApp Business API endpoint to broadcast verified campaign messages, media brochures, and customer updates.",
+  },
+  {
+    id: "threads",
+    name: "Threads",
+    subtitle: "Profile",
+    actionText: "Connect",
+    buttonLabel: "Continue with Threads",
+    buttonClass: "bg-black hover:bg-slate-900 text-white shadow-xs",
+    realOAuthUrl: "/api/social/threads/connect",
+    description:
+      "Connect your Instagram Threads profile to broadcast 500-character conversations, images, and short video clips.",
+  },
+  {
+    id: "google_business",
+    name: "Google Business Profile",
+    subtitle: "Account",
+    actionText: "Connect",
+    buttonLabel: "Continue with Google Business",
+    buttonClass: "bg-[#4285F4] hover:bg-[#3367D6] text-white shadow-xs hover:shadow-blue-500/30",
+    realOAuthUrl: "/api/social/google-business/connect",
+    description:
+      "Connect your Google Business Profile to publish local updates, offers, and photos directly to Google Search and Google Maps.",
   },
   {
     id: "reddit",
     name: "Reddit",
-    connectTitle: "Connect your official Reddit account.",
+    subtitle: "Subreddit Submissions",
+    actionText: "Connect",
     buttonLabel: "Continue with Reddit",
-    buttonClass: "bg-[#FF4500] hover:bg-[#E03D00] text-white font-semibold",
+    buttonClass: "bg-[#FF4500] hover:bg-[#D93A00] text-white shadow-xs hover:shadow-orange-500/30",
     realOAuthUrl: "/api/social/reddit/connect",
-    description: "Connect your Reddit account to share articles and links to subreddits and track karma.",
-    scopes: [
-      { name: "identity", description: "Authenticate your Reddit username and karma score" },
-      { name: "submit", description: "Publish text, links, and media to targeted subreddits" },
-      { name: "read", description: "Monitor upvote ratios, comments, and post performance" },
-    ],
-  },
-  {
-    id: "bluesky",
-    name: "Bluesky",
-    connectTitle: "Connect your official Bluesky account.",
-    buttonLabel: "Continue with Bluesky",
-    buttonClass: "bg-[#1185FE] hover:bg-[#0D70D8] text-white font-semibold",
-    realOAuthUrl: "/api/social/bluesky/connect",
-    description: "Connect your Bluesky profile to publish posts to the AT Protocol decentralized network.",
-    scopes: [
-      { name: "atproto.read", description: "Read public posts and profile feeds" },
-      { name: "atproto.write", description: "Publish posts, replies, and image media" },
-    ],
+    description:
+      "Connect your Reddit account to schedule posts across targeted subreddits, engage in community discussions, and track karma reach.",
   },
   {
     id: "telegram",
     name: "Telegram",
-    connectTitle: "Connect your official Telegram Channel.",
+    subtitle: "Channel or Bot",
+    actionText: "Connect",
     buttonLabel: "Continue with Telegram",
-    buttonClass: "bg-[#24A1DE] hover:bg-[#208DC3] text-white font-semibold",
+    buttonClass: "bg-[#24A1DE] hover:bg-[#1E8EC4] text-white shadow-xs hover:shadow-sky-500/30",
     realOAuthUrl: "/api/social/telegram/connect",
-    description: "Connect your Telegram Channel to broadcast announcements, articles, and media.",
-    scopes: [
-      { name: "bot_broadcast", description: "Send announcements and media to your official channel" },
-      { name: "channel_info", description: "Read subscriber counts and channel metrics" },
-    ],
+    description:
+      "Connect your official Telegram Channel via BotFather token to broadcast rich announcements and photos instantly.",
+  },
+  {
+    id: "bluesky",
+    name: "Bluesky",
+    subtitle: "Profile",
+    actionText: "Connect",
+    buttonLabel: "Continue with Bluesky",
+    buttonClass: "bg-[#1185FE] hover:bg-[#0A73DF] text-white shadow-xs hover:shadow-blue-500/30",
+    realOAuthUrl: "/api/social/bluesky/connect",
+    description:
+      "Connect your Bluesky handle to broadcast decentralized updates over the authenticated AT Protocol network.",
+  },
+  {
+    id: "mastodon",
+    name: "Mastodon",
+    subtitle: "Profile",
+    actionText: "Connect",
+    buttonLabel: "Continue with Mastodon",
+    buttonClass: "bg-[#6364FF] hover:bg-[#5253EA] text-white shadow-xs hover:shadow-indigo-500/30",
+    realOAuthUrl: "/api/social/mastodon/connect",
+    description:
+      "Connect your Mastodon profile on any instance to publish federated toots, attach media, and engage with the Fediverse.",
+  },
+  {
+    id: "shopify",
+    name: "Shopify",
+    subtitle: "Store",
+    actionText: "Connect",
+    buttonLabel: "Continue with Shopify",
+    buttonClass: "bg-[#96BF48] hover:bg-[#7ea23b] text-white shadow-xs hover:shadow-emerald-500/30",
+    realOAuthUrl: "/api/social/shopify/connect",
+    description:
+      "Connect your Shopify e-commerce store to sync product catalogs, publish new arrivals, and tag merchandise in social posts.",
+  },
+  {
+    id: "start_page",
+    name: "Start Page",
+    subtitle: "A shareable landing page",
+    actionText: "Create",
+    buttonLabel: "Create Start Page",
+    buttonClass: "bg-gradient-to-r from-[#F59E0B] via-[#E08738] to-[#D97706] hover:brightness-105 text-slate-950 font-bold shadow-xs",
+    realOAuthUrl: "/posts/new",
+    description:
+      "Build a beautiful, high-converting bio link landing page to showcase all your social channels and latest campaigns.",
   },
 ];
 
-export interface ConnectedAccountData {
-  id?: string;
-  platform: string;
-  displayName: string;
-  username?: string;
-  avatarUrl?: string;
-  providerAccountId?: string;
-  scopes?: string[];
-  followersCount?: number | null;
-  postsCount?: number | null;
-  metadata?: Record<string, any>;
-}
-
-interface UniversalSocialConnectModalProps {
+export interface UniversalSocialConnectModalProps {
+  isOpen?: boolean;
+  title?: string;
   platformId?: string;
   initialPlatformId?: string;
   defaultChannelId?: string;
-  title?: string;
-  isOpen: boolean;
   onClose: () => void;
-  onSuccess?: (channel?: any) => void;
-  onAccountConnected?: (channel?: any) => void;
+  onSuccess?: (accountData?: any) => void;
+  onAccountConnected?: (accountData?: any) => void;
 }
 
 export function UniversalSocialConnectModal({
+  isOpen = true,
   platformId,
   initialPlatformId,
   defaultChannelId,
-  isOpen,
   onClose,
   onSuccess,
   onAccountConnected,
 }: UniversalSocialConnectModalProps) {
+  const router = useRouter();
   const { toast } = useToast();
   const { activeBrand } = useBrand();
 
-  const selectedPlatform = initialPlatformId || defaultChannelId || platformId || "youtube";
-  const [activeTab, setActiveTab] = useState<string>(selectedPlatform);
-
-  useEffect(() => {
-    if (initialPlatformId || platformId || defaultChannelId) {
-      setActiveTab(initialPlatformId || platformId || defaultChannelId || "youtube");
-    }
-  }, [initialPlatformId, platformId, defaultChannelId]);
-
-  const [step, setStep] = useState<"connect" | "permissions" | "success">("connect");
-
-  // OAuth states
-  const [isOpeningOAuth, setIsOpeningOAuth] = useState(false);
-  const [isOAuthWaiting, setIsOAuthWaiting] = useState(false);
-  const [pendingAuthUrl, setPendingAuthUrl] = useState<string | null>(null);
+  const [connectedAccountProviders, setConnectedAccountProviders] = useState<Set<string>>(new Set());
+  const [connectingChannelId, setConnectingChannelId] = useState<string | null>(null);
   const [oauthError, setOauthError] = useState<string | null>(null);
+  const [fallbackUrl, setFallbackUrl] = useState<string | null>(null);
 
-  // Real connected account data
-  const [connectedAccount, setConnectedAccount] = useState<ConnectedAccountData | null>(null);
+  // Manual developer token input state
+  const [showManualToken, setShowManualToken] = useState(false);
+  const [manualPlatform, setManualPlatform] = useState("snapchat");
+  const [manualToken, setManualToken] = useState("");
+  const [isSubmittingToken, setIsSubmittingToken] = useState(false);
 
-  // Sync active tab with platformId/defaultChannelId when opened
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Load connected channels on open to mark cards as Connected
+  const loadConnectedAccounts = async () => {
+    try {
+      const res = await fetch("/api/social/accounts", { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        const provs = new Set<string>();
+        if (Array.isArray(data.accounts)) {
+          data.accounts.forEach((acc: any) => {
+            if (acc.provider) {
+              const p = acc.provider.toLowerCase();
+              provs.add(p);
+              if (p === "x") provs.add("twitter");
+              if (p === "twitter") provs.add("x");
+            }
+          });
+        }
+        setConnectedAccountProviders(provs);
+        return provs;
+      }
+    } catch {}
+    return null;
+  };
+
   useEffect(() => {
-    const target = defaultChannelId || platformId;
-    if (target) {
-      setActiveTab(target);
-    }
-    setStep("connect");
-    setOauthError(null);
-    setIsOAuthWaiting(false);
-  }, [platformId, defaultChannelId, isOpen]);
+    if (!isOpen) return;
+    loadConnectedAccounts();
+  }, [isOpen, activeBrand?.id]);
 
-  // Listen for real OAuth completion from child popup window
+  // Clean up poll interval on unmount
   useEffect(() => {
+    return () => {
+      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+    };
+  }, []);
+
+  // Listen to postMessage from OAuth callback popup
+  useEffect(() => {
+    if (!isOpen) return;
+
     const handleMessage = (event: MessageEvent) => {
-      if (event.data?.type === "PULSESOCIAL_CHANNEL_CONNECTED" && event.data.account) {
-        const acc = event.data.account;
-        setConnectedAccount(acc);
-        setIsOAuthWaiting(false);
-        setIsOpeningOAuth(false);
-        setStep("permissions");
+      if (
+        event.data?.type === "PULSESOCIAL_CHANNEL_CONNECTED" ||
+        event.data?.type === "PULSESOCIAL_OAUTH_SUCCESS"
+      ) {
+        const acc = event.data.account || (event.data.accounts && event.data.accounts[0]);
+        const provKey = (acc?.platform || acc?.provider || "").toLowerCase();
+
+        if (provKey) {
+          setConnectedAccountProviders((prev) => {
+            const next = new Set(prev);
+            next.add(provKey);
+            if (provKey === "x") next.add("twitter");
+            if (provKey === "twitter") next.add("x");
+            return next;
+          });
+        }
+
+        setConnectingChannelId(null);
+        setOauthError(null);
+        setFallbackUrl(null);
+
+        if (pollIntervalRef.current) {
+          clearInterval(pollIntervalRef.current);
+          pollIntervalRef.current = null;
+        }
 
         toast({
-          title: "Authorization Confirmed!",
-          message: `Official ${acc.displayName} account verified. Review permissions to link.`,
+          title: "Channel Connected!",
+          message: `${acc?.displayName || "Social channel"} authorized successfully in your workspace.`,
           type: "success",
         });
+
+        window.dispatchEvent(new Event("pulsesocial_account_connected"));
+        if (onSuccess) onSuccess(acc);
+        if (onAccountConnected) onAccountConnected(acc);
       }
     };
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [toast]);
-
-  const [copiedRedirect, setCopiedRedirect] = useState(false);
+  }, [isOpen, onSuccess, onAccountConnected, toast]);
 
   if (!isOpen) return null;
 
-  const currentConfig =
-    BRAND_CHANNELS.find((c) => c.id === activeTab) || BRAND_CHANNELS[0];
-
-  const liveRedirectUri = typeof window !== "undefined"
-    ? `${window.location.origin}/api/social/${activeTab}/callback`
-    : `http://localhost:3000/api/social/${activeTab}/callback`;
-
-  // Launch official OAuth authorization directly in new window
-  const handleLaunchOfficialOAuth = async (tier: "full" | "standard" | "basic" = "full") => {
+  // SEAMLESS IN-POPUP OAUTH HANDLER (Leaves current tab completely intact)
+  const handleLaunchChannelOAuth = async (ch: ChannelCardConfig) => {
     setOauthError(null);
-    setIsOpeningOAuth(true);
+    setFallbackUrl(null);
+    setConnectingChannelId(ch.id);
+
+    if (ch.id === "start_page") {
+      onClose();
+      router.push("/posts/new");
+      return;
+    }
 
     try {
-      const res = await fetch(`/api/social/${activeTab}/connect?format=json&tier=${tier}`);
+      const targetApiId = ch.id === "twitter" ? "x" : ch.id;
+      const res = await fetch(`/api/social/${targetApiId}/connect?format=json`);
       const data = await res.json();
 
       if (!res.ok || !data.success || !data.authUrl) {
         setOauthError(
           data.error ||
-          `OAuth credentials for ${currentConfig.name} are not configured in environment variables (.env). Configure CLIENT_ID and CLIENT_SECRET to authenticate.`
+            `OAuth credentials for ${ch.name} are not configured in your environment variables. You can enter an access token below.`
         );
+        setConnectingChannelId(null);
         return;
       }
 
-      setPendingAuthUrl(data.authUrl);
-      setIsOAuthWaiting(true);
+      // Calculate centered popup coordinates
+      const width = 640;
+      const height = 760;
+      const left = Math.max(0, Math.floor(window.screenX + (window.outerWidth - width) / 2));
+      const top = Math.max(0, Math.floor(window.screenY + (window.outerHeight - height) / 2));
 
-      // Redirect to provider official authorization page in the same tab
-      window.location.href = data.authUrl;
-      return;
+      const popup = window.open(
+        data.authUrl,
+        `pulsesocial_oauth_${targetApiId}`,
+        `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes,scrollbars=yes`
+      );
+
+      if (!popup || popup.closed || typeof popup.closed === "undefined") {
+        // Popup was blocked by browser
+        setOauthError(
+          `Popup was blocked by your browser. Please click the button below to open authorization:`
+        );
+        setFallbackUrl(data.authUrl);
+        setConnectingChannelId(null);
+        return;
+      }
+
+      // Smooth polling while popup is open
+      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+
+      let attempts = 0;
+      pollIntervalRef.current = setInterval(async () => {
+        attempts++;
+        const updatedProvs = await loadConnectedAccounts();
+
+        if (
+          updatedProvs &&
+          (updatedProvs.has(ch.id) || (ch.id === "twitter" && updatedProvs.has("x")))
+        ) {
+          if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+          pollIntervalRef.current = null;
+          setConnectingChannelId(null);
+
+          try {
+            if (popup && !popup.closed) popup.close();
+          } catch {}
+
+          toast({
+            title: "Channel Connected!",
+            message: `${ch.name} successfully linked to your workspace.`,
+            type: "success",
+          });
+
+          window.dispatchEvent(new Event("pulsesocial_account_connected"));
+          if (onSuccess) onSuccess({ platform: ch.id });
+          if (onAccountConnected) onAccountConnected({ platform: ch.id });
+          return;
+        }
+
+        // Check if popup closed by user
+        if (popup.closed) {
+          if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+          pollIntervalRef.current = null;
+          setConnectingChannelId(null);
+        }
+
+        // Timeout after 3 minutes
+        if (attempts > 90) {
+          if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+          pollIntervalRef.current = null;
+          setConnectingChannelId(null);
+        }
+      }, 2000);
     } catch (err: unknown) {
       setOauthError((err as Error).message || "Unable to initiate authorization.");
-    } finally {
-      setIsOpeningOAuth(false);
+      setConnectingChannelId(null);
     }
   };
 
-  // Final confirmation after reviewing permissions
-  const handleConfirmLinkAccount = () => {
-    setStep("success");
-    toast({
-      title: "Account Connected!",
-      message: `${connectedAccount?.displayName} has been linked to ${activeBrand?.name || "your workspace"}.`,
-      type: "success",
-    });
-    if (onSuccess) onSuccess(connectedAccount);
-    if (onAccountConnected) onAccountConnected(connectedAccount);
-  };
+  // Direct manual token submission for developer / testing mode
+  const handleManualTokenSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualToken.trim()) return;
 
-  const handleFinish = () => {
-    if (onSuccess) onSuccess(connectedAccount);
-    if (onAccountConnected) onAccountConnected(connectedAccount);
-    onClose();
+    setIsSubmittingToken(true);
+    setOauthError(null);
+
+    try {
+      const targetProvider = manualPlatform === "twitter" ? "x" : manualPlatform;
+      const res = await fetch("/api/social/accounts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          provider: targetProvider,
+          accessToken: manualToken.trim(),
+          brandId: activeBrand?.id,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to verify access token");
+      }
+
+      toast({
+        title: "Channel Connected!",
+        message: `Successfully connected ${manualPlatform.toUpperCase()} to your workspace.`,
+        type: "success",
+      });
+
+      await loadConnectedAccounts();
+      window.dispatchEvent(new Event("pulsesocial_account_connected"));
+      if (onSuccess) onSuccess(data);
+      if (onAccountConnected) onAccountConnected(data);
+      setManualToken("");
+      setShowManualToken(false);
+    } catch (err: any) {
+      setOauthError(err.message || "Failed to link account with provided token.");
+    } finally {
+      setIsSubmittingToken(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg overflow-hidden text-slate-900 dark:text-white animate-in fade-in zoom-in-95 duration-150 my-auto">
-        
-        {/* ======================================================== */}
-        {/* STEP 1: OFFICIAL OAUTH CONNECTION DIALOG (NO FAKE UI)    */}
-        {/* ======================================================== */}
-        {step === "connect" && (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Connect your channels"
+      onClick={onClose}
+      className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto animate-in fade-in duration-150"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white dark:bg-[#17171A] rounded-3xl shadow-2xl border border-slate-200/90 dark:border-white/10 ring-1 ring-purple-500/20 dark:ring-amber-500/20 w-full max-w-5xl max-h-[92vh] overflow-y-auto p-6 sm:p-8 flex flex-col text-slate-900 dark:text-white animate-in zoom-in-95 duration-150"
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between pb-5 border-b border-slate-100 dark:border-white/7">
           <div>
-            {/* Header: Platform Icon + Connect [Platform] + Close X */}
-            <div className="px-6 pt-5 pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0">
-                  {renderPlatformIcon(currentConfig.id, 28)}
-                </div>
-                <div>
-                  <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
-                    Connect {currentConfig.name}
-                  </h2>
-                  <p className="text-[11px] text-slate-500 font-medium">
-                    Official Channel Connection
-                  </p>
-                </div>
-              </div>
-
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+              Connect your channels
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-[#9CA3AF] mt-1 leading-relaxed">
+              Looking for step-by-step instructions? Visit our Help Center to read our{" "}
               <button
                 type="button"
-                onClick={onClose}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                onClick={() => router.push("/resources")}
+                className="font-bold text-[#E08738] hover:underline dark:text-[#F59E0B] cursor-pointer"
               >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+                Getting Started
+              </button>{" "}
+              guides and learn about supported channel types.
+            </p>
+          </div>
 
-            {/* Platform Selector Horizontal Strip */}
-            <div className="px-6 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/60 overflow-x-auto scrollbar-none flex items-center gap-2">
-              <span className="text-[10px] uppercase font-bold text-slate-400 shrink-0 mr-1">Switch:</span>
-              {BRAND_CHANNELS.map((ch) => {
-                const isActive = activeTab === ch.id;
-                return (
-                  <button
-                    key={ch.id}
-                    type="button"
-                    onClick={() => {
-                      setActiveTab(ch.id);
-                      setOauthError(null);
-                      setIsOAuthWaiting(false);
-                    }}
-                    className={`px-2 py-1 rounded-md text-[11px] font-semibold transition cursor-pointer flex items-center gap-1.5 shrink-0 ${
-                      isActive
-                        ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs border border-slate-200 dark:border-slate-700"
-                        : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-300"
-                    }`}
-                  >
-                    <div className="w-3.5 h-3.5 flex items-center justify-center">
-                      {renderPlatformIcon(ch.id, 14)}
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition cursor-pointer shrink-0 ml-4"
+            title="Close"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* OAuth Feedback Alert */}
+        {oauthError && (
+          <div className="my-4 p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs flex items-start gap-3 animate-in fade-in">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
+            <div className="min-w-0 flex-1 space-y-1.5">
+              <p className="font-semibold">{oauthError}</p>
+              {fallbackUrl && (
+                <a
+                  href={fallbackUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs transition"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Open Authorization Screen</span>
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Full 3-Column Channels Cards Grid (Responsive, Spacious, Real Direct Actions) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4.5 py-4">
+          {CHANNELS_CATALOG.map((ch) => {
+            const isConnected =
+              connectedAccountProviders.has(ch.id) ||
+              (ch.id === "twitter" && connectedAccountProviders.has("x"));
+            const isConnecting = connectingChannelId === ch.id;
+
+            return (
+              <div
+                key={ch.id}
+                className="bg-white dark:bg-[#1C1C20] border border-slate-200/90 dark:border-white/7 rounded-2xl p-5 text-center hover:shadow-lg hover:border-amber-400/80 dark:hover:border-amber-500/30 hover:-translate-y-0.5 transition-all duration-200 flex flex-col items-center justify-between min-h-[225px] relative group"
+              >
+                {/* Optional Pill Badge */}
+                {ch.badge && (
+                  <span className="absolute top-3.5 right-3.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#82C91E]/20 text-[#2B8A3E] dark:bg-emerald-950/60 dark:text-emerald-400 border border-[#82C91E]/30">
+                    {ch.badge}
+                  </span>
+                )}
+
+                {/* Platform Icon */}
+                <div className="w-13 h-13 rounded-full flex items-center justify-center mb-2.5 mt-1 group-hover:scale-108 transition-transform duration-200">
+                  {renderPlatformIcon(ch.id, 42)}
+                </div>
+
+                {/* Platform Name & Subtitle */}
+                <div className="flex-1 flex flex-col justify-center mb-3">
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white leading-tight">
+                    {ch.name}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+                    {ch.subtitle}
+                  </p>
+
+                  {ch.learnMoreUrl && (
+                    <a
+                      href={ch.learnMoreUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-[#E08738] dark:hover:text-[#FBBF24] hover:underline mt-1 inline-flex items-center justify-center gap-1 transition"
+                    >
+                      <span>Learn more</span>
+                      <span>→</span>
+                    </a>
+                  )}
+                </div>
+
+                {/* DIRECT ACTION BUTTON / CONNECTED BADGE */}
+                {isConnected ? (
+                  <div className="w-full space-y-1.5">
+                    <div className="w-full py-2 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs">
+                      <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                      <span>Connected</span>
                     </div>
-                    <span>{ch.name}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Content Body */}
-            <div className="p-6 space-y-5">
-              {/* OAuth Status Alert */}
-              {oauthError && (
-                <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-300 text-xs space-y-2 animate-in fade-in">
-                  <div className="flex items-start gap-2.5">
-                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                    <span className="flex-1 font-medium">{oauthError}</span>
-                  </div>
-                  <div className="pt-2 border-t border-amber-200/60 dark:border-amber-800/60 flex items-center justify-between text-[11px]">
-                    <span className="text-amber-700 dark:text-amber-400 font-mono truncate mr-2">
-                      Callback: {liveRedirectUri}
-                    </span>
                     <button
                       type="button"
-                      onClick={() => {
-                        navigator.clipboard.writeText(liveRedirectUri);
-                        setCopiedRedirect(true);
-                        setTimeout(() => setCopiedRedirect(false), 2000);
-                      }}
-                      className="px-2 py-0.5 rounded bg-amber-200/70 dark:bg-amber-800/60 hover:bg-amber-300 dark:hover:bg-amber-700 text-amber-900 dark:text-amber-200 font-semibold flex items-center gap-1 cursor-pointer shrink-0"
+                      onClick={() => handleLaunchChannelOAuth(ch)}
+                      disabled={isConnecting}
+                      className="text-[11px] font-semibold text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition cursor-pointer"
                     >
-                      {copiedRedirect ? <Check className="w-3 h-3 text-purple-600" /> : <Copy className="w-3 h-3" />}
-                      <span>{copiedRedirect ? "Copied" : "Copy URI"}</span>
+                      {isConnecting ? "Reconnecting..." : "Reconnect"}
                     </button>
                   </div>
-                </div>
-              )}
-
-              {/* Official OAuth Integration Box */}
-              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 space-y-4 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm mx-auto flex items-center justify-center">
-                  {renderPlatformIcon(currentConfig.id, 32)}
-                </div>
-
-                <div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                    {currentConfig.name}
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto leading-relaxed">
-                    {currentConfig.description}
-                  </p>
-                </div>
-
-                {/* Big Action Button */}
-                <button
-                  type="button"
-                  onClick={() => handleLaunchOfficialOAuth("full")}
-                  disabled={isOpeningOAuth}
-                  className={`w-full py-3 px-4 rounded-xl ${currentConfig.buttonClass} font-semibold text-sm shadow-sm transition active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50`}
-                >
-                  {isOpeningOAuth ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Connecting to {currentConfig.name}…</span>
-                    </>
-                  ) : (
-                    <>
-                      <ExternalLink className="w-4 h-4" />
-                      <span>{currentConfig.buttonLabel}</span>
-                    </>
-                  )}
-                </button>
-
-
-              </div>
-
-            </div>
-
-            {/* Bottom Actions Row */}
-            <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950/60 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold transition cursor-pointer"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ======================================================== */}
-        {/* STEP 2: REVIEW REAL PERMISSIONS & VERIFIED ACCOUNT       */}
-        {/* ======================================================== */}
-        {step === "permissions" && connectedAccount && (
-          <div className="p-6 space-y-5 animate-in fade-in duration-200">
-            {/* Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0">
-                  {renderPlatformIcon(connectedAccount.platform, 28)}
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                    {currentConfig.name} Permissions
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Channel Permissions Review
-                  </p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={onClose}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Authenticated Account Preview */}
-            <div className="p-3.5 bg-slate-50 dark:bg-slate-950/50 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800 flex items-center justify-center font-bold text-purple-700 overflow-hidden shrink-0">
-                {connectedAccount.avatarUrl ? (
-                  <img
-                    src={connectedAccount.avatarUrl}
-                    alt={connectedAccount.displayName}
-                    className="w-full h-full object-cover"
-                  />
                 ) : (
-                  connectedAccount.displayName.charAt(0).toUpperCase()
+                  <button
+                    type="button"
+                    onClick={() => handleLaunchChannelOAuth(ch)}
+                    disabled={isConnecting}
+                    className={`w-full py-2.5 px-3.5 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 disabled:opacity-60 shadow-xs hover:shadow-md ${ch.buttonClass}`}
+                  >
+                    {isConnecting ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Connecting...</span>
+                      </>
+                    ) : (
+                      <>
+                        <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                        <span className="truncate">{ch.buttonLabel}</span>
+                      </>
+                    )}
+                  </button>
                 )}
               </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">
-                    {connectedAccount.displayName}
-                  </h4>
-                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-purple-500/10 text-purple-600 text-[10px] font-bold">
-                    <CheckCircle2 className="w-3 h-3" />
-                    Verified
-                  </span>
-                </div>
-                <p className="text-xs text-slate-500 truncate">
-                  {connectedAccount.username ? `@${connectedAccount.username}` : currentConfig.name}
-                </p>
-              </div>
-            </div>
+            );
+          })}
+        </div>
 
-            {/* Granted Scopes */}
-            <div className="space-y-2">
-              <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                PulseSocial currently has permission to:
-              </p>
-              <div className="space-y-2">
-                {currentConfig.scopes.map((s, idx) => (
-                  <div
-                    key={idx}
-                    className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800 flex items-start gap-2.5"
-                  >
-                    <CheckCircle2 className="w-4 h-4 text-purple-500 shrink-0 mt-0.5" />
-                    <div className="text-xs">
-                      <span className="font-semibold text-slate-800 dark:text-slate-200 block">
-                        {s.name}
-                      </span>
-                      <span className="text-slate-500">{s.description}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+        {/* Developer Direct Token Entry Collapsible */}
+        <div className="mt-2 pt-4 border-t border-slate-100 dark:border-white/7">
+          <button
+            type="button"
+            onClick={() => setShowManualToken(!showManualToken)}
+            className="text-[11px] font-semibold text-slate-500 hover:text-[#E08738] dark:hover:text-[#FBBF24] transition inline-flex items-center gap-1.5 cursor-pointer"
+          >
+            <Key className="w-3 h-3" />
+            <span>
+              {showManualToken
+                ? "Hide direct token entry"
+                : "Developer / Tester: Paste Access Token directly"}
+            </span>
+          </button>
 
-            {/* Bottom Confirm Buttons */}
-            <div className="pt-2 flex items-center justify-end gap-2.5">
-              <button
-                type="button"
-                onClick={() => setStep("connect")}
-                className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold transition cursor-pointer"
-              >
-                Back
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmLinkAccount}
-                className="px-5 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs transition cursor-pointer flex items-center gap-1.5"
-              >
-                <Check className="w-4 h-4" />
-                <span>Confirm & Link Account</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ======================================================== */}
-        {/* STEP 3: SUCCESS STATE                                    */}
-        {/* ======================================================== */}
-        {step === "success" && (
-          <div className="p-8 text-center space-y-4 animate-in zoom-in-95 duration-200">
-            <div className="w-16 h-16 rounded-full bg-purple-100 dark:bg-purple-950/50 border border-purple-300 dark:border-purple-800 flex items-center justify-center text-purple-600 mx-auto">
-              <CheckCircle2 className="w-8 h-8" />
-            </div>
-
-            <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                Account Connected Successfully
-              </h3>
-              <p className="text-xs text-slate-500 mt-1">
-                {connectedAccount?.displayName} is now active and ready for publishing in PulseSocial.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleFinish}
-              className="w-full py-2.5 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white text-xs font-bold transition shadow-xs cursor-pointer"
+          {showManualToken && (
+            <form
+              onSubmit={handleManualTokenSubmit}
+              className="mt-3 p-4 rounded-2xl bg-slate-50 dark:bg-[#111113] border border-slate-200 dark:border-white/10 space-y-3 animate-in fade-in"
             >
-              Done & Return to Workspace
-            </button>
-          </div>
-        )}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                    Select Channel
+                  </label>
+                  <select
+                    value={manualPlatform}
+                    onChange={(e) => setManualPlatform(e.target.value)}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#1C1C20] text-slate-900 dark:text-white"
+                  >
+                    {CHANNELS_CATALOG.filter((c) => c.id !== "start_page").map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                    Access Token / Bearer Key
+                  </label>
+                  <input
+                    type="password"
+                    value={manualToken}
+                    onChange={(e) => setManualToken(e.target.value)}
+                    placeholder="Paste EAAB... or Bearer token here"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#1C1C20] font-mono text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-[#E08738]"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={isSubmittingToken || !manualToken.trim()}
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#F59E0B] via-[#E08738] to-[#D97706] hover:brightness-105 text-slate-950 text-xs font-bold transition disabled:opacity-50 cursor-pointer flex items-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-[0.98]"
+                >
+                  {isSubmittingToken ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Check className="w-3.5 h-3.5" />
+                  )}
+                  <span>Save & Connect Directly</span>
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
 
+        {/* Footer Back Navigation */}
+        <div className="pt-4 border-t border-slate-100 dark:border-white/7 mt-3 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-xs font-bold text-slate-600 dark:text-[#9CA3AF] hover:text-[#E08738] dark:hover:text-[#FBBF24] flex items-center gap-1.5 transition cursor-pointer"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Close</span>
+          </button>
+
+          <span className="text-[11px] text-slate-400 dark:text-[#6B7280] font-medium flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+            <span>AES-256 Zero-Knowledge Encrypted</span>
+          </span>
+        </div>
       </div>
     </div>
   );
 }
+
+export default UniversalSocialConnectModal;

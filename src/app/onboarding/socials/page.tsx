@@ -72,11 +72,11 @@ const SUPPORTED_PLATFORMS: PlatformDef[] = [
     oauthUrl: "/api/social/tiktok/connect",
   },
   {
-    id: "google_business",
-    name: "Google Business Profile",
-    category: "business",
-    description: "Manage local search visibility, customer reviews, and business updates.",
-    oauthUrl: "/api/social/google-business/connect",
+    id: "pinterest",
+    name: "Pinterest Business",
+    category: "social",
+    description: "Publish visual pins, organize rich boards, and drive qualified organic shoppers.",
+    oauthUrl: "/api/social/pinterest/connect",
   },
   {
     id: "threads",
@@ -112,13 +112,6 @@ const SUPPORTED_PLATFORMS: PlatformDef[] = [
     category: "messaging",
     description: "Server webhooks, community engagement channels, and member announcements.",
     oauthUrl: "/api/social/discord/connect",
-  },
-  {
-    id: "snapchat",
-    name: "Snapchat",
-    category: "video",
-    description: "Snap Spotlight, story scheduling, and brand lens performance.",
-    oauthUrl: "/api/social/snapchat/connect",
   },
   {
     id: "mastodon",

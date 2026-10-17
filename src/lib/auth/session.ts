@@ -46,24 +46,75 @@ export async function createSession(user: SessionUser, rememberMe = true): Promi
 export async function getSession(): Promise<SessionUser | null> {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get(COOKIE_NAME)?.value;
+    const token =
+      cookieStore.get(COOKIE_NAME)?.value ||
+      cookieStore.get("pulsesocial_session")?.value;
     if (!token) return null;
 
     const { payload } = await jwtVerify(token, JWT_SECRET);
     const userId = payload.sub as string;
+    if (!userId) return null;
+
     let activeOrgId = (payload.activeOrgId as string) || undefined;
     let role = (payload.role as string) || undefined;
 
-    // Fallback: If activeOrgId is not set in JWT, resolve from user's primary membership
-    if (!activeOrgId && userId) {
-      const membership = await prisma.organizationMember.findFirst({
-        where: { userId },
-        orderBy: { createdAt: "asc" },
-      });
-      if (membership) {
-        activeOrgId = membership.organizationId;
-        role = membership.role;
+    // Resilient workspace resolution: handle missing or deleted workspaces gracefully
+    try {
+      if (activeOrgId) {
+        const existingMembership = await prisma.organizationMember.findFirst({
+          where: { userId, organizationId: activeOrgId },
+        });
+        if (!existingMembership) {
+          activeOrgId = undefined;
+          role = undefined;
+        } else {
+          role = existingMembership.role;
+        }
       }
+
+      if (!activeOrgId) {
+        const membership = await prisma.organizationMember.findFirst({
+          where: { userId },
+          orderBy: { createdAt: "asc" },
+        });
+        if (membership) {
+          activeOrgId = membership.organizationId;
+          role = membership.role;
+        } else {
+          // Auto-provision default workspace if user has none
+          const userRecord = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { name: true, email: true },
+          });
+          if (userRecord) {
+            const orgName = userRecord.name ? `${userRecord.name}'s Workspace` : "My Workspace";
+            const slug =
+              (userRecord.name || userRecord.email.split("@")[0] || "workspace")
+                .toLowerCase()
+                .replace(/[^a-z0-9]/g, "-")
+                .slice(0, 30) +
+              "-" +
+              Math.random().toString(36).substring(2, 7);
+
+            const newOrg = await prisma.organization.create({
+              data: {
+                name: orgName,
+                slug,
+                members: {
+                  create: {
+                    userId,
+                    role: "OWNER",
+                  },
+                },
+              },
+            });
+            activeOrgId = newOrg.id;
+            role = "OWNER";
+          }
+        }
+      }
+    } catch (dbErr) {
+      console.warn("[SESSION_RESOLVE_ORG_FAILED]", dbErr);
     }
 
     return {

@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   LayoutDashboard,
   Share2,
@@ -25,9 +24,12 @@ import {
   Menu,
   X,
   CheckCircle2,
+  AlertTriangle,
+  Folder,
   Sun,
   Moon,
   Shield,
+  ShieldCheck,
   User,
   Plus,
   ArrowRight,
@@ -63,11 +65,14 @@ import { CreateBrandModal } from "@/components/brand/CreateBrandModal";
 import { ActivityStreamDrawer } from "@/components/layout/ActivityStreamDrawer";
 import { AnnouncementsModal } from "@/components/layout/AnnouncementsModal";
 import { AppsSuiteMenu } from "@/components/layout/AppsSuiteMenu";
-import { BottomDockBar } from "@/components/layout/BottomDockBar";
 import { PulseAIPanel } from "@/components/ai/PulseAIPanel";
 import { authService, UserSession } from "@/lib/services";
 import { useBrand } from "@/context/BrandContext";
 import { useToast } from "@/components/ui/toast";
+import { SocialConnectionsHub } from "@/components/social/SocialConnectionsHub";
+import { ThemeSwitcher } from "@/components/layout/ThemeSwitcher";
+import { DashboardFooter } from "@/components/layout/DashboardFooter";
+import { PulseHelpGuidesModal } from "@/components/layout/PulseHelpGuidesModal";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -129,13 +134,67 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [isAppsSuiteOpen, setIsAppsSuiteOpen] = useState(false);
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
+  const [selectedConnectPlatform, setSelectedConnectPlatform] = useState<string | undefined>(undefined);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isAIDrawerOpen, setIsAIDrawerOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isPostsDropdownOpen, setIsPostsDropdownOpen] = useState(true);
+  const [isSidebarNewPostOpen, setIsSidebarNewPostOpen] = useState(false);
+  const [composerInitialOption, setComposerInitialOption] = useState<"now" | "schedule" | "queue" | "smartq" | undefined>(undefined);
+  const [postStatusCounts, setPostStatusCounts] = useState<{
+    failed: number;
+    approvals: number;
+    scheduled: number;
+    drafts: number;
+    published: number;
+    total: number;
+  }>({ failed: 0, approvals: 0, scheduled: 0, drafts: 0, published: 0, total: 0 });
+
+  const searchParams = useSearchParams();
+  const searchStr = searchParams ? searchParams.toString() : "";
+  const fullPath = searchStr ? `${pathname}?${searchStr}` : pathname;
+
+  const isPostsRoute =
+    pathname.startsWith("/posts") ||
+    pathname.startsWith("/calendar") ||
+    pathname.startsWith("/drafts") ||
+    pathname.startsWith("/scheduled") ||
+    pathname.startsWith("/published") ||
+    pathname.startsWith("/approvals");
+
+  useEffect(() => {
+    if (isPostsRoute) {
+      setIsPostsDropdownOpen(true);
+    }
+  }, [pathname, isPostsRoute]);
+
+  // Dynamic Page Breadcrumbs
+  const getBreadcrumb = (path: string): { section: string; title: string } => {
+    if (path === "/dashboard") return { section: "Overview", title: "Executive Dashboard" };
+    if (path.startsWith("/posts/new")) return { section: "Studio", title: "Post Composer" };
+    if (path.startsWith("/posts")) return { section: "Publishing", title: "Posts & Queue" };
+    if (path.startsWith("/social-accounts")) return { section: "Channels", title: "Social Integrations" };
+    if (path.startsWith("/calendar")) return { section: "Planning", title: "Content Calendar" };
+    if (path.startsWith("/inbox")) return { section: "Community", title: "Unified Inbox" };
+    if (path.startsWith("/analytics")) return { section: "Telemetry", title: "Analytics & Telemetry" };
+    if (path.startsWith("/team")) return { section: "Workspace", title: "Team & Permissions" };
+    if (path.startsWith("/settings/profile")) return { section: "Account", title: "Profile & Security" };
+    if (path.startsWith("/settings")) return { section: "Workspace", title: "Workspace Settings" };
+    if (path.startsWith("/billing")) return { section: "Workspace", title: "Subscription & Plans" };
+    if (path.startsWith("/ai-assistant") || path === "/ai") return { section: "AI Studio", title: "AI Assistant" };
+    if (path.startsWith("/canva")) return { section: "Creation", title: "Canva Studio" };
+    if (path.startsWith("/notifications")) return { section: "Engagement", title: "Notifications" };
+    if (path.startsWith("/admin")) return { section: "Administration", title: "Admin Console" };
+    return { section: "PulseSocial", title: "Workspace" };
+  };
+
+  const breadcrumb = getBreadcrumb(pathname);
 
   // Dropdown refs
   const brandMenuRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const notifMenuRef = useRef<HTMLDivElement>(null);
+  const sidebarNewPostRef = useRef<HTMLDivElement>(null);
 
   // Load real user session with immediate cache retrieval
   useEffect(() => {
@@ -232,20 +291,43 @@ export function AppLayout({ children }: AppLayoutProps) {
       .catch(() => {});
   };
 
+  // Load real post counts for sidebar badges
+  const loadPostCounts = () => {
+    fetch("/api/posts")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d?.posts)) {
+          setPostStatusCounts({
+            failed: d.posts.filter((p: any) => p.status === "FAILED").length,
+            approvals: d.posts.filter((p: any) => p.status === "PENDING_APPROVAL").length,
+            scheduled: d.posts.filter((p: any) => p.status === "SCHEDULED").length,
+            drafts: d.posts.filter((p: any) => p.status === "DRAFT").length,
+            published: d.posts.filter((p: any) => p.status === "PUBLISHED").length,
+            total: d.posts.length,
+          });
+        }
+      })
+      .catch(() => {});
+  };
+
   useEffect(() => {
     loadInboxUnread();
     loadNotifications();
+    loadPostCounts();
 
     const handleUpdate = () => {
       loadInboxUnread();
       loadNotifications();
+      loadPostCounts();
     };
 
     window.addEventListener("pulsesocial_active_brand_changed", handleUpdate);
     window.addEventListener("pulsesocial_post_created", handleUpdate);
+    window.addEventListener("pulsesocial_posts_updated", handleUpdate);
     return () => {
       window.removeEventListener("pulsesocial_active_brand_changed", handleUpdate);
       window.removeEventListener("pulsesocial_post_created", handleUpdate);
+      window.removeEventListener("pulsesocial_posts_updated", handleUpdate);
     };
   }, [activeBrand?.id]);
 
@@ -267,17 +349,26 @@ export function AppLayout({ children }: AppLayoutProps) {
       if (notifMenuRef.current && !notifMenuRef.current.contains(target)) {
         setIsNotificationsOpen(false);
       }
+      if (sidebarNewPostRef.current && !sidebarNewPostRef.current.contains(target)) {
+        setIsSidebarNewPostOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Keyboard shortcut: Cmd+K / Ctrl+K
+  // Keyboard shortcut: Cmd+K / Ctrl+K and Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setIsCommandPaletteOpen((prev) => !prev);
+      }
+      if (e.key === "Escape") {
+        setIsSidebarNewPostOpen(false);
+        setIsBrandMenuOpen(false);
+        setIsUserMenuOpen(false);
+        setIsNotificationsOpen(false);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -340,40 +431,67 @@ export function AppLayout({ children }: AppLayoutProps) {
       title: "PUBLISHING",
       items: [
         {
-          label: "Posts",
-          href: "/posts",
+          label: "Posts & Queue",
           icon: FileText,
-          match: (p: string) => p === "/posts" && !p.includes("filter=") && !p.includes("tab="),
-        },
-        {
-          label: "New Post",
-          href: "/posts/new",
-          icon: PlusCircle,
-          match: (p: string) => p.startsWith("/posts/new") || p.startsWith("/compose"),
-        },
-        {
-          label: "Content Calendar",
-          href: "/calendar",
-          icon: Calendar,
-          match: (p: string) => p.startsWith("/calendar"),
-        },
-        {
-          label: "Drafts",
-          href: "/drafts",
-          icon: FileEdit,
-          match: (p: string) => p.startsWith("/drafts") || p.includes("filter=DRAFT") || p.includes("filter=draft"),
-        },
-        {
-          label: "Scheduled",
-          href: "/posts?filter=SCHEDULED",
-          icon: Clock,
-          match: (p: string) => p.startsWith("/scheduled") || p.includes("filter=SCHEDULED") || p.includes("filter=scheduled"),
-        },
-        {
-          label: "Published",
-          href: "/posts?filter=PUBLISHED",
-          icon: CheckCircle2,
-          match: (p: string) => p.startsWith("/published") || p.includes("filter=PUBLISHED") || p.includes("filter=published"),
+          href: "/posts",
+          isDropdown: true,
+          match: (p: string) =>
+            p.startsWith("/posts") ||
+            p.startsWith("/calendar") ||
+            p.startsWith("/drafts") ||
+            p.startsWith("/scheduled") ||
+            p.startsWith("/published") ||
+            p.startsWith("/approvals"),
+          children: [
+            {
+              label: "All Posts",
+              href: "/posts",
+              icon: FileText,
+              match: (p: string) => (p === "/posts" || p === "/posts/") && !p.includes("filter="),
+            },
+            {
+              label: "Published Posts",
+              href: "/posts?filter=PUBLISHED",
+              icon: CheckCircle2,
+              match: (p: string) => p.includes("filter=PUBLISHED") || p.includes("filter=published"),
+              badge: postStatusCounts.published > 0 ? postStatusCounts.published.toString() : undefined,
+            },
+            {
+              label: "Scheduled Posts",
+              href: "/posts?filter=SCHEDULED",
+              icon: Clock,
+              match: (p: string) => p.includes("filter=SCHEDULED") || p.includes("filter=scheduled"),
+              badge: postStatusCounts.scheduled > 0 ? postStatusCounts.scheduled.toString() : undefined,
+            },
+            {
+              label: "Drafts",
+              href: "/posts?filter=DRAFT",
+              icon: FileEdit,
+              match: (p: string) => p.startsWith("/drafts") || p.includes("filter=DRAFT") || p.includes("filter=draft"),
+              badge: postStatusCounts.drafts > 0 ? postStatusCounts.drafts.toString() : undefined,
+            },
+            {
+              label: "Unpublished / Failed Posts",
+              href: "/posts?filter=FAILED",
+              icon: AlertTriangle,
+              match: (p: string) => p.includes("filter=FAILED") || p.includes("filter=unpublished") || p.includes("filter=failed"),
+              badge: postStatusCounts.failed > 0 ? postStatusCounts.failed.toString() : undefined,
+              badgeColor: "rose",
+            },
+            {
+              label: "Approvals",
+              href: "/posts?filter=PENDING_APPROVAL",
+              icon: ShieldCheck,
+              match: (p: string) => p.startsWith("/approvals") || p.includes("filter=PENDING_APPROVAL") || p.includes("filter=approvals"),
+              badge: postStatusCounts.approvals > 0 ? postStatusCounts.approvals.toString() : undefined,
+            },
+            {
+              label: "Content Calendar",
+              href: "/calendar",
+              icon: Calendar,
+              match: (p: string) => p.startsWith("/calendar"),
+            },
+          ],
         },
       ],
     },
@@ -518,6 +636,12 @@ export function AppLayout({ children }: AppLayoutProps) {
           icon: Palette,
           match: (p: string) => p.startsWith("/canva") || p.includes("action=canva"),
         },
+        {
+          label: "Media Library",
+          href: "/media",
+          icon: Folder,
+          match: (p: string) => p.startsWith("/media"),
+        },
       ],
     },
     {
@@ -565,18 +689,18 @@ export function AppLayout({ children }: AppLayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex font-sans transition-colors duration-200">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0D0D0E] text-slate-900 dark:text-[#9CA3AF] flex font-sans transition-colors duration-200">
       
       {/* ============================================================ */}
-      {/* SIDEBAR NAVIGATION: Professional SaaS Clean Sidebar         */}
+      {/* SIDEBAR NAVIGATION: Matte Obsidian & Warm Amber SaaS Sidebar  */}
       {/* ============================================================ */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-all duration-300 ease-in-out ${
+        className={`fixed inset-y-0 left-0 z-50 bg-white dark:bg-[#111113] border-r border-slate-200 dark:border-white/7 flex flex-col transition-all duration-300 ease-in-out ${
           isSidebarOpen ? "w-64" : "w-20"
         } ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
         {/* Brand Monogram Header */}
-        <div className="h-16 px-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
+        <div className="h-16 px-4 flex items-center justify-between border-b border-slate-200 dark:border-white/7">
           <Link
             href="/dashboard"
             className="flex items-center gap-2.5 overflow-hidden group py-1"
@@ -588,7 +712,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           <button
             type="button"
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="hidden lg:flex w-7 h-7 rounded-lg items-center justify-center text-slate-400 hover:text-[#5846A8] hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            className="hidden lg:flex w-7 h-7 rounded-lg items-center justify-center text-slate-400 hover:text-[#5846A8] dark:hover:text-[#E08738] hover:bg-purple-50 dark:hover:bg-white/5 transition-all duration-150 cursor-pointer hover:scale-105"
             title={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
           >
             {isSidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
@@ -598,110 +722,234 @@ export function AppLayout({ children }: AppLayoutProps) {
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(false)}
-            className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+            className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Workspace Brand Badge */}
-        {isSidebarOpen && (
-          <div className="p-3 mx-3 mt-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="relative w-8 h-8 rounded-lg bg-[#5846A8] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs overflow-visible">
-                <div className="w-full h-full rounded-lg overflow-hidden flex items-center justify-center">
-                  {activeBrand?.avatarUrl ? (
-                    <img
-                      src={activeBrand.avatarUrl}
-                      alt={activeBrand.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    (activeBrand?.name || "P").charAt(0).toUpperCase()
-                  )}
-                </div>
-                {connectedAccounts.length > 0 && (
-                  <div
-                    className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-white dark:bg-slate-900 ring-1 ring-white dark:ring-slate-900 flex items-center justify-center shadow-xs overflow-hidden"
-                    title={`${connectedAccounts[0]?.displayName} (${connectedAccounts[0]?.provider})`}
+        {/* Sidebar Primary Action: + New Post Button (Royal Purple in Light, Golden Amber in Dark) with working Dropdown */}
+        <div className="px-3 pt-3 pb-1 shrink-0 relative" ref={sidebarNewPostRef}>
+          {isSidebarOpen ? (
+            <div className="relative">
+              <div className="flex items-center rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 dark:bg-gradient-to-r dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:hover:brightness-105 dark:text-slate-950 font-bold dark:shadow-amber-500/25 transition-all overflow-hidden hover:-translate-y-0.5 active:translate-y-0 active:scale-95 duration-200">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setComposerInitialOption("now");
+                    setIsComposerOpen(true);
+                  }}
+                  className="flex-1 py-2.5 px-3 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition text-white dark:text-slate-950"
+                  title="Create New Social Post (Modal)"
+                >
+                  <Plus className="w-4 h-4 stroke-[2.5]" />
+                  <span>New Post</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsSidebarNewPostOpen(!isSidebarNewPostOpen);
+                  }}
+                  aria-expanded={isSidebarNewPostOpen}
+                  className="px-2 py-2.5 border-l border-white/20 dark:border-black/15 hover:bg-white/10 dark:hover:bg-black/10 transition cursor-pointer text-white dark:text-slate-950"
+                  title="More creation options"
+                >
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Working Sidebar New Post Dropdown */}
+              {isSidebarNewPostOpen && (
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute left-0 right-0 top-12 bg-white dark:bg-[#1C1C20] rounded-xl shadow-2xl border border-slate-200 dark:border-white/10 backdrop-blur-md py-1.5 z-50 text-xs font-semibold animate-in fade-in zoom-in-95"
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSidebarNewPostOpen(false);
+                      setComposerInitialOption("now");
+                      setIsComposerOpen(true);
+                    }}
+                    className="w-full px-3 py-2 text-left hover:bg-purple-50 dark:hover:bg-white/8 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer"
                   >
-                    {renderPlatformIcon(connectedAccounts[0]?.provider, 14)}
-                  </div>
-                )}
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                  {activeBrand?.name || "Pulse Workspace"}
-                </p>
-                {connectedAccounts.length > 0 ? (
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-50 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 truncate max-w-[125px]">
-                      <span className="w-3 h-3 shrink-0 flex items-center justify-center">
-                        {renderPlatformIcon(connectedAccounts[0]?.provider, 12)}
-                      </span>
-                      <span className="truncate">{connectedAccounts[0]?.displayName || "Active"}</span>
-                    </span>
-                    {connectedAccounts.length > 1 && (
-                      <span className="text-[9px] text-slate-400 font-bold shrink-0">
-                        +{connectedAccounts.length - 1}
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
-                    0 Connected Channels
-                  </p>
-                )}
-              </div>
+                    <Plus className="w-3.5 h-3.5 text-[#5846A8] dark:text-[#E08738]" />
+                    <span>Create Post</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSidebarNewPostOpen(false);
+                      setComposerInitialOption("schedule");
+                      setIsComposerOpen(true);
+                    }}
+                    className="w-full px-3 py-2 text-left hover:bg-purple-50 dark:hover:bg-white/8 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer"
+                  >
+                    <Clock className="w-3.5 h-3.5 text-[#5846A8] dark:text-amber-500" />
+                    <span>Schedule Post</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSidebarNewPostOpen(false);
+                      setComposerInitialOption("now");
+                      setIsComposerOpen(true);
+                    }}
+                    className="w-full px-3 py-2 text-left hover:bg-purple-50 dark:hover:bg-white/8 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                    <span>Create Draft</span>
+                  </button>
+                  <div className="border-t border-slate-100 dark:border-white/10 my-1" />
+                  <Link
+                    href="/calendar"
+                    onClick={() => setIsSidebarNewPostOpen(false)}
+                    className="w-full px-3 py-2 text-left hover:bg-purple-50 dark:hover:bg-white/8 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer"
+                  >
+                    <Calendar className="w-3.5 h-3.5 text-[#5846A8] dark:text-amber-500" />
+                    <span>Content Calendar</span>
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSidebarNewPostOpen(false);
+                      setIsConnectModalOpen(true);
+                    }}
+                    className="w-full px-3 py-2 text-left hover:bg-purple-50 dark:hover:bg-white/8 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer"
+                  >
+                    <Share2 className="w-3.5 h-3.5 text-[#5846A8] dark:text-[#E08738]" />
+                    <span>Connect Channel</span>
+                  </button>
+                </div>
+              )}
             </div>
+          ) : (
             <button
               type="button"
-              onClick={() => setIsConnectModalOpen(true)}
-              className="p-1 rounded-md text-[#5846A8] dark:text-purple-400 hover:bg-white dark:hover:bg-slate-700 transition cursor-pointer"
-              title="Connect Channel"
+              onClick={() => {
+                setComposerInitialOption("now");
+                setIsComposerOpen(true);
+              }}
+              className="w-10 h-10 mx-auto rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 dark:bg-gradient-to-r dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:hover:brightness-105 dark:text-slate-950 font-bold dark:shadow-amber-500/25 flex items-center justify-center cursor-pointer active:scale-95 transition-all duration-200"
+              title="Create New Social Post (Modal)"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-5 h-5 stroke-[2.5]" />
             </button>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Navigation Items */}
-        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
+        <div className="flex-1 overflow-y-auto px-3 py-2 space-y-4">
           {SIDEBAR_SECTIONS.map((section, sIdx) => (
             <div key={section.title} className="space-y-1">
               {isSidebarOpen ? (
-                <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-3 pt-1 pb-0.5">
+                <div className="text-[10px] font-bold text-slate-400 dark:text-[#6B7280] uppercase tracking-wider px-3 pt-1 pb-0.5">
                   {section.title}
                 </div>
               ) : sIdx > 0 ? (
-                <div className="my-2 border-t border-slate-100 dark:border-slate-800" />
+                <div className="my-2 border-t border-slate-100 dark:border-white/7" />
               ) : null}
 
-              {section.items.map((item) => {
+              {section.items.map((item: any) => {
                 const Icon = item.icon;
-                const isActive = item.match(pathname);
+                const isItemActive = item.match(fullPath);
+
+                if (item.isDropdown) {
+                  return (
+                    <div key={item.label} className="space-y-0.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!isSidebarOpen) {
+                            setIsSidebarOpen(true);
+                            setIsPostsDropdownOpen(true);
+                          } else {
+                            setIsPostsDropdownOpen((prev) => !prev);
+                          }
+                        }}
+                        aria-expanded={isPostsDropdownOpen}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer ${
+                          isItemActive
+                            ? "bg-purple-50 text-[#5846A8] border border-purple-200/80 font-bold shadow-2xs dark:bg-[#241C14] dark:border dark:border-[#E08738]/50 dark:text-[#FBBF24]"
+                            : "text-slate-600 dark:text-[#9CA3AF] hover:text-[#5846A8] dark:hover:text-white hover:bg-purple-50/60 dark:hover:bg-white/5"
+                        }`}
+                        title={!isSidebarOpen ? item.label : undefined}
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <Icon className={`w-4 h-4 shrink-0 ${isItemActive ? "text-[#5846A8] dark:text-[#FBBF24]" : "text-slate-400 dark:text-[#9CA3AF] group-hover:text-[#5846A8] dark:group-hover:text-white"}`} />
+                          {isSidebarOpen && <span className="truncate flex-1 text-left">{item.label}</span>}
+                        </div>
+                        {isSidebarOpen && (
+                          <ChevronDown
+                            className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 shrink-0 ${
+                              isPostsDropdownOpen ? "rotate-180" : ""
+                            }`}
+                          />
+                        )}
+                      </button>
+
+                      {/* Dropdown Children */}
+                      {isPostsDropdownOpen && isSidebarOpen && item.children && (
+                        <div className="pl-3.5 pr-1 py-1 space-y-0.5 border-l-2 border-slate-200 dark:border-white/10 ml-4 animate-in fade-in duration-150">
+                          {item.children.map((sub: any) => {
+                            const SubIcon = sub.icon;
+                            const isSubActive = sub.match(fullPath);
+                            return (
+                              <Link
+                                key={sub.label}
+                                href={sub.href}
+                                className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs transition-all duration-150 ${
+                                  isSubActive
+                                    ? "bg-[#5846A8] text-white font-bold shadow-2xs dark:bg-gradient-to-r dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:text-slate-950"
+                                    : "text-slate-600 dark:text-[#9CA3AF] hover:text-[#5846A8] dark:hover:text-white hover:bg-purple-50/60 dark:hover:bg-white/5 font-medium"
+                                }`}
+                              >
+                                <SubIcon className={`w-3.5 h-3.5 shrink-0 ${isSubActive ? "text-white dark:text-slate-950" : "text-slate-400 dark:text-[#9CA3AF]"}`} />
+                                <span className="truncate flex-1">{sub.label}</span>
+                                {sub.badge && (
+                                  <span
+                                    className={`px-1.5 py-0.2 rounded-full text-[9px] font-bold ${
+                                      isSubActive
+                                        ? "bg-white/25 text-white dark:bg-black/20 dark:text-slate-950 font-extrabold"
+                                        : sub.badgeColor === "rose"
+                                        ? "bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border border-rose-200 dark:border-rose-900"
+                                        : "bg-purple-100 text-[#5846A8] dark:bg-[#E08738]/20 dark:text-[#FBBF24]"
+                                    }`}
+                                  >
+                                    {sub.badge}
+                                  </span>
+                                )}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
 
                 return (
                   <Link
                     key={item.label}
                     href={item.href}
                     className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 ${
-                      isActive
-                        ? "bg-purple-50 dark:bg-purple-950/40 text-purple-900 dark:text-purple-200 font-bold border border-purple-100 dark:border-purple-900/40 shadow-2xs"
-                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/60"
+                      isItemActive
+                        ? "bg-purple-50 text-[#5846A8] font-bold border border-purple-200/80 shadow-2xs dark:bg-[#241C14] dark:border dark:border-[#E08738]/50 dark:text-[#FBBF24]"
+                        : "text-slate-600 dark:text-[#9CA3AF] hover:text-[#5846A8] dark:hover:text-white hover:bg-purple-50/60 dark:hover:bg-white/5"
                     }`}
                     title={!isSidebarOpen ? item.label : undefined}
                   >
-                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-[#5846A8] dark:text-purple-400" : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300"}`} />
+                    <Icon className={`w-4 h-4 shrink-0 ${isItemActive ? "text-[#5846A8] dark:text-[#FBBF24]" : "text-slate-400 dark:text-[#9CA3AF] group-hover:text-[#5846A8] dark:group-hover:text-white"}`} />
                     {isSidebarOpen && (
                       <span className="truncate flex-1">{item.label}</span>
                     )}
                     {isSidebarOpen && item.badge && (
                       <span
                         className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-                          isActive
-                            ? "bg-[#5846A8] text-white"
-                            : "bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300"
+                          isItemActive
+                            ? "bg-[#5846A8] text-white dark:bg-gradient-to-r dark:from-[#F59E0B] dark:to-[#D97706] dark:text-slate-950"
+                            : "bg-slate-100 dark:bg-white/10 text-slate-800 dark:text-slate-300"
                         }`}
                       >
                         {item.badge}
@@ -715,12 +963,12 @@ export function AppLayout({ children }: AppLayoutProps) {
         </div>
 
         {/* Sidebar Footer: Quick Action & Profile preview */}
-        <div className="p-3 border-t border-slate-200 dark:border-slate-800 space-y-2">
+        <div className="p-3 border-t border-slate-200 dark:border-white/7 space-y-2">
           {isSidebarOpen ? (
             <button
               type="button"
               onClick={() => setIsConnectModalOpen(true)}
-              className="w-full py-2 px-3 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/60 text-[#5846A8] dark:text-purple-300 border border-slate-200 dark:border-slate-700 text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+              className="w-full py-2 px-3 rounded-xl bg-white dark:bg-[#17171A] hover:bg-purple-50/80 dark:hover:bg-white/8 text-[#5846A8] dark:text-[#FBBF24] border border-purple-200/80 dark:border-white/7 text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer hover:-translate-y-0.5 active:scale-95 duration-200"
             >
               <Share2 className="w-3.5 h-3.5" />
               <span>Connect Platform</span>
@@ -729,7 +977,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <button
               type="button"
               onClick={() => setIsConnectModalOpen(true)}
-              className="w-full py-2 rounded-xl text-[#5846A8] hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer"
+              className="w-full py-2 rounded-xl text-[#5846A8] dark:text-[#FBBF24] hover:bg-purple-50/80 dark:hover:bg-white/8 flex items-center justify-center cursor-pointer transition"
               title="Connect Platform"
             >
               <Share2 className="w-4 h-4" />
@@ -742,7 +990,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       {/* Mobile Drawer Backdrop */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs lg:hidden transition-opacity"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs lg:hidden transition-opacity"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
@@ -755,29 +1003,29 @@ export function AppLayout({ children }: AppLayoutProps) {
       }`}>
         
         {/* ============================================================ */}
-        {/* HEADER: Enterprise Clean White Surface (Section 3)           */}
+        {/* HEADER: Enterprise Matte Obsidian & Warm Amber Header        */}
         {/* ============================================================ */}
-        <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-2xs">
+        <header className="h-16 shrink-0 bg-white dark:bg-[#0D0D0E]/95 backdrop-blur-md border-b border-slate-200 dark:border-white/7 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-2xs">
           
           {/* Left: Mobile hamburger & Brand selector */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(true)}
-              className="lg:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              className="lg:hidden h-9 w-9 flex items-center justify-center rounded-xl text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-100 dark:hover:bg-white/5 transition cursor-pointer"
               title="Open Navigation"
             >
               <Menu className="w-5 h-5" />
             </button>
 
             {/* Brand Workspace Switcher Dropdown */}
-            <div className="relative" ref={brandMenuRef}>
+            <div className="relative shrink-0" ref={brandMenuRef}>
               <button
                 type="button"
                 onClick={() => setIsBrandMenuOpen(!isBrandMenuOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition cursor-pointer text-xs font-semibold text-slate-800 dark:text-slate-200"
+                className="h-9 flex items-center gap-2 px-3 rounded-xl bg-slate-50 dark:bg-[#17171A] hover:bg-purple-50/60 dark:hover:bg-white/5 border border-slate-200 dark:border-white/7 transition cursor-pointer text-xs font-semibold text-slate-800 dark:text-white shrink-0"
               >
-                <div className="w-5 h-5 rounded-md bg-[#5846A8] text-white flex items-center justify-center text-[10px] font-bold overflow-hidden shrink-0 shadow-2xs">
+                <div className="w-5 h-5 rounded-md bg-gradient-to-br from-[#7B61FF] to-[#5846A8] text-white dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:text-slate-950 flex items-center justify-center text-[10px] font-extrabold overflow-hidden shrink-0 shadow-2xs">
                   {activeBrand?.avatarUrl ? (
                     <img
                       src={activeBrand.avatarUrl}
@@ -788,35 +1036,25 @@ export function AppLayout({ children }: AppLayoutProps) {
                     (activeBrand?.name || "P").charAt(0).toUpperCase()
                   )}
                 </div>
-                <span className="max-w-[120px] sm:max-w-[180px] truncate">
+                <span className="max-w-[140px] sm:max-w-[200px] truncate">
                   {activeBrand?.name || "Pulse Workspace"}
                 </span>
-                {connectedAccounts.length > 0 && (
-                  <span
-                    className="flex items-center gap-1 pl-1.5 border-l border-slate-200 dark:border-slate-750"
-                    title={`${connectedAccounts[0]?.displayName} (${connectedAccounts[0]?.provider})`}
-                  >
-                    <span className="w-4 h-4 rounded-full overflow-hidden shrink-0">
-                      {renderPlatformIcon(connectedAccounts[0]?.provider, 16)}
-                    </span>
-                  </span>
-                )}
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
               </button>
 
               {isBrandMenuOpen && (
-                <div className="absolute left-0 mt-2 w-72 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <div className="absolute left-0 top-full mt-2 w-72 rounded-xl bg-white dark:bg-[#1C1C20] border border-slate-200 dark:border-white/10 shadow-2xl backdrop-blur-md p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 dark:text-[#6B7280] uppercase tracking-wider">
                     Workspaces & Brands
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     {brands.map((b) => (
                       <div
                         key={b.id}
-                        className={`w-full flex items-center justify-between p-2 rounded-lg text-xs transition ${
+                        className={`w-full p-2.5 rounded-xl text-xs transition border ${
                           b.id === activeBrand.id
-                            ? "bg-purple-50 dark:bg-purple-950/40 text-purple-900 dark:text-purple-200 font-bold"
-                            : "hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
+                            ? "bg-purple-50 dark:bg-amber-500/15 border-purple-200 dark:border-amber-500/30 text-slate-900 dark:text-white font-medium"
+                            : "hover:bg-slate-50 dark:hover:bg-white/5 border-transparent text-slate-700 dark:text-slate-300"
                         }`}
                       >
                         <button
@@ -830,9 +1068,9 @@ export function AppLayout({ children }: AppLayoutProps) {
                               type: "info",
                             });
                           }}
-                          className="flex items-start gap-2.5 truncate flex-1 text-left cursor-pointer"
+                          className="flex items-start gap-2.5 w-full text-left cursor-pointer"
                         >
-                          <div className="w-6 h-6 rounded-md bg-[#5846A8] text-white flex items-center justify-center text-[10px] font-bold shrink-0 overflow-hidden shadow-2xs mt-0.5">
+                          <div className="w-7 h-7 rounded-lg bg-[#5846A8] text-white dark:bg-[#E08738] dark:text-[#0F0F11] font-extrabold flex items-center justify-center text-xs shrink-0 overflow-hidden shadow-2xs mt-0.5">
                             {b.avatarUrl ? (
                               <img
                                 src={b.avatarUrl}
@@ -844,44 +1082,49 @@ export function AppLayout({ children }: AppLayoutProps) {
                             )}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <span className="truncate block font-semibold">{b.name}</span>
-                            {/* Connected Social Channel Badges */}
-                            {b.socialAccounts && b.socialAccounts.length > 0 ? (
-                              <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                                {b.socialAccounts.map((acc) => (
-                                  <span
+                            <div className="flex items-center justify-between">
+                              <span className="truncate block font-bold text-slate-900 dark:text-white">
+                                {b.name}
+                              </span>
+                              {b.id === activeBrand.id && (
+                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-purple-100 text-[#5846A8] dark:bg-[#E08738] dark:text-[#0F0F11] shrink-0 ml-1">
+                                  Current
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Stacked Vertical Channel Rows (One below the other per user request) */}
+                            {((b.socialAccounts && b.socialAccounts.length > 0) || (b.id === activeBrand.id && connectedAccounts.length > 0)) ? (
+                              <div className="flex flex-col gap-1.5 mt-2 w-full">
+                                {(b.socialAccounts && b.socialAccounts.length > 0 ? b.socialAccounts : connectedAccounts).map((acc) => (
+                                  <div
                                     key={acc.id}
-                                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 shadow-2xs"
-                                    title={`${acc.displayName} (${acc.provider})`}
+                                    className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg bg-slate-100/80 dark:bg-black/40 border border-slate-200/80 dark:border-white/10 hover:border-purple-300 dark:hover:border-amber-500/40 transition text-left"
                                   >
-                                    <span className="w-3 h-3 flex items-center justify-center shrink-0">
-                                      {renderPlatformIcon(acc.provider, 12)}
-                                    </span>
-                                    <span className="truncate max-w-[90px]">
-                                      {acc.displayName || acc.provider}
-                                    </span>
-                                  </span>
-                                ))}
-                              </div>
-                            ) : b.id === activeBrand.id && connectedAccounts.length > 0 ? (
-                              <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                                {connectedAccounts.map((acc) => (
-                                  <span
-                                    key={acc.id}
-                                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 shadow-2xs"
-                                    title={`${acc.displayName} (${acc.provider})`}
-                                  >
-                                    <span className="w-3 h-3 flex items-center justify-center shrink-0">
-                                      {renderPlatformIcon(acc.provider, 12)}
-                                    </span>
-                                    <span className="truncate max-w-[90px]">
-                                      {acc.displayName || acc.provider}
-                                    </span>
-                                  </span>
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <div className="w-5 h-5 rounded-md bg-white dark:bg-[#17171A] flex items-center justify-center shrink-0 shadow-2xs border border-slate-200/60 dark:border-white/10">
+                                        {renderPlatformIcon(acc.provider, 13)}
+                                      </div>
+                                      <div className="min-w-0">
+                                        <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 block truncate leading-tight">
+                                          {acc.displayName || acc.provider}
+                                        </span>
+                                        <span className="text-[9px] text-slate-400 block truncate">
+                                          {acc.username ? (acc.username.startsWith("@") ? acc.username : `@${acc.username}`) : acc.provider}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-1 shrink-0 ml-1.5">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-xs shadow-emerald-500/50" />
+                                      <span className="text-[9px] font-semibold text-emerald-600 dark:text-emerald-400">
+                                        Active
+                                      </span>
+                                    </div>
+                                  </div>
                                 ))}
                               </div>
                             ) : (
-                              <span className="text-[10px] text-slate-400 font-normal">
+                              <span className="text-[10px] text-slate-400 font-normal mt-0.5 block">
                                 0 channels connected
                               </span>
                             )}
@@ -891,14 +1134,14 @@ export function AppLayout({ children }: AppLayoutProps) {
                     ))}
                   </div>
 
-                  <div className="pt-2 mt-1 border-t border-slate-100 dark:border-slate-800">
+                  <div className="pt-2 mt-1 border-t border-slate-100 dark:border-white/10">
                     <button
                       type="button"
                       onClick={() => {
                         setIsBrandMenuOpen(false);
                         setIsCreateBrandOpen(true);
                       }}
-                      className="w-full flex items-center gap-2 p-2 rounded-lg text-xs font-semibold text-[#5846A8] dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-slate-800 transition cursor-pointer"
+                      className="w-full flex items-center gap-2 p-2 rounded-lg text-xs font-semibold text-[#5846A8] dark:text-[#FBBF24] hover:bg-purple-50 dark:hover:bg-white/8 transition cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>Create New Workspace</span>
@@ -907,152 +1150,175 @@ export function AppLayout({ children }: AppLayoutProps) {
                 </div>
               )}
             </div>
+
+            {/* Accessible breadcrumb (hidden visually per user request to expand search bar) */}
+            <div className="sr-only" aria-hidden="true">
+              <span>{breadcrumb.section}</span>
+              <span>/</span>
+              <span>{breadcrumb.title}</span>
+            </div>
           </div>
 
-          {/* Center: Command Palette Trigger */}
-          <div className="hidden md:flex items-center flex-1 max-w-md mx-6">
+          {/* Center: Command Palette Search Bar (Expanded, Linear/Raycast/Stripe Executive Style) */}
+          <div className="flex items-center flex-1 max-w-xl lg:max-w-2xl mx-3 sm:mx-6 min-w-[200px]">
             <button
               type="button"
+              id="global-header-search-bar"
               onClick={() => setIsCommandPaletteOpen(true)}
-              className="w-full flex items-center justify-between px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/60 text-slate-400 hover:border-[#5846A8]/50 hover:bg-white dark:hover:bg-slate-800 transition cursor-pointer shadow-2xs"
+              className="h-10 w-full flex items-center justify-between px-3.5 sm:px-4 text-xs rounded-xl border border-slate-200/90 dark:border-white/7 bg-slate-50/80 dark:bg-[#17171A] text-slate-500 dark:text-[#9CA3AF] hover:border-purple-400/80 dark:hover:border-[#E08738]/60 hover:bg-white dark:hover:bg-[#1C1C20] hover:shadow-xs transition-all duration-150 cursor-pointer shadow-2xs group"
+              title="Search channels, posts, analytics (Ctrl + K)"
             >
-              <div className="flex items-center gap-2">
-                <Search className="w-3.5 h-3.5 text-slate-400" />
-                <span>Search channels, posts, analytics...</span>
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Search className="w-4 h-4 text-slate-400 dark:text-[#9CA3AF] group-hover:text-[#5846A8] dark:group-hover:text-[#E08738] transition-colors shrink-0" />
+                <span className="truncate text-slate-500 dark:text-[#9CA3AF] font-normal sm:text-xs">
+                  Search channels, posts, queue, analytics...
+                </span>
               </div>
-              <kbd className="px-1.5 py-0.5 text-[10px] font-mono bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded text-slate-500 dark:text-slate-300">
-                Ctrl K
-              </kbd>
+              <div className="flex items-center gap-1 shrink-0 ml-2">
+                <kbd className="px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded text-slate-500 dark:text-slate-300 shadow-2xs group-hover:border-purple-300 dark:group-hover:border-amber-500/40 transition-colors">
+                  Ctrl
+                </kbd>
+                <kbd className="px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded text-slate-500 dark:text-slate-300 shadow-2xs group-hover:border-purple-300 dark:group-hover:border-amber-500/40 transition-colors">
+                  K
+                </kbd>
+              </div>
             </button>
           </div>
 
           {/* Right: Actions, Badges, Profile Menu */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 justify-end">
             
-            {/* Connected Social Channels Badge */}
-            <Link
-              href="/social-accounts"
-              className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-50 dark:bg-purple-950/50 text-[#5846A8] dark:text-purple-300 border border-purple-200 dark:border-purple-800 transition hover:bg-purple-100/60 hover:border-purple-300 shadow-2xs"
-              title="Manage Connected Channels"
-            >
-              {connectedAccounts.length > 0 ? (
-                <>
-                  <div className="flex items-center -space-x-1">
-                    {connectedAccounts.slice(0, 3).map((acc) => (
-                      <div
-                        key={acc.id}
-                        className="w-4 h-4 rounded-full ring-1 ring-white dark:ring-slate-900 overflow-hidden shrink-0"
-                        title={`${acc.displayName} on ${acc.provider}`}
-                      >
-                        {renderPlatformIcon(acc.provider, 16)}
-                      </div>
-                    ))}
-                  </div>
-                  <span className="flex items-center gap-1 font-bold">
-                    <span>
-                      {connectedAccounts[0]?.provider === "linkedin"
-                        ? "LinkedIn"
-                        : connectedAccounts[0]?.provider?.toUpperCase()}
-                    </span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  </span>
-                  <span className="text-[10px] opacity-75 font-normal">
-                    • {connectedAccounts.length} Connected
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span className="w-2 h-2 rounded-full bg-slate-300" />
-                  <span>0 Connected</span>
-                </>
-              )}
-            </Link>
+            {/* Single Unified Social Connections Hub */}
+            <SocialConnectionsHub
+              connectedAccounts={connectedAccounts}
+              onOpenConnectModal={(plat) => {
+                setSelectedConnectPlatform(plat);
+                setIsConnectModalOpen(true);
+              }}
+              onRefreshAccounts={loadAccounts}
+            />
 
-            {/* + New Post Purple Button */}
+            {/* Professional '+ Add Social' Action Button (Signature Purple in Light, Warm Amber in Dark) */}
             <button
               type="button"
+              id="header-add-social-btn"
+              onClick={() => {
+                setSelectedConnectPlatform(undefined);
+                setIsConnectModalOpen(true);
+              }}
+              className="h-9 px-3 sm:px-3.5 rounded-xl border border-purple-200 bg-purple-50/90 text-[#5846A8] hover:bg-purple-100 hover:border-purple-300 shadow-2xs hover:shadow-purple-500/20 dark:border-white/10 dark:bg-white/5 dark:text-[#FBBF24] dark:hover:bg-[#E08738] dark:hover:text-[#0F0F11] dark:hover:border-[#E08738] dark:hover:shadow-[0_0_16px_rgba(224,135,56,0.35)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center gap-1.5 cursor-pointer font-bold text-xs shrink-0 group"
+              title="Connect a new social network (14+ official platforms)"
+            >
+              <div className="w-4 h-4 rounded-full bg-purple-500/15 group-hover:bg-purple-500/25 dark:bg-amber-500/20 dark:group-hover:bg-amber-500/30 flex items-center justify-center transition-colors">
+                <Plus className="w-3 h-3 text-[#5846A8] dark:text-[#FBBF24] group-hover:text-[#48388d] dark:group-hover:text-[#0F0F11] stroke-[2.5] transition-colors" />
+              </div>
+              <span className="tracking-tight">Add Social</span>
+            </button>
+
+            {/* Primary CTA: + New Post (Royal Purple in Light, Golden Amber in Dark) */}
+            <button
+              type="button"
+              id="header-new-post-btn"
               onClick={() => setIsComposerOpen(true)}
-              className="px-3.5 py-2 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white text-xs font-semibold shadow-xs shadow-purple-900/20 transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+              className="h-9 px-3.5 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 hover:shadow-purple-900/35 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 dark:bg-gradient-to-r dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:hover:brightness-105 dark:text-slate-950 dark:shadow-amber-500/25 dark:hover:shadow-amber-500/40 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0"
+              title="Create a new publication"
             >
-              <Plus className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">New Post</span>
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span className="font-bold">New Post</span>
             </button>
 
-            {/* Live Activity Stream Button */}
-            <button
-              type="button"
-              onClick={() => setIsActivityOpen(true)}
-              className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-              title="Live Activity Stream"
-            >
-              <Activity className="w-4 h-4" />
-            </button>
+            {/* Quick Utility Icons: Theme Toggle, Activity, Help, Notifications */}
+            <div className="flex items-center gap-1 shrink-0">
+              {/* Global Theme Switcher: Direct Light / Dark / System Mode */}
+              <ThemeSwitcher />
 
-            {/* Notifications Menu */}
-            <div className="relative" ref={notifMenuRef}>
+              {/* Live Activity Stream Button */}
               <button
                 type="button"
-                onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                className="relative p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                title="Notifications"
+                onClick={() => setIsActivityOpen(true)}
+                className="h-9 w-9 flex items-center justify-center rounded-xl text-slate-500 dark:text-[#9CA3AF] hover:text-[#5846A8] dark:hover:text-white hover:bg-purple-50/70 dark:hover:bg-white/5 transition duration-200 cursor-pointer shrink-0 hover:scale-105"
+                title="Live Activity Stream"
               >
-                <Bell className="w-4 h-4" />
-                {unreadNotificationsCount > 0 && (
-                  <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-purple-600 ring-2 ring-white dark:ring-slate-900" />
-                )}
+                <Activity className="w-4 h-4" />
               </button>
 
-              {isNotificationsOpen && (
-                <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-                    <h4 className="text-xs font-bold text-slate-900 dark:text-white">Notifications</h4>
-                    {unreadNotificationsCount > 0 && (
-                      <button
-                        type="button"
-                        onClick={handleMarkAllNotificationsRead}
-                        className="text-[10px] text-[#5846A8] dark:text-purple-400 font-semibold hover:underline cursor-pointer"
-                      >
-                        Mark all as read
-                      </button>
-                    )}
-                  </div>
+              {/* Help & Documentation Guide Modal Button */}
+              <button
+                type="button"
+                onClick={() => setIsHelpOpen(true)}
+                className="h-9 w-9 flex items-center justify-center rounded-xl text-slate-500 dark:text-[#9CA3AF] hover:text-[#5846A8] dark:hover:text-white hover:bg-purple-50/70 dark:hover:bg-white/5 transition duration-200 cursor-pointer shrink-0 hover:scale-105"
+                title="Help & Quick Guides"
+                aria-label="Open Help and Guides"
+              >
+                <HelpCircle className="w-4 h-4" />
+              </button>
 
-                  <div className="py-2 space-y-2 max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
-                    {notifications.length === 0 ? (
-                      <p className="text-center text-xs text-slate-400 py-6">No notifications yet</p>
-                    ) : (
-                      notifications.map((notif) => (
-                        <div key={notif.id} className="pt-2 first:pt-0">
-                          <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                            {notif.title}
-                          </p>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5">
-                            {notif.description}
-                          </p>
-                          <span className="text-[9px] text-slate-400 mt-1 inline-block">{notif.time}</span>
-                        </div>
-                      ))
-                    )}
+              {/* Notifications Menu */}
+              <div className="relative shrink-0" ref={notifMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                  className="h-9 w-9 relative flex items-center justify-center rounded-xl text-slate-500 dark:text-[#9CA3AF] hover:text-[#5846A8] dark:hover:text-white hover:bg-purple-50/70 dark:hover:bg-white/5 transition duration-200 cursor-pointer hover:scale-105"
+                  title="Notifications"
+                >
+                  <Bell className="w-4 h-4" />
+                  {unreadNotificationsCount > 0 && (
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#5846A8] dark:bg-[#E08738] ring-2 ring-white dark:ring-[#0D0D0E]" />
+                  )}
+                </button>
+
+                {isNotificationsOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-80 rounded-2xl bg-white dark:bg-[#1C1C20] border border-slate-200 dark:border-white/10 shadow-2xl backdrop-blur-md p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/10">
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white">Notifications</h4>
+                      {unreadNotificationsCount > 0 && (
+                        <button
+                          type="button"
+                          onClick={handleMarkAllNotificationsRead}
+                          className="text-[10px] text-[#5846A8] hover:text-[#48388d] dark:text-[#FBBF24] dark:hover:text-[#E08738] font-semibold hover:underline cursor-pointer"
+                        >
+                          Mark all as read
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="py-2 space-y-2 max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-white/5">
+                      {notifications.length === 0 ? (
+                        <p className="text-center text-xs text-slate-400 py-6">No notifications yet</p>
+                      ) : (
+                        notifications.map((notif) => (
+                          <div key={notif.id} className="pt-2 first:pt-0">
+                            <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                              {notif.title}
+                            </p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5">
+                              {notif.description}
+                            </p>
+                            <span className="text-[9px] text-slate-400 mt-1 inline-block">{notif.time}</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
             {/* User Profile Avatar & Dropdown */}
-            <div className="relative" ref={userMenuRef}>
+            <div className="relative shrink-0" ref={userMenuRef}>
               <button
                 type="button"
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="h-9 flex items-center gap-2 p-1 rounded-xl hover:bg-purple-50/70 dark:hover:bg-white/5 transition duration-200 cursor-pointer"
               >
-                <div className="w-8 h-8 rounded-full bg-[#5846A8] text-white flex items-center justify-center font-bold text-xs ring-2 ring-purple-100 dark:ring-purple-900 shadow-xs">
+                <div className="w-7 h-7 rounded-full bg-[#5846A8] text-white dark:bg-[#E08738] dark:text-[#0F0F11] flex items-center justify-center font-extrabold text-xs ring-2 ring-purple-500/30 dark:ring-amber-500/30 shadow-xs">
                   {initial}
                 </div>
                 <div className="hidden xl:flex flex-col text-left">
-                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 leading-tight truncate max-w-[120px]">
+                  <span className="text-xs font-bold text-slate-800 dark:text-white leading-tight truncate max-w-[120px]">
                     {realName}
                   </span>
-                  <span className="text-[10px] text-slate-400 leading-tight truncate max-w-[120px]">
+                  <span className="text-[10px] text-slate-400 dark:text-[#9CA3AF] leading-tight truncate max-w-[120px]">
                     {realRole}
                   </span>
                 </div>
@@ -1060,46 +1326,44 @@ export function AppLayout({ children }: AppLayoutProps) {
               </button>
 
               {isUserMenuOpen && (
-                <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-2.5 z-50 animate-in fade-in zoom-in-95 duration-150 text-xs">
-                  <div className="p-3 bg-purple-50/60 dark:bg-slate-800/80 rounded-xl mb-1.5 border border-purple-100/80 dark:border-purple-900/40">
+                <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 rounded-2xl bg-white dark:bg-[#1C1C20] border border-slate-200 dark:border-white/10 shadow-2xl backdrop-blur-md p-2.5 z-50 animate-in fade-in zoom-in-95 duration-150 text-xs">
+                  <div className="p-3 bg-slate-50 dark:bg-[#17171A] rounded-xl mb-1.5 border border-slate-200/80 dark:border-white/10">
                     <p className="font-bold text-slate-900 dark:text-white truncate text-sm">
                       {realName}
                     </p>
                     {realEmail && (
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5 font-mono">
+                      <p className="text-[11px] text-slate-500 dark:text-[#9CA3AF] truncate mt-0.5 font-mono">
                         {realEmail}
                       </p>
                     )}
                     <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                      <span className="inline-block text-[9px] font-bold px-2 py-0.5 rounded bg-[#5846A8] text-white shadow-2xs">
+                      <span className="inline-block text-[9px] font-bold px-2 py-0.5 rounded bg-purple-100 text-[#5846A8] dark:bg-[#E08738] dark:text-[#0F0F11] shadow-2xs">
                         {realRole}
                       </span>
                       {user?.activeOrganization?.name && (
-                        <span className="inline-block text-[9px] font-semibold px-2 py-0.5 rounded bg-purple-100 text-[#5846A8] dark:bg-purple-900/60 dark:text-purple-300 truncate max-w-[140px]">
+                        <span className="inline-block text-[9px] font-semibold px-2 py-0.5 rounded bg-purple-50 text-[#5846A8] border border-purple-200 dark:bg-amber-500/15 dark:text-[#FBBF24] dark:border-amber-500/30 truncate max-w-[210px]" title={user.activeOrganization.name}>
                           🏢 {user.activeOrganization.name}
                         </span>
                       )}
                     </div>
-                    {/* Google Login indicator */}
-                    <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-purple-100/70 dark:border-slate-700/60 text-[10px] text-slate-600 dark:text-slate-400">
-                      <div className="w-3.5 h-3.5 shrink-0">
-                        {renderPlatformIcon("google", 14)}
-                      </div>
-                      <span>Logged in via Google SSO</span>
+                    {/* Authenticated Session Indicator */}
+                    <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-slate-200/60 dark:border-white/10 text-[10px] text-slate-600 dark:text-[#9CA3AF]">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                      <span>Verified Authenticated Session</span>
                     </div>
                   </div>
 
                   {/* Connected Social Channels in Active Workspace */}
                   {connectedAccounts.length > 0 && (
-                    <div className="px-2 py-2 mb-1 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                    <div className="px-2 py-2 mb-1 rounded-xl bg-slate-50/80 dark:bg-[#17171A] border border-slate-100 dark:border-white/10">
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                        <span className="text-[9px] font-bold text-slate-400 dark:text-[#6B7280] uppercase tracking-wider">
                           Connected Channels
                         </span>
                         <Link
                           href="/social-accounts"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="text-[9px] font-bold text-[#5846A8] dark:text-purple-400 hover:underline"
+                          className="text-[9px] font-bold text-[#5846A8] dark:text-[#FBBF24] hover:underline hover:scale-105 transition-transform"
                         >
                           Manage
                         </Link>
@@ -1108,7 +1372,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                         {connectedAccounts.map((acc) => (
                           <div
                             key={acc.id}
-                            className="flex items-center justify-between p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 shadow-2xs"
+                            className="flex items-center justify-between p-1.5 rounded-lg bg-white dark:bg-[#111113] border border-slate-200/80 dark:border-white/10 shadow-2xs hover:border-purple-300 dark:hover:border-amber-500/40 transition-colors"
                           >
                             <div className="flex items-center gap-1.5 min-w-0">
                               <div className="w-4 h-4 rounded-full overflow-hidden shrink-0">
@@ -1131,7 +1395,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                     <Link
                       href="/settings/profile"
                       onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition text-slate-700 dark:text-slate-300 font-medium"
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-purple-50 dark:hover:bg-white/8 transition-all text-slate-700 dark:text-slate-300 hover:text-[#5846A8] dark:hover:text-white font-medium"
                     >
                       <User className="w-3.5 h-3.5 text-slate-400" />
                       <span>Account Profile</span>
@@ -1140,7 +1404,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                     <Link
                       href="/settings"
                       onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition text-slate-700 dark:text-slate-300 font-medium"
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-purple-50 dark:hover:bg-white/8 transition-all text-slate-700 dark:text-slate-300 hover:text-[#5846A8] dark:hover:text-white font-medium"
                     >
                       <Settings className="w-3.5 h-3.5 text-slate-400" />
                       <span>Workspace Settings</span>
@@ -1149,13 +1413,13 @@ export function AppLayout({ children }: AppLayoutProps) {
                     <button
                       type="button"
                       onClick={handleToggleDarkMode}
-                      className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition text-slate-700 dark:text-slate-300 text-left font-medium cursor-pointer"
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-purple-50 dark:hover:bg-white/8 transition-all text-slate-700 dark:text-slate-300 hover:text-[#5846A8] dark:hover:text-white text-left font-medium cursor-pointer"
                     >
                       <span className="flex items-center gap-2.5">
-                        {isDarkMode ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-slate-400" />}
+                        {isDarkMode ? <Sun className="w-3.5 h-3.5 text-[#E08738]" /> : <Moon className="w-3.5 h-3.5 text-[#5846A8]" />}
                         <span>Dark Theme</span>
                       </span>
-                      <span className="text-[10px] text-slate-400">{isDarkMode ? "On" : "Off"}</span>
+                      <span className="text-[10px] text-slate-400 font-semibold">{isDarkMode ? "On" : "Off"}</span>
                     </button>
 
                     {(user?.role?.toUpperCase() === "OWNER" ||
@@ -1166,13 +1430,13 @@ export function AppLayout({ children }: AppLayoutProps) {
                       <Link
                         href="/admin"
                         onClick={() => setIsUserMenuOpen(false)}
-                        className="flex items-center justify-between px-3 py-2 rounded-lg bg-purple-50/80 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-900/60 transition text-[#5846A8] dark:text-purple-300 font-bold"
+                        className="flex items-center justify-between px-3 py-2 rounded-lg bg-purple-50 dark:bg-amber-950/40 hover:bg-purple-100 dark:hover:bg-amber-900/60 transition text-[#5846A8] dark:text-amber-300 font-bold"
                       >
                         <span className="flex items-center gap-2.5">
-                          <Shield className="w-3.5 h-3.5 text-[#5846A8] dark:text-purple-400" />
+                          <Shield className="w-3.5 h-3.5 text-[#5846A8] dark:text-amber-400" />
                           <span>Admin Console</span>
                         </span>
-                        <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-[#5846A8] text-white">
+                        <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-[#5846A8] text-white dark:bg-gradient-to-r dark:from-[#F59E0B] dark:to-[#D97706] dark:text-slate-950">
                           Admin
                         </span>
                       </Link>
@@ -1195,25 +1459,32 @@ export function AppLayout({ children }: AppLayoutProps) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto pb-16 flex flex-col justify-between">
-          <div>{children}</div>
+        <main className="flex-1 overflow-y-auto flex flex-col justify-between">
+          <div className="flex-1">{children}</div>
+          <DashboardFooter />
         </main>
       </div>
-
-      {/* Sticky Bottom Dock Bar with Notebook, Search, Help */}
-      <BottomDockBar />
 
       {/* Global Modals & Drawers */}
       <PostComposerModal
         isOpen={isComposerOpen}
-        onClose={() => setIsComposerOpen(false)}
+        onClose={() => {
+          setIsComposerOpen(false);
+          setComposerInitialOption(undefined);
+        }}
+        initialPublishingOption={composerInitialOption}
       />
 
       <UniversalSocialConnectModal
         isOpen={isConnectModalOpen}
-        onClose={() => setIsConnectModalOpen(false)}
+        initialPlatformId={selectedConnectPlatform}
+        onClose={() => {
+          setIsConnectModalOpen(false);
+          setSelectedConnectPlatform(undefined);
+        }}
         onSuccess={() => {
           setIsConnectModalOpen(false);
+          setSelectedConnectPlatform(undefined);
           loadAccounts();
           toast({
             title: "Channel Connected",
@@ -1247,13 +1518,25 @@ export function AppLayout({ children }: AppLayoutProps) {
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
         onOpenComposer={() => setIsComposerOpen(true)}
-        onOpenAddBrand={() => setIsConnectModalOpen(true)}
+        onOpenAddBrand={() => setIsCreateBrandOpen(true)}
         onOpenActivity={() => setIsActivityOpen(true)}
+        onOpenConnectModal={(plat) => {
+          setSelectedConnectPlatform(plat);
+          setIsConnectModalOpen(true);
+        }}
+        onToggleTheme={handleToggleDarkMode}
+        onOpenHelp={() => setIsHelpOpen(true)}
+        connectedAccounts={connectedAccounts}
       />
 
       <PulseAIPanel
         isOpen={isAIDrawerOpen}
         onClose={() => setIsAIDrawerOpen(false)}
+      />
+
+      <PulseHelpGuidesModal
+        isOpen={isHelpOpen}
+        onClose={() => setIsHelpOpen(false)}
       />
     </div>
   );

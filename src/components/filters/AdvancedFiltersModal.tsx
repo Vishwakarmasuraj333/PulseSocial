@@ -149,24 +149,24 @@ export function AdvancedFiltersModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-slate-900 dark:text-white flex flex-col max-h-[90vh]">
+      <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-[#17171A] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 ring-1 ring-amber-500/15 w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-slate-900 dark:text-white flex flex-col max-h-[90vh]">
           {/* Header */}
-          <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div className="px-6 py-4 border-b border-slate-100 dark:border-white/7 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#5846A8] to-purple-500 flex items-center justify-center text-white shadow-md shadow-purple-900/20">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#E08738] to-[#F59E0B] flex items-center justify-center text-[#0F0F11] font-bold shadow-md shadow-amber-900/20">
                 <Filter className="w-4 h-4" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-sm font-bold tracking-tight">Advanced Post Filters</h3>
                   {activeCount > 0 && (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#5846A8] text-white">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E08738] text-[#0F0F11]">
                       {activeCount} Active
                     </span>
                   )}
                 </div>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                <p className="text-[11px] text-slate-500 dark:text-[#9CA3AF]">
                   Filter posts by platform, campaign, and approval status in real-time.
                 </p>
               </div>
@@ -187,7 +187,7 @@ export function AdvancedFiltersModal({
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
                 <label className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                  <Share2 className="w-3.5 h-3.5 text-[#5846A8]" />
+                  <Share2 className="w-3.5 h-3.5 text-[#E08738] dark:text-[#FBBF24]" />
                   <span>Social Platforms</span>
                 </label>
                 {draft.platforms.length > 0 && (
@@ -210,13 +210,13 @@ export function AdvancedFiltersModal({
                       onClick={() => togglePlatform(plat.id)}
                       className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-medium transition cursor-pointer text-left ${
                         isChecked
-                          ? "bg-purple-50/80 dark:bg-purple-950/40 border-[#5846A8] text-[#5846A8] dark:text-purple-300 shadow-2xs font-bold"
-                          : "bg-white dark:bg-slate-850 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
+                          ? "bg-amber-500/10 dark:bg-amber-500/15 border-[#E08738] text-amber-700 dark:text-[#FBBF24] shadow-2xs font-bold"
+                          : "bg-white dark:bg-[#1C1C20] border-slate-200 dark:border-white/7 text-slate-700 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/5"
                       }`}
                     >
                       <div className="shrink-0">{renderPlatformIcon(plat.provider, 15)}</div>
                       <span className="truncate flex-1">{plat.name}</span>
-                      {isChecked && <Check className="w-3.5 h-3.5 text-[#5846A8] shrink-0" />}
+                      {isChecked && <Check className="w-3.5 h-3.5 text-[#E08738] dark:text-[#FBBF24] shrink-0" />}
                     </button>
                   );
                 })}
@@ -251,8 +251,8 @@ export function AdvancedFiltersModal({
                       onClick={() => toggleApprovalStatus(status.id)}
                       className={`flex items-center gap-2.5 px-3 py-2 rounded-xl border text-xs transition cursor-pointer text-left ${
                         isChecked
-                          ? `${status.color} font-bold shadow-2xs ring-1 ring-offset-0 ring-[#5846A8]/40`
-                          : "bg-white dark:bg-slate-850 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
+                          ? `${status.color} font-bold shadow-2xs ring-1 ring-offset-0 ring-[#E08738]/40`
+                          : "bg-white dark:bg-[#1C1C20] border-slate-200 dark:border-white/7 text-slate-700 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/5"
                       }`}
                     >
                       <Icon className="w-4 h-4 shrink-0" />
@@ -268,7 +268,7 @@ export function AdvancedFiltersModal({
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
                 <label className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                  <Tag className="w-3.5 h-3.5 text-blue-600" />
+                  <Tag className="w-3.5 h-3.5 text-amber-500" />
                   <span>Workspace Campaigns</span>
                 </label>
                 {draft.campaigns.length > 0 && (
@@ -291,8 +291,8 @@ export function AdvancedFiltersModal({
                       onClick={() => toggleCampaign(camp.id)}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition cursor-pointer ${
                         isChecked
-                          ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white font-bold shadow-xs"
-                          : "bg-white dark:bg-slate-850 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
+                          ? "bg-[#E08738] text-[#0F0F11] border-[#E08738] font-bold shadow-xs"
+                          : "bg-white dark:bg-[#1C1C20] border-slate-200 dark:border-white/7 text-slate-700 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/5"
                       }`}
                     >
                       <span className={`w-2 h-2 rounded-full ${camp.color}`} />
@@ -307,7 +307,7 @@ export function AdvancedFiltersModal({
             {/* 4. Filter by Content Format */}
             <div className="space-y-2.5">
               <label className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5 text-purple-600" />
+                <Layers className="w-3.5 h-3.5 text-[#E08738] dark:text-[#FBBF24]" />
                 <span>Content Format</span>
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -320,12 +320,12 @@ export function AdvancedFiltersModal({
                       onClick={() => toggleContentType(type.id)}
                       className={`p-2.5 rounded-xl border text-center transition cursor-pointer flex flex-col items-center justify-center gap-1 ${
                         isChecked
-                          ? "bg-purple-50/80 dark:bg-purple-950/40 border-[#5846A8] text-[#5846A8] dark:text-purple-300 font-bold"
-                          : "bg-white dark:bg-slate-850 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
+                          ? "bg-amber-500/10 dark:bg-amber-500/15 border-[#E08738] text-amber-700 dark:text-[#FBBF24] font-bold"
+                          : "bg-white dark:bg-[#1C1C20] border-slate-200 dark:border-white/7 text-slate-700 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/5"
                       }`}
                     >
                       <span className="text-xs font-semibold">{type.label}</span>
-                      <span className="text-[10px] text-slate-400 font-normal line-clamp-1">{type.desc}</span>
+                      <span className="text-[10px] text-slate-400 dark:text-[#6B7280] font-normal line-clamp-1">{type.desc}</span>
                     </button>
                   );
                 })}
@@ -334,7 +334,7 @@ export function AdvancedFiltersModal({
           </div>
 
           {/* Footer Actions */}
-          <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950/60 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div className="px-6 py-4 bg-slate-50 dark:bg-[#111113] border-t border-slate-100 dark:border-white/7 flex items-center justify-between">
             <button
               type="button"
               onClick={handleReset}
@@ -348,7 +348,7 @@ export function AdvancedFiltersModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-200/60 dark:hover:bg-white/5 transition cursor-pointer"
               >
                 Cancel
               </button>
@@ -356,7 +356,7 @@ export function AdvancedFiltersModal({
               <button
                 type="button"
                 onClick={handleApply}
-                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-[#5846A8] hover:bg-[#47378c] text-white text-xs font-bold shadow-md shadow-purple-900/20 transition cursor-pointer active:scale-95"
+                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-gradient-to-r from-[#E08738] to-[#F59E0B] hover:brightness-105 text-[#0F0F11] text-xs font-bold shadow-md shadow-amber-900/20 transition cursor-pointer active:scale-95"
               >
                 <Check className="w-3.5 h-3.5" />
                 <span>Apply Filters {activeCount > 0 ? `(${activeCount})` : ""}</span>

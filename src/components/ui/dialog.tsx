@@ -53,7 +53,7 @@ export function Dialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-4">
       {/* Backdrop with smooth fade animation */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+        className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity animate-in fade-in duration-200"
         onClick={handleClose}
         aria-hidden="true"
       />
@@ -61,7 +61,7 @@ export function Dialog({
       {/* Dialog Window with smooth zoom & scale animation */}
       <div
         className={cn(
-          "relative z-50 w-full h-full md:h-auto max-md:max-h-full rounded-none md:rounded-2xl bg-white shadow-2xl border border-slate-200/90 dark:bg-slate-900 dark:border-slate-800 p-4 md:p-6 overflow-y-auto animate-in fade-in zoom-in-95 duration-200 ease-out",
+          "relative z-50 w-full h-full md:h-auto max-md:max-h-full rounded-none md:rounded-2xl bg-white shadow-2xl border border-slate-200/90 dark:bg-[#17171A] dark:border-white/10 ring-1 ring-amber-500/10 dark:text-white p-4 md:p-6 overflow-y-auto animate-in fade-in zoom-in-95 duration-200 ease-out",
           maxWidth,
           className
         )}

@@ -52,11 +52,11 @@ export default function PlatformsPage() {
       features: ["Direct video upload with progress tracking", "Aspect ratio validation (9:16 vertical)", "Cover frame selection", "Virality telemetry"],
     },
     {
-      id: "google_business",
-      name: "Google Business Profile",
-      type: "Local Commerce",
-      desc: "Google My Business API for local storefronts, retail locations, customer review alerts, and special offer updates.",
-      features: ["Location post publishing", "Customer reviews monitoring and quick replies", "Business hours and offer announcements", "Local search view telemetry"],
+      id: "pinterest",
+      name: "Pinterest Business",
+      type: "Visual Commerce",
+      desc: "Official Pinterest API for visual pin authoring, board organization, shopping tags, and rich analytics.",
+      features: ["Pin scheduling & rich metadata", "Board and section targeting", "Visual search impressions", "Click-through telemetry"],
     },
     {
       id: "threads",
@@ -92,13 +92,6 @@ export default function PlatformsPage() {
       type: "Community Servers",
       desc: "Discord Webhook and Bot integrations for community announcements, product updates, and member notifications.",
       features: ["Rich embed message styling", "Channel selector", "Scheduled announcements", "Automated release notifications"],
-    },
-    {
-      id: "snapchat",
-      name: "Snapchat Spotlight",
-      type: "Mobile Camera",
-      desc: "Marketing API for creator Spotlight videos, public brand stories, and mobile audience discovery.",
-      features: ["Spotlight video scheduling", "Lens and filter campaign tracking", "View counts and shares", "Vertical video validation"],
     },
     {
       id: "mastodon",

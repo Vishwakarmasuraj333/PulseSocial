@@ -1034,7 +1034,7 @@ export function PostEngagementDetailsModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white text-xs font-semibold transition cursor-pointer shadow-xs"
+            className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#F59E0B] via-[#E08738] to-[#D97706] hover:brightness-105 text-slate-950 text-xs font-bold transition cursor-pointer shadow-md shadow-amber-500/20 active:scale-[0.98]"
           >
             Close Details
           </button>

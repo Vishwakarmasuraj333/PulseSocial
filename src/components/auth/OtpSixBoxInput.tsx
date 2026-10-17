@@ -180,17 +180,17 @@ export function OtpSixBoxInput({
               className={`w-full h-full text-center text-xl sm:text-2xl font-bold font-mono rounded-xl transition-all duration-150 outline-none select-all
                 ${
                   hasError
-                    ? "border-2 border-rose-500 bg-rose-50/50 text-rose-900 focus:ring-4 focus:ring-rose-500/20"
+                    ? "border-2 border-rose-500 bg-rose-50/50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200 focus:ring-4 focus:ring-rose-500/20"
                     : isFilled
-                    ? "border-2 border-[#1592e6] bg-blue-50/30 text-slate-900 shadow-sm"
-                    : "border-2 border-slate-200 bg-slate-50/60 text-slate-900 hover:border-slate-300 focus:border-[#1592e6] focus:bg-white focus:ring-4 focus:ring-[#1592e6]/15"
+                    ? "border-2 border-[#5846A8] dark:border-[#E08738] bg-purple-50/40 dark:bg-amber-500/10 text-slate-900 dark:text-white shadow-sm"
+                    : "border-2 border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-[#16161D] text-slate-900 dark:text-white hover:border-slate-300 dark:hover:border-slate-600 focus:border-[#5846A8] dark:focus:border-[#E08738] focus:bg-white dark:focus:bg-[#1C1C24] focus:ring-4 focus:ring-[#5846A8]/15 dark:focus:ring-[#E08738]/20"
                 }
-                ${disabled ? "opacity-50 cursor-not-allowed bg-slate-100" : "cursor-text"}
+                ${disabled ? "opacity-50 cursor-not-allowed bg-slate-100 dark:bg-slate-800" : "cursor-text"}
               `}
             />
             {/* Subtle center indicator line when empty */}
             {!isFilled && !disabled && (
-              <span className="absolute bottom-2.5 left-1/2 -translate-x-1/2 w-2 h-0.5 bg-slate-300 rounded-full pointer-events-none" />
+              <span className="absolute bottom-2.5 left-1/2 -translate-x-1/2 w-2 h-0.5 bg-slate-300 dark:bg-slate-600 rounded-full pointer-events-none" />
             )}
           </div>
         );

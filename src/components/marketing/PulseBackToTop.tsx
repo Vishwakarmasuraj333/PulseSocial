@@ -49,16 +49,16 @@ export function PulseBackToTop() {
         onClick={scrollToTop}
         aria-label="Scroll back to top"
         title="Scroll to top of page"
-        className="group relative flex items-center gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#5846A8] via-[#6348B8] to-[#714EC8] hover:from-[#4C3A94] hover:to-[#6240B9] text-white border border-purple-300/30 shadow-[0_10px_25px_-3px_rgba(88,70,168,0.45)] hover:shadow-[0_16px_35px_-4px_rgba(88,70,168,0.6)] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer overflow-hidden ring-1 ring-white/20"
+        className="group relative flex items-center gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#D97706] via-[#E08738] to-[#F59E0B] hover:brightness-105 text-slate-950 border border-amber-300/40 shadow-[0_10px_25px_-3px_rgba(224,135,56,0.45)] hover:shadow-[0_16px_35px_-4px_rgba(224,135,56,0.6)] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer overflow-hidden ring-1 ring-white/20"
       >
-        {/* Sleek horizontal progress line at bottom (purple & white theme) */}
+        {/* Sleek horizontal progress line at bottom */}
         <div
-          className="absolute bottom-0 left-0 h-[2.5px] bg-white transition-all duration-150 rounded-full"
+          className="absolute bottom-0 left-0 h-[2.5px] bg-slate-950/80 transition-all duration-150 rounded-full"
           style={{ width: `${scrollProgress}%` }}
         />
 
-        {/* Crisp white rounded icon square with purple arrow */}
-        <div className="w-6 h-6 sm:w-6.5 sm:h-6.5 rounded-lg bg-white text-[#5846A8] flex items-center justify-center shadow-xs shrink-0 group-hover:-translate-y-0.5 transition-transform duration-200">
+        {/* Crisp icon square with dark arrow */}
+        <div className="w-6 h-6 sm:w-6.5 sm:h-6.5 rounded-lg bg-slate-950 text-[#F59E0B] flex items-center justify-center shadow-xs shrink-0 group-hover:-translate-y-0.5 transition-transform duration-200">
           <ArrowUp className="w-3.5 h-3.5 stroke-[2.75]" />
         </div>
 

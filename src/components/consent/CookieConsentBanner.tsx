@@ -273,7 +273,7 @@ export function CookieConsentBanner({
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="space-y-1.5 max-w-3xl">
               <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-[#5846A8] dark:text-purple-400 shrink-0" aria-hidden="true" />
+                <Shield className="w-4 h-4 text-[#E08738] dark:text-[#FBBF24] shrink-0" aria-hidden="true" />
                 <h2 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
                   Your privacy choices
                 </h2>
@@ -286,7 +286,7 @@ export function CookieConsentBanner({
               <div className="flex items-center gap-3 pt-0.5 text-xs">
                 <Link
                   href="/cookie-policy"
-                  className="text-slate-700 dark:text-slate-300 hover:text-[#5846A8] dark:hover:text-purple-300 underline underline-offset-2 font-medium transition"
+                  className="text-slate-700 dark:text-slate-300 hover:text-[#E08738] dark:hover:text-[#FBBF24] underline underline-offset-2 font-medium transition"
                 >
                   Cookie Policy
                 </Link>
@@ -295,7 +295,7 @@ export function CookieConsentBanner({
                 </span>
                 <Link
                   href="/privacy"
-                  className="text-slate-700 dark:text-slate-300 hover:text-[#5846A8] dark:hover:text-purple-300 underline underline-offset-2 font-medium transition"
+                  className="text-slate-700 dark:text-slate-300 hover:text-[#E08738] dark:hover:text-[#FBBF24] underline underline-offset-2 font-medium transition"
                 >
                   Privacy Policy
                 </Link>
@@ -313,7 +313,7 @@ export function CookieConsentBanner({
                   id="cookie-reject-all"
                   onClick={handleRejectAll}
                   disabled={isSubmitting}
-                  className="cookie-action-btn w-full sm:w-[110px] min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white transition cursor-pointer flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#5846A8] focus:ring-offset-2 dark:focus:ring-offset-slate-900 shadow-xs"
+                  className="cookie-action-btn w-full sm:w-[110px] min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white transition cursor-pointer flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#E08738] focus:ring-offset-2 dark:focus:ring-offset-slate-900 shadow-xs"
                 >
                   Reject all
                 </button>
@@ -323,7 +323,7 @@ export function CookieConsentBanner({
                   id="cookie-accept-all"
                   onClick={handleAcceptAll}
                   disabled={isSubmitting}
-                  className="cookie-action-btn w-full sm:w-[110px] min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white transition cursor-pointer flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#5846A8] focus:ring-offset-2 dark:focus:ring-offset-slate-900 shadow-xs"
+                  className="cookie-action-btn w-full sm:w-[110px] min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white transition cursor-pointer flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#E08738] focus:ring-offset-2 dark:focus:ring-offset-slate-900 shadow-xs"
                 >
                   Accept all
                 </button>
@@ -334,7 +334,7 @@ export function CookieConsentBanner({
                 id="cookie-customize"
                 onClick={openPreferences}
                 disabled={isSubmitting}
-                className="w-full sm:w-auto min-h-[44px] px-4 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-transparent transition cursor-pointer flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-[#5846A8] focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+                className="w-full sm:w-auto min-h-[44px] px-4 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-transparent transition cursor-pointer flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-[#E08738] focus:ring-offset-2 dark:focus:ring-offset-slate-900"
               >
                 <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" aria-hidden="true" />
                 <span>Customize</span>
@@ -416,7 +416,7 @@ export function CookieConsentBanner({
                 type="button"
                 onClick={closePreferences}
                 aria-label="Close preferences dialog"
-                className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer shrink-0 focus:outline-none focus:ring-2 focus:ring-[#5846A8]"
+                className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer shrink-0 focus:outline-none focus:ring-2 focus:ring-[#E08738]"
               >
                 <X className="w-5 h-5" aria-hidden="true" />
               </button>
@@ -502,12 +502,12 @@ export function CookieConsentBanner({
                             aria-label={`Toggle ${cat.name}`}
                             onClick={handleToggle}
                             disabled={isSubmitting}
-                            className="min-h-[44px] min-w-[70px] inline-flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#5846A8]"
+                            className="min-h-[44px] min-w-[70px] inline-flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#E08738]"
                           >
                             <span
                               className={`text-xs font-bold select-none ${
                                 isChecked
-                                  ? "text-[#5846A8] dark:text-purple-400"
+                                  ? "text-[#E08738] dark:text-[#FBBF24]"
                                   : "text-slate-500 dark:text-slate-400"
                               }`}
                             >
@@ -515,7 +515,7 @@ export function CookieConsentBanner({
                             </span>
                             <span
                               className={`w-7 h-4 rounded-full transition-colors flex items-center p-0.5 ${
-                                isChecked ? "bg-[#5846A8]" : "bg-slate-300 dark:bg-slate-700"
+                                isChecked ? "bg-[#E08738]" : "bg-slate-300 dark:bg-slate-700"
                               }`}
                             >
                               <span
@@ -535,7 +535,7 @@ export function CookieConsentBanner({
                         type="button"
                         onClick={() => toggleCategoryExpander(cat.id)}
                         aria-expanded={isExpanded}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#5846A8] dark:text-purple-400 hover:underline cursor-pointer min-h-[36px]"
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#E08738] dark:text-[#FBBF24] hover:underline cursor-pointer min-h-[36px]"
                       >
                         <span>
                           {isExpanded ? "Hide cookies" : `View cookies (${cat.cookies.length})`}
@@ -561,7 +561,7 @@ export function CookieConsentBanner({
                             <tbody className="divide-y divide-slate-100 dark:divide-slate-850">
                               {cat.cookies.map((c) => (
                                 <tr key={c.name} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
-                                  <td className="py-2 px-3 font-mono text-[#5846A8] dark:text-purple-400 font-semibold text-[11px]">
+                                  <td className="py-2 px-3 font-mono text-[#E08738] dark:text-[#FBBF24] font-semibold text-[11px]">
                                     {c.name}
                                   </td>
                                   <td className="py-2 px-3 text-slate-700 dark:text-slate-300">
@@ -594,7 +594,7 @@ export function CookieConsentBanner({
                 id="dialog-reject-all"
                 onClick={handleRejectAll}
                 disabled={isSubmitting}
-                className="cookie-dialog-action-btn w-full sm:w-[120px] min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white transition cursor-pointer flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#5846A8] shadow-xs"
+                className="cookie-dialog-action-btn w-full sm:w-[120px] min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white transition cursor-pointer flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#E08738] shadow-xs"
               >
                 Reject all
               </button>
@@ -605,7 +605,7 @@ export function CookieConsentBanner({
                   id="dialog-save-choices"
                   onClick={handleSaveChoices}
                   disabled={isSubmitting}
-                  className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-xl text-xs font-bold bg-[#5846A8] hover:bg-[#48388d] text-white transition cursor-pointer flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#5846A8] shadow-xs"
+                  className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-[#F59E0B] via-[#E08738] to-[#D97706] hover:brightness-105 text-slate-950 transition cursor-pointer flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#E08738] shadow-md shadow-amber-500/20 active:scale-[0.98]"
                 >
                   Save my choices
                 </button>
@@ -615,7 +615,7 @@ export function CookieConsentBanner({
                   id="dialog-accept-all"
                   onClick={handleAcceptAll}
                   disabled={isSubmitting}
-                  className="cookie-dialog-action-btn w-full sm:w-[120px] min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white transition cursor-pointer flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#5846A8] shadow-xs"
+                  className="cookie-dialog-action-btn w-full sm:w-[120px] min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white transition cursor-pointer flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#E08738] shadow-xs"
                 >
                   Accept all
                 </button>

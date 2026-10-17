@@ -39,7 +39,6 @@ import {
   ToggleRight,
 } from "lucide-react";
 import { UniversalSocialConnectModal } from "@/components/social/UniversalSocialConnectModal";
-import { CreateBusinessAssetModal } from "@/components/social/CreateBusinessAssetModal";
 
 export interface ConnectedAccountItem {
   id: string;
@@ -61,22 +60,21 @@ export interface ConnectedAccountItem {
 }
 
 export const PLATFORM_NAV_ITEMS = [
-  { id: "all", name: "All", icon: "all" },
-  { id: "google_business", name: "GBP", icon: "google_business" },
+  { id: "all", name: "All Channels", icon: "all" },
   { id: "facebook", name: "Facebook", icon: "facebook" },
   { id: "instagram", name: "Instagram", icon: "instagram" },
   { id: "threads", name: "Threads", icon: "threads" },
   { id: "linkedin", name: "LinkedIn", icon: "linkedin" },
-  { id: "tiktok", name: "TikTok", icon: "tiktok" },
+  { id: "x", name: "X (Twitter)", icon: "x" },
   { id: "youtube", name: "YouTube", icon: "youtube" },
-  { id: "community", name: "Community", icon: "telegram" },
-  { id: "x", name: "X", icon: "x" },
+  { id: "tiktok", name: "TikTok", icon: "tiktok" },
+  { id: "pinterest", name: "Pinterest", icon: "pinterest" },
   { id: "snapchat", name: "Snapchat", icon: "snapchat" },
+  { id: "bluesky", name: "Bluesky", icon: "bluesky" },
+  { id: "mastodon", name: "Mastodon", icon: "mastodon" },
+  { id: "telegram", name: "Telegram", icon: "telegram" },
   { id: "whatsapp", name: "WhatsApp", icon: "whatsapp" },
   { id: "reddit", name: "Reddit", icon: "reddit" },
-  { id: "bluesky", name: "Bluesky", icon: "bluesky" },
-  { id: "telegram", name: "Telegram", icon: "telegram" },
-  { id: "mastodon", name: "Mastodon", icon: "mastodon" },
 ];
 
 export default function SocialAccountsPage() {
@@ -86,7 +84,6 @@ export default function SocialAccountsPage() {
   // Navigation Subtabs
   const [activeSettingsTab, setActiveSettingsTab] = useState<
     | "social_accounts"
-    | "communities"
     | "notifications"
     | "social_categories"
     | "watermark"
@@ -108,7 +105,6 @@ export default function SocialAccountsPage() {
   // Modals state
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const [connectModalPlatform, setConnectModalPlatform] = useState<string | null>(null);
-  const [isAssetModalOpen, setIsAssetModalOpen] = useState(false);
   const [deleteConfirmAccount, setDeleteConfirmAccount] = useState<ConnectedAccountItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -253,9 +249,7 @@ export default function SocialAccountsPage() {
     return accounts.filter((acc) => {
       // Platform filter
       if (selectedPlatform !== "all") {
-        if (selectedPlatform === "community") {
-          if (acc.provider !== "telegram") return false;
-        } else if (acc.provider.toLowerCase() !== selectedPlatform.toLowerCase()) {
+        if (acc.provider.toLowerCase() !== selectedPlatform.toLowerCase()) {
           return false;
         }
       }
@@ -359,20 +353,6 @@ export default function SocialAccountsPage() {
 
                 <button
                   type="button"
-                  onClick={() => setActiveSettingsTab("communities")}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
-                    activeSettingsTab === "communities"
-                      ? "bg-[#eef4ff] text-[#1877F2] dark:bg-blue-950/60 dark:text-blue-400"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
-                  }`}
-                >
-                  <Users className="w-4 h-4" />
-                  <span>Communities</span>
-                </button>
-
-
-                <button
-                  type="button"
                   onClick={() => setActiveSettingsTab("notifications")}
                   className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
                     activeSettingsTab === "notifications"
@@ -456,33 +436,24 @@ export default function SocialAccountsPage() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                        Social Integration
+                        Connected Social Channels
                       </h1>
                       <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-                        Connect multiple social accounts securely to publish and sync real posts.
+                        Connect multiple verified social channels securely to publish, schedule, and sync real posts.
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <button
-                        type="button"
-                        onClick={() => setIsAssetModalOpen(true)}
-                        className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
-                      >
-                        <PlusCircle className="w-3.5 h-3.5 text-slate-500" />
-                        <span>Create Page / Asset</span>
-                      </button>
-
+                    <div className="flex items-center gap-2">
                       <button
                         type="button"
                         onClick={() => {
                           setConnectModalPlatform(null);
                           setIsConnectModalOpen(true);
                         }}
-                        className="px-4 py-2 rounded-xl bg-[#1877F2] hover:bg-blue-600 text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs active:scale-[0.98]"
+                        className="px-4 py-2.5 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white text-xs font-bold flex items-center gap-2 transition cursor-pointer shadow-sm active:scale-[0.98]"
                       >
                         <Plus className="w-4 h-4" />
-                        <span>Connect Social</span>
+                        <span>Connect Social Channel</span>
                       </button>
                     </div>
                   </div>
@@ -914,77 +885,6 @@ export default function SocialAccountsPage() {
                 </div>
               )}
 
-              {/* TAB 2: COMMUNITIES */}
-              {activeSettingsTab === "communities" && (
-                <div className="space-y-6">
-                  <div>
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Communities</h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Connect private community spaces including Discord servers, Telegram channels, and Slack communities.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                    <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg bg-[#24A1DE] text-white flex items-center justify-center">
-                            {renderPlatformIcon("telegram", 20)}
-                          </div>
-                          <div>
-                            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Telegram Channel / Bot</h3>
-                            <span className="text-[11px] text-slate-500">Official Telegram Bot API</span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">Supported</span>
-                      </div>
-                      <p className="text-xs text-slate-600 dark:text-slate-400">
-                        Broadcast approved posts, announcements, and rich media directly to your public or private Telegram channels.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setConnectModalPlatform("telegram");
-                          setIsConnectModalOpen(true);
-                        }}
-                        className="w-full py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold transition"
-                      >
-                        Connect Telegram Community
-                      </button>
-                    </div>
-
-                    <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg bg-[#25D366] text-white flex items-center justify-center">
-                            {renderPlatformIcon("whatsapp", 20)}
-                          </div>
-                          <div>
-                            <h3 className="text-sm font-bold text-slate-900 dark:text-white">WhatsApp Business Broadcast</h3>
-                            <span className="text-[11px] text-slate-500">Cloud API Verified</span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">Supported</span>
-                      </div>
-                      <p className="text-xs text-slate-600 dark:text-slate-400">
-                        Integrate verified WhatsApp Business Cloud API for multi-client announcements and verified broadcasts.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setConnectModalPlatform("whatsapp");
-                          setIsConnectModalOpen(true);
-                        }}
-                        className="w-full py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold transition"
-                      >
-                        Connect WhatsApp Cloud API
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-
               {/* TAB 4: NOTIFICATIONS */}
               {activeSettingsTab === "notifications" && (
                 <div className="space-y-6">
@@ -1192,16 +1092,6 @@ export default function SocialAccountsPage() {
             setIsConnectModalOpen(false);
             setConnectModalPlatform(null);
             loadAccounts();
-          }}
-        />
-
-        {/* Create Page / Business Asset Modal */}
-        <CreateBusinessAssetModal
-          isOpen={isAssetModalOpen}
-          onClose={() => setIsAssetModalOpen(false)}
-          onConnectExisting={(platformId) => {
-            setConnectModalPlatform(platformId);
-            setIsConnectModalOpen(true);
           }}
         />
       </div>

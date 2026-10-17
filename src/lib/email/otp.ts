@@ -127,12 +127,12 @@ export async function sendVerificationEmail(toEmail: string, otp: string) {
     const mailHtml = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 520px; margin: 0 auto; padding: 32px 24px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px;">
         <div style="margin-bottom: 24px;">
-          <span style="font-size: 22px; font-weight: 800; color: #5846A8; letter-spacing: -0.5px;">PulseSocial</span>
+          <span style="font-size: 22px; font-weight: 800; color: #E08738; letter-spacing: -0.5px;">PulseSocial</span>
         </div>
         <h2 style="color: #0f172a; margin-top: 0; font-size: 20px; font-weight: 700;">Verify your email address</h2>
         <p style="color: #475569; font-size: 14px; line-height: 1.6;">Your verification code is:</p>
-        <div style="background: #f5f3ff; border: 1.5px dashed #8b5cf6; border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0;">
-          <span style="font-family: monospace; font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #5846A8;">${otp}</span>
+        <div style="background: #fffbeb; border: 1.5px dashed #F59E0B; border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0;">
+          <span style="font-family: monospace; font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #B45309;">${otp}</span>
         </div>
         <p style="color: #64748b; font-size: 13px; line-height: 1.5;">This code expires in 5 minutes.</p>
         <p style="color: #94a3b8; font-size: 12px; line-height: 1.5; margin-top: 16px;">If you did not request this code, you can safely ignore this email.</p>

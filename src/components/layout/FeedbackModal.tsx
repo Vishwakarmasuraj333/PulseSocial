@@ -207,7 +207,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
           <div className="absolute -bottom-1.5 right-12 w-3.5 h-3.5 bg-white dark:bg-slate-900 border-b border-r border-slate-200 dark:border-slate-800 rotate-45 pointer-events-none" />
 
           {/* 1. Header: SocialPulse Brand Header */}
-          <div className="relative flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-[#312E81] via-[#5846A8] to-[#6F52B5] text-white rounded-t-xl select-none shadow-xs">
+          <div className="relative flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-[#78350F] via-[#B45309] to-[#E08738] text-white rounded-t-xl select-none shadow-xs">
             <div className="flex items-center gap-2">
               <h2 className="text-[15px] font-semibold tracking-tight text-white">
                 Share Your Feedback
@@ -246,11 +246,11 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
               type="button"
               onClick={handleOpenFileDialog}
               title="Attach File or Screenshot"
-              className="absolute right-5 top-11 -translate-y-1/2 w-11 h-11 rounded-full bg-white dark:bg-slate-800 shadow-md border border-slate-200/90 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-200 hover:text-[#1e70eb] dark:hover:text-[#1e70eb] hover:shadow-lg hover:scale-105 active:scale-95 transition-all cursor-pointer z-20 group"
+              className="absolute right-5 top-11 -translate-y-1/2 w-11 h-11 rounded-full bg-white dark:bg-slate-800 shadow-md border border-slate-200/90 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-200 hover:text-[#E08738] dark:hover:text-[#FBBF24] hover:shadow-lg hover:scale-105 active:scale-95 transition-all cursor-pointer z-20 group"
             >
-              <Paperclip className="w-5 h-5 transition-transform group-hover:rotate-12 text-slate-600 dark:text-slate-300 group-hover:text-[#1e70eb]" />
+              <Paperclip className="w-5 h-5 transition-transform group-hover:rotate-12 text-slate-600 dark:text-slate-300 group-hover:text-[#E08738]" />
               {attachedFile && (
-                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-purple-500 border-2 border-white dark:border-slate-800 rounded-full" />
+                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#E08738] border-2 border-white dark:border-slate-800 rounded-full" />
               )}
             </button>
           )}
@@ -386,7 +386,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                   <button
                     type="button"
                     onClick={() => setIsCategoryPickerOpen(!isCategoryPickerOpen)}
-                    className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 hover:text-[#1e70eb] dark:hover:text-[#1e70eb] transition cursor-pointer font-medium py-1 text-left"
+                    className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 hover:text-[#E08738] dark:hover:text-[#FBBF24] transition cursor-pointer font-medium py-1 text-left"
                   >
                     <Info className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     <span className="truncate max-w-[190px]">
@@ -405,11 +405,11 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                   <Button
                     type="submit"
                     disabled={isSubmitting || (!subject.trim() && !description.trim())}
-                    className="bg-[#1e70eb] hover:bg-[#185ec4] text-white font-medium text-xs h-9 px-6 rounded-lg shadow-sm transition active:scale-95 cursor-pointer disabled:opacity-50"
+                    className="bg-gradient-to-r from-[#F59E0B] via-[#E08738] to-[#D97706] hover:brightness-105 text-slate-950 font-bold text-xs h-9 px-6 rounded-xl shadow-md shadow-amber-500/25 transition active:scale-95 cursor-pointer disabled:opacity-50"
                   >
                     {isSubmitting ? (
                       <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+                        <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5 text-slate-950" />
                         <span>Sending...</span>
                       </>
                     ) : (

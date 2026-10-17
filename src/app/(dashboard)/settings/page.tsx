@@ -1118,14 +1118,6 @@ function SettingsContent() {
                       cardBorder: "hover:border-slate-500/50 hover:bg-slate-50/30",
                     },
                     {
-                      platform: "snapchat",
-                      name: "Snapchat",
-                      desc: "Camera Stories, Lens Assets & Vertical Creative Kit Publishing",
-                      btnLabel: "Connect Snapchat",
-                      btnClass: "bg-[#FFFC00] hover:bg-yellow-400 text-black font-bold shadow-xs hover:shadow-md",
-                      cardBorder: "hover:border-yellow-400/50 hover:bg-yellow-50/20",
-                    },
-                    {
                       platform: "threads",
                       name: "Threads",
                       desc: "Conversational Microblogging, Reply Chains & Instagram Community",

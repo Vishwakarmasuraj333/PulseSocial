@@ -84,19 +84,16 @@ export async function GET() {
       "tiktok",
       "pinterest",
       "threads",
-      "google_business",
       "mastodon",
       "telegram",
       "reddit",
       "bluesky",
-      "snapchat",
     ];
 
     const health: PlatformHealthReport[] = [];
 
     for (const p of platformsList) {
-      const capKey = p === "google_business" ? "googlebusiness" : p;
-      const capability = PLATFORM_CAPABILITIES[capKey] || PLATFORM_CAPABILITIES[p];
+      const capability = PLATFORM_CAPABILITIES[p];
 
       let isConfigured = false;
       try {
@@ -107,9 +104,7 @@ export async function GET() {
       }
 
       const matchingAccounts = accounts.filter(
-        (a) =>
-          a.provider.toLowerCase() === p.toLowerCase() ||
-          (p === "google_business" && a.provider.toLowerCase().includes("google"))
+        (a) => a.provider.toLowerCase() === p.toLowerCase()
       );
 
       const isConnected = matchingAccounts.length > 0;

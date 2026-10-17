@@ -23,9 +23,9 @@ export default function ResourcesPage() {
       desc: "Technical documentation covering Meta Graph API, LinkedIn Community Management, X v2 endpoints, and webhooks.",
       icon: Code,
       links: [
-        { label: "OAuth 2.0 State & PKCE Authorization Architecture", href: "/docs" },
-        { label: "Inbound Webhook Verification & Real-time Synchronization", href: "/docs" },
-        { label: "AES-256 Hardware Encryption Vault Security Whitepaper", href: "/security" },
+        { label: "OAuth 2.0 State & PKCE Authorization Architecture", href: "/platforms" },
+        { label: "Multi-Platform Publishing & Scheduling Architecture", href: "/features" },
+        { label: "AES-256 Hardware Encryption Vault Security Architecture", href: "/privacy" },
       ],
     },
     {

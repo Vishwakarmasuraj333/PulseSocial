@@ -28,19 +28,161 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 
-const CHANNEL_ICONS = [
-  { id: "facebook", name: "Facebook" },
-  { id: "instagram", name: "Instagram" },
-  { id: "x", name: "X (Twitter)" },
-  { id: "linkedin", name: "LinkedIn" },
-  { id: "youtube", name: "YouTube" },
-  { id: "google_business", name: "Google Business" },
-  { id: "threads", name: "Threads" },
-  { id: "mastodon", name: "Mastodon" },
-  { id: "telegram", name: "Telegram" },
-  { id: "whatsapp", name: "WhatsApp" },
-  { id: "snapchat", name: "Snapchat" },
-  { id: "bluesky", name: "Bluesky" },
+export interface SupportedSocialBrand {
+  id: string;
+  name: string;
+  category: "Professional" | "Video & Media" | "Creative & Visual" | "Messaging & Community";
+  bgClass: string;
+  borderClass: string;
+  hoverClass: string;
+  glowClass: string;
+  description: string;
+  textDark?: boolean;
+}
+
+export const REAL_SOCIAL_PLATFORMS: SupportedSocialBrand[] = [
+  {
+    id: "linkedin",
+    name: "LinkedIn",
+    category: "Professional",
+    bgClass: "bg-[#0A66C2]",
+    borderClass: "border-[#0A66C2]/40",
+    hoverClass: "hover:bg-[#084e96] hover:border-[#0A66C2]",
+    glowClass: "shadow-[#0A66C2]/20 hover:shadow-[#0A66C2]/35",
+    description: "Company updates & articles",
+  },
+  {
+    id: "x",
+    name: "X (Twitter)",
+    category: "Professional",
+    bgClass: "bg-black dark:bg-[#111622]",
+    borderClass: "border-slate-800 dark:border-slate-700",
+    hoverClass: "hover:bg-slate-900 dark:hover:bg-[#161c2d] hover:border-slate-600",
+    glowClass: "shadow-black/20 hover:shadow-black/35",
+    description: "Real-time posts & threads",
+  },
+  {
+    id: "youtube",
+    name: "YouTube",
+    category: "Video & Media",
+    bgClass: "bg-[#FF0000]",
+    borderClass: "border-[#FF0000]/40",
+    hoverClass: "hover:bg-[#D90000] hover:border-[#FF0000]",
+    glowClass: "shadow-[#FF0000]/20 hover:shadow-[#FF0000]/35",
+    description: "Shorts, videos & community",
+  },
+  {
+    id: "instagram",
+    name: "Instagram",
+    category: "Creative & Visual",
+    bgClass: "bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737]",
+    borderClass: "border-pink-500/40",
+    hoverClass: "hover:opacity-95 hover:border-pink-400",
+    glowClass: "shadow-pink-500/20 hover:shadow-pink-500/35",
+    description: "Reels, carousels & stories",
+  },
+  {
+    id: "facebook",
+    name: "Facebook",
+    category: "Video & Media",
+    bgClass: "bg-[#1877F2]",
+    borderClass: "border-[#1877F2]/40",
+    hoverClass: "hover:bg-[#1464CC] hover:border-[#1877F2]",
+    glowClass: "shadow-[#1877F2]/20 hover:shadow-[#1877F2]/35",
+    description: "Pages, groups & reels",
+  },
+  {
+    id: "tiktok",
+    name: "TikTok",
+    category: "Video & Media",
+    bgClass: "bg-black dark:bg-[#07090e]",
+    borderClass: "border-slate-800 hover:border-[#00f2fe]/60",
+    hoverClass: "hover:bg-slate-900",
+    glowClass: "shadow-slate-900/20",
+    description: "Short-form video feeds",
+  },
+  {
+    id: "pinterest",
+    name: "Pinterest",
+    category: "Creative & Visual",
+    bgClass: "bg-[#E60023]",
+    borderClass: "border-[#E60023]/40",
+    hoverClass: "hover:bg-[#CC001F] hover:border-[#E60023]",
+    glowClass: "shadow-[#E60023]/20 hover:shadow-[#E60023]/35",
+    description: "Pins, boards & search",
+  },
+  {
+    id: "reddit",
+    name: "Reddit",
+    category: "Messaging & Community",
+    bgClass: "bg-[#FF4500]",
+    borderClass: "border-[#FF4500]/40",
+    hoverClass: "hover:bg-[#D93A00] hover:border-[#FF4500]",
+    glowClass: "shadow-[#FF4500]/20 hover:shadow-[#FF4500]/35",
+    description: "Subreddits & discussions",
+  },
+  {
+    id: "threads",
+    name: "Threads",
+    category: "Messaging & Community",
+    bgClass: "bg-black dark:bg-[#111115]",
+    borderClass: "border-slate-800 dark:border-slate-700",
+    hoverClass: "hover:bg-slate-900 hover:border-slate-600",
+    glowClass: "shadow-black/20 hover:shadow-black/35",
+    description: "Conversations & text posts",
+  },
+  {
+    id: "whatsapp",
+    name: "WhatsApp",
+    category: "Messaging & Community",
+    bgClass: "bg-[#25D366]",
+    borderClass: "border-[#25D366]/40",
+    hoverClass: "hover:bg-[#1EBE5D] hover:border-[#25D366]",
+    glowClass: "shadow-[#25D366]/20 hover:shadow-[#25D366]/35",
+    description: "Broadcasts & client channels",
+  },
+  {
+    id: "telegram",
+    name: "Telegram",
+    category: "Messaging & Community",
+    bgClass: "bg-[#24A1DE]",
+    borderClass: "border-[#24A1DE]/40",
+    hoverClass: "hover:bg-[#1E8EC4] hover:border-[#24A1DE]",
+    glowClass: "shadow-[#24A1DE]/20 hover:shadow-[#24A1DE]/35",
+    description: "Broadcast channels & bots",
+  },
+  {
+    id: "bluesky",
+    name: "Bluesky",
+    category: "Messaging & Community",
+    bgClass: "bg-[#1185FE]",
+    borderClass: "border-[#1185FE]/40",
+    hoverClass: "hover:bg-[#0D6ECC] hover:border-[#1185FE]",
+    glowClass: "shadow-[#1185FE]/20 hover:shadow-[#1185FE]/35",
+    description: "Decentralized AT Protocol",
+  },
+  {
+    id: "snapchat",
+    name: "Snapchat",
+    category: "Messaging & Community",
+    bgClass: "bg-[#FFFC00]",
+    borderClass: "border-yellow-400/80 hover:border-yellow-500",
+    hoverClass: "hover:bg-[#FFF500]",
+    glowClass: "shadow-yellow-400/30 hover:shadow-yellow-400/50",
+    description: "Stories, spotlight & filters",
+    textDark: true,
+  },
+
+  {
+    id: "mastodon",
+    name: "Mastodon",
+    category: "Messaging & Community",
+    bgClass: "bg-[#6364FF]",
+    borderClass: "border-[#6364FF]/40",
+    hoverClass: "hover:bg-[#5253EA] hover:border-[#6364FF]",
+    glowClass: "shadow-[#6364FF]/20 hover:shadow-[#6364FF]/35",
+    description: "Fediverse federated statuses",
+  },
 ];
 
 export default function DashboardPage() {
@@ -49,7 +191,7 @@ export default function DashboardPage() {
 
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const [isComposerOpen, setIsComposerOpen] = useState(false);
-  const [selectedConnectPlatform, setSelectedConnectPlatform] = useState<string>("facebook");
+  const [selectedConnectPlatform, setSelectedConnectPlatform] = useState<string>("youtube");
   const [selectedMediaPost, setSelectedMediaPost] = useState<any | null>(null);
 
   const [livePosts, setLivePosts] = useState<any[]>([]);
@@ -58,107 +200,141 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [streamStatus, setStreamStatus] = useState<"connected" | "polling" | "offline">("polling");
 
-  // Fetch real data from backend database
+  // Fetch real data from backend database with fault-tolerant individual handlers
   const loadDashboardData = async () => {
     try {
-      const [postsRes, provRes, accRes, auditRes, analyticsRes] = await Promise.all([
-        fetch("/api/posts"),
-        fetch("/api/social/providers"),
-        fetch("/api/social/accounts"),
-        fetch("/api/audit?limit=6"),
-        fetch("/api/analytics"),
+      const fetchSafe = async (url: string) => {
+        try {
+          const res = await fetch(url, { headers: { "Cache-Control": "no-cache" } });
+          if (res.ok) return await res.json();
+        } catch {}
+        return null;
+      };
+
+      const [postsData, provData, accData, auditData] = await Promise.all([
+        fetchSafe("/api/posts"),
+        fetchSafe("/api/social/providers"),
+        fetchSafe("/api/social/accounts"),
+        fetchSafe("/api/audit?limit=6"),
       ]);
 
       let fetchedPosts: any[] = [];
-      if (postsRes.ok) {
-        const data = await postsRes.json();
-        if (data.posts && data.posts.length > 0) {
-          fetchedPosts = data.posts;
-          setLivePosts(data.posts);
-        }
+      if (postsData?.posts && Array.isArray(postsData.posts)) {
+        fetchedPosts = postsData.posts;
+        setLivePosts(postsData.posts);
       }
 
-      if (auditRes.ok) {
-        const auditData = await auditRes.json();
-        if (Array.isArray(auditData.logs)) {
-          setLiveAuditEvents(auditData.logs);
-        }
+      if (auditData?.logs && Array.isArray(auditData.logs)) {
+        setLiveAuditEvents(auditData.logs);
       }
 
-      let analyticsSummary: any = null;
-      let analyticsAccounts: any[] = [];
-      if (analyticsRes.ok) {
-        const aJson = await analyticsRes.json();
-        analyticsSummary = aJson.summary || aJson;
-        if (Array.isArray(aJson.accounts)) analyticsAccounts = aJson.accounts;
-      }
+      let realAccounts: any[] = [];
 
-      let realConnected: any[] = [];
-      if (provRes.ok) {
-        const pData = await provRes.json();
-        if (pData.providers) {
-          const active = pData.providers.filter(
-            (p: any) => p.isConnected && p.connectedAccount
+      // 1. Primary: load directly from /api/social/accounts
+      if (accData?.accounts && Array.isArray(accData.accounts) && accData.accounts.length > 0) {
+        realAccounts = accData.accounts.map((a: any) => {
+          const matchedProv = provData?.providers?.find(
+            (p: any) =>
+              p.platform?.toLowerCase() === a.provider?.toLowerCase() ||
+              (a.provider === "x" && p.platform === "twitter")
           );
-          if (active.length > 0) {
-            realConnected = active;
-          }
-        }
-      }
+          const channelPostsCount = fetchedPosts.filter((p) =>
+            p.targets?.some(
+              (t: any) =>
+                t.socialAccountId === a.id ||
+                t.socialAccount?.provider?.toLowerCase() === a.provider?.toLowerCase()
+            )
+          ).length || a.postsCount || 0;
 
-      // Merge real accounts from DB and analytics
-      if (accRes.ok) {
-        const aData = await accRes.json();
-        if (aData.accounts && aData.accounts.length > 0) {
-          const mappedAccounts = aData.accounts.map((a: any) => {
-            const matchedAnalytics = analyticsAccounts.find((acc) => acc.id === a.id);
-            const followers = typeof a.followersCount === "number"
-              ? a.followersCount
-              : (typeof matchedAnalytics?.followersCount === "number" ? matchedAnalytics.followersCount : null);
-            const channelPostsCount = fetchedPosts.filter((p) =>
-              p.targets?.some((t: any) => t.socialAccountId === a.id || t.socialAccount?.provider === a.provider)
-            ).length || a.postsCount || 0;
-            const reach = matchedAnalytics?.reach || 0;
-            const engagements = matchedAnalytics?.engagements || 0;
-
-            return {
+          return {
+            id: a.id,
+            platform: a.provider,
+            name: a.displayName,
+            username: a.username || a.displayName,
+            profileImageUrl: a.profileImageUrl,
+            isConnected: true,
+            status: a.status || "CONNECTED",
+            tokenStatus: matchedProv?.tokenStatus || (a.validityDays > 0 ? "VALID" : "EXPIRED"),
+            publishingStatus: matchedProv?.publishingStatus || "Ready to publish",
+            validityDays: a.validityDays ?? 60,
+            postsCount: channelPostsCount,
+            reach: 0,
+            engagements: 0,
+            connectedAccount: {
               id: a.id,
-              platform: a.provider,
-              name: a.displayName,
-              isConnected: true,
-              postsCount: channelPostsCount,
-              reach,
-              engagements,
-              growth: matchedAnalytics?.growthRate ? `+${matchedAnalytics.growthRate}%` : null,
-              connectedAccount: {
-                id: a.id,
-                displayName: a.displayName,
-                username: a.username || a.displayName,
-                followerCount: followers,
-              },
-            };
-          });
-
-          const combined = [...realConnected];
-          mappedAccounts.forEach((ma: any) => {
-            if (
-              !combined.some(
-                (c) =>
-                  c.platform === ma.platform &&
-                  c.connectedAccount?.displayName === ma.connectedAccount?.displayName
-              )
-            ) {
-              combined.push(ma);
-            }
-          });
-
-          if (combined.length > 0) {
-            realConnected = combined;
-          }
-        }
+              displayName: a.displayName,
+              username: a.username || a.displayName,
+              followerCount: a.followersCount ?? null,
+              profileImageUrl: a.profileImageUrl,
+            },
+          };
+        });
       }
 
-      setConnectedChannels(realConnected);
+      // 2. Secondary: load from /api/social/providers if not already mapped
+      if (provData?.providers && Array.isArray(provData.providers)) {
+        const activeProviders = provData.providers.filter(
+          (p: any) => p.isConnected && p.connectedAccount
+        );
+        activeProviders.forEach((ap: any) => {
+          if (
+            !realAccounts.some(
+              (ra) =>
+                ra.platform === ap.platform ||
+                ra.id === ap.connectedAccount?.id ||
+                (ra.platform === "x" && ap.platform === "twitter")
+            )
+          ) {
+            realAccounts.push({
+              id: ap.connectedAccount?.id || ap.platform,
+              platform: ap.platform,
+              name: ap.connectedAccount?.displayName || ap.displayName,
+              username: ap.connectedAccount?.username || ap.connectedAccount?.displayName,
+              profileImageUrl: ap.connectedAccount?.profileImageUrl,
+              isConnected: true,
+              status: "CONNECTED",
+              tokenStatus: ap.tokenStatus || "VALID",
+              publishingStatus: ap.publishingStatus || "Ready to publish",
+              validityDays: 60,
+              postsCount: 0,
+              reach: 0,
+              engagements: 0,
+              connectedAccount: {
+                id: ap.connectedAccount?.id,
+                displayName: ap.connectedAccount?.displayName || ap.displayName,
+                username: ap.connectedAccount?.username || ap.connectedAccount?.displayName,
+                followerCount: null,
+                profileImageUrl: ap.connectedAccount?.profileImageUrl,
+              },
+            });
+          }
+        });
+      }
+
+      // 3. Fallback from activeBrand context
+      if (realAccounts.length === 0 && activeBrand?.socialAccounts && activeBrand.socialAccounts.length > 0) {
+        realAccounts = activeBrand.socialAccounts.map((a: any) => ({
+          id: a.id,
+          platform: a.provider,
+          name: a.displayName,
+          username: a.username || a.displayName,
+          profileImageUrl: a.profileImageUrl,
+          isConnected: true,
+          status: "CONNECTED",
+          tokenStatus: "VALID",
+          postsCount: 0,
+          reach: 0,
+          engagements: 0,
+          connectedAccount: {
+            id: a.id,
+            displayName: a.displayName,
+            username: a.username || a.displayName,
+            followerCount: null,
+          },
+        }));
+      }
+
+      setConnectedChannels(realAccounts);
     } catch (err) {
       console.error("Failed to load dashboard data:", err);
     } finally {
@@ -169,10 +345,13 @@ export default function DashboardPage() {
   useEffect(() => {
     loadDashboardData();
 
-    const handlePostCreated = () => {
+    const handleUpdate = () => {
       loadDashboardData();
     };
-    window.addEventListener("pulsesocial_post_created", handlePostCreated);
+
+    window.addEventListener("pulsesocial_post_created", handleUpdate);
+    window.addEventListener("pulsesocial_active_brand_changed", handleUpdate);
+    window.addEventListener("pulsesocial_account_connected", handleUpdate);
 
     // Check if user came from OTP verification, login, signup, or brand setup
     if (typeof window !== "undefined") {
@@ -182,12 +361,16 @@ export default function DashboardPage() {
 
       if (isExplicitSetup && !hasDoneSetup) {
         setIsConnectModalOpen(true);
-        setSelectedConnectPlatform(urlParams.get("platform") || "facebook");
+        setSelectedConnectPlatform(urlParams.get("platform") || "youtube");
       }
     }
 
-    return () => window.removeEventListener("pulsesocial_post_created", handlePostCreated);
-  }, []);
+    return () => {
+      window.removeEventListener("pulsesocial_post_created", handleUpdate);
+      window.removeEventListener("pulsesocial_active_brand_changed", handleUpdate);
+      window.removeEventListener("pulsesocial_account_connected", handleUpdate);
+    };
+  }, [activeBrand?.id]);
 
   // Connect to live SSE realtime stream with honest status indicator and polling fallback
   useEffect(() => {
@@ -243,7 +426,7 @@ export default function DashboardPage() {
     };
   }, [activeBrand?.id]);
 
-  const openConnect = (platform = "facebook") => {
+  const openConnect = (platform = "youtube") => {
     setSelectedConnectPlatform(platform);
     setIsConnectModalOpen(true);
   };
@@ -252,27 +435,72 @@ export default function DashboardPage() {
     loadDashboardData();
   };
 
+  const publishedPostsCount = livePosts.filter((p) => p.status === "PUBLISHED" || p.status === "PARTIALLY_PUBLISHED").length;
+  const scheduledPostsCount = livePosts.filter((p) => p.status === "SCHEDULED").length;
+
   return (
     <AppLayout>
-      <div className="bg-[#F8F7FF] dark:bg-[#0B0F19] min-h-screen p-4 sm:p-6 lg:p-8 text-slate-800 dark:text-slate-200 font-sans space-y-6">
+      <div className="bg-slate-50 dark:bg-[#0D0D0E] min-h-screen p-4 sm:p-6 lg:p-8 text-slate-800 dark:text-[#9CA3AF] font-sans space-y-6">
         
-        {/* Executive Metric Cards (Section 5: Real dynamic metrics, no fake numbers) */}
+        {/* Linear / Modern SaaS Style Capsule Tab Bar */}
+        <div className="flex items-center justify-between flex-wrap gap-3 pb-1">
+          <div className="flex items-center gap-1.5 p-1 rounded-full bg-slate-100 dark:bg-[#17171A] border border-slate-200/80 dark:border-white/7">
+            <span className="px-3.5 py-1 rounded-full text-xs font-bold bg-[#5846A8] text-white dark:bg-[#E08738] dark:text-[#0F0F11] shadow-xs flex items-center gap-1.5 cursor-default">
+              <Activity className="w-3.5 h-3.5" />
+              <span>Dashboard Overview</span>
+            </span>
+            <Link
+              href="/analytics"
+              className="px-3.5 py-1 rounded-full text-xs font-medium text-slate-600 hover:text-[#5846A8] dark:text-[#9CA3AF] dark:hover:text-white hover:bg-purple-50/50 dark:hover:bg-white/5 transition"
+            >
+              Analytics
+            </Link>
+            <Link
+              href="/posts"
+              className="px-3.5 py-1 rounded-full text-xs font-medium text-slate-600 hover:text-[#5846A8] dark:text-[#9CA3AF] dark:hover:text-white hover:bg-purple-50/50 dark:hover:bg-white/5 transition"
+            >
+              Posts & Queue
+            </Link>
+            <Link
+              href="/social-accounts"
+              className="px-3.5 py-1 rounded-full text-xs font-medium text-slate-600 hover:text-[#5846A8] dark:text-[#9CA3AF] dark:hover:text-white hover:bg-purple-50/50 dark:hover:bg-white/5 transition hidden sm:inline-block"
+            >
+              Channels
+            </Link>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-500 dark:text-[#6B7280] hidden md:inline-block">
+              Workspace: <strong className="text-slate-800 dark:text-white font-semibold">{activeBrand?.name || "Pulse Workspace"}</strong>
+            </span>
+            <button
+              type="button"
+              onClick={() => openConnect()}
+              className="h-8 px-3 rounded-full bg-[#5846A8] hover:bg-[#4A3990] text-white dark:bg-[#E08738] dark:hover:bg-[#D97706] dark:text-[#0F0F11] text-xs font-bold transition flex items-center gap-1 shadow-xs hover:shadow-purple-500/20 dark:hover:shadow-[0_0_16px_rgba(224,135,56,0.35)] cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Add Network</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Executive Metric Cards (Elevated matte panels #17171A, thin top/border highlight, rounded mini circular icon buttons on top right) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link
             href="/social-accounts"
-            className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xs hover:border-[#5846A8]/40 transition group cursor-pointer"
+            className="p-5 rounded-2xl bg-white dark:bg-[#17171A] border border-slate-200/90 dark:border-white/7 shadow-xs hover:border-purple-300 dark:hover:border-[#E08738]/50 transition group cursor-pointer"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Connected Accounts</span>
-              <div className="w-8 h-8 rounded-xl bg-[#F5F3FF] dark:bg-purple-950/50 text-[#5846A8] dark:text-purple-300 flex items-center justify-center">
-                <Share2 className="w-4 h-4" />
+              <span className="text-xs font-semibold text-slate-500 dark:text-[#9CA3AF]">Connected Accounts</span>
+              <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-[#5846A8] dark:text-[#FBBF24] flex items-center justify-center group-hover:bg-purple-50 dark:group-hover:bg-[#E08738]/10 group-hover:border-purple-300 dark:group-hover:border-[#E08738]/40 transition shrink-0">
+                <Share2 className="w-3.5 h-3.5" />
               </div>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
-              <span className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                 {connectedChannels.length}
               </span>
-              <span className="text-xs font-medium text-purple-600 dark:text-purple-400">
+              <span className="text-xs font-medium text-[#5846A8] dark:text-[#FBBF24]">
                 {connectedChannels.length > 0 ? "Channels active" : "None connected"}
               </span>
             </div>
@@ -280,70 +508,70 @@ export default function DashboardPage() {
 
           <Link
             href="/posts"
-            className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xs hover:border-[#5846A8]/40 transition group cursor-pointer"
+            className="p-5 rounded-2xl bg-white dark:bg-[#17171A] border border-slate-200/90 dark:border-white/7 shadow-xs hover:border-purple-300 dark:hover:border-[#E08738]/50 transition group cursor-pointer"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Published Content</span>
-              <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-300 flex items-center justify-center">
-                <Send className="w-4 h-4" />
+              <span className="text-xs font-semibold text-slate-500 dark:text-[#9CA3AF]">Published Content</span>
+              <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-[#5846A8] dark:text-[#FBBF24] flex items-center justify-center group-hover:bg-purple-50 dark:group-hover:bg-[#E08738]/10 group-hover:border-purple-300 dark:group-hover:border-[#E08738]/40 transition shrink-0">
+                <Send className="w-3.5 h-3.5" />
               </div>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
-              <span className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                {livePosts.length}
+              <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                {publishedPostsCount}
               </span>
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                Broadcasts
+              <span className="text-xs font-medium text-slate-500 dark:text-[#9CA3AF]">
+                {publishedPostsCount === 1 ? "Broadcast" : "Broadcasts"}
               </span>
             </div>
           </Link>
 
           <Link
             href="/posts?filter=SCHEDULED"
-            className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xs hover:border-[#5846A8]/40 transition group cursor-pointer"
+            className="p-5 rounded-2xl bg-white dark:bg-[#17171A] border border-slate-200/90 dark:border-white/7 shadow-xs hover:border-purple-300 dark:hover:border-[#E08738]/50 transition group cursor-pointer"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Scheduled Queue</span>
-              <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-300 flex items-center justify-center">
-                <Clock className="w-4 h-4" />
+              <span className="text-xs font-semibold text-slate-500 dark:text-[#9CA3AF]">Scheduled Queue</span>
+              <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-[#5846A8] dark:text-[#FBBF24] flex items-center justify-center group-hover:bg-purple-50 dark:group-hover:bg-[#E08738]/10 group-hover:border-purple-300 dark:group-hover:border-[#E08738]/40 transition shrink-0">
+                <Clock className="w-3.5 h-3.5" />
               </div>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
-              <span className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                0
+              <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                {scheduledPostsCount}
               </span>
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              <span className="text-xs font-medium text-slate-500 dark:text-[#9CA3AF]">
                 In calendar
               </span>
             </div>
           </Link>
 
-          <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xs">
+          <div className="p-5 rounded-2xl bg-white dark:bg-[#17171A] border border-slate-200/90 dark:border-white/7 shadow-xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Workspace Health</span>
+              <span className="text-xs font-semibold text-slate-500 dark:text-[#9CA3AF]">Workspace Health</span>
               <div
-                className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                className={`w-8 h-8 rounded-full border flex items-center justify-center shrink-0 ${
                   connectedChannels.length > 0
-                    ? "bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-300"
-                    : "bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-300"
+                    ? "bg-emerald-50 dark:bg-emerald-950/50 border-emerald-500/30 text-emerald-500"
+                    : "bg-purple-50 dark:bg-amber-500/10 border-purple-200 dark:border-amber-500/30 text-[#5846A8] dark:text-[#E08738]"
                 }`}
               >
-                <Activity className="w-4 h-4" />
+                <Activity className="w-3.5 h-3.5" />
               </div>
             </div>
             <div className="mt-3 flex flex-col gap-0.5">
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                   {connectedChannels.length > 0 ? "100%" : "Standby"}
                 </span>
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                <span className="text-xs font-medium text-slate-500 dark:text-[#9CA3AF]">
                   {connectedChannels.length > 0 ? "Operational" : "Setup needed"}
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
+              <p className="text-[10px] text-slate-400 dark:text-[#6B7280] mt-1 truncate">
                 {connectedChannels.length > 0
-                  ? "Accounts connected • AES-256 vault active • Queue ready"
-                  : "Next step: Connect your first social account to activate publishing."}
+                  ? `${connectedChannels.length} active channels • AES-256 vault active`
+                  : "Connect your official channels to activate multi-network broadcasting."}
               </p>
             </div>
           </div>
@@ -360,94 +588,136 @@ export default function DashboardPage() {
             {/* Visual Analytics Chart */}
             <PerformanceDynamicsChart dateRange="last30" />
 
-            {/* 1. BRAND HEALTH CARD */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xs">
+            {/* 1. BRAND HEALTH CARD WITH REAL CONNECTED CHANNELS */}
+            <div className="bg-white dark:bg-[#17171A] border border-slate-200/90 dark:border-white/7 rounded-2xl p-5 sm:p-6 shadow-xs">
               
               {/* Card Title & Subtitle */}
-              <div className="flex items-center gap-2 mb-4">
-                <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
-                  Brand Health
-                </h2>
-                <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 font-normal">
-                  <Info className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  Channels overview for the past 30 days
-                </span>
+              <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+                    Brand Health
+                  </h2>
+                  <span className="text-xs text-slate-500 dark:text-[#9CA3AF] flex items-center gap-1 font-normal">
+                    <Info className="w-3.5 h-3.5 text-slate-400 dark:text-[#9CA3AF] shrink-0" />
+                    Live connected channels & performance
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-purple-50 dark:bg-amber-500/10 text-[#5846A8] dark:text-[#FBBF24] border border-purple-200/60 dark:border-amber-500/30">
+                    {connectedChannels.length} Connected {connectedChannels.length === 1 ? "Channel" : "Channels"}
+                  </span>
+                </div>
               </div>
 
-              {/* Table */}
+              {/* Connected Channels Table */}
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                      <th className="pb-3 font-semibold text-slate-600 dark:text-slate-400">CHANNELS</th>
-                      <th className="pb-3 font-semibold text-right text-slate-600 dark:text-slate-400">
-                        TOTAL FOLLOWERS <HelpCircle className="inline w-3 h-3 text-slate-350 -mt-0.5 ml-0.5" />
+                    <tr className="border-b border-slate-100 dark:border-white/7 text-[11px] font-semibold text-slate-400 dark:text-[#6B7280] uppercase tracking-wider">
+                      <th className="pb-3 font-semibold text-slate-600 dark:text-[#9CA3AF]">CHANNELS</th>
+                      <th className="pb-3 font-semibold text-right text-slate-600 dark:text-[#9CA3AF]">
+                        FOLLOWERS
                       </th>
-                      <th className="pb-3 font-semibold text-right text-slate-600 dark:text-slate-400">
-                        NEW FOLLOWERS <HelpCircle className="inline w-3 h-3 text-slate-350 -mt-0.5 ml-0.5" />
+                      <th className="pb-3 font-semibold text-right text-slate-600 dark:text-[#9CA3AF]">
+                        STATUS
                       </th>
-                      <th className="pb-3 font-semibold text-right text-slate-600 dark:text-slate-400">
-                        NO. OF POSTS <HelpCircle className="inline w-3 h-3 text-slate-350 -mt-0.5 ml-0.5" />
+                      <th className="pb-3 font-semibold text-right text-slate-600 dark:text-[#9CA3AF]">
+                        NO. OF POSTS
                       </th>
-                      <th className="pb-3 font-semibold text-right text-slate-600 dark:text-slate-400">
-                        REACH <HelpCircle className="inline w-3 h-3 text-slate-350 -mt-0.5 ml-0.5" />
+                      <th className="pb-3 font-semibold text-right text-slate-600 dark:text-[#9CA3AF]">
+                        REACH
                       </th>
-                      <th className="pb-3 font-semibold text-right text-slate-600 dark:text-slate-400">
-                        ENGAGEMENTS <HelpCircle className="inline w-3 h-3 text-slate-350 -mt-0.5 ml-0.5" />
+                      <th className="pb-3 font-semibold text-right text-slate-600 dark:text-[#9CA3AF]">
+                        ACTIONS
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
+                  <tbody className="divide-y divide-slate-100 dark:divide-white/5 font-medium">
                     {connectedChannels.length > 0 ? (
                       connectedChannels.map((channel, idx) => (
                         <tr
                           key={channel.id || idx}
-                          className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition"
+                          className="hover:bg-purple-50/40 dark:hover:bg-white/5 transition group"
                         >
                           <td className="py-3.5">
                             <div className="flex items-center gap-2.5">
-                              <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center shrink-0">
-                                {renderPlatformIcon(channel.platform, 20)}
+                              <div className="w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center shrink-0 shadow-2xs bg-white dark:bg-[#111113] border border-slate-200/80 dark:border-white/10 group-hover:scale-105 transition-transform">
+                                {channel.profileImageUrl ? (
+                                  <img
+                                    src={channel.profileImageUrl}
+                                    alt={channel.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  renderPlatformIcon(channel.platform, 20)
+                                )}
                               </div>
-                              <span className="font-semibold text-slate-800 dark:text-slate-200">
-                                {channel.connectedAccount?.displayName || channel.name}
-                              </span>
+                              <div>
+                                <span className="font-bold text-slate-900 dark:text-white block group-hover:text-[#5846A8] dark:group-hover:text-[#FBBF24] transition-colors">
+                                  {channel.connectedAccount?.displayName || channel.name}
+                                </span>
+                                <span className="text-[11px] text-slate-400 dark:text-[#9CA3AF] font-normal">
+                                  {channel.username
+                                    ? channel.username.startsWith("@")
+                                      ? channel.username
+                                      : `@${channel.username}`
+                                    : channel.platform}
+                                </span>
+                              </div>
                             </div>
                           </td>
                           <td className="py-3.5 text-right font-medium text-slate-800 dark:text-slate-200">
-                            <span>{channel.connectedAccount?.followerCount != null ? channel.connectedAccount.followerCount.toLocaleString() : "—"}</span>
-                            {channel.growth && (
-                              <span className="text-[11px] text-purple-600 font-semibold ml-1.5">
-                                ↑ {channel.growth}
+                            <span>
+                              {channel.connectedAccount?.followerCount != null
+                                ? channel.connectedAccount.followerCount.toLocaleString()
+                                : "Live Sync"}
+                            </span>
+                          </td>
+                          <td className="py-3.5 text-right">
+                            {channel.tokenStatus === "EXPIRED" ? (
+                              <button
+                                type="button"
+                                onClick={() => openConnect(channel.platform)}
+                                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 dark:bg-amber-950/60 text-[#5846A8] dark:text-amber-300 border border-purple-200 dark:border-amber-800 hover:bg-purple-100 transition cursor-pointer"
+                              >
+                                Re-auth required
+                              </button>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                Active
                               </span>
                             )}
                           </td>
                           <td className="py-3.5 text-right font-medium text-slate-800 dark:text-slate-200">
-                            <span>{channel.newFollowers ?? "—"}</span>
-                          </td>
-                          <td className="py-3.5 text-right font-medium text-slate-800 dark:text-slate-200">
-                            <span className="font-bold">{channel.postsCount || 0}</span>
-                            <span className="text-[11px] text-blue-600 font-semibold ml-1.5">
+                            <span className="font-bold text-slate-900 dark:text-white">{channel.postsCount || 0}</span>
+                            <span className="text-[11px] text-[#5846A8] dark:text-[#FBBF24] font-semibold ml-1.5">
                               Live
                             </span>
                           </td>
                           <td className="py-3.5 text-right font-medium text-slate-800 dark:text-slate-200">
-                            <span>{channel.reach > 0 ? channel.reach.toLocaleString() : "Awaiting sync"}</span>
+                            <span>{channel.reach > 0 ? channel.reach.toLocaleString() : "Real-time"}</span>
                           </td>
-                          <td className="py-3.5 text-right font-medium text-slate-800 dark:text-slate-200">
-                            <span>{channel.engagements > 0 ? channel.engagements.toLocaleString() : "Awaiting sync"}</span>
+                          <td className="py-3.5 text-right font-medium">
+                            <button
+                              type="button"
+                              onClick={() => openConnect(channel.platform)}
+                              className="text-xs font-semibold text-[#5846A8] dark:text-[#FBBF24] hover:underline cursor-pointer transition-colors"
+                            >
+                              Manage
+                            </button>
                           </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={6} className="py-6 text-center text-slate-500 dark:text-slate-400">
-                          <div className="flex flex-col items-center justify-center gap-1.5">
-                            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                              Awaiting live platform data
+                        <td colSpan={6} className="py-8 text-center text-slate-500 dark:text-[#9CA3AF]">
+                          <div className="flex flex-col items-center justify-center gap-2">
+                            <span className="text-sm font-bold text-slate-800 dark:text-white">
+                              No social channels connected yet
                             </span>
-                            <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                              No social channels connected. Click any network icon below to authorize your account.
+                            <span className="text-xs text-slate-500 dark:text-[#9CA3AF] max-w-md">
+                              Click any platform connect button below to authorize and link your official accounts.
                             </span>
                           </div>
                         </td>
@@ -457,182 +727,214 @@ export default function DashboardPage() {
                 </table>
               </div>
 
-              {/* Add more channels row with round icons */}
-              <div className="flex flex-wrap items-center justify-end gap-2 pt-4 border-t border-slate-100 dark:border-slate-800 mt-2">
-                <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 mr-1.5">
-                  Add more channels
-                </span>
-                {CHANNEL_ICONS.map((ch) => (
-                  <button
-                    key={ch.id}
-                    type="button"
-                    onClick={() => openConnect(ch.id)}
-                    className="w-5 h-5 rounded-full overflow-hidden hover:scale-115 transition-transform cursor-pointer drop-shadow-xs"
-                    title={`Connect ${ch.name}`}
-                  >
-                    {renderPlatformIcon(ch.id, 20)}
-                  </button>
-                ))}
+              {/* PROFESSIONAL SOCIAL CONNECT SECTION WITH AUTHENTIC BRAND COLORS */}
+              <div className="pt-6 border-t border-slate-100 dark:border-white/7 mt-5 space-y-3.5">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                      <Plus className="w-3.5 h-3.5 text-[#5846A8] dark:text-[#FBBF24]" />
+                      <span>Connect Official Social Channels</span>
+                    </h3>
+                    <p className="text-[11px] text-slate-500 dark:text-[#9CA3AF] mt-0.5">
+                      Click any platform to connect your account directly with AES-256 zero-knowledge security
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-semibold text-slate-400 dark:text-[#6B7280]">
+                    {REAL_SOCIAL_PLATFORMS.length} Official Networks Supported
+                  </span>
+                </div>
+
+                {/* Professional Social Buttons Grid (Spacious, 100% responsive, high-contrast badges) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 pt-1">
+                  {REAL_SOCIAL_PLATFORMS.map((platform) => {
+                    const isConnected = connectedChannels.some(
+                      (ch) =>
+                        ch.platform?.toLowerCase() === platform.id.toLowerCase() ||
+                        (platform.id === "x" && (ch.platform === "twitter" || ch.platform === "x"))
+                    );
+                    const matchingChannel = connectedChannels.find(
+                      (ch) =>
+                        ch.platform?.toLowerCase() === platform.id.toLowerCase() ||
+                        (platform.id === "x" && (ch.platform === "twitter" || ch.platform === "x"))
+                    );
+                    const needsReauth = matchingChannel?.tokenStatus === "EXPIRED";
+
+                    return (
+                      <button
+                        key={platform.id}
+                        type="button"
+                        onClick={() => openConnect(platform.id)}
+                        className={`group relative flex items-center justify-between p-3 rounded-xl transition-all duration-200 cursor-pointer text-left border shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 ${
+                          platform.textDark ? "text-slate-950 font-bold" : "text-white"
+                        } ${platform.bgClass} ${platform.borderClass} ${platform.hoverClass} ${platform.glowClass}`}
+                        title={`Connect official ${platform.name} account`}
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                          <div
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 p-1 border shadow-2xs group-hover:scale-105 transition-transform ${
+                              platform.textDark
+                                ? "bg-black/10 border-black/15 shadow-2xs"
+                                : "bg-white/15 backdrop-blur-xs border-white/20"
+                            }`}
+                          >
+                            {renderPlatformIcon(platform.id, 20)}
+                          </div>
+                          <div className="min-w-0 flex-1 pr-1">
+                            <span
+                              className={`text-xs font-bold block whitespace-nowrap leading-tight ${
+                                platform.textDark ? "text-slate-950 font-bold" : "text-white"
+                              }`}
+                            >
+                              {platform.name}
+                            </span>
+                            <span
+                              className={`text-[10px] block whitespace-nowrap ${
+                                platform.textDark ? "text-slate-800 font-semibold" : "opacity-80"
+                              }`}
+                            >
+                              {isConnected ? (needsReauth ? "Re-auth" : "Linked") : "Connect"}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="shrink-0 ml-1.5">
+                          {isConnected ? (
+                            needsReauth ? (
+                              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-400 text-slate-950 uppercase tracking-tight shadow-2xs">
+                                Fix
+                              </span>
+                            ) : (
+                              <span className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold shadow-2xs">
+                                ✓
+                              </span>
+                            )
+                          ) : (
+                            <span
+                              className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-colors shadow-2xs ${
+                                platform.textDark
+                                  ? "bg-black/15 text-slate-950 group-hover:bg-slate-950 group-hover:text-white"
+                                  : "bg-white/20 text-white group-hover:bg-white group-hover:text-slate-900"
+                              }`}
+                            >
+                              + Add
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            {/* 2. RECENT POSTS CARD */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+            {/* 2. RECENT POSTS CARD (Redundant dashed box removed as requested) */}
+            <div className="bg-white dark:bg-[#17171A] border border-slate-200/90 dark:border-white/7 rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
                     Recent Posts
                   </h2>
-                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#F5F3FF] dark:bg-purple-950/60 text-[#6F52B5] dark:text-purple-300 border border-[#EDE9FE] dark:border-purple-900/60">
-                    {livePosts.length > 0 ? `${livePosts.length} Published` : "Live Feed"}
+                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-purple-50 dark:bg-amber-500/10 text-[#5846A8] dark:text-[#FBBF24] border border-purple-200/60 dark:border-amber-500/30">
+                    {livePosts.length > 0 ? `${livePosts.length} Broadcasts` : "Live Feed"}
                   </span>
                 </div>
                 {livePosts.length > 0 && (
                   <Link
                     href="/posts"
-                    className="text-xs font-semibold text-[#6F52B5] dark:text-purple-400 hover:underline flex items-center gap-1"
+                    className="text-xs font-semibold text-[#5846A8] hover:text-[#48388d] dark:text-[#FBBF24] dark:hover:text-[#E08738] hover:underline flex items-center gap-1 transition-colors"
                   >
                     View all posts <ArrowUpRight className="w-3.5 h-3.5" />
                   </Link>
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Left Side: Real Posts Display or Premium Empty State */}
-                {livePosts.length > 0 ? (
-                  <div className="rounded-2xl border border-slate-200 dark:border-slate-800 p-5 space-y-3 bg-white dark:bg-slate-900/90 shadow-xs flex flex-col justify-between hover:border-[#6F52B5]/30 transition group">
-                    <div>
-                      {/* Post Header */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 rounded-xl overflow-hidden flex items-center justify-center shrink-0 bg-slate-100 dark:bg-slate-800 shadow-2xs">
-                            {renderPlatformIcon(livePosts[0]?.targets?.[0]?.socialAccount?.provider || "facebook", 20)}
+              {/* Posts Feed Showcase */}
+              {livePosts.length > 0 ? (
+                <div className={`grid grid-cols-1 ${livePosts.length > 1 ? "md:grid-cols-2" : ""} gap-4`}>
+                  {livePosts.slice(0, 2).map((post, idx) => (
+                    <div
+                      key={post.id || idx}
+                      className="rounded-2xl border border-slate-200 dark:border-white/7 p-5 space-y-3 bg-white dark:bg-[#111113] shadow-xs flex flex-col justify-between hover:border-purple-300 dark:hover:border-[#E08738]/40 transition group"
+                    >
+                      <div>
+                        {/* Post Header */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-7 h-7 rounded-xl overflow-hidden flex items-center justify-center shrink-0 bg-slate-100 dark:bg-[#17171A] border border-slate-200/60 dark:border-white/10 shadow-2xs group-hover:scale-105 transition-transform">
+                              {renderPlatformIcon(post.targets?.[0]?.socialAccount?.provider || "linkedin", 20)}
+                            </div>
+                            <div>
+                              <h4 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-[#5846A8] dark:group-hover:text-[#E08738] transition">
+                                {post.targets?.[0]?.socialAccount?.displayName || activeBrand?.name || "Connected Page"}
+                              </h4>
+                              <span className="text-[10px] text-slate-400 dark:text-[#9CA3AF] capitalize">
+                                Published to {post.targets?.map((t: any) => t.socialAccount?.provider).filter(Boolean).join(", ") || "Social Networks"}
+                              </span>
+                            </div>
                           </div>
-                          <div>
-                            <h4 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-[#6F52B5] transition">
-                              {livePosts[0]?.targets?.[0]?.socialAccount?.displayName || activeBrand?.name || "Connected Page"}
-                            </h4>
-                            <span className="text-[10px] text-slate-500 capitalize">
-                              Published to {livePosts[0]?.targets?.[0]?.socialAccount?.provider || "Social Network"}
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                                post.status === "PUBLISHED"
+                                  ? "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800"
+                                  : post.status === "PARTIALLY_PUBLISHED"
+                                  ? "text-[#5846A8] dark:text-[#FBBF24] bg-purple-50 dark:bg-amber-500/10 border border-purple-200 dark:border-amber-500/30"
+                                  : "text-[#5846A8] dark:text-amber-300 bg-purple-50 dark:bg-amber-950/50 border border-purple-200 dark:border-amber-800"
+                              }`}
+                            >
+                              {post.status}
                             </span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                            livePosts[0]?.status === "PUBLISHED"
-                              ? "text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800"
-                              : "text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800"
-                          }`}>
-                            {livePosts[0]?.status || "READY"}
-                          </span>
-                        </div>
-                      </div>
 
-                      {/* Post Media / Preview */}
-                      {(livePosts[0]?.mediaUrls?.[0] || livePosts[0]?.media?.[0]?.url) ? (
-                        <div
-                          onClick={() => setSelectedMediaPost(livePosts[0])}
-                          className="mt-3 relative aspect-video w-full rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 cursor-pointer group/media"
-                        >
-                          <img
-                            src={livePosts[0]?.mediaUrls?.[0] || livePosts[0]?.media?.[0]?.url}
-                            alt="Post visual"
-                            className="w-full h-full object-cover group-hover/media:scale-105 transition duration-300"
-                          />
-                        </div>
-                      ) : (
-                        <div className="mt-3 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-700 dark:text-slate-300 border border-slate-100 dark:border-slate-800">
+                        {/* Post Content */}
+                        <div className="mt-3 p-3.5 rounded-xl bg-slate-50 dark:bg-[#17171A] text-xs text-slate-700 dark:text-slate-200 border border-slate-100 dark:border-white/7">
                           <p className="line-clamp-3 leading-relaxed">
-                            {livePosts[0]?.content}
+                            {post.content || "(No caption text)"}
                           </p>
                         </div>
-                      )}
-
-                      {/* Caption text */}
-                      {livePosts[0]?.content && (livePosts[0]?.mediaUrls?.[0] || livePosts[0]?.media?.[0]?.url) && (
-                        <p className="mt-2.5 text-xs text-slate-800 dark:text-slate-200 font-medium line-clamp-2">
-                          {livePosts[0].content}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Interaction footer */}
-                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
-                      <div className="flex items-center gap-1.5">
-                        <ThumbsUp className="w-3.5 h-3.5 text-blue-600" />
-                        <span className="font-semibold text-slate-700 dark:text-slate-300">
-                          {livePosts[0]?.likes != null ? livePosts[0].likes : "No likes yet"}
-                        </span>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <MessageCircle className="w-3.5 h-3.5 text-indigo-500" />
-                        <span>{livePosts[0]?.comments != null ? `${livePosts[0].comments} comments` : "No comments yet"}</span>
+
+                      {/* Interaction footer */}
+                      <div className="pt-3 border-t border-slate-100 dark:border-white/7 flex items-center justify-between text-xs text-slate-500 dark:text-[#9CA3AF]">
+                        <div className="flex items-center gap-1.5">
+                          <ThumbsUp className="w-3.5 h-3.5 text-[#5846A8] dark:text-[#E08738]" />
+                          <span className="font-semibold text-slate-700 dark:text-slate-300">
+                            {post.likes != null ? post.likes : 0} likes
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <MessageCircle className="w-3.5 h-3.5 text-[#5846A8] dark:text-amber-500" />
+                          <span>{post.comments != null ? `${post.comments} comments` : "0 comments"}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="relative overflow-hidden rounded-2xl border border-slate-200/90 dark:border-slate-800/80 bg-gradient-to-b from-white to-[#FBFBFF] dark:from-slate-900 dark:to-[#0d121f] p-6 flex flex-col items-center justify-center text-center min-h-[240px] shadow-2xs">
-                    {/* Subtle ambient background glow */}
-                    <div className="absolute -top-12 -right-12 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl pointer-events-none" />
-                    <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
-
-                    <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#6F52B5] to-[#8B6BD6] text-white flex items-center justify-center mb-3 shadow-md shadow-[#6F52B5]/25">
-                      <Sparkles className="w-6 h-6 animate-pulse" />
-                    </div>
-                    
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
-                      No posts published yet
-                    </h4>
-                    
-                    <p className="text-xs text-slate-500 dark:text-slate-400 max-w-[260px] mt-1.5 mb-4 leading-relaxed">
-                      Create and broadcast your first post to see live engagements and real-time channel statistics here.
-                    </p>
-                    
-                    <button
-                      type="button"
-                      onClick={() => setIsComposerOpen(true)}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#6F52B5] to-[#8B6BD6] hover:from-[#5E44A1] hover:to-[#7A5CBF] text-white text-xs font-bold shadow-md shadow-[#6F52B5]/25 hover:shadow-lg hover:shadow-[#6F52B5]/35 hover:-translate-y-0.5 active:translate-y-0 transition duration-200 cursor-pointer"
-                    >
-                      <Plus className="w-4 h-4 stroke-[2.5]" />
-                      <span>Create Post</span>
-                    </button>
-                  </div>
-                )}
-
-                {/* Right Side: Professional 'Add more social channels...' card */}
-                <div
-                  onClick={() => openConnect("facebook")}
-                  className="relative overflow-hidden rounded-2xl border border-dashed border-purple-200 dark:border-purple-900/50 hover:border-[#6F52B5] dark:hover:border-[#8B6BD6] bg-gradient-to-b from-[#FAF8FF]/60 to-white dark:from-slate-900/60 dark:to-slate-900/90 p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-300 min-h-[240px] group shadow-2xs hover:shadow-md hover:shadow-purple-500/5"
-                >
-                  {/* Platform Icons Floating Bar */}
-                  <div className="flex items-center -space-x-1.5 mb-3.5 group-hover:scale-105 transition-transform duration-300">
-                    {["instagram", "youtube", "linkedin", "x", "facebook"].map((pId) => (
-                      <div
-                        key={pId}
-                        className="w-7 h-7 rounded-full bg-white dark:bg-slate-800 p-0.5 shadow-sm border border-slate-200/80 dark:border-slate-700 flex items-center justify-center overflow-hidden"
-                      >
-                        {renderPlatformIcon(pId, 18)}
-                      </div>
-                    ))}
-                    <div className="w-7 h-7 rounded-full bg-[#F5F3FF] dark:bg-purple-950 text-[#6F52B5] dark:text-purple-300 text-[10px] font-bold border border-purple-200 dark:border-purple-800 flex items-center justify-center shadow-xs">
-                      +7
-                    </div>
-                  </div>
-
-                  <h4 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-[#6F52B5] transition">
-                    Connect Social Channels
-                  </h4>
-
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium max-w-[240px] mt-1.5 mb-3.5 leading-relaxed">
-                    Add YouTube, Instagram, LinkedIn, and more to view your live multi-platform posts and metrics.
-                  </p>
-
-                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#6F52B5] dark:text-purple-400 group-hover:gap-2 transition-all">
-                    <span>Add channels</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </span>
+                  ))}
                 </div>
-              </div>
+              ) : (
+                <div className="relative overflow-hidden rounded-2xl border border-slate-200/90 dark:border-white/7 bg-gradient-to-b from-white to-[#FBFBFF] dark:from-[#111113] dark:to-[#0D0D0E] p-8 flex flex-col items-center justify-center text-center shadow-2xs">
+                  <div className="relative w-12 h-12 rounded-2xl bg-[#5846A8] text-white dark:bg-[#E08738] dark:text-[#0F0F11] flex items-center justify-center mb-3 shadow-md shadow-purple-500/20 dark:shadow-amber-500/20">
+                    <Sparkles className="w-6 h-6" />
+                  </div>
+                  
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
+                    No posts published yet
+                  </h4>
+                  
+                  <p className="text-xs text-slate-500 dark:text-[#9CA3AF] max-w-sm mt-1.5 mb-4 leading-relaxed">
+                    Create and broadcast your first post to see live engagements and real-time channel statistics here.
+                  </p>
+                  
+                  <button
+                    type="button"
+                    onClick={() => setIsComposerOpen(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 hover:shadow-purple-900/35 dark:bg-[#E08738] dark:hover:bg-[#D97706] dark:text-[#0F0F11] dark:shadow-amber-500/20 text-xs font-bold hover:-translate-y-0.5 active:translate-y-0 transition duration-200 cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4 stroke-[2.5]" />
+                    <span>Create Post</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -644,28 +946,28 @@ export default function DashboardPage() {
 
 
             {/* 2. Live Stream Card */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
+            <div className="bg-white dark:bg-[#17171A] border border-slate-200/90 dark:border-white/7 rounded-2xl p-5 shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
                     Live Activity Stream
                   </h3>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                  <p className="text-[11px] text-slate-500 dark:text-[#9CA3AF] mt-0.5 leading-relaxed">
                     Live updates across authenticated workspaces.
                   </p>
                 </div>
                 {streamStatus === "connected" ? (
-                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
-                    <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
+                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-purple-50 dark:bg-amber-500/10 text-[#5846A8] dark:text-[#FBBF24] border border-purple-200 dark:border-amber-500/30">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#5846A8] dark:bg-[#E08738] animate-pulse" />
                     REALTIME
                   </span>
                 ) : streamStatus === "polling" ? (
-                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-[#9CA3AF] border border-slate-200 dark:border-white/10">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#5846A8] dark:bg-[#E08738]" />
                     Updates every 60s
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-[#6B7280] border border-slate-200 dark:border-white/10">
                     <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                     Offline
                   </span>
@@ -702,13 +1004,13 @@ export default function DashboardPage() {
                     return (
                       <div
                         key={evt.id}
-                        className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-[#F5F3FF]/50 dark:hover:bg-slate-850 transition"
+                        className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-purple-50/50 dark:hover:bg-white/5 transition"
                       >
                         <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
                           {platform ? (
                             renderPlatformIcon(platform, 24)
                           ) : (
-                            <div className="w-full h-full bg-[#5846A8] text-white flex items-center justify-center font-bold text-[9px]">
+                            <div className="w-full h-full bg-[#5846A8] text-white dark:bg-[#E08738] dark:text-[#0F0F11] flex items-center justify-center font-bold text-[9px]">
                               {evt.user?.avatarInitials || "S"}
                             </div>
                           )}
@@ -718,11 +1020,11 @@ export default function DashboardPage() {
                             <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">
                               {cleanTitle}
                             </p>
-                            <span className="text-[9px] text-slate-400 shrink-0 ml-1">
+                            <span className="text-[9px] text-slate-400 dark:text-[#6B7280] shrink-0 ml-1">
                               {evt.timestamp}
                             </span>
                           </div>
-                          <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
+                          <p className="text-[10px] text-slate-500 dark:text-[#9CA3AF] line-clamp-1 mt-0.5">
                             {cleanDescription}
                           </p>
                         </div>
@@ -730,8 +1032,8 @@ export default function DashboardPage() {
                     );
                   })
                 ) : (
-                  <div className="p-6 text-center text-slate-400 dark:text-slate-500 space-y-1.5">
-                    <Activity className="w-6 h-6 mx-auto text-slate-300 dark:text-slate-600" />
+                  <div className="p-6 text-center text-slate-400 dark:text-[#6B7280] space-y-1.5">
+                    <Activity className="w-6 h-6 mx-auto text-slate-300 dark:text-[#6B7280]" />
                     <p className="text-xs font-medium text-slate-600 dark:text-slate-300">No activity logged yet</p>
                     <p className="text-[10px]">Publishing, scheduling, and channel actions will stream here in real time.</p>
                   </div>

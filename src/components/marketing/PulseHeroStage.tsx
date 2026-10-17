@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { X, CheckCircle2, Eye, Heart, MessageSquare, Share2, Bookmark, Lock } from "lucide-react";
+import { PulseInteractiveDotGrid } from "./PulseInteractiveDotGrid";
 
 interface PulseHeroStageProps {
   onWatchVideo?: () => void;
@@ -138,29 +139,31 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
   ];
 
   return (
-    <section className="relative pt-16 sm:pt-24 lg:pt-32 pb-0 bg-gradient-to-b from-[#F8F7FF] via-[#F2EEFE] to-[#FAF8FF] dark:from-[#080B14] dark:via-[#0F1426] dark:to-[#070913] text-slate-900 dark:text-white overflow-hidden transition-colors duration-500">
+    <section className="relative pt-16 sm:pt-24 lg:pt-32 pb-0 bg-gradient-to-b from-[#F8F7FF] via-[#F2EEFE] to-[#FAF8FF] dark:from-[#090A14] dark:via-[#0F1122] dark:to-[#080911] text-slate-900 dark:text-white overflow-hidden transition-colors duration-500">
+      {/* Interactive Mouse Hover Canvas Dot Grid */}
+      <PulseInteractiveDotGrid />
+
       {/* Dynamic Background Light Orbs & Tech Mesh */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] sm:w-[1300px] h-[550px] bg-gradient-to-b from-[#8B6BD6]/25 via-[#6366F1]/15 to-transparent dark:from-[#6F52B5]/35 dark:via-[#4F46E5]/20 dark:to-transparent rounded-full blur-[110px] pointer-events-none -z-10" />
-      <div className="absolute top-1/4 -left-32 w-80 h-80 bg-[#38BDF8]/15 dark:bg-[#0284C7]/20 rounded-full blur-3xl pointer-events-none -z-10" />
-      <div className="absolute top-1/3 -right-32 w-80 h-80 bg-[#EC4899]/15 dark:bg-[#BE185D]/20 rounded-full blur-3xl pointer-events-none -z-10" />
-      <div className="absolute inset-0 bg-[radial-gradient(#6F52B5_1px,transparent_1px)] dark:bg-[radial-gradient(#818cf8_1px,transparent_1px)] [background-size:28px_28px] opacity-[0.14] dark:opacity-[0.16] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] sm:w-[1300px] h-[550px] bg-gradient-to-b from-[#8B6BD6]/25 via-[#6366F1]/15 to-transparent dark:from-purple-600/20 dark:via-indigo-600/15 dark:to-transparent rounded-full blur-[110px] pointer-events-none -z-10" />
+      <div className="absolute top-1/4 -left-32 w-80 h-80 bg-[#8B6BD6]/15 dark:bg-purple-600/15 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute top-1/3 -right-32 w-80 h-80 bg-[#5846A8]/15 dark:bg-indigo-600/15 rounded-full blur-3xl pointer-events-none -z-10" />
 
       {/* ========================================================= */}
       {/* 1. HERO TYPOGRAPHY & HEADLINE (Enhanced Height & Aesthetic)*/}
       {/* ========================================================= */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-5 sm:space-y-7 pb-16 sm:pb-24 lg:pb-28 relative z-10">
         {/* Floating Tag Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/95 dark:bg-slate-900/90 border border-[#8B6BD6]/30 dark:border-indigo-500/30 text-[#6F52B5] dark:text-[#A78BDF] text-xs font-bold tracking-wide shadow-sm backdrop-blur-md hover:scale-105 transition-transform select-none">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/95 dark:bg-[#171724]/90 border border-purple-200 dark:border-purple-500/30 text-purple-700 dark:text-purple-300 text-xs font-bold tracking-wide shadow-sm backdrop-blur-md hover:scale-105 transition-transform select-none">
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#6F52B5] opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#6F52B5]"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-600 dark:bg-purple-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-600 dark:bg-purple-400"></span>
           </span>
           <span>Next-Gen Social Command Center</span>
         </div>
 
         <h1 className="text-4xl sm:text-6xl lg:text-[68px] font-black text-slate-900 dark:text-white tracking-tight leading-[1.08]">
           Your Entire Social Media Workflow. <br className="hidden sm:inline" />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-500 dark:from-indigo-400 dark:via-purple-400 dark:to-sky-400">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-[#6366F1] to-indigo-600 dark:from-purple-300 dark:via-indigo-200 dark:to-purple-100">
             One Powerful Platform.
           </span>
         </h1>
@@ -173,7 +176,7 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
         <div className="pt-3 sm:pt-5 flex flex-wrap items-center justify-center gap-3.5 sm:gap-5">
           <Link
             href="/signup"
-            className="px-8 sm:px-10 py-3.5 rounded-[8px] bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2 group"
+            className="px-8 sm:px-10 py-3.5 rounded-xl bg-gradient-to-r from-purple-600 via-[#6366F1] to-[#5846A8] hover:opacity-95 text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 shadow-xl shadow-purple-600/30 hover:shadow-purple-600/50 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2 group"
           >
             <span>START FREE TRIAL</span>
             <span className="group-hover:translate-x-1 transition-transform">→</span>
@@ -181,7 +184,7 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
 
           <Link
             href="/features"
-            className="px-8 sm:px-10 py-3.5 rounded-[8px] border-[2px] border-slate-900 dark:border-white text-slate-900 dark:text-white bg-white/90 dark:bg-slate-900/80 hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 shadow-md hover:shadow-2xl hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-sm flex items-center gap-2"
+            className="px-8 sm:px-10 py-3.5 rounded-xl border-2 border-[#5846A8] dark:border-purple-400/80 text-[#5846A8] dark:text-purple-300 bg-white/90 dark:bg-[#171724]/80 hover:bg-[#5846A8] hover:text-white dark:hover:bg-purple-600 dark:hover:text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 shadow-md hover:shadow-2xl hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-sm flex items-center gap-2"
           >
             <span>EXPLORE FEATURES</span>
           </Link>

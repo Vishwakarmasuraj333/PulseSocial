@@ -35,6 +35,7 @@ import {
   Info,
   Link as LinkIcon,
   Loader2,
+  Eye,
 } from "lucide-react";
 import { PostPreview, PreviewMediaItem } from "@/components/composer/previews/PostPreview";
 import { RealLocationMapModal, LocationData } from "./RealLocationMapModal";
@@ -45,6 +46,7 @@ interface PostComposerModalProps {
   onSuccess?: () => void;
   initialContent?: string;
   initialMediaUrl?: string;
+  initialPublishingOption?: "now" | "schedule" | "queue" | "smartq";
 }
 
 // Categorized comprehensive real emoji library
@@ -218,6 +220,7 @@ export function PostComposerModal({
   onSuccess,
   initialContent,
   initialMediaUrl,
+  initialPublishingOption,
 }: PostComposerModalProps) {
   const { toast } = useToast();
   const { activeBrand } = useBrand();
@@ -237,6 +240,7 @@ export function PostComposerModal({
   const [mediaLibraryTab, setMediaLibraryTab] = useState<"all" | "brand" | "ai">("all");
   const [isCloudPickerOpen, setIsCloudPickerOpen] = useState(false);
   const [cloudPickerUrl, setCloudPickerUrl] = useState("");
+  const [modalActiveTab, setModalActiveTab] = useState<"editor" | "scheduling" | "preview">("editor");
 
   const fetchChannels = async () => {
     try {
@@ -352,7 +356,14 @@ export function PostComposerModal({
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
   const [youtubeTitle, setYoutubeTitle] = useState("");
   const [isShorts, setIsShorts] = useState(false);
-  const [publishingOption, setPublishingOption] = useState<"now" | "schedule" | "queue" | "smartq">("now");
+  const [publishingOption, setPublishingOption] = useState<"now" | "schedule" | "queue" | "smartq">(
+    initialPublishingOption || "now"
+  );
+  useEffect(() => {
+    if (initialPublishingOption) {
+      setPublishingOption(initialPublishingOption);
+    }
+  }, [initialPublishingOption]);
   const [sendForApproval, setSendForApproval] = useState(false);
   const [scheduledDate, setScheduledDate] = useState(() => {
     const d = new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -841,14 +852,14 @@ export function PostComposerModal({
       onClose={onClose}
       showCloseButton={false}
       maxWidth="max-w-6xl"
-      className="p-0 overflow-hidden rounded-2xl border border-slate-200/90 shadow-2xl bg-white text-slate-800"
+      className="p-0 overflow-hidden rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-2xl bg-white dark:bg-[#17171A] text-slate-800 dark:text-slate-100 ring-1 ring-amber-500/15"
     >
       <div className="relative min-h-[620px] flex flex-col justify-between">
         {/* Single Premium Animated Modal Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="group absolute top-4 right-4 z-30 flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100/90 hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 hover:border-rose-200 transition-all duration-200 hover:scale-105 active:scale-95 shadow-xs cursor-pointer"
+          className="group absolute top-4 right-4 z-30 flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100/90 dark:bg-white/5 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 border border-slate-200 dark:border-white/10 hover:border-rose-200 dark:hover:border-rose-800 transition-all duration-200 hover:scale-105 active:scale-95 shadow-xs cursor-pointer"
           title="Close Composer (Esc)"
           aria-label="Close composer"
         >
@@ -858,17 +869,65 @@ export function PostComposerModal({
           <X className="w-4 h-4 transition-transform duration-300 group-hover:rotate-90 group-hover:scale-110" />
         </button>
 
+        {/* Mobile & Tablet Modal Navigation Tabs */}
+        <div className="flex lg:hidden items-center justify-between px-6 pt-3 pb-2 border-b border-slate-100 dark:border-white/7 bg-slate-50/60 dark:bg-[#131316]">
+          <div className="flex items-center p-1 rounded-xl bg-slate-200/70 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 shadow-2xs">
+            <button
+              type="button"
+              id="modal-tab-editor"
+              onClick={() => setModalActiveTab("editor")}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                modalActiveTab === "editor"
+                  ? "bg-white dark:bg-[#282830] text-[#5846A8] dark:text-white shadow-xs"
+                  : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white"
+              }`}
+            >
+              Compose
+            </button>
+            <button
+              type="button"
+              id="modal-tab-scheduling"
+              onClick={() => setModalActiveTab("scheduling")}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                modalActiveTab === "scheduling"
+                  ? "bg-white dark:bg-[#282830] text-[#5846A8] dark:text-white shadow-xs"
+                  : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white"
+              }`}
+            >
+              Options
+            </button>
+            <button
+              type="button"
+              id="modal-tab-preview"
+              onClick={() => setModalActiveTab("preview")}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                modalActiveTab === "preview"
+                  ? "bg-white dark:bg-[#282830] text-[#5846A8] dark:text-white shadow-xs"
+                  : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white"
+              }`}
+            >
+              <Eye className="w-3.5 h-3.5 text-[#5846A8] dark:text-purple-400" />
+              <span>Preview Tab</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            </button>
+          </div>
+        </div>
+
         {/* 3-Column Body matching User Screenshot */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 flex-1 border-b border-slate-100">
+        <div className="grid grid-cols-1 lg:grid-cols-12 flex-1 border-b border-slate-100 dark:border-white/7">
           {/* ============================================================ */}
           {/* COLUMN 1: Post Editor (5 cols)                                */}
           {/* ============================================================ */}
-          <div className="lg:col-span-5 p-6 border-b lg:border-b-0 lg:border-r border-slate-100 flex flex-col justify-between relative bg-white">
+          <div
+            className={`lg:col-span-5 p-6 border-b lg:border-b-0 lg:border-r border-slate-100 dark:border-white/7 flex flex-col justify-between relative bg-white dark:bg-[#17171A] ${
+              modalActiveTab === "editor" ? "block" : "hidden lg:flex"
+            }`}
+          >
             <div>
               {/* Dropdown: New Post */}
               <div className="flex items-center gap-2 mb-4">
-                <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-800 transition">
-                  New Post <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+                <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 text-xs font-semibold text-slate-800 dark:text-white transition">
+                  New Post <ChevronDown className="w-3.5 h-3.5 text-slate-500 dark:text-[#9CA3AF]" />
                 </button>
               </div>
 
@@ -891,7 +950,13 @@ export function PostComposerModal({
                       { key: "x", name: "X (Twitter)", provider: "TWITTER" },
                       { key: "facebook", name: "Facebook", provider: "FACEBOOK" },
                       { key: "youtube", name: "YouTube", provider: "YOUTUBE" },
+                      { key: "snapchat", name: "Snapchat", provider: "SNAPCHAT" },
+                      { key: "tiktok", name: "TikTok", provider: "TIKTOK" },
+                      { key: "pinterest", name: "Pinterest", provider: "PINTEREST" },
                       { key: "threads", name: "Threads", provider: "THREADS" },
+                      { key: "whatsapp", name: "WhatsApp", provider: "WHATSAPP" },
+                      { key: "reddit", name: "Reddit", provider: "REDDIT" },
+                      { key: "bluesky", name: "Bluesky", provider: "BLUESKY" },
                     ].map((p) => {
                       const isSelected = activePreviewId === `sim-${p.key}` || (!activePreviewId && p.key === "linkedin");
                       return (
@@ -1896,21 +1961,25 @@ export function PostComposerModal({
           {/* ============================================================ */}
           {/* COLUMN 2: Publishing Options (3 cols)                          */}
           {/* ============================================================ */}
-          <div className="lg:col-span-3 p-6 border-b lg:border-b-0 lg:border-r border-slate-100 bg-white">
-            <h3 className="text-sm font-semibold text-slate-800 mb-6 tracking-tight">
+          <div
+            className={`lg:col-span-3 p-6 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-white/7 bg-white dark:bg-[#141416] ${
+              modalActiveTab === "scheduling" ? "block" : "hidden lg:block"
+            }`}
+          >
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-white mb-6 tracking-tight">
               Publishing Options
             </h3>
 
             {/* Send for approval toggle */}
             <div className="flex items-center justify-between mb-6">
-              <span className="text-xs text-slate-700 font-medium flex items-center gap-1">
+              <span className="text-xs text-slate-700 dark:text-slate-300 font-medium flex items-center gap-1">
                 Send for approval <Info className="w-3 h-3 text-slate-400" />
               </span>
               <button
                 type="button"
                 onClick={() => setSendForApproval(!sendForApproval)}
                 className={`w-9 h-5 rounded-full transition-colors relative cursor-pointer ${
-                  sendForApproval ? "bg-blue-600" : "bg-slate-200"
+                  sendForApproval ? "bg-[#E08738]" : "bg-slate-200 dark:bg-white/10"
                 }`}
               >
                 <span
@@ -1922,14 +1991,14 @@ export function PostComposerModal({
             </div>
 
             {/* Publishing options radio list */}
-            <div className="space-y-4 text-xs font-medium text-slate-700">
+            <div className="space-y-4 text-xs font-medium text-slate-700 dark:text-slate-300">
               <label className="flex items-center gap-2.5 cursor-pointer">
                 <input
                   type="radio"
                   name="publishing_opt"
                   checked={publishingOption === "now"}
                   onChange={() => setPublishingOption("now")}
-                  className="accent-blue-600 w-4 h-4"
+                  className="accent-[#E08738] w-4 h-4"
                 />
                 <span>Publish Now</span>
               </label>
@@ -1940,7 +2009,7 @@ export function PostComposerModal({
                   name="publishing_opt"
                   checked={publishingOption === "schedule"}
                   onChange={() => setPublishingOption("schedule")}
-                  className="accent-blue-600 w-4 h-4"
+                  className="accent-[#E08738] w-4 h-4"
                 />
                 <span>Schedule for a Specific Date</span>
               </label>
@@ -1951,13 +2020,13 @@ export function PostComposerModal({
                     type="date"
                     value={scheduledDate}
                     onChange={(e) => setScheduledDate(e.target.value)}
-                    className="w-full text-xs p-1.5 rounded border border-slate-200"
+                    className="w-full text-xs p-1.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#1C1C20] text-slate-900 dark:text-white"
                   />
                   <input
                     type="time"
                     value={scheduledTime}
                     onChange={(e) => setScheduledTime(e.target.value)}
-                    className="w-full text-xs p-1.5 rounded border border-slate-200"
+                    className="w-full text-xs p-1.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#1C1C20] text-slate-900 dark:text-white"
                   />
                 </div>
               )}
@@ -1968,7 +2037,7 @@ export function PostComposerModal({
                   name="publishing_opt"
                   checked={publishingOption === "queue"}
                   onChange={() => setPublishingOption("queue")}
-                  className="accent-blue-600 w-4 h-4"
+                  className="accent-[#E08738] w-4 h-4"
                 />
                 <span className="flex items-center gap-1">
                   Add to Queue (your queue slot) <Info className="w-3 h-3 text-slate-400" />
@@ -1981,7 +2050,7 @@ export function PostComposerModal({
                   name="publishing_opt"
                   checked={publishingOption === "smartq"}
                   onChange={() => setPublishingOption("smartq")}
-                  className="accent-blue-600 w-4 h-4"
+                  className="accent-[#E08738] w-4 h-4"
                 />
                 <span className="flex items-center gap-1">
                   Choose a Slot (next available queue slot) <Info className="w-3 h-3 text-slate-400" />
@@ -1998,12 +2067,12 @@ export function PostComposerModal({
             {effectiveChannels.some(
               (c) => selectedAccountIds.includes(c.id) && c.provider.toLowerCase().includes("youtube")
             ) && (
-              <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
+              <div className="mt-4 pt-4 border-t border-slate-100 dark:border-white/7 space-y-3">
                 <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">
                   YouTube Settings
                 </h4>
                 <div>
-                  <label className="text-[11px] text-slate-500 font-medium block mb-1">
+                  <label className="text-[11px] text-slate-500 dark:text-slate-400 font-medium block mb-1">
                     Video Title
                   </label>
                   <input
@@ -2011,7 +2080,7 @@ export function PostComposerModal({
                     value={youtubeTitle}
                     onChange={(e) => setYoutubeTitle(e.target.value)}
                     placeholder="Enter YouTube video title..."
-                    className="w-full text-xs p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+                    className="w-full text-xs p-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#1C1C20] text-slate-900 dark:text-white"
                   />
                 </div>
                 <label className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer">
@@ -2019,7 +2088,7 @@ export function PostComposerModal({
                     type="checkbox"
                     checked={isShorts}
                     onChange={(e) => setIsShorts(e.target.checked)}
-                    className="rounded accent-red-600"
+                    className="rounded accent-[#E08738]"
                   />
                   <span>Publish as YouTube Shorts (9:16)</span>
                 </label>
@@ -2030,7 +2099,7 @@ export function PostComposerModal({
           {/* ============================================================ */}
           {/* COLUMN 3: Live Platform Post Preview (4 cols)                 */}
           {/* ============================================================ */}
-          <div className="lg:col-span-4 p-6 bg-slate-50/50 dark:bg-slate-900/40 flex flex-col justify-between overflow-y-auto max-h-[75vh]">
+          <div className="lg:col-span-4 p-6 bg-slate-50/50 dark:bg-[#0D0D0E] flex flex-col justify-between overflow-y-auto max-h-[75vh]">
             <div>
               <PostPreview
                 accounts={effectiveChannels.filter((c) => selectedAccountIds.includes(c.id))}
@@ -2044,16 +2113,16 @@ export function PostComposerModal({
                 firstComment={attachedComment}
                 youtubeTitle={youtubeTitle}
                 isShorts={isShorts}
-                brandName={activePreviewChannel.displayName || activeBrand.name || "Suraj Vishwakarma"}
+                brandName={activePreviewChannel.displayName || activeBrand.name || "PulseSocial Workspace"}
                 brandAvatar={activePreviewChannel.profileImageUrl || activeBrand.avatarUrl || "/icons/pulse-logo.svg"}
-                brandHandle={activePreviewChannel.username || activeBrand.slug || "surajvishwakarma"}
+                brandHandle={activePreviewChannel.username || activeBrand.slug || "workspace"}
               />
             </div>
           </div>
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-3.5 bg-white flex items-center justify-between border-t border-slate-100">
+        <div className="px-6 py-3.5 bg-white dark:bg-[#111113] flex items-center justify-between border-t border-slate-100 dark:border-white/7">
           <div className="text-[11px] text-slate-400 font-medium">
             {content.length > 0 && <span>{content.length} characters</span>}
           </div>
@@ -2064,7 +2133,7 @@ export function PostComposerModal({
               type="button"
               onClick={handleSaveDraft}
               disabled={isSubmitting || (!content.trim() && media.length === 0 && !attachedUrlData)}
-              className="px-5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 transition cursor-pointer disabled:opacity-40"
+              className="px-5 py-2 rounded-xl border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 text-xs font-semibold text-slate-700 dark:text-slate-300 transition cursor-pointer disabled:opacity-40"
             >
               {isSubmitting ? "Saving..." : "Save Draft"}
             </button>
@@ -2078,7 +2147,7 @@ export function PostComposerModal({
                 (!content.trim() && media.length === 0 && !attachedUrlData) ||
                 selectedAccountIds.length === 0
               }
-              className="px-6 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
+              className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#E08738] to-[#F59E0B] hover:from-[#D97706] hover:to-[#E08738] text-[#0F0F11] font-bold text-xs shadow-md shadow-amber-900/20 hover:shadow-amber-500/25 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
             >
               {isUploadingMedia ? (
                 <>
@@ -2128,7 +2197,7 @@ export function PostComposerModal({
 
     {/* Media Library Modal */}
     {isMediaLibraryOpen && (
-      <div className="fixed inset-0 z-60 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[70] bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-slate-900 dark:text-white flex flex-col max-h-[85vh]">
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
@@ -2223,7 +2292,7 @@ export function PostComposerModal({
 
     {/* Cloud Picker Modal */}
     {isCloudPickerOpen && (
-      <div className="fixed inset-0 z-60 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[70] bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-slate-900 dark:text-white p-6 space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2">

@@ -6,14 +6,11 @@ import {
   X,
   Send,
   Layers,
-  Facebook,
-  Instagram,
-  Linkedin,
-  Twitter,
   Sparkles,
 } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { useBrand } from "@/context/BrandContext";
+import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
 
 interface CustomizeContentModalProps {
   isOpen: boolean;
@@ -24,10 +21,14 @@ interface CustomizeContentModalProps {
 }
 
 const PLATFORMS = [
-  { id: "facebook", name: "Facebook", icon: Facebook, limit: 63206, color: "text-[#1877F2]" },
-  { id: "instagram", name: "Instagram", icon: Instagram, limit: 2200, color: "text-[#E1306C]" },
-  { id: "linkedin", name: "LinkedIn", icon: Linkedin, limit: 3000, color: "text-[#0A66C2]" },
-  { id: "x", name: "X (Twitter)", icon: Twitter, limit: 280, color: "text-black" },
+  { id: "linkedin", name: "LinkedIn", provider: "linkedin", limit: 3000 },
+  { id: "instagram", name: "Instagram", provider: "instagram", limit: 2200 },
+  { id: "x", name: "X (Twitter)", provider: "x", limit: 280 },
+  { id: "facebook", name: "Facebook", provider: "facebook", limit: 63206 },
+  { id: "youtube", name: "YouTube", provider: "youtube", limit: 5000 },
+  { id: "tiktok", name: "TikTok", provider: "tiktok", limit: 2200 },
+  { id: "threads", name: "Threads", provider: "threads", limit: 500 },
+  { id: "pinterest", name: "Pinterest", provider: "pinterest", limit: 500 },
 ];
 
 export function CustomizeContentModal({
@@ -162,7 +163,6 @@ export function CustomizeContentModal({
               Channels
             </p>
             {PLATFORMS.map((platform) => {
-              const Icon = platform.icon;
               const isActive = activePlatform === platform.id;
               const charCount = (platformTexts[platform.id] || "").length;
 
@@ -177,10 +177,12 @@ export function CustomizeContentModal({
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Icon className={`w-4 h-4 ${platform.color}`} />
+                    <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                      {renderPlatformIcon(platform.provider, 18)}
+                    </div>
                     <span>{platform.name}</span>
                   </div>
-                  <span className="text-[10px] text-slate-400">
+                  <span className="text-[10px] text-slate-400 font-mono">
                     {charCount}/{platform.limit}
                   </span>
                 </button>

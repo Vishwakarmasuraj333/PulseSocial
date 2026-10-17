@@ -21,7 +21,7 @@ export function InstagramConnectOptionModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-60 bg-black/65 backdrop-blur-xs flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[70] bg-black/65 backdrop-blur-xs flex items-center justify-center p-4">
       <div className="bg-white rounded-xl shadow-2xl border border-slate-200/90 w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-slate-900">
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-5 pb-2">

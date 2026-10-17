@@ -166,13 +166,13 @@ export function ZiaCopilotModal({
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#5846A8] to-purple-500 flex items-center justify-center text-white shadow-md shadow-purple-900/20">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#B45309] to-[#F59E0B] flex items-center justify-center text-slate-950 shadow-md shadow-amber-900/20">
                 <Sparkles className="w-4 h-4" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-sm font-bold tracking-tight">SocialPulse AI Copilot</h3>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-100 dark:bg-purple-950/60 text-[#5846A8] dark:text-purple-300">
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-[#B45309] dark:text-amber-300">
                     Gemini 2.5 Flash
                   </span>
                 </div>
@@ -213,7 +213,7 @@ export function ZiaCopilotModal({
                       onClick={() => setCategory(cat)}
                       className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
                         category === cat
-                          ? "bg-[#5846A8] text-white shadow-xs"
+                          ? "bg-gradient-to-r from-[#F59E0B] via-[#E08738] to-[#D97706] text-slate-950 font-bold shadow-xs"
                           : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
                       }`}
                     >
@@ -233,7 +233,7 @@ export function ZiaCopilotModal({
                   onChange={(e) => setPrompt(e.target.value)}
                   placeholder="What would you like Google Gemini to write about? e.g. Announcing our 2026 product release, or tips for remote marketing teams..."
                   rows={3}
-                  className="w-full p-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 focus:outline-none focus:ring-2 focus:ring-[#5846A8]/40 resize-none leading-relaxed text-slate-900 dark:text-white"
+                  className="w-full p-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 focus:outline-none focus:ring-2 focus:ring-[#E08738]/40 resize-none leading-relaxed text-slate-900 dark:text-white"
                   autoFocus
                 />
 
@@ -250,7 +250,7 @@ export function ZiaCopilotModal({
                       key={chip.label}
                       type="button"
                       onClick={() => setPrompt(chip.promptText)}
-                      className="px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/40 text-[#5846A8] dark:text-purple-300 text-[11px] font-semibold border border-purple-200 dark:border-purple-800 hover:bg-purple-100 cursor-pointer"
+                      className="px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 text-[#B45309] dark:text-amber-300 text-[11px] font-semibold border border-amber-200 dark:border-amber-800 hover:bg-amber-100 cursor-pointer"
                     >
                       + {chip.label}
                     </button>
@@ -259,13 +259,13 @@ export function ZiaCopilotModal({
               </div>
 
               {/* Include Images Checkbox matching screenshot */}
-              <div className="flex items-center gap-2 p-3 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/40">
+              <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40">
                 <input
                   id="include-images-toggle"
                   type="checkbox"
                   checked={includeImages}
                   onChange={(e) => setIncludeImages(e.target.checked)}
-                  className="w-4 h-4 rounded text-[#5846A8] focus:ring-[#5846A8] cursor-pointer"
+                  className="w-4 h-4 rounded text-[#E08738] focus:ring-[#E08738] cursor-pointer"
                 />
                 <label
                   htmlFor="include-images-toggle"

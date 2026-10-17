@@ -37,6 +37,7 @@ export interface PreviewMediaItem {
   type: "image" | "video" | "IMAGE" | "VIDEO";
   name?: string;
   size?: number;
+  altText?: string;
 }
 
 interface FacebookPostPreviewProps {

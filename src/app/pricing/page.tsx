@@ -107,7 +107,7 @@ export default function PricingPage() {
 
       <main className="pt-32 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-12 space-y-4">
-          <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#5846A8] dark:text-[#FBBF24]">
             Simple, Transparent Pricing
           </span>
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-950 dark:text-white">
@@ -125,7 +125,7 @@ export default function PricingPage() {
                 onClick={() => setBillingCycle("monthly")}
                 className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition cursor-pointer ${
                   billingCycle === "monthly"
-                    ? "bg-indigo-600 text-white shadow-xs"
+                    ? "bg-[#5846A8] text-white shadow-xs dark:bg-gradient-to-r dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:text-slate-950 dark:font-bold"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
@@ -136,12 +136,12 @@ export default function PricingPage() {
                 onClick={() => setBillingCycle("annual")}
                 className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition cursor-pointer flex items-center gap-1.5 ${
                   billingCycle === "annual"
-                    ? "bg-indigo-600 text-white shadow-xs"
+                    ? "bg-[#5846A8] text-white shadow-xs dark:bg-gradient-to-r dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:text-slate-950 dark:font-bold"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
                 <span>Annual</span>
-                <span className="text-[10px] px-1.5 py-0.2 rounded bg-purple-500 text-white font-bold">
+                <span className="text-[10px] px-1.5 py-0.2 rounded bg-purple-100 dark:bg-amber-500/20 text-[#5846A8] dark:text-[#FBBF24] font-bold">
                   Save 20%
                 </span>
               </button>
@@ -156,14 +156,14 @@ export default function PricingPage() {
             return (
               <div
                 key={p.name}
-                className={`relative rounded-3xl p-6 bg-white dark:bg-slate-900 border transition-all duration-200 flex flex-col justify-between ${
+                className={`relative rounded-3xl p-6 bg-white dark:bg-[#16161D] border transition-all duration-200 flex flex-col justify-between ${
                   p.highlight
-                    ? "border-indigo-600 dark:border-indigo-500 shadow-xl ring-2 ring-indigo-500/20"
+                    ? "border-[#5846A8] dark:border-[#E08738] shadow-xl ring-2 ring-[#5846A8]/20 dark:ring-[#E08738]/20"
                     : "border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md"
                 }`}
               >
                 {p.badge && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-wider shadow-xs">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-[#5846A8] dark:bg-gradient-to-r dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] text-white dark:text-slate-950 text-[10px] font-bold uppercase tracking-wider shadow-xs">
                     {p.badge}
                   </span>
                 )}
@@ -193,7 +193,7 @@ export default function PricingPage() {
                   <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 mb-6">
                     {p.features.map((f: string) => (
                       <li key={f} className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-purple-500 shrink-0 mt-0.5" />
+                        <Check className="w-4 h-4 text-[#5846A8] dark:text-[#E08738] shrink-0 mt-0.5" />
                         <span className="leading-snug">{f}</span>
                       </li>
                     ))}
@@ -202,10 +202,10 @@ export default function PricingPage() {
 
                 <Link
                   href={p.ctaHref || "/signup"}
-                  className={`w-full py-2.5 text-center rounded-xl text-xs font-semibold transition active:scale-[0.98] ${
+                  className={`w-full py-2.5 text-center rounded-xl text-xs font-bold transition hover:-translate-y-0.5 active:translate-y-0 active:scale-95 duration-200 cursor-pointer ${
                     p.highlight
-                      ? "bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20"
-                      : "border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200"
+                      ? "bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 dark:bg-gradient-to-r dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:hover:brightness-105 dark:text-slate-950 dark:shadow-amber-500/25"
+                      : "border border-purple-200 dark:border-amber-500/30 text-[#5846A8] dark:text-[#FBBF24] hover:bg-purple-50 dark:hover:bg-white/5"
                   }`}
                 >
                   {p.ctaLabel}

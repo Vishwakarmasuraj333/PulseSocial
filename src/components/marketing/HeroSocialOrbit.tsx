@@ -11,12 +11,14 @@ import {
   YouTubeIcon,
   TikTokIcon,
   ThreadsIcon,
-  SnapchatIcon,
+  PinterestIcon,
   WhatsAppIcon,
   TelegramIcon,
   BlueskyIcon,
   RedditIcon,
   MastodonIcon,
+  SnapchatIcon,
+  GoogleStorefrontIcon,
 } from "@/components/icons/PlatformIcons";
 import { CheckCircle2, Sparkles, ArrowUpRight } from "lucide-react";
 
@@ -81,12 +83,12 @@ export function HeroSocialOrbit() {
         icon: (s) => <TikTokIcon size={s} className="shrink-0" />,
       },
       {
-        id: "snapchat",
-        name: "Snapchat",
-        badge: "Spotlight & Public Stories",
-        color: "#FFFC00",
-        glowColor: "rgba(255, 252, 0, 0.5)",
-        icon: (s) => <SnapchatIcon size={s} className="shrink-0" />,
+        id: "pinterest",
+        name: "Pinterest",
+        badge: "Pins, Boards & Rich Visual Analytics",
+        color: "#E60023",
+        glowColor: "rgba(230, 0, 35, 0.5)",
+        icon: (s) => <PinterestIcon size={s} className="shrink-0" />,
       },
       {
         id: "threads",
@@ -159,6 +161,22 @@ export function HeroSocialOrbit() {
         color: "#6364FF",
         glowColor: "rgba(99, 100, 255, 0.5)",
         icon: (s) => <MastodonIcon size={s} className="shrink-0" />,
+      },
+      {
+        id: "snapchat",
+        name: "Snapchat",
+        badge: "Spotlight, Stories & Audience Reach",
+        color: "#FFFC00",
+        glowColor: "rgba(255, 252, 0, 0.5)",
+        icon: (s) => <SnapchatIcon size={s} className="shrink-0" />,
+      },
+      {
+        id: "google_business",
+        name: "Google Business",
+        badge: "Search & Maps Local Updates",
+        color: "#4285F4",
+        glowColor: "rgba(66, 133, 244, 0.5)",
+        icon: (s) => <GoogleStorefrontIcon size={s} className="shrink-0" />,
       },
     ],
     []

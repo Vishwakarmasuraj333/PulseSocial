@@ -4,45 +4,41 @@
 
 @layer base {
   :root {
-    /* PulseSocial Design Tokens - Signature Royal Purple Palette */
-    --brand-emerald: #6F52B5;
-    --brand-purple-hover: #59409A;
-    --brand-purple-light: #F4F0FC;
-    --brand-purple-border: #DDD3F4;
+    /* PulseSocial Design Tokens - Signature Royal Purple (Light Mode) */
+    --brand-emerald: #5846A8;
+    --brand-purple: #5846A8;
+    --brand-purple-hover: #48388d;
+    --brand-purple-light: #F5F3FF;
+    --brand-purple-border: rgba(88, 70, 168, 0.25);
 
-    --brand-purple: #6F52B5;
-    --brand-purple-hover: #59409A;
-    --brand-purple-light: #F4F0FC;
-    --brand-purple-border: #DDD3F4;
-
-    --primary-purple: #8B6BD6;
-    --primary-purple-hover: #795BC2;
-    --primary-purple-deep: #6F52B5;
-    --primary-purple-dark: #59409A;
-    --primary-purple-soft: #A78BDF;
-    --primary-purple-light: #F4F0FC;
-    --border-purple: #DDD3F4;
-    --lavender-background: #F8F7FB;
+    --primary-purple: #5846A8;
+    --primary-purple-hover: #48388d;
+    --primary-purple-deep: #3F2B7B;
+    --primary-purple-dark: #2A185A;
+    --primary-purple-soft: rgba(88, 70, 168, 0.12);
+    --primary-purple-light: #F5F3FF;
+    --border-purple: rgba(88, 70, 168, 0.25);
+    --lavender-background: #F9F8FD;
     --surface: #ffffff;
-    --surface-secondary: #F4F1FA;
-    --surface-hover: #F0EBF9;
-    --text-primary: #17132B;
-    --text-secondary: #68627A;
-    --text-muted: #9690A5;
-    --link: #6F52B5;
-    --border: #E7E2F0;
-    --success: #8B6BD6;
-    --warning: #f59e0b;
-    --error: #ef4444;
+    --surface-secondary: #F8F7FC;
+    --surface-hover: #F2EFF9;
+    --text-primary: #0F172A;
+    --text-secondary: #64748B;
+    --text-muted: #94A3B8;
+    --link: #5846A8;
+    --border: #E2E8F0;
+    --success: #10B981;
+    --warning: #F59E0B;
+    --error: #EF4444;
 
     /* Legacy CSS Variable Aliases */
-    --primary: #6F52B5;
-    --primary-hover: #59409A;
-    --background: #F8F7FB;
-    --surface-hover: #F0EBF9;
-    --text: #17132B;
-    --muted: #68627A;
-    --danger: #ef4444;
+    --primary: #5846A8;
+    --primary-hover: #48388d;
+    --background: #FFFFFF;
+    --surface-hover: #F8F7FC;
+    --text: #0F172A;
+    --muted: #64748B;
+    --danger: #EF4444;
 
     /* Tailwind HSL mappings */
     --foreground: 222.2 84% 4.9%;
@@ -50,67 +46,68 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --secondary: 260 40% 97%;
-    --secondary-foreground: 260 47% 11%;
+    --secondary: 250 30% 96%;
+    --secondary-foreground: 258 45% 20%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 260 40% 96%;
-    --accent-foreground: 260 47% 11%;
+    --accent: 258 45% 47%;
+    --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 254 44% 47%;
+    --ring: 258 45% 47%;
     --radius: 0.75rem;
   }
 
   .dark {
-    --brand-emerald: #8B6BD6;
-    --brand-purple-hover: #795BC2;
-    --brand-purple-light: #2e2850;
-    --brand-purple-border: #3b3267;
+    /* Matte Obsidian & Warm Amber Design System Tokens */
+    --brand-emerald: #E08738;
+    --brand-purple-hover: #D97706;
+    --brand-purple-light: rgba(245, 158, 11, 0.12);
+    --brand-purple-border: rgba(255, 255, 255, 0.07);
 
-    --brand-purple: #8B6BD6;
-    --brand-purple-hover: #795BC2;
-    --brand-purple-light: #2e2850;
-    --brand-purple-border: #3b3267;
+    --brand-purple: #E08738;
+    --brand-purple-hover: #D97706;
+    --brand-purple-light: rgba(245, 158, 11, 0.12);
+    --brand-purple-border: rgba(255, 255, 255, 0.07);
 
-    --primary-purple: #7c68ce;
-    --primary-purple-hover: #6c57bf;
-    --primary-purple-light: #9d8de6;
-    --primary-purple-soft: #1e1b4b;
-    --lavender-background: #0b0f19;
-    --surface: #111827;
-    --surface-secondary: #1a1f33;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
-    --border: #1e293b;
-    --border-purple: #2e2850;
-    --success: #8B6BD6;
-    --warning: #f59e0b;
-    --error: #ef4444;
+    --primary-purple: #E08738;
+    --primary-purple-hover: #D97706;
+    --primary-purple-light: #F59E0B;
+    --primary-purple-soft: rgba(224, 135, 56, 0.15);
+    --lavender-background: #0D0D0E;
+    --surface: #17171A;
+    --surface-secondary: #1C1C20;
+    --text-primary: #FFFFFF;
+    --text-secondary: #9CA3AF;
+    --text-muted: #6B7280;
+    --border: rgba(255, 255, 255, 0.07);
+    --border-purple: rgba(224, 135, 56, 0.3);
+    --success: #10B981;
+    --warning: #F59E0B;
+    --error: #EF4444;
 
-    --primary: #7c68ce;
-    --primary-hover: #6c57bf;
-    --background: #0b0f19;
-    --surface-hover: #1f2937;
-    --text: #f8fafc;
-    --muted: #94a3b8;
-    --danger: #ef4444;
+    --primary: #E08738;
+    --primary-hover: #D97706;
+    --background: #0D0D0E;
+    --surface-hover: rgba(255, 255, 255, 0.05);
+    --text: #FFFFFF;
+    --muted: #9CA3AF;
+    --danger: #EF4444;
 
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 6.5%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 6.5%;
-    --popover-foreground: 210 40% 98%;
-    --secondary: 260 30% 18%;
-    --secondary-foreground: 210 40% 98%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 260 30% 18%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 254 44% 57%;
+    --foreground: 0 0% 100%;
+    --card: 240 6% 10%;
+    --card-foreground: 0 0% 100%;
+    --popover: 240 6% 12%;
+    --popover-foreground: 0 0% 100%;
+    --secondary: 240 4% 16%;
+    --secondary-foreground: 0 0% 100%;
+    --muted-foreground: 218 11% 65%;
+    --accent: 28 78% 55%;
+    --accent-foreground: 240 6% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --input: 240 6% 18%;
+    --ring: 28 78% 55%;
   }
 }
 
@@ -518,4 +515,204 @@ body {
   will-change: transform, opacity;
   transform-style: preserve-3d;
 }
+
+/* ========================================================================= */
+/* MATTE DARK OBSIDIAN / CHARCOAL & WARM AMBER DESIGN SYSTEM UTILITIES       */
+/* ========================================================================= */
+.matte-canvas {
+  background-color: #0D0D0E;
+}
+
+.matte-panel {
+  background-color: #17171A;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 1rem;
+}
+
+.matte-popover {
+  background-color: #1C1C20;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.amber-cta {
+  background-color: #E08738;
+  color: #18181B;
+  font-weight: 700;
+  transition: all 150ms ease-in-out;
+}
+.amber-cta:hover {
+  background-color: #D97706;
+  box-shadow: 0 0 16px rgba(224, 135, 56, 0.35);
+}
+
+.btn-primary {
+  background-color: #5846A8;
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 14px 0 rgba(88, 70, 168, 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background-color: #48388d;
+  box-shadow: 0 6px 20px 0 rgba(88, 70, 168, 0.35);
+  transform: translateY(-1.5px);
+}
+.btn-primary:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px 0 rgba(88, 70, 168, 0.2);
+}
+
+.dark .btn-primary {
+  background: linear-gradient(135deg, #F59E0B 0%, #E08738 50%, #D97706 100%);
+  color: #0A0A0E;
+  box-shadow: 0 4px 14px 0 rgba(224, 135, 56, 0.32);
+}
+.dark .btn-primary:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 6px 20px 0 rgba(224, 135, 56, 0.45);
+  transform: translateY(-1.5px);
+}
+.dark .btn-primary:active {
+  transform: translateY(0) scale(0.98);
+  filter: brightness(0.96);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #5846A8;
+  border: 1px solid rgba(88, 70, 168, 0.35);
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.btn-secondary:hover {
+  background: rgba(88, 70, 168, 0.08);
+  border-color: #5846A8;
+  transform: translateY(-1px);
+}
+.dark .btn-secondary {
+  color: #E08738;
+  border: 1px solid rgba(224, 135, 56, 0.4);
+}
+.dark .btn-secondary:hover {
+  background: rgba(224, 135, 56, 0.1);
+  border-color: rgba(224, 135, 56, 0.8);
+  color: #F59E0B;
+}
+
+.btn-primary-gold {
+  background: linear-gradient(135deg, #F59E0B 0%, #E08738 50%, #D97706 100%);
+  color: #0A0A0E;
+  font-weight: 700;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 14px 0 rgba(224, 135, 56, 0.32);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.btn-primary-gold:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 6px 20px 0 rgba(224, 135, 56, 0.45);
+  transform: translateY(-1px);
+}
+.btn-primary-gold:active {
+  transform: translateY(0);
+  filter: brightness(0.96);
+  box-shadow: 0 2px 8px 0 rgba(224, 135, 56, 0.25);
+}
+
+.btn-secondary-gold {
+  background: transparent;
+  color: #E08738;
+  border: 1px solid rgba(224, 135, 56, 0.4);
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.btn-secondary-gold:hover {
+  background: rgba(224, 135, 56, 0.1);
+  border-color: rgba(224, 135, 56, 0.8);
+  color: #F59E0B;
+}
+
+.dark ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.dark ::-webkit-scrollbar-track {
+  background: #0D0D0E;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #27272A;
+  border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3F3F46;
+}
+
+/* ============================================================ */
+/* PROFESSIONAL ICON INTERACTION & TOOLTIP SYSTEM               */
+/* ============================================================ */
+.icon-interactive {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.15s ease, background-color 0.15s ease;
+  cursor: pointer;
+}
+.icon-interactive:hover {
+  transform: scale(1.08);
+}
+.icon-interactive:active {
+  transform: scale(0.95);
+}
+.icon-interactive:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Accessible Floating Tooltip Bubble */
+.tooltip-base {
+  position: absolute;
+  z-index: 50;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  background-color: var(--surface-secondary, #F4F1FA);
+  color: var(--text-primary, #17132B);
+  border: 1px solid var(--border, #E7E2F0);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+.dark .tooltip-base {
+  background-color: var(--surface-secondary, #1C1C20);
+  color: var(--text-primary, #FFFFFF);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+*:hover > .tooltip-base,
+*:focus-visible > .tooltip-base {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 

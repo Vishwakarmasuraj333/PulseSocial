@@ -440,7 +440,7 @@ export default function DashboardPage() {
 
   return (
     <AppLayout>
-      <div className="bg-slate-50 dark:bg-[#0D0D0E] min-h-screen p-4 sm:p-6 lg:p-8 text-slate-800 dark:text-[#9CA3AF] font-sans space-y-6">
+      <div className="bg-slate-50 dark:bg-[#0D0D0E] min-h-[calc(100vh-64px)] p-4 sm:p-6 lg:p-8 text-slate-800 dark:text-[#9CA3AF] font-sans space-y-6 max-w-7xl mx-auto">
         
         {/* Linear / Modern SaaS Style Capsule Tab Bar */}
         <div className="flex items-center justify-between flex-wrap gap-3 pb-1">

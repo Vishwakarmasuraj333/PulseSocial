@@ -180,7 +180,8 @@ export async function GET(
 
     // Direct redirection to official third-party authorization consent screen
     const tier = url.searchParams.get("tier") || "full";
-    const authUrl = socialProvider.getAuthorizationUrl(state, redirectUri, codeVerifier, { tier });
+    const shop = url.searchParams.get("shop") || undefined;
+    const authUrl = socialProvider.getAuthorizationUrl(state, redirectUri, codeVerifier, { tier, shop });
 
     try {
       await logAudit({

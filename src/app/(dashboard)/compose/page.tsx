@@ -240,7 +240,7 @@ export default function ComposePage() {
 
   return (
     <AppLayout>
-      <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6">
+      <div className="bg-slate-50 dark:bg-[#0D0D0E] min-h-[calc(100vh-64px)] p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto font-sans text-slate-800 dark:text-[#9CA3AF]">
         
         {/* Top Title Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -248,7 +248,7 @@ export default function ComposePage() {
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
               Create Post
             </h1>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 dark:text-[#6B7280] mt-1">
               Craft, preview, and schedule content across all your social channels simultaneously.
             </p>
           </div>
@@ -258,7 +258,7 @@ export default function ComposePage() {
               type="button"
               onClick={() => handlePublish("DRAFT")}
               disabled={isSubmitting}
-              className="px-3.5 py-2 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-white transition flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
               <Save className="w-3.5 h-3.5" />
               <span>Save Draft</span>
@@ -268,7 +268,7 @@ export default function ComposePage() {
               type="button"
               onClick={() => handlePublish("PUBLISHED")}
               disabled={isSubmitting}
-              className="px-4 py-2 text-xs font-semibold rounded-lg bg-[#5846A8] hover:bg-[#48388d] text-white shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              className="px-4 py-2 text-xs font-bold rounded-xl bg-[#5846A8] hover:bg-[#48388d] dark:bg-[#E08738] dark:hover:bg-[#D97706] text-white dark:text-[#0F0F11] shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
               {isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
               <span>Publish Now</span>
@@ -282,7 +282,7 @@ export default function ComposePage() {
           {/* ============================================================ */}
           {/* LEFT: Channel Selector & Content Editor (7 Cols)             */}
           {/* ============================================================ */}
-          <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-xs space-y-5">
+          <div className="lg:col-span-7 bg-white dark:bg-[#17171A] rounded-2xl border border-slate-200 dark:border-white/7 p-5 sm:p-6 shadow-xs space-y-5">
             
             {/* 1. Platform Chips Selector */}
             <div>
@@ -409,16 +409,16 @@ export default function ComposePage() {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="What's happening? Share updates, links, announcements, or stories with your audience..."
-                className="w-full p-3.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#5846A8] resize-none leading-relaxed transition"
+                className="w-full p-3.5 text-sm rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#111113] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#6B7280] focus:outline-none focus:ring-1 focus:ring-[#5846A8] dark:focus:ring-[#E08738] resize-none leading-relaxed transition"
               />
 
               {/* Character Counter & Helper Toolbar */}
               <div className="flex items-center justify-between pt-2 text-xs">
-                <div className="flex items-center gap-2 text-slate-400">
+                <div className="flex items-center gap-2 text-slate-400 dark:text-[#6B7280]">
                   <button
                     type="button"
                     onClick={() => setContent((c) => c + " #PulseSocial #Growth ")}
-                    className="p-1 hover:text-[#5846A8] transition cursor-pointer"
+                    className="p-1 hover:text-[#5846A8] dark:hover:text-[#FBBF24] transition cursor-pointer"
                     title="Add Hashtags"
                   >
                     <Hash className="w-4 h-4" />
@@ -426,7 +426,7 @@ export default function ComposePage() {
                   <button
                     type="button"
                     onClick={() => setContent((c) => c + " 🚀✨ ")}
-                    className="p-1 hover:text-[#5846A8] transition cursor-pointer"
+                    className="p-1 hover:text-[#5846A8] dark:hover:text-[#FBBF24] transition cursor-pointer"
                     title="Insert Emoji"
                   >
                     <Smile className="w-4 h-4" />
@@ -434,14 +434,14 @@ export default function ComposePage() {
                   <button
                     type="button"
                     onClick={() => setContent((c) => c + " @")}
-                    className="p-1 hover:text-[#5846A8] transition cursor-pointer"
+                    className="p-1 hover:text-[#5846A8] dark:hover:text-[#FBBF24] transition cursor-pointer"
                     title="Mention Account"
                   >
                     <AtSign className="w-4 h-4" />
                   </button>
                 </div>
 
-                <div className={`font-mono text-xs ${charsRemaining < 0 ? "text-rose-500 font-bold" : "text-slate-400"}`}>
+                <div className={`font-mono text-xs ${charsRemaining < 0 ? "text-rose-500 font-bold" : "text-slate-400 dark:text-[#6B7280]"}`}>
                   {content.length} / {currentLimit} chars
                 </div>
               </div>
@@ -457,7 +457,7 @@ export default function ComposePage() {
               {mediaUrls.length > 0 && (
                 <div className="flex flex-wrap gap-3 mb-3">
                   {mediaUrls.map((url, idx) => (
-                    <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden border border-slate-200 group">
+                    <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden border border-slate-200 dark:border-white/10 group">
                       <img src={url} alt="Attached" className="w-full h-full object-cover" />
                       <button
                         type="button"
@@ -483,22 +483,22 @@ export default function ComposePage() {
               {/* Media drop box */}
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-[#5846A8] rounded-xl p-6 text-center cursor-pointer transition hover:bg-[#f5f3ff]/40 dark:hover:bg-slate-950/40 relative"
+                className="border-2 border-dashed border-slate-200 dark:border-white/10 hover:border-[#5846A8] dark:hover:border-[#E08738] rounded-xl p-6 text-center cursor-pointer transition hover:bg-[#f5f3ff]/40 dark:hover:bg-[#111113] relative"
               >
                 {isUploading ? (
                   <div className="flex flex-col items-center py-2">
-                    <Loader2 className="w-8 h-8 text-[#5846A8] animate-spin mb-2" />
+                    <Loader2 className="w-8 h-8 text-[#5846A8] dark:text-[#FBBF24] animate-spin mb-2" />
                     <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                       Uploading media...
                     </p>
                   </div>
                 ) : (
                   <>
-                    <UploadCloud className="w-8 h-8 text-[#5846A8] mx-auto mb-2" />
+                    <UploadCloud className="w-8 h-8 text-[#5846A8] dark:text-[#FBBF24] mx-auto mb-2" />
                     <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                       Click to browse and upload creative
                     </p>
-                    <p className="text-[11px] text-slate-400 mt-0.5">
+                    <p className="text-[11px] text-slate-400 dark:text-[#6B7280] mt-0.5">
                       PNG, JPG, WEBP or MP4 supported
                     </p>
                   </>
@@ -507,9 +507,9 @@ export default function ComposePage() {
             </div>
 
             {/* 4. Scheduling Options */}
-            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="pt-2 border-t border-slate-100 dark:border-white/7 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-[#5846A8]" />
+                <Calendar className="w-4 h-4 text-[#5846A8] dark:text-[#FBBF24]" />
                 <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                   Schedule for later:
                 </span>
@@ -520,19 +520,19 @@ export default function ComposePage() {
                   type="date"
                   value={scheduledDate}
                   onChange={(e) => setScheduledDate(e.target.value)}
-                  className="px-2.5 py-1 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200"
+                  className="px-2.5 py-1 text-xs rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#111113] text-slate-800 dark:text-white"
                 />
                 <input
                   type="time"
                   value={scheduledTime}
                   onChange={(e) => setScheduledTime(e.target.value)}
-                  className="px-2.5 py-1 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200"
+                  className="px-2.5 py-1 text-xs rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#111113] text-slate-800 dark:text-white"
                 />
                 <button
                   type="button"
                   onClick={() => handlePublish("SCHEDULED")}
                   disabled={isSubmitting || !scheduledDate}
-                  className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#5846A8] hover:bg-[#48388d] text-white disabled:opacity-50 transition cursor-pointer"
+                  className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#5846A8] hover:bg-[#48388d] dark:bg-[#E08738] dark:hover:bg-[#D97706] text-white dark:text-[#0F0F11] disabled:opacity-50 transition cursor-pointer"
                 >
                   Schedule
                 </button>
@@ -545,12 +545,12 @@ export default function ComposePage() {
           {/* ============================================================ */}
           <div className="lg:col-span-5 space-y-4 sticky top-6">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <span className="text-xs font-bold text-slate-500 dark:text-[#6B7280] uppercase tracking-wider">
                 Live Native Preview
               </span>
 
               {/* Quick Preview Channel Switcher */}
-              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl overflow-x-auto max-w-[280px] scrollbar-none">
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-[#111113] border border-transparent dark:border-white/7 p-1 rounded-xl overflow-x-auto max-w-[280px] scrollbar-none">
                 {[
                   "instagram",
                   "facebook",
@@ -568,7 +568,7 @@ export default function ComposePage() {
                     onClick={() => setActivePreviewPlatform(plat)}
                     className={`p-1.5 rounded-lg transition-all cursor-pointer ${
                       activePreviewPlatform === plat
-                        ? "bg-white dark:bg-slate-900 shadow-xs text-indigo-600"
+                        ? "bg-white dark:bg-[#17171A] shadow-xs text-indigo-600 dark:text-[#FBBF24]"
                         : "opacity-60 hover:opacity-100"
                     }`}
                     title={plat.toUpperCase()}

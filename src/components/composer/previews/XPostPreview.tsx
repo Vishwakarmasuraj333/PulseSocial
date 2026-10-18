@@ -92,22 +92,20 @@ export function XPostPreview({ account, content, media, location }: XPostPreview
 
           {/* Media Attachment */}
           {media.length > 0 && (
-            <div className="relative mt-2.5 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-950">
+            <div className="relative mt-2.5 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-900/60 dark:bg-black/60 flex items-center justify-center">
               {media[activeMediaIndex]?.type === "video" ? (
                 <video
                   src={media[activeMediaIndex].url}
                   controls
                   playsInline
-                  className="w-full max-h-[300px] object-contain bg-black"
+                  className="w-full max-h-[420px] object-contain bg-black rounded-2xl"
                 />
               ) : (
-                <div className="relative w-full h-64">
-                  <Image
+                <div className="relative w-full flex items-center justify-center p-1.5 bg-black/40 min-h-[220px]">
+                  <img
                     src={media[activeMediaIndex].url}
                     alt="X Media"
-                    fill
-                    className="object-cover"
-                    unoptimized
+                    className="w-auto h-auto max-h-[460px] max-w-full object-contain rounded-xl shadow-xs"
                   />
                 </div>
               )}

@@ -53,7 +53,7 @@ export default function AIPage() {
 
   return (
     <AppLayout>
-      <div className="p-6 max-w-5xl mx-auto space-y-6">
+      <div className="bg-slate-50 dark:bg-[#0D0D0E] min-h-[calc(100vh-64px)] p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto font-sans text-slate-800 dark:text-[#9CA3AF]">
         {/* Header Title */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>

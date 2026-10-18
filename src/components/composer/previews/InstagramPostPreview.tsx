@@ -78,13 +78,11 @@ export function InstagramPostPreview({
               className="w-full h-full object-contain bg-black"
             />
           ) : (
-            <div className="relative w-full h-full">
-              <Image
+            <div className="relative w-full h-full flex items-center justify-center bg-black/40">
+              <img
                 src={media[activeMediaIndex].url}
                 alt="Instagram post"
-                fill
-                className="object-cover"
-                unoptimized
+                className="w-auto h-auto max-h-full max-w-full object-contain"
               />
             </div>
           )

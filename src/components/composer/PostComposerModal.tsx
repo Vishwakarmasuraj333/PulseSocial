@@ -210,7 +210,16 @@ interface ConnectedAccountItem {
   username: string | null;
   profileImageUrl: string | null;
   status: string;
+  tokenExpiresAt?: string | null;
+  validityDays?: number;
 }
+
+export const isAccountHealthy = (acc: ConnectedAccountItem) => {
+  if (acc.status === "EXPIRED" || acc.status === "DISCONNECTED") return false;
+  if (acc.validityDays !== undefined && acc.validityDays <= 0) return false;
+  if (acc.tokenExpiresAt && new Date(acc.tokenExpiresAt) < new Date()) return false;
+  return acc.status === "CONNECTED";
+};
 
 const DEFAULT_REAL_ACCOUNTS: ConnectedAccountItem[] = [];
 
@@ -259,9 +268,12 @@ export function PostComposerModal({
             username: c.username || c.displayName,
             profileImageUrl: c.profileImageUrl || "",
             status: c.status || "CONNECTED",
+            tokenExpiresAt: c.tokenExpiresAt,
+            validityDays: c.validityDays,
           }));
           setConnectedAccounts(mapped);
-          setSelectedAccountIds(mapped.map((m) => m.id));
+          const healthy = mapped.filter(isAccountHealthy);
+          setSelectedAccountIds(healthy.length > 0 ? healthy.map((m) => m.id) : [mapped[0].id]);
           return;
         }
       }
@@ -276,9 +288,12 @@ export function PostComposerModal({
             username: c.username,
             profileImageUrl: c.avatarUrl || c.profileImageUrl || "",
             status: c.status || "CONNECTED",
+            tokenExpiresAt: c.tokenExpiresAt,
+            validityDays: c.validityDays,
           }));
           setConnectedAccounts(mapped);
-          setSelectedAccountIds(mapped.map((m) => m.id));
+          const healthy = mapped.filter(isAccountHealthy);
+          setSelectedAccountIds(healthy.length > 0 ? healthy.map((m) => m.id) : [mapped[0].id]);
           return;
         }
       }
@@ -981,11 +996,19 @@ export function PostComposerModal({
 
                 {effectiveChannels.map((ch) => {
                   const isSelected = selectedAccountIds.includes(ch.id);
+                  const isHealthy = isAccountHealthy(ch);
                   return (
                     <button
                       key={ch.id}
                       type="button"
                       onClick={() => {
+                        if (!isHealthy) {
+                          toast({
+                            title: "Token Expired",
+                            message: `${ch.displayName}'s authorization for ${ch.provider.toUpperCase()} has expired. Please re-authenticate in Social Accounts.`,
+                            type: "warning",
+                          });
+                        }
                         setSelectedAccountIds((prev) =>
                           prev.includes(ch.id)
                             ? (prev.length > 1 ? prev.filter((id) => id !== ch.id) : prev)
@@ -993,12 +1016,14 @@ export function PostComposerModal({
                         );
                       }}
                       className="relative group cursor-pointer focus:outline-none"
-                      title={`${ch.displayName} (${ch.provider.toUpperCase()}) — Click to toggle`}
+                      title={`${ch.displayName} (${ch.provider.toUpperCase()}) ${!isHealthy ? "— [EXPIRED: Re-auth required]" : "— Ready to publish"}`}
                     >
                       <div
                         className={`w-8 h-8 rounded-full overflow-hidden border transition ${
                           isSelected
-                            ? "border-blue-500 ring-2 ring-blue-500 ring-offset-1"
+                            ? isHealthy
+                              ? "border-blue-500 ring-2 ring-blue-500 ring-offset-1"
+                              : "border-amber-500 ring-2 ring-amber-500 ring-offset-1"
                             : "border-slate-200 opacity-50 hover:opacity-100"
                         }`}
                       >
@@ -1013,6 +1038,11 @@ export function PostComposerModal({
                       <div className="absolute -bottom-0.5 -right-0.5 rounded-full ring-1 ring-white shadow-2xs overflow-hidden shrink-0">
                         {renderPlatformIcon(ch.provider, 14)}
                       </div>
+                      {!isHealthy && (
+                        <div className="absolute -top-1 -right-1 bg-amber-500 text-slate-950 text-[8px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center ring-1 ring-white shadow-xs" title="Token Expired">
+                          !
+                        </div>
+                      )}
                     </button>
                   );
                 })}
@@ -1021,10 +1051,12 @@ export function PostComposerModal({
                   <button
                     type="button"
                     onClick={() => {
-                      if (selectedAccountIds.length === effectiveChannels.length) {
-                        setSelectedAccountIds([effectiveChannels[0].id]);
+                      const healthyChannels = effectiveChannels.filter(isAccountHealthy);
+                      const targetChannels = healthyChannels.length > 0 ? healthyChannels : effectiveChannels;
+                      if (selectedAccountIds.length === targetChannels.length) {
+                        setSelectedAccountIds([targetChannels[0].id]);
                       } else {
-                        setSelectedAccountIds(effectiveChannels.map((c) => c.id));
+                        setSelectedAccountIds(targetChannels.map((c) => c.id));
                       }
                     }}
                     className={`ml-1 px-2.5 py-1 rounded-full text-[11px] font-bold border transition cursor-pointer flex items-center gap-1 ${
@@ -2098,8 +2130,7 @@ export function PostComposerModal({
 
           {/* ============================================================ */}
           {/* COLUMN 3: Live Platform Post Preview (4 cols)                 */}
-          {/* ============================================================ */}
-          <div className="lg:col-span-4 p-6 bg-slate-50/50 dark:bg-[#0D0D0E] flex flex-col justify-between overflow-y-auto max-h-[75vh]">
+          <div className="lg:col-span-4 p-4 sm:p-5 bg-slate-50/70 dark:bg-[#0B0B0D] overflow-y-auto max-h-[78vh] scrollbar-thin">
             <div>
               <PostPreview
                 accounts={effectiveChannels.filter((c) => selectedAccountIds.includes(c.id))}

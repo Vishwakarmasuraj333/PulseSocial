@@ -84,14 +84,14 @@ export function PulseAwardsGrid() {
   ];
 
   return (
-    <section className="py-12 sm:py-16 bg-white dark:bg-slate-950 border-t border-b border-slate-100 dark:border-slate-850 select-none">
+    <section className="py-12 sm:py-16 bg-white dark:bg-[#0D0D0E] border-t border-b border-slate-100 dark:border-white/7 select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* ========================================================= */}
         {/* ROW 1: 5-COLUMN INDUSTRY ACCREDITATIONS (Pre-slider clean)*/}
         {/* ========================================================= */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 lg:gap-8 items-start text-center">
           {/* 1. Constellation Research */}
-          <div className="flex flex-col items-center justify-start space-y-2 p-3 rounded-2xl hover:bg-slate-50/80 dark:hover:bg-slate-900/60 transition-all duration-300 hover:scale-105 group cursor-pointer">
+          <div className="flex flex-col items-center justify-start space-y-2 p-3 rounded-2xl hover:bg-slate-50/80 dark:hover:bg-[#17171A] transition-all duration-300 hover:scale-105 group cursor-pointer">
             <div className="h-14 flex items-center justify-center transition-transform group-hover:scale-110">
               <div className="flex items-center gap-1.5 text-slate-800 dark:text-slate-200">
                 <div className="w-8 h-8 rounded-full border-2 border-purple-600 flex items-center justify-center relative shadow-xs">
@@ -108,32 +108,32 @@ export function PulseAwardsGrid() {
                 </div>
               </div>
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight max-w-[170px]">
+            <p className="text-[11px] text-slate-500 dark:text-[#9CA3AF] leading-tight max-w-[170px]">
               Shortlist for Social Engagement and Listening Platforms 2026
             </p>
           </div>
 
           {/* 2. Forbes ADVISOR */}
-          <div className="flex flex-col items-center justify-start space-y-2 p-3 rounded-2xl hover:bg-slate-50/80 dark:hover:bg-slate-900/60 transition-all duration-300 hover:scale-105 group cursor-pointer">
+          <div className="flex flex-col items-center justify-start space-y-2 p-3 rounded-2xl hover:bg-slate-50/80 dark:hover:bg-[#17171A] transition-all duration-300 hover:scale-105 group cursor-pointer">
             <div className="h-14 flex items-center justify-center transition-transform group-hover:scale-110">
               <div className="text-center">
                 <span className="font-serif font-black text-2xl tracking-tight text-slate-900 dark:text-white">
                   Forbes
                 </span>
-                <span className="block text-[9px] font-bold tracking-[2px] text-slate-500 dark:text-slate-400 uppercase mt-0.5">
+                <span className="block text-[9px] font-bold tracking-[2px] text-slate-500 dark:text-[#6B7280] uppercase mt-0.5">
                   ADVISOR
                 </span>
               </div>
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight max-w-[170px]">
+            <p className="text-[11px] text-slate-500 dark:text-[#9CA3AF] leading-tight max-w-[170px]">
               Best Social Media Management Tools 2026: For Individual Creators
             </p>
           </div>
 
           {/* 3. Software Advice Front Runners */}
-          <div className="flex flex-col items-center justify-start space-y-2 p-3 rounded-2xl hover:bg-slate-50/80 dark:hover:bg-slate-900/60 transition-all duration-300 hover:scale-105 group cursor-pointer">
+          <div className="flex flex-col items-center justify-start space-y-2 p-3 rounded-2xl hover:bg-slate-50/80 dark:hover:bg-[#17171A] transition-all duration-300 hover:scale-105 group cursor-pointer">
             <div className="h-14 flex items-center justify-center transition-transform group-hover:scale-110">
-              <div className="w-[124px] bg-[#1E293B] rounded-lg shadow-sm border border-slate-700 overflow-hidden text-center">
+              <div className="w-[124px] bg-[#1E293B] dark:bg-[#17171A] rounded-lg shadow-sm border border-slate-700 dark:border-white/10 overflow-hidden text-center">
                 <div className="bg-[#EA580C] text-white text-[8px] font-bold py-0.5 tracking-wider uppercase">
                   Software Advice
                 </div>
@@ -145,15 +145,15 @@ export function PulseAwardsGrid() {
                 </div>
               </div>
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight max-w-[170px]">
+            <p className="text-[11px] text-slate-500 dark:text-[#9CA3AF] leading-tight max-w-[170px]">
               Best in Front Runners 2026 for Brand Management
             </p>
           </div>
 
           {/* 4. Capterra Shortlist */}
-          <div className="flex flex-col items-center justify-start space-y-2 p-3 rounded-2xl hover:bg-slate-50/80 dark:hover:bg-slate-900/60 transition-all duration-300 hover:scale-105 group cursor-pointer">
+          <div className="flex flex-col items-center justify-start space-y-2 p-3 rounded-2xl hover:bg-slate-50/80 dark:hover:bg-[#17171A] transition-all duration-300 hover:scale-105 group cursor-pointer">
             <div className="h-14 flex items-center justify-center transition-transform group-hover:scale-110">
-              <div className="w-[124px] bg-[#0F172A] rounded-lg shadow-sm border border-slate-700 overflow-hidden text-center">
+              <div className="w-[124px] bg-[#0F172A] dark:bg-[#17171A] rounded-lg shadow-sm border border-slate-700 dark:border-white/10 overflow-hidden text-center">
                 <div className="bg-[#0284C7] text-white text-[8px] font-bold py-0.5 tracking-wider uppercase flex items-center justify-center gap-1">
                   <span className="w-1.5 h-1.5 bg-amber-400 inline-block rotate-45" />
                   Capterra
@@ -166,15 +166,15 @@ export function PulseAwardsGrid() {
                 </div>
               </div>
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight max-w-[170px]">
+            <p className="text-[11px] text-slate-500 dark:text-[#9CA3AF] leading-tight max-w-[170px]">
               Shortlist for Social Media Marketing 2026
             </p>
           </div>
 
           {/* 5. GetApp Category Leaders */}
-          <div className="col-span-2 sm:col-span-1 flex flex-col items-center justify-start space-y-2 p-3 rounded-2xl hover:bg-slate-50/80 dark:hover:bg-slate-900/60 transition-all duration-300 hover:scale-105 group cursor-pointer">
+          <div className="col-span-2 sm:col-span-1 flex flex-col items-center justify-start space-y-2 p-3 rounded-2xl hover:bg-slate-50/80 dark:hover:bg-[#17171A] transition-all duration-300 hover:scale-105 group cursor-pointer">
             <div className="h-14 flex items-center justify-center transition-transform group-hover:scale-110">
-              <div className="w-[124px] bg-[#134E4A] rounded-lg shadow-sm border border-teal-700 overflow-hidden text-center">
+              <div className="w-[124px] bg-[#134E4A] dark:bg-[#17171A] rounded-lg shadow-sm border border-teal-700 dark:border-white/10 overflow-hidden text-center">
                 <div className="bg-[#0D9488] text-white text-[8px] font-bold py-0.5 tracking-wider uppercase flex items-center justify-center gap-0.5">
                   <span className="font-black">»</span> GetApp
                 </div>
@@ -186,7 +186,7 @@ export function PulseAwardsGrid() {
                 </div>
               </div>
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight max-w-[170px]">
+            <p className="text-[11px] text-slate-500 dark:text-[#9CA3AF] leading-tight max-w-[170px]">
               Category Leaders 2026 for Social Media Analytics Tool
             </p>
           </div>
@@ -195,19 +195,19 @@ export function PulseAwardsGrid() {
         {/* ========================================================= */}
         {/* ROW 2: VERIFIED RATINGS & REVIEWS (Pre-slider clean grid) */}
         {/* ========================================================= */}
-        <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800">
+        <div className="mt-8 pt-8 border-t border-slate-100 dark:border-white/7">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6 items-center">
             {ratingPlatforms.map((item) => (
               <div
                 key={item.name}
-                className="flex items-center justify-between p-3.5 sm:p-4 rounded-xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800 shadow-xs hover:shadow-md hover:scale-105 hover:bg-white dark:hover:bg-slate-850 transition-all duration-300 cursor-pointer"
+                className="flex items-center justify-between p-3.5 sm:p-4 rounded-xl bg-slate-50/90 dark:bg-[#17171A] border border-slate-200/70 dark:border-white/7 shadow-xs hover:shadow-md hover:scale-105 hover:bg-white dark:hover:bg-[#111113] transition-all duration-300 cursor-pointer"
               >
                 <div className="flex items-center">{item.icon}</div>
                 <div className="flex items-baseline gap-0.5 text-right font-black">
                   <span className="text-base sm:text-lg text-slate-900 dark:text-white">
                     {item.score}
                   </span>
-                  <span className="text-xs text-slate-400 font-normal">/{item.max}</span>
+                  <span className="text-xs text-slate-400 dark:text-[#6B7280] font-normal">/{item.max}</span>
                 </div>
               </div>
             ))}

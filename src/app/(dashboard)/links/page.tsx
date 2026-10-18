@@ -135,20 +135,20 @@ export default function TriggerLinksPage() {
 
   return (
     <AppLayout>
-      <div className="bg-[#f8fafc] dark:bg-slate-950 min-h-[calc(100vh-60px)] p-4 sm:p-6 lg:p-8 space-y-6">
+      <div className="bg-slate-50 dark:bg-[#0D0D0E] min-h-[calc(100vh-64px)] p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto font-sans text-slate-800 dark:text-[#9CA3AF]">
         
         {/* Top Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-white/7 pb-5">
           <div>
             <div className="flex items-center gap-2">
-              <span className="p-2 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400">
+              <span className="p-2 rounded-xl bg-purple-100 dark:bg-amber-500/15 text-[#5846A8] dark:text-[#FBBF24]">
                 <Link2 className="w-5 h-5" />
               </span>
               <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
                 Trigger Links & Tracking
               </h1>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-xs text-slate-500 dark:text-[#9CA3AF] mt-1">
               Shorten links, track real-time social clicks, and attach UTM parameters for {activeBrand.name}.
             </p>
           </div>
@@ -156,14 +156,14 @@ export default function TriggerLinksPage() {
           <div className="flex items-center gap-2.5">
             <Link
               href="/social-accounts"
-              className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 transition"
+              className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-white dark:bg-[#17171A] border border-slate-200 dark:border-white/7 text-slate-700 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/5 transition"
             >
               Social Planner Settings
             </Link>
             <button
               type="button"
               onClick={() => setIsCreateOpen(true)}
-              className="px-4 py-2 text-xs font-bold rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
+              className="px-4 py-2 text-xs font-bold rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white dark:bg-[#E08738] dark:hover:bg-[#d97706] dark:text-[#0F0F11] shadow-md shadow-purple-900/20 dark:shadow-amber-900/20 flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Create Trigger Link</span>
@@ -173,42 +173,42 @@ export default function TriggerLinksPage() {
 
         {/* Stats Strip */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 flex items-center justify-center text-indigo-600">
+          <div className="bg-white dark:bg-[#17171A] p-4 rounded-2xl border border-slate-200/90 dark:border-white/7 shadow-xs flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-amber-500/15 flex items-center justify-center text-[#5846A8] dark:text-[#FBBF24]">
               <Link2 className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-xs text-slate-400 font-medium">Total Active Links</p>
+              <p className="text-xs text-slate-400 dark:text-[#6B7280] font-medium">Total Active Links</p>
               <p className="text-xl font-bold text-slate-900 dark:text-white">{links.length}</p>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/50 flex items-center justify-center text-purple-600">
+          <div className="bg-white dark:bg-[#17171A] p-4 rounded-2xl border border-slate-200/90 dark:border-white/7 shadow-xs flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-amber-500/15 flex items-center justify-center text-[#5846A8] dark:text-[#FBBF24]">
               <MousePointerClick className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-xs text-slate-400 font-medium">Total Tracked Clicks</p>
+              <p className="text-xs text-slate-400 dark:text-[#6B7280] font-medium">Total Tracked Clicks</p>
               <p className="text-xl font-bold text-slate-900 dark:text-white">
                 {links.reduce((acc, l) => acc + l.clicks, 0).toLocaleString()}
               </p>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/50 flex items-center justify-center text-purple-600">
+          <div className="bg-white dark:bg-[#17171A] p-4 rounded-2xl border border-slate-200/90 dark:border-white/7 shadow-xs flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-amber-500/15 flex items-center justify-center text-[#5846A8] dark:text-[#FBBF24]">
               <TrendingUp className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-xs text-slate-400 font-medium">Click-Through Rate</p>
+              <p className="text-xs text-slate-400 dark:text-[#6B7280] font-medium">Click-Through Rate</p>
               <p className="text-xl font-bold text-slate-900 dark:text-white">18.4%</p>
             </div>
           </div>
         </div>
 
         {/* Links Table */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
-          <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+        <div className="bg-white dark:bg-[#17171A] rounded-2xl border border-slate-200/90 dark:border-white/7 overflow-hidden shadow-xs">
+          <div className="p-4 border-b border-slate-100 dark:border-white/7 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 flex-1 max-w-sm px-2">
               <Search className="w-4 h-4 text-slate-400" />
               <input
@@ -226,7 +226,7 @@ export default function TriggerLinksPage() {
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 dark:bg-slate-950/60 text-slate-500 font-semibold border-b border-slate-100 dark:border-slate-800">
+              <thead className="bg-slate-50 dark:bg-[#111113] text-slate-500 dark:text-[#9CA3AF] font-semibold border-b border-slate-100 dark:border-white/7">
                 <tr>
                   <th className="py-3 px-4">Title & Shortlink</th>
                   <th className="py-3 px-4">Destination Target</th>
@@ -235,20 +235,20 @@ export default function TriggerLinksPage() {
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              <tbody className="divide-y divide-slate-100 dark:divide-white/7">
                 {filteredLinks.map((link) => (
-                  <tr key={link.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-850/50 transition">
+                  <tr key={link.id} className="hover:bg-slate-50/60 dark:hover:bg-white/5 transition">
                     <td className="py-3.5 px-4">
                       <div className="font-bold text-slate-900 dark:text-white">{link.title}</div>
-                      <div className="text-[11px] font-mono text-indigo-600 dark:text-indigo-400 flex items-center gap-1 mt-0.5">
+                      <div className="text-[11px] font-mono text-[#5846A8] dark:text-[#FBBF24] flex items-center gap-1 mt-0.5">
                         <span>pulse.to/{link.slug}</span>
                       </div>
                     </td>
-                    <td className="py-3.5 px-4 max-w-xs truncate text-slate-600 dark:text-slate-400 font-mono text-[11px]">
+                    <td className="py-3.5 px-4 max-w-xs truncate text-slate-600 dark:text-[#9CA3AF] font-mono text-[11px]">
                       {link.targetUrl}
                     </td>
                     <td className="py-3.5 px-4">
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/80">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-50 dark:bg-amber-500/15 text-[#5846A8] dark:text-[#FBBF24] border border-purple-200/80 dark:border-amber-500/30">
                         {link.utmCampaign}
                       </span>
                     </td>
@@ -260,16 +260,16 @@ export default function TriggerLinksPage() {
                         <button
                           type="button"
                           onClick={() => handleCopyLink(link.slug, link.id)}
-                          className="p-1.5 rounded-lg text-slate-500 hover:text-[#5846A8] hover:bg-purple-50 dark:hover:bg-slate-800 transition cursor-pointer"
+                          className="p-1.5 rounded-lg text-slate-500 hover:text-[#5846A8] dark:hover:text-[#FBBF24] hover:bg-purple-50 dark:hover:bg-white/5 transition cursor-pointer"
                           title="Copy Short URL"
                         >
-                          {copiedId === link.id ? <Check className="w-3.5 h-3.5 text-purple-600" /> : <Copy className="w-3.5 h-3.5" />}
+                          {copiedId === link.id ? <Check className="w-3.5 h-3.5 text-purple-600 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                         </button>
                         <a
                           href={link.targetUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                          className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition"
                           title="Open Destination"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
@@ -277,7 +277,7 @@ export default function TriggerLinksPage() {
                         <button
                           type="button"
                           onClick={() => handleDelete(link.id)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-800 transition cursor-pointer"
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition cursor-pointer"
                           title="Delete Link"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -294,12 +294,12 @@ export default function TriggerLinksPage() {
         {/* Create Modal */}
         {isCreateOpen && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-6 shadow-2xl animate-in zoom-in-95 duration-150 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div className="bg-white dark:bg-[#17171A] rounded-2xl border border-slate-200/90 dark:border-white/10 max-w-md w-full p-6 shadow-2xl animate-in zoom-in-95 duration-150 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 pb-3">
                 <h3 className="font-bold text-sm text-slate-900 dark:text-white">Create Trigger Link</h3>
                 <button
                   onClick={() => setIsCreateOpen(false)}
-                  className="text-slate-400 hover:text-slate-600 text-xs font-bold"
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-white text-xs font-bold"
                 >
                   ✕
                 </button>
@@ -316,7 +316,7 @@ export default function TriggerLinksPage() {
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
                     placeholder="e.g. Summer Promo Instagram Reel Bio"
-                    className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 outline-none focus:ring-2 focus:ring-purple-500/20"
+                    className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#111113] text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-[#E08738]/20 focus:border-[#E08738]"
                   />
                 </div>
 
@@ -330,7 +330,7 @@ export default function TriggerLinksPage() {
                     value={newTarget}
                     onChange={(e) => setNewTarget(e.target.value)}
                     placeholder="https://yourwebsite.com/product"
-                    className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 outline-none focus:ring-2 focus:ring-purple-500/20"
+                    className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#111113] text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-[#E08738]/20 focus:border-[#E08738]"
                   />
                 </div>
 
@@ -339,7 +339,7 @@ export default function TriggerLinksPage() {
                     Custom Slug (Optional)
                   </label>
                   <div className="flex items-center">
-                    <span className="px-3 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 text-xs rounded-l-xl border border-r-0 border-slate-200 dark:border-slate-800">
+                    <span className="px-3 py-2.5 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-[#9CA3AF] text-xs rounded-l-xl border border-r-0 border-slate-200 dark:border-white/10">
                       pulse.to/
                     </span>
                     <input
@@ -347,7 +347,7 @@ export default function TriggerLinksPage() {
                       value={newSlug}
                       onChange={(e) => setNewSlug(e.target.value)}
                       placeholder="summer25"
-                      className="w-full text-xs px-3.5 py-2.5 rounded-r-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 outline-none focus:ring-2 focus:ring-purple-500/20 font-mono"
+                      className="w-full text-xs px-3.5 py-2.5 rounded-r-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#111113] text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-[#E08738]/20 focus:border-[#E08738] font-mono"
                     />
                   </div>
                 </div>
@@ -356,13 +356,13 @@ export default function TriggerLinksPage() {
                   <button
                     type="button"
                     onClick={() => setIsCreateOpen(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded-xl text-xs font-bold bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-[#5846A8] hover:bg-[#48388d] text-white dark:bg-[#E08738] dark:hover:bg-[#d97706] dark:text-[#0F0F11] shadow-md shadow-purple-900/20 dark:shadow-amber-900/20 cursor-pointer"
                   >
                     Save Trigger Link
                   </button>

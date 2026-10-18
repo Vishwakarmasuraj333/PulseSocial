@@ -14,6 +14,8 @@ import { RedditProvider } from "./providers/reddit";
 import { BlueskyProvider } from "./providers/bluesky";
 import { TelegramProvider } from "./providers/telegram";
 
+import { ShopifyProvider } from "./providers/shopify";
+
 const providerFactories: Record<SupportedPlatform, () => SocialProvider> = {
   facebook: () => new MetaProvider("facebook"),
   instagram: () => new MetaProvider("instagram"),
@@ -30,6 +32,7 @@ const providerFactories: Record<SupportedPlatform, () => SocialProvider> = {
   reddit: () => new RedditProvider(),
   bluesky: () => new BlueskyProvider(),
   telegram: () => new TelegramProvider(),
+  shopify: () => new ShopifyProvider(),
 };
 
 const providerInstances: Partial<Record<SupportedPlatform, SocialProvider>> = {};

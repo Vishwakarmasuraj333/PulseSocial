@@ -277,7 +277,7 @@ export default function InboxPage() {
 
   return (
     <AppLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+      <div className="bg-slate-50 dark:bg-[#0D0D0E] min-h-[calc(100vh-64px)] p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto font-sans text-slate-800 dark:text-[#9CA3AF]">
         {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -285,17 +285,17 @@ export default function InboxPage() {
               <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                 Unified Social Inbox
               </h1>
-              <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 dark:bg-amber-500/15 dark:text-[#FBBF24] border border-purple-200 dark:border-amber-500/30">
                 Live Sync
               </span>
             </div>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 dark:text-[#9CA3AF] mt-1">
               Real two-way conversations, comments, and direct messages across all 14 connected channels.
             </p>
           </div>
 
           {/* Filter Tabs */}
-          <div className="flex items-center p-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-xs overflow-x-auto shadow-2xs">
+          <div className="flex items-center p-1 bg-white dark:bg-[#17171A] rounded-xl border border-slate-200/90 dark:border-white/7 text-xs overflow-x-auto shadow-2xs">
             {[
               { id: "all", label: "All Threads" },
               { id: "unread", label: "Unread" },
@@ -309,8 +309,8 @@ export default function InboxPage() {
                 onClick={() => setActiveTab(t.id as any)}
                 className={`px-3 py-1.5 font-semibold rounded-lg transition cursor-pointer whitespace-nowrap ${
                   activeTab === t.id
-                    ? "bg-blue-600 text-white shadow-xs"
-                    : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                    ? "bg-[#5846A8] text-white dark:bg-[#E08738] dark:text-[#0F0F11] font-bold shadow-xs"
+                    : "text-slate-500 dark:text-[#9CA3AF] hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
                 {t.label}
@@ -320,26 +320,26 @@ export default function InboxPage() {
         </div>
 
         {/* 2-Column Responsive Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs overflow-hidden min-h-[640px]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 bg-white dark:bg-[#17171A] rounded-2xl border border-slate-200/90 dark:border-white/7 shadow-2xs overflow-hidden min-h-[640px]">
           
           {/* ======================================================== */}
           {/* LEFT COLUMN: Conversation List (5 cols)                 */}
           {/* ======================================================== */}
           <div
-            className={`lg:col-span-5 border-r border-slate-200 dark:border-slate-800 flex flex-col ${
+            className={`lg:col-span-5 border-r border-slate-200/90 dark:border-white/7 flex flex-col ${
               mobileShowThread ? "hidden lg:flex" : "flex"
             }`}
           >
             {/* Search Box */}
-            <div className="p-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-950/40">
+            <div className="p-3.5 border-b border-slate-100 dark:border-white/7 bg-slate-50/40 dark:bg-[#111113]">
               <div className="relative">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-slate-400 dark:text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search conversations, senders, text..."
-                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-2xs"
+                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-white dark:bg-[#17171A] border border-slate-200/90 dark:border-white/10 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#E08738] shadow-2xs"
                 />
               </div>
             </div>
@@ -356,11 +356,11 @@ export default function InboxPage() {
                       onClick={() => handleSelectConversation(conv)}
                       className={`w-full p-4 text-left flex items-start gap-3 transition cursor-pointer ${
                         isSelected
-                          ? "bg-blue-50/80 dark:bg-blue-950/40 border-l-4 border-blue-600"
-                          : "hover:bg-slate-50 dark:hover:bg-slate-800/40"
+                          ? "bg-purple-50/80 dark:bg-amber-500/15 border-l-4 border-[#5846A8] dark:border-[#E08738]"
+                          : "hover:bg-slate-50 dark:hover:bg-white/5"
                       }`}
                     >
-                      <div className="relative w-11 h-11 rounded-full bg-slate-200 dark:bg-slate-800 shrink-0 overflow-hidden shadow-xs ring-1 ring-slate-200 dark:ring-slate-700">
+                      <div className="relative w-11 h-11 rounded-full bg-slate-200 dark:bg-white/10 shrink-0 overflow-hidden shadow-xs ring-1 ring-slate-200 dark:ring-white/10">
                         {conv.senderAvatar ? (
                           <img
                             src={conv.senderAvatar}
@@ -372,7 +372,7 @@ export default function InboxPage() {
                             {conv.senderName.charAt(0)}
                           </div>
                         )}
-                        <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-white dark:bg-slate-900 flex items-center justify-center shadow-xs">
+                        <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-white dark:bg-[#111113] flex items-center justify-center shadow-xs">
                           {renderPlatformIcon(conv.platform, 12)}
                         </div>
                       </div>
@@ -382,26 +382,26 @@ export default function InboxPage() {
                           <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
                             {conv.senderName}
                           </span>
-                          <span className="text-[10px] text-slate-400 font-mono">
+                          <span className="text-[10px] text-slate-400 dark:text-[#6B7280] font-mono">
                             {conv.lastMessageAt}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-1 leading-relaxed">
+                        <p className="text-xs text-slate-600 dark:text-[#9CA3AF] line-clamp-1 leading-relaxed">
                           {conv.lastMessage}
                         </p>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-[10px] text-slate-400 uppercase font-semibold">
+                          <span className="text-[10px] text-slate-400 dark:text-[#6B7280] uppercase font-semibold">
                             {conv.platform}
                           </span>
-                          <span className="text-slate-300">•</span>
-                          <span className="text-[10px] text-blue-600 font-medium">
+                          <span className="text-slate-300 dark:text-white/10">•</span>
+                          <span className="text-[10px] text-[#5846A8] dark:text-[#FBBF24] font-medium">
                             {conv.type}
                           </span>
                         </div>
                       </div>
 
                       {conv.unreadCount > 0 && (
-                        <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-[10px] font-extrabold flex items-center justify-center shrink-0 shadow-xs">
+                        <span className="w-5 h-5 rounded-full bg-[#5846A8] dark:bg-[#E08738] text-white dark:text-[#0F0F11] text-[10px] font-extrabold flex items-center justify-center shrink-0 shadow-xs">
                           {conv.unreadCount}
                         </span>
                       )}
@@ -410,7 +410,7 @@ export default function InboxPage() {
                 })
               ) : (
                 <div className="p-8 text-center text-slate-400 flex flex-col items-center justify-center h-64">
-                  <Inbox className="w-8 h-8 mb-2 opacity-50 text-blue-500" />
+                  <Inbox className="w-8 h-8 mb-2 opacity-50 text-[#5846A8] dark:text-[#E08738]" />
                   <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                     No conversations match
                   </p>
@@ -426,14 +426,14 @@ export default function InboxPage() {
           {/* RIGHT COLUMN: Active Chat Thread (7 cols)               */}
           {/* ======================================================== */}
           <div
-            className={`lg:col-span-7 flex flex-col justify-between bg-slate-50/40 dark:bg-slate-950/30 ${
+            className={`lg:col-span-7 flex flex-col justify-between bg-slate-50/40 dark:bg-[#111113]/50 ${
               !mobileShowThread ? "hidden lg:flex" : "flex"
             }`}
           >
             {selectedConversation ? (
               <>
                 {/* Thread Header */}
-                <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between shadow-2xs">
+                <div className="p-4 border-b border-slate-200/90 dark:border-white/7 bg-white dark:bg-[#17171A] flex items-center justify-between shadow-2xs">
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
@@ -521,18 +521,18 @@ export default function InboxPage() {
                         <div
                           className={`max-w-[80%] sm:max-w-[70%] p-3.5 rounded-2xl text-xs leading-relaxed shadow-xs transition-all ${
                             msg.isMe
-                              ? "bg-blue-600 text-white rounded-br-xs"
-                              : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-bl-xs"
+                              ? "bg-[#5846A8] dark:bg-[#E08738] text-white dark:text-[#0F0F11] font-medium rounded-br-xs"
+                              : "bg-white dark:bg-[#17171A] border border-slate-200/90 dark:border-white/7 text-slate-800 dark:text-slate-200 rounded-bl-xs"
                           }`}
                         >
                           <p className="whitespace-pre-wrap">{msg.text}</p>
                           <div
                             className={`flex items-center justify-end gap-1 mt-1 text-[10px] ${
-                              msg.isMe ? "text-blue-100" : "text-slate-400"
+                              msg.isMe ? "text-purple-200 dark:text-amber-950/70" : "text-slate-400 dark:text-[#6B7280]"
                             }`}
                           >
                             <span>{msg.timestamp}</span>
-                            {msg.isMe && <CheckCheck className="w-3.5 h-3.5 text-blue-200" />}
+                            {msg.isMe && <CheckCheck className="w-3.5 h-3.5" />}
                           </div>
                         </div>
                       </div>
@@ -540,7 +540,7 @@ export default function InboxPage() {
                   ) : (
                     /* Fallback to single message */
                     <div className="flex items-start gap-2.5 max-w-[85%]">
-                      <div className="w-7 h-7 rounded-full bg-slate-300 shrink-0 overflow-hidden">
+                      <div className="w-7 h-7 rounded-full bg-slate-300 dark:bg-white/10 shrink-0 overflow-hidden">
                         {selectedConversation.senderAvatar ? (
                           <img
                             src={selectedConversation.senderAvatar}
@@ -553,7 +553,7 @@ export default function InboxPage() {
                           </div>
                         )}
                       </div>
-                      <div className="bg-white dark:bg-slate-900 p-3.5 rounded-2xl rounded-tl-xs border border-slate-200 dark:border-slate-800 text-xs text-slate-800 dark:text-slate-200 leading-relaxed shadow-xs">
+                      <div className="bg-white dark:bg-[#17171A] p-3.5 rounded-2xl rounded-tl-xs border border-slate-200/90 dark:border-white/7 text-xs text-slate-800 dark:text-slate-200 leading-relaxed shadow-xs">
                         {selectedConversation.lastMessage}
                       </div>
                     </div>
@@ -562,7 +562,7 @@ export default function InboxPage() {
                   {/* Typing Indicator */}
                   {isTyping && (
                     <div className="flex items-center gap-2 text-slate-400 text-xs pl-2">
-                      <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
+                      <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-white/10 flex items-center justify-center">
                         <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-ping" />
                       </div>
                       <span className="text-[11px] italic">
@@ -575,14 +575,14 @@ export default function InboxPage() {
                 </div>
 
                 {/* Quick Canned Responses Bar */}
-                <div className="px-4 py-2 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2 overflow-x-auto text-[11px]">
-                  <span className="text-slate-400 font-semibold shrink-0">Quick reply:</span>
+                <div className="px-4 py-2 bg-white dark:bg-[#17171A] border-t border-slate-100 dark:border-white/7 flex items-center gap-2 overflow-x-auto text-[11px]">
+                  <span className="text-slate-400 dark:text-[#6B7280] font-semibold shrink-0">Quick reply:</span>
                   {CANNED_RESPONSES.map((resp, i) => (
                     <button
                       key={i}
                       type="button"
                       onClick={() => handleCannedResponse(resp)}
-                      className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950/40 text-slate-700 dark:text-slate-300 hover:text-blue-600 transition cursor-pointer whitespace-nowrap shadow-2xs"
+                      className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-purple-50 dark:hover:bg-amber-500/15 text-slate-700 dark:text-[#9CA3AF] hover:text-[#5846A8] dark:hover:text-[#FBBF24] transition cursor-pointer whitespace-nowrap shadow-2xs"
                     >
                       {resp}
                     </button>
@@ -590,21 +590,21 @@ export default function InboxPage() {
                 </div>
 
                 {/* Reply Composer */}
-                <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 relative">
+                <div className="p-4 bg-white dark:bg-[#17171A] border-t border-slate-200/90 dark:border-white/7 relative">
                   {/* Emoji Picker Popover */}
                   {isEmojiPickerOpen && (
                     <div
                       ref={emojiPickerRef}
-                      className="absolute bottom-full left-4 mb-2 w-80 sm:w-96 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150"
+                      className="absolute bottom-full left-4 mb-2 w-80 sm:w-96 rounded-2xl bg-white dark:bg-[#1C1C20] border border-slate-200 dark:border-white/10 shadow-2xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150"
                     >
-                      <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800 mb-2">
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/10 mb-2">
                         <h4 className="text-xs font-bold text-slate-900 dark:text-white">
                           Select Emoji
                         </h4>
                         <button
                           type="button"
                           onClick={() => setIsEmojiPickerOpen(false)}
-                          className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"
+                          className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10"
                         >
                           <X className="w-3.5 h-3.5" />
                         </button>
@@ -622,7 +622,7 @@ export default function InboxPage() {
                                   key={emoji}
                                   type="button"
                                   onClick={() => handleInsertEmoji(emoji)}
-                                  className="w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-lg transition hover:scale-120 cursor-pointer"
+                                  className="w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 flex items-center justify-center text-lg transition hover:scale-120 cursor-pointer"
                                 >
                                   {emoji}
                                 </button>
@@ -640,12 +640,12 @@ export default function InboxPage() {
                       <img
                         src={attachedImage}
                         alt="Attached media"
-                        className="h-16 w-16 object-cover rounded-lg border border-slate-200 shadow-xs"
+                        className="h-16 w-16 object-cover rounded-lg border border-slate-200 dark:border-white/10 shadow-xs"
                       />
                       <button
                         type="button"
                         onClick={() => setAttachedImage(null)}
-                        className="absolute -top-1.5 -right-1.5 bg-rose-600 text-white rounded-full p-0.5 shadow-xs"
+                        className="absolute -top-1.5 -right-1.5 bg-rose-600 text-white rounded-full p-0.5 shadow-xs cursor-pointer"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -657,8 +657,8 @@ export default function InboxPage() {
                       <button
                         type="button"
                         onClick={() => setIsEmojiPickerOpen(!isEmojiPickerOpen)}
-                        className={`p-1.5 rounded-lg hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer ${
-                          isEmojiPickerOpen ? "text-blue-600 bg-blue-50 dark:bg-blue-950/60" : ""
+                        className={`p-1.5 rounded-lg hover:text-[#5846A8] dark:hover:text-[#FBBF24] hover:bg-slate-100 dark:hover:bg-white/5 transition cursor-pointer ${
+                          isEmojiPickerOpen ? "text-[#5846A8] dark:text-[#FBBF24] bg-purple-50 dark:bg-amber-500/15" : ""
                         }`}
                         title="Pick Emojis"
                       >
@@ -677,7 +677,7 @@ export default function InboxPage() {
                         type="button"
                         onClick={() => attachmentInputRef.current?.click()}
                         disabled={isUploadingAttachment}
-                        className="p-1.5 rounded-lg hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer disabled:opacity-50"
+                        className="p-1.5 rounded-lg hover:text-[#5846A8] dark:hover:text-[#FBBF24] hover:bg-slate-100 dark:hover:bg-white/5 transition cursor-pointer disabled:opacity-50"
                         title="Attach Media / Images"
                       >
                         <Paperclip className="w-4 h-4" />
@@ -697,12 +697,12 @@ export default function InboxPage() {
                           }
                         }}
                         placeholder={`Reply directly to ${selectedConversation.senderName}... (Press Enter to send)`}
-                        className="flex-1 p-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 resize-none leading-relaxed transition shadow-2xs"
+                        className="flex-1 p-3 text-xs rounded-xl border border-slate-200/90 dark:border-white/10 bg-slate-50/70 dark:bg-[#111113] focus:outline-none focus:ring-1 focus:ring-[#E08738] focus:border-[#E08738] text-slate-900 dark:text-white resize-none leading-relaxed transition shadow-2xs"
                       />
                       <button
                         type="submit"
                         disabled={isSending || (!replyText.trim() && !attachedImage)}
-                        className="p-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition disabled:opacity-40 cursor-pointer shrink-0 shadow-xs flex items-center justify-center h-10 w-10 active:scale-95"
+                        className="p-3 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white dark:bg-[#E08738] dark:hover:bg-[#d97706] dark:text-[#0F0F11] transition disabled:opacity-40 cursor-pointer shrink-0 shadow-xs flex items-center justify-center h-10 w-10 active:scale-95"
                         title="Send Message"
                       >
                         <Send className="w-4 h-4" />

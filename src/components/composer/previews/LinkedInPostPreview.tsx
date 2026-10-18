@@ -82,36 +82,6 @@ export function LinkedInPostPreview({
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden text-xs font-sans transition-all">
-      {/* ============================================================ */}
-      {/* 1. TRUTHFUL SIMULATION vs LIVE STATUS BANNER                 */}
-      {/* ============================================================ */}
-      <div className="px-3.5 py-1.5 bg-slate-50 dark:bg-slate-850 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-[11px]">
-        <div className="flex items-center gap-1.5">
-          {isConnected ? (
-            <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>LinkedIn OAuth Active</span>
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1 text-amber-700 dark:text-amber-400 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-amber-500" />
-              <span>Publishing Preview Simulation</span>
-            </span>
-          )}
-        </div>
-
-        {/* Live Character Limit Counter */}
-        <div className="flex items-center gap-1.5">
-          <span className={`font-mono font-medium ${isOverLimit ? "text-rose-600 font-bold" : "text-slate-400"}`}>
-            {content.length}/{LINKEDIN_MAX_CHARS}
-          </span>
-          {isOverLimit && (
-            <span className="text-[10px] text-rose-500 font-semibold">
-              Exceeds Cap
-            </span>
-          )}
-        </div>
-      </div>
 
       {/* ============================================================ */}
       {/* 2. LINKEDIN FEED HEADER                                      */}
@@ -196,13 +166,11 @@ export function LinkedInPostPreview({
               className="w-full max-h-[340px] object-contain bg-black"
             />
           ) : (
-            <div className="relative w-full h-80">
-              <Image
+            <div className="relative w-full flex items-center justify-center p-1.5 bg-black/40 min-h-[220px]">
+              <img
                 src={media[activeMediaIndex].url}
                 alt={media[activeMediaIndex].altText || "LinkedIn media preview"}
-                fill
-                className="object-contain"
-                unoptimized
+                className="w-auto h-auto max-h-[460px] max-w-full object-contain shadow-xs"
               />
             </div>
           )}

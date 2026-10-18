@@ -5,9 +5,6 @@ import {
   Smartphone,
   Tablet,
   Monitor,
-  Sun,
-  Moon,
-  Laptop,
   CheckCircle2,
   AlertTriangle,
   Eye,
@@ -51,7 +48,6 @@ export type SupportedPlatformKey =
   | "bluesky";
 
 export type DevicePreviewMode = "mobile" | "tablet" | "desktop";
-export type PreviewThemeMode = "auto" | "light" | "dark";
 
 export interface PlatformTabOption {
   key: SupportedPlatformKey;
@@ -141,7 +137,6 @@ export function PostPreview({
 
   const [activePlatform, setActivePlatform] = useState<SupportedPlatformKey>(initialPlatform);
   const [deviceMode, setDeviceMode] = useState<DevicePreviewMode>(defaultDeviceMode);
-  const [previewTheme, setPreviewTheme] = useState<PreviewThemeMode>("auto");
 
   // Keep in sync if forcedPlatform changes
   useEffect(() => {
@@ -228,48 +223,47 @@ export function PostPreview({
 
   const isOverLimit = content.length > activeDef.characterLimit;
 
-  // Determine theme class for preview container
-  const themeContainerClass = useMemo(() => {
-    if (previewTheme === "light") return "light [color-scheme:light]";
-    if (previewTheme === "dark") return "dark [color-scheme:dark]";
-    return "";
-  }, [previewTheme]);
-
   return (
-    <div className="w-full space-y-4" id="post-preview-root">
+    <div className="w-full space-y-3" id="post-preview-root">
       {/* ============================================================ */}
-      {/* PREVIEW TOOLBAR: PLATFORM TABS & 3 PROPER SIMULATION MODES    */}
+      {/* PREVIEW TOOLBAR: CLEAN, COMPACT, NO CLUTTER                  */}
       {/* ============================================================ */}
       {!hideHeaderControls && (
-        <div className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-[#151518] border border-slate-200/90 dark:border-white/10 shadow-xs space-y-3">
-          {/* Top Bar: Title, 3 Device Modes, 3 Theme Modes */}
-          <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="p-3 rounded-2xl bg-white dark:bg-[#151518] border border-slate-200/90 dark:border-white/10 shadow-xs space-y-2.5">
+          {/* Top Bar: Platform Name + Connected Badge + Device Switcher */}
+          <div className="flex items-center justify-between gap-2 flex-wrap">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-xl bg-purple-50 dark:bg-[#E08738]/15 border border-purple-200 dark:border-[#E08738]/40 flex items-center justify-center text-[#5846A8] dark:text-[#FBBF24] shadow-2xs">
-                <Eye className="w-4 h-4" />
+              <div className="w-7 h-7 rounded-lg bg-purple-50 dark:bg-[#E08738]/15 border border-purple-200 dark:border-[#E08738]/40 flex items-center justify-center text-[#5846A8] dark:text-[#FBBF24]">
+                {renderPlatformIcon(activePlatform, 16)}
               </div>
-              <div>
-                <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5 leading-none">
-                  <span>Live Platform Preview</span>
-                  {matchingConnectedAccount ? (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9.5px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                      <CheckCircle2 className="w-2.5 h-2.5" /> Connected
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9.5px] font-semibold bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-400">
-                      Simulated
-                    </span>
-                  )}
-                </h4>
-                <p className="text-[10.5px] text-slate-500 dark:text-slate-400 mt-0.5">
-                  Real-time native rendering for {activeDef.label}
-                </p>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-900 dark:text-white">
+                  {activeDef.label} Preview
+                </span>
+                {matchingConnectedAccount ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    <CheckCircle2 className="w-2.5 h-2.5" /> Connected
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-400">
+                    Preview
+                  </span>
+                )}
               </div>
             </div>
 
-            {/* Interactive Control Toggles */}
-            <div className="flex items-center gap-2 shrink-0">
-              {/* 3 PREVIEW DEVICE MODES: Mobile, Tablet, Desktop */}
+            {/* Device Switcher (Mobile / Desktop) + Inline Char Limit */}
+            <div className="flex items-center gap-2">
+              <span
+                className={`text-[11px] font-mono font-medium ${
+                  isOverLimit
+                    ? "text-rose-600 font-bold"
+                    : "text-slate-400 dark:text-slate-500"
+                }`}
+              >
+                {content.length}/{activeDef.characterLimit}
+              </span>
+
               <div
                 className="flex items-center p-0.5 rounded-xl bg-slate-100 dark:bg-[#1C1C20] border border-slate-200 dark:border-white/10"
                 role="group"
@@ -281,28 +275,13 @@ export function PostPreview({
                   onClick={() => setDeviceMode("mobile")}
                   className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
                     deviceMode === "mobile"
-                      ? "bg-white dark:bg-[#282830] text-[#5846A8] dark:text-[#FBBF24] shadow-xs scale-102"
-                      : "text-slate-500 hover:text-[#5846A8] hover:bg-white/60 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5"
+                      ? "bg-white dark:bg-[#282830] text-[#5846A8] dark:text-[#FBBF24] shadow-xs"
+                      : "text-slate-500 hover:text-[#5846A8] dark:text-slate-400 dark:hover:text-white"
                   }`}
-                  title="Mobile View (385px Smartphone Frame)"
+                  title="Mobile View"
                 >
                   <Smartphone className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Mobile</span>
-                </button>
-
-                <button
-                  type="button"
-                  id="preview-mode-tablet"
-                  onClick={() => setDeviceMode("tablet")}
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                    deviceMode === "tablet"
-                      ? "bg-white dark:bg-[#282830] text-[#5846A8] dark:text-[#FBBF24] shadow-xs scale-102"
-                      : "text-slate-500 hover:text-[#5846A8] hover:bg-white/60 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5"
-                  }`}
-                  title="Tablet View (620px Responsive Viewport)"
-                >
-                  <Tablet className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Tablet</span>
                 </button>
 
                 <button
@@ -311,66 +290,19 @@ export function PostPreview({
                   onClick={() => setDeviceMode("desktop")}
                   className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
                     deviceMode === "desktop"
-                      ? "bg-white dark:bg-[#282830] text-[#5846A8] dark:text-[#FBBF24] shadow-xs scale-102"
-                      : "text-slate-500 hover:text-[#5846A8] hover:bg-white/60 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5"
+                      ? "bg-white dark:bg-[#282830] text-[#5846A8] dark:text-[#FBBF24] shadow-xs"
+                      : "text-slate-500 hover:text-[#5846A8] dark:text-slate-400 dark:hover:text-white"
                   }`}
-                  title="Desktop View (Full Width Desktop Card)"
+                  title="Desktop View"
                 >
                   <Monitor className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Desktop</span>
                 </button>
               </div>
-
-              {/* 3 PREVIEW THEME MODES: Auto / Light / Dark */}
-              <div
-                className="flex items-center p-0.5 rounded-xl bg-slate-100 dark:bg-[#1C1C20] border border-slate-200 dark:border-white/10"
-                role="group"
-                aria-label="Preview theme modes"
-              >
-                <button
-                  type="button"
-                  id="preview-theme-light"
-                  onClick={() => setPreviewTheme("light")}
-                  className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
-                    previewTheme === "light"
-                      ? "bg-white text-amber-500 shadow-xs scale-105"
-                      : "text-slate-400 hover:text-amber-500"
-                  }`}
-                  title="Preview in Light Mode"
-                >
-                  <Sun className="w-3 h-3" />
-                </button>
-                <button
-                  type="button"
-                  id="preview-theme-dark"
-                  onClick={() => setPreviewTheme("dark")}
-                  className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
-                    previewTheme === "dark"
-                      ? "bg-[#282830] text-purple-400 shadow-xs scale-105"
-                      : "text-slate-400 hover:text-purple-400"
-                  }`}
-                  title="Preview in Dark Mode"
-                >
-                  <Moon className="w-3 h-3" />
-                </button>
-                <button
-                  type="button"
-                  id="preview-theme-auto"
-                  onClick={() => setPreviewTheme("auto")}
-                  className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
-                    previewTheme === "auto"
-                      ? "bg-white dark:bg-[#282830] text-[#5846A8] dark:text-white shadow-xs scale-105"
-                      : "text-slate-400 hover:text-slate-700 dark:hover:text-white"
-                  }`}
-                  title="Match System/Workspace Theme"
-                >
-                  <Laptop className="w-3 h-3" />
-                </button>
-              </div>
             </div>
           </div>
 
-          {/* Social Platform Channel Tabs with ALL Real Brand Icons */}
+          {/* Social Platform Channel Tabs */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-0.5 scrollbar-thin">
             {ALL_PREVIEW_PLATFORMS.map((plat) => {
               const isSelected = activePlatform === plat.key;
@@ -388,15 +320,15 @@ export function PostPreview({
                   type="button"
                   id={`preview-tab-${plat.key}`}
                   onClick={() => handleSelectPlatform(plat.key)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 hover:scale-[1.03] ${
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer shrink-0 ${
                     isSelected
-                      ? "bg-[#5846A8] text-white shadow-sm ring-2 ring-purple-400/40 scale-102 dark:bg-[#E08738] dark:text-[#0F0F11] dark:ring-amber-500/40"
-                      : "bg-slate-100 hover:bg-purple-50 hover:text-[#5846A8] text-slate-700 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300 dark:hover:text-[#FBBF24] border border-slate-200/70 dark:border-white/5 hover:border-purple-300 dark:hover:border-amber-500/30"
+                      ? "bg-[#5846A8] text-white shadow-xs dark:bg-[#E08738] dark:text-[#0F0F11]"
+                      : "bg-slate-100 hover:bg-purple-50 hover:text-[#5846A8] text-slate-700 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300 dark:hover:text-[#FBBF24] border border-slate-200/70 dark:border-white/5"
                   }`}
                   title={`Preview on ${plat.label}`}
                 >
-                  <div className="w-4 h-4 shrink-0 flex items-center justify-center">
-                    {renderPlatformIcon(plat.key, 16)}
+                  <div className="w-3.5 h-3.5 shrink-0 flex items-center justify-center">
+                    {renderPlatformIcon(plat.key, 14)}
                   </div>
                   <span>{plat.label}</span>
                   {hasConnectedAcc && (
@@ -406,100 +338,24 @@ export function PostPreview({
               );
             })}
           </div>
-
-          {/* Platform Limits & Health Indicator Bar */}
-          <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-white/7 text-[11px]">
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-slate-500 dark:text-slate-400">
-                Limit for {activeDef.label}:
-              </span>
-              <span
-                className={`font-mono font-bold ${
-                  isOverLimit
-                    ? "text-rose-600 dark:text-rose-400 flex items-center gap-1"
-                    : "text-slate-700 dark:text-slate-300"
-                }`}
-              >
-                {isOverLimit && <AlertTriangle className="w-3 h-3 text-rose-500 inline" />}
-                {content.length.toLocaleString()} / {activeDef.characterLimit.toLocaleString()} chars
-              </span>
-            </div>
-
-            <div className="text-[10.5px] text-slate-400">
-              {deviceMode === "mobile" && "📱 Mobile Viewport (390px)"}
-              {deviceMode === "tablet" && "📟 Tablet Viewport (620px)"}
-              {deviceMode === "desktop" && "💻 Desktop Responsive View"}
-            </div>
-          </div>
         </div>
       )}
 
       {/* ============================================================ */}
-      {/* DEVICE FRAME SIMULATOR WRAPPER (MOBILE / TABLET / DESKTOP)   */}
+      {/* DEVICE FRAME SIMULATOR WRAPPER (MOBILE / DESKTOP)            */}
       {/* ============================================================ */}
-      <div className={`transition-all duration-300 ${themeContainerClass}`}>
-        {/* MODE 1: MOBILE (CLASSIC PROFESSIONAL MOBILE VIEWPORT) */}
-        {deviceMode === "mobile" && (
-          <div className="max-w-[420px] mx-auto rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-lg overflow-hidden bg-white dark:bg-[#111113] transition-all">
-            {/* Clean Professional Feed Bar */}
-            <div className="px-4 py-2.5 bg-slate-50/90 dark:bg-[#17171A] border-b border-slate-200/80 dark:border-white/10 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 flex items-center justify-center">
-                  {renderPlatformIcon(activePlatform, 18)}
-                </div>
-                <span className="font-bold text-slate-900 dark:text-white">
-                  {activeDef.label} Mobile View
-                </span>
-              </div>
-              <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400">
-                390px Viewport
-              </span>
-            </div>
-
-            {/* Post Card Inside Responsive Container */}
-            <div className="p-3 bg-slate-50/50 dark:bg-[#0D0D0E]/80 max-h-[700px] overflow-y-auto">
+      <div className="transition-all duration-200">
+        {deviceMode === "mobile" ? (
+          <div className="max-w-[390px] mx-auto rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-md overflow-hidden bg-white dark:bg-[#111113]">
+            <div className="p-3 bg-slate-50/50 dark:bg-[#0D0D0E]/80">
               <div className="rounded-xl overflow-hidden shadow-xs">
                 {renderActivePreview()}
               </div>
             </div>
           </div>
-        )}
-
-        {/* MODE 2: TABLET (RESPONSIVE TABLET VIEWPORT) */}
-        {deviceMode === "tablet" && (
-          <div className="max-w-[620px] mx-auto rounded-3xl border-4 border-slate-300 dark:border-slate-700 shadow-xl overflow-hidden bg-slate-100/60 dark:bg-[#111113] p-4 sm:p-6">
-            <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-white/10 text-xs">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 flex items-center justify-center">
-                  {renderPlatformIcon(activePlatform, 18)}
-                </div>
-                <span className="font-bold text-slate-800 dark:text-white">
-                  {activeDef.label} Tablet Preview
-                </span>
-              </div>
-              <span className="text-[11px] font-mono text-slate-400">Viewport: 620px</span>
-            </div>
-            <div className="rounded-xl overflow-hidden shadow-sm">
-              {renderActivePreview()}
-            </div>
-          </div>
-        )}
-
-        {/* MODE 3: DESKTOP (FULL DESKTOP FEED CARD VIEW) */}
-        {deviceMode === "desktop" && (
-          <div className="w-full max-w-2xl mx-auto rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden bg-white dark:bg-slate-900">
-            <div className="px-4 py-2.5 bg-slate-50 dark:bg-[#161619] border-b border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 flex items-center justify-center">
-                  {renderPlatformIcon(activePlatform, 18)}
-                </div>
-                <span className="font-bold text-slate-900 dark:text-white">
-                  {activeDef.label} Desktop Browser Feed
-                </span>
-              </div>
-              <span className="text-[11px] text-slate-400 font-mono">100% Desktop View</span>
-            </div>
-            <div className="p-3 sm:p-5">
+        ) : (
+          <div className="w-full max-w-2xl mx-auto rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-xs overflow-hidden bg-white dark:bg-[#111113]">
+            <div className="p-3 sm:p-4">
               {renderActivePreview()}
             </div>
           </div>

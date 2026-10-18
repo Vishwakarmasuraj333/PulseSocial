@@ -120,7 +120,7 @@ export const PLATFORM_CAPABILITIES: Record<string, PlatformCapability> = {
     canSchedule: true,
     supportedMedia: ["IMAGE", "VIDEO", "DOCUMENT"],
     maxCharacterLimit: 3000,
-    notes: "Migrated to current REST /rest/posts API using LinkedIn-Version 202401.",
+    notes: `Migrated to current REST /rest/posts API using LinkedIn-Version ${SOCIAL_API_VERSIONS.LINKEDIN_REST}.`,
   },
   x: {
     platform: "x",
@@ -386,6 +386,30 @@ export const PLATFORM_CAPABILITIES: Record<string, PlatformCapability> = {
     unsupportedMessage: "BLOCKED — PARTNER APPROVAL REQUIRED. Story posting via standard API token is restricted by Snap Inc.",
     notes: "Requires official approved Snapchat Creative Kit and Business Ad Account integration.",
   },
+  shopify: {
+    platform: "shopify",
+    displayName: "Shopify",
+    apiVersion: "Admin REST / GraphQL 2024-01",
+    status: "CONFIGURATION REQUIRED",
+    CONNECTED: false,
+    TOKEN_VALID: false,
+    ACCOUNT_SYNCED: false,
+    PUBLISHING_SUPPORTED: true,
+    APPROVAL_REQUIRED: false,
+    PUBLISHING_APPROVED: false,
+    PUBLIC_PUBLISHING_ALLOWED: false,
+    MEDIA_UPLOAD_SUPPORTED: true,
+    REAL_API_VERIFIED: true,
+    canPublish: true,
+    canLike: false,
+    canComment: false,
+    canShare: false,
+    canSave: false,
+    canSchedule: true,
+    supportedMedia: ["IMAGE", "VIDEO"],
+    maxCharacterLimit: 5000,
+    notes: "Requires Shopify Store Custom App or OAuth credentials (SHOPIFY_API_KEY & SHOPIFY_API_SECRET).",
+  },
 };
 
 export function getPlatformCapability(
@@ -412,6 +436,7 @@ export function getPlatformCapability(
   else if (norm.includes("reddit")) base = { ...PLATFORM_CAPABILITIES.reddit };
   else if (norm.includes("bluesky")) base = { ...PLATFORM_CAPABILITIES.bluesky };
   else if (norm.includes("snapchat")) base = { ...PLATFORM_CAPABILITIES.snapchat };
+  else if (norm.includes("shopify")) base = { ...PLATFORM_CAPABILITIES.shopify };
   else {
     base = {
       platform: norm,

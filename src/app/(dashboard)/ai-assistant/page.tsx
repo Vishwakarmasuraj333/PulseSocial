@@ -429,15 +429,15 @@ export default function GeminiAiStudioPage() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
+                  <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                     Google Gemini AI Studio
                   </h1>
-                  <span className="px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800 text-[11px] font-bold border border-purple-200 flex items-center gap-1">
+                  <span className="px-2.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 text-[11px] font-bold border border-purple-200 dark:border-purple-800/60 flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
                     Gemini 3.8 Flash Ready
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   Full-stack social content generation strictly complying with platform rules, character caps, and Flux.1 Pro visuals.
                 </p>
               </div>
@@ -448,9 +448,9 @@ export default function GeminiAiStudioPage() {
             <button
               type="button"
               onClick={() => setShowKeyInput(!showKeyInput)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#1C1C22] text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 shadow-2xs transition cursor-pointer"
             >
-              <Key className="w-3.5 h-3.5 text-purple-600" />
+              <Key className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
               <span>{showKeyInput ? "Hide API Key Settings" : "Configure Gemini API Key"}</span>
             </button>
           </div>
@@ -458,13 +458,13 @@ export default function GeminiAiStudioPage() {
 
         {/* API Key Configuration Dropdown */}
         {showKeyInput && (
-          <div className="p-5 rounded-2xl bg-purple-50/80 border border-purple-200 shadow-sm space-y-3 animate-in fade-in duration-200">
+          <div className="p-5 rounded-2xl bg-purple-50/80 dark:bg-[#191524] border border-purple-200 dark:border-purple-800/50 shadow-sm space-y-3 animate-in fade-in duration-200">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
-                <span className="text-xs font-bold text-purple-900 flex items-center gap-1.5">
-                  <Key className="w-4 h-4 text-purple-600" /> Google Gemini API Key Configuration
+                <span className="text-xs font-bold text-purple-900 dark:text-purple-200 flex items-center gap-1.5">
+                  <Key className="w-4 h-4 text-purple-600 dark:text-purple-400" /> Google Gemini API Key Configuration
                 </span>
-                <p className="text-[11px] text-slate-600 mt-0.5">
+                <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
                   PulseSocial uses the active server key in <code>.env</code> by default. You can override it with your own key below.
                 </p>
               </div>
@@ -472,7 +472,7 @@ export default function GeminiAiStudioPage() {
                 href="https://aistudio.google.com/app/apikey"
                 target="_blank"
                 rel="noreferrer"
-                className="text-xs text-purple-700 font-semibold hover:underline inline-flex items-center gap-1 shrink-0"
+                className="text-xs text-purple-700 dark:text-purple-300 font-semibold hover:underline inline-flex items-center gap-1 shrink-0"
               >
                 <span>Get API key from Google AI Studio</span>
                 <ExternalLink className="w-3 h-3" />
@@ -485,13 +485,13 @@ export default function GeminiAiStudioPage() {
                 value={customKey}
                 onChange={(e) => setCustomKey(e.target.value)}
                 placeholder="AIzaSy... (or keep blank to use server environment key)"
-                className="flex-1 text-xs p-2.5 rounded-xl border border-purple-200 bg-white text-slate-800 placeholder:text-slate-400 focus:outline-hidden focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                className="flex-1 text-xs p-2.5 rounded-xl border border-purple-200 dark:border-purple-800/60 bg-white dark:bg-[#110E1A] text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-hidden focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
               />
               <button
                 type="button"
                 onClick={handleTestConnection}
                 disabled={isTestingKey}
-                className="px-3.5 py-2.5 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-800 text-xs font-bold transition flex items-center gap-1.5 disabled:opacity-50"
+                className="px-3.5 py-2.5 rounded-xl bg-purple-100 dark:bg-purple-900/50 hover:bg-purple-200 dark:hover:bg-purple-900/70 text-purple-800 dark:text-purple-200 text-xs font-bold transition flex items-center gap-1.5 disabled:opacity-50"
               >
                 {isTestingKey ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
                 <span>Test Connection</span>
@@ -509,18 +509,18 @@ export default function GeminiAiStudioPage() {
               <div
                 className={`p-2.5 rounded-xl text-xs flex items-center gap-2 ${
                   keyStatus.ok
-                    ? "bg-purple-50 text-purple-800 border border-purple-200"
-                    : "bg-red-50 text-red-800 border border-red-200"
+                    ? "bg-purple-50 dark:bg-purple-950/60 text-purple-800 dark:text-purple-200 border border-purple-200 dark:border-purple-800"
+                    : "bg-red-50 dark:bg-red-950/60 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-800"
                 }`}
               >
                 {keyStatus.ok ? (
-                  <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
                 ) : (
-                  <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+                  <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
                 )}
                 <span>{keyStatus.message}</span>
                 {keyStatus.latencyMs && (
-                  <span className="ml-auto font-mono text-[10px] bg-white px-2 py-0.5 rounded-full border border-purple-300">
+                  <span className="ml-auto font-mono text-[10px] bg-white dark:bg-[#110E1A] px-2 py-0.5 rounded-full border border-purple-300 dark:border-purple-700">
                     {keyStatus.latencyMs}ms
                   </span>
                 )}
@@ -530,17 +530,17 @@ export default function GeminiAiStudioPage() {
         )}
 
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-100 border border-slate-200/80 max-w-lg">
+        <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-100 dark:bg-[#151518] border border-slate-200/80 dark:border-white/10 max-w-lg">
           <button
             type="button"
             onClick={() => setActiveTab("text")}
             className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition ${
               activeTab === "text"
-                ? "bg-white text-purple-700 shadow-sm"
-                : "text-slate-600 hover:text-slate-900"
+                ? "bg-white dark:bg-[#232329] text-purple-700 dark:text-purple-300 shadow-sm dark:shadow-none"
+                : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
             }`}
           >
-            <PenTool className="w-3.5 h-3.5 text-purple-600" />
+            <PenTool className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
             <span>Captions & Variations</span>
           </button>
 
@@ -549,13 +549,13 @@ export default function GeminiAiStudioPage() {
             onClick={() => setActiveTab("image")}
             className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition ${
               activeTab === "image"
-                ? "bg-white text-pink-700 shadow-sm"
-                : "text-slate-600 hover:text-slate-900"
+                ? "bg-white dark:bg-[#232329] text-pink-700 dark:text-pink-300 shadow-sm dark:shadow-none"
+                : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
             }`}
           >
             <ImageIcon className="w-3.5 h-3.5 text-pink-500" />
             <span>AI Image Studio</span>
-            <span className="px-1.5 py-0.2 rounded-full bg-pink-100 text-pink-700 text-[9px] font-bold">
+            <span className="px-1.5 py-0.2 rounded-full bg-pink-100 dark:bg-pink-950/60 text-pink-700 dark:text-pink-300 text-[9px] font-bold">
               Flux.1
             </span>
           </button>
@@ -565,11 +565,11 @@ export default function GeminiAiStudioPage() {
             onClick={() => setActiveTab("rules")}
             className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition ${
               activeTab === "rules"
-                ? "bg-white text-indigo-700 shadow-sm"
-                : "text-slate-600 hover:text-slate-900"
+                ? "bg-white dark:bg-[#232329] text-indigo-700 dark:text-indigo-300 shadow-sm dark:shadow-none"
+                : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
             }`}
           >
-            <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
+            <ShieldCheck className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
             <span>Platform Rules</span>
           </button>
         </div>
@@ -580,13 +580,13 @@ export default function GeminiAiStudioPage() {
         {activeTab === "text" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Left Controls (5 cols) */}
-            <div className="lg:col-span-5 bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm space-y-5">
+            <div className="lg:col-span-5 bg-white dark:bg-[#151518] p-6 rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-sm space-y-5">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block">
+                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider block">
                     What is your post about?
                   </label>
-                  <span className="text-[10px] font-semibold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] font-semibold text-purple-600 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-full border border-purple-200/60 dark:border-purple-800/60">
                     Target: {activeRule.name}
                   </span>
                 </div>
@@ -595,13 +595,13 @@ export default function GeminiAiStudioPage() {
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   placeholder="e.g. Announcing our 2026 digital product release with early bird access..."
-                  className="w-full text-xs p-3.5 rounded-xl border border-slate-200 text-slate-800 placeholder:text-slate-400 focus:outline-hidden focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition resize-none leading-relaxed"
+                  className="w-full text-xs p-3.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#1C1C22] text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-hidden focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition resize-none leading-relaxed"
                 />
               </div>
 
               {/* Model Selector */}
               <div>
-                <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-2">
+                <label className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider block mb-2">
                   Google Gemini Model
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -612,17 +612,17 @@ export default function GeminiAiStudioPage() {
                       onClick={() => setSelectedTextModel(m.id)}
                       className={`p-2.5 rounded-xl border text-left transition ${
                         selectedTextModel === m.id
-                          ? "border-purple-600 bg-purple-50/60 text-purple-900 ring-1 ring-purple-600 shadow-xs"
-                          : "border-slate-200 hover:border-slate-300 text-slate-700 bg-white"
+                          ? "border-purple-600 bg-purple-50/80 text-purple-900 ring-1 ring-purple-600 shadow-xs dark:bg-purple-950/50 dark:text-purple-200 dark:border-purple-500"
+                          : "border-slate-200 hover:border-slate-300 text-slate-700 bg-white dark:bg-[#1C1C22] dark:border-white/10 dark:text-slate-300 dark:hover:border-white/20"
                       }`}
                     >
                       <div className="flex items-center justify-between mb-0.5">
                         <span className="text-xs font-bold truncate">{m.name}</span>
-                        <span className="text-[9px] font-bold px-1.5 py-0.2 bg-purple-100 text-purple-700 rounded-full shrink-0">
+                        <span className="text-[9px] font-bold px-1.5 py-0.2 bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 rounded-full shrink-0">
                           {m.badge}
                         </span>
                       </div>
-                      <span className="text-[10px] text-slate-500 block leading-tight line-clamp-2">
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block leading-tight line-clamp-2">
                         {m.desc}
                       </span>
                     </button>
@@ -633,10 +633,10 @@ export default function GeminiAiStudioPage() {
               {/* Target Platform */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block">
+                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider block">
                     Target Platform & Rules
                   </label>
-                  <span className="text-[10px] text-slate-500">
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">
                     Cap: <strong>{activeRule.maxChars} chars</strong>
                   </span>
                 </div>
@@ -648,8 +648,8 @@ export default function GeminiAiStudioPage() {
                       onClick={() => setPlatform(p.id)}
                       className={`px-3 py-2 rounded-xl text-xs font-semibold border transition text-center truncate ${
                         platform === p.id
-                          ? "border-purple-600 bg-purple-50 text-purple-900 font-bold shadow-xs"
-                          : "border-slate-200 hover:border-slate-300 text-slate-600 bg-white"
+                          ? "border-purple-600 bg-purple-50 text-purple-900 font-bold shadow-xs dark:bg-purple-950/50 dark:text-purple-200 dark:border-purple-500"
+                          : "border-slate-200 hover:border-slate-300 text-slate-600 bg-white dark:bg-[#1C1C22] dark:border-white/10 dark:text-slate-300 dark:hover:border-white/20"
                       }`}
                     >
                       {p.name}
@@ -658,15 +658,15 @@ export default function GeminiAiStudioPage() {
                 </div>
 
                 {/* Quick Rule Pill */}
-                <div className="mt-2.5 p-2 rounded-xl bg-slate-50 border border-slate-200/80 text-[11px] text-slate-600 flex items-center justify-between">
+                <div className="mt-2.5 p-2 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-[11px] text-slate-600 dark:text-slate-300 flex items-center justify-between">
                   <span className="flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
+                    <ShieldCheck className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                     <span>Max {activeRule.maxHashtags} hashtags • Hook &lt; {activeRule.idealHookLength} chars</span>
                   </span>
                   <button
                     type="button"
                     onClick={() => setActiveTab("rules")}
-                    className="text-purple-600 font-semibold hover:underline text-[10px]"
+                    className="text-purple-600 dark:text-purple-400 font-semibold hover:underline text-[10px]"
                   >
                     View regulations
                   </button>
@@ -675,7 +675,7 @@ export default function GeminiAiStudioPage() {
 
               {/* Tone of Voice */}
               <div>
-                <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-2">
+                <label className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider block mb-2">
                   Tone of Voice
                 </label>
                 <div className="space-y-1.5">
@@ -686,12 +686,12 @@ export default function GeminiAiStudioPage() {
                       onClick={() => setTone(t.label)}
                       className={`w-full px-3.5 py-2 rounded-xl text-xs border text-left flex items-center justify-between transition ${
                         tone === t.label
-                          ? "border-purple-600 bg-purple-50 text-purple-900 font-bold"
-                          : "border-slate-200 hover:border-slate-300 text-slate-700 bg-white"
+                          ? "border-purple-600 bg-purple-50 text-purple-900 font-bold dark:bg-purple-950/50 dark:text-purple-200 dark:border-purple-500"
+                          : "border-slate-200 hover:border-slate-300 text-slate-700 bg-white dark:bg-[#1C1C22] dark:border-white/10 dark:text-slate-300 dark:hover:border-white/20"
                       }`}
                     >
                       <span>{t.label}</span>
-                      <span className="text-[10px] text-slate-400 font-normal">{t.desc}</span>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">{t.desc}</span>
                     </button>
                   ))}
                 </div>
@@ -722,12 +722,12 @@ export default function GeminiAiStudioPage() {
             <div className="lg:col-span-7 space-y-4">
               {variations.length > 0 ? (
                 <>
-                  <div className="p-3 rounded-xl bg-purple-50/70 border border-purple-200 text-xs flex items-center justify-between">
-                    <span className="font-semibold text-purple-900 flex items-center gap-1.5">
+                  <div className="p-3 rounded-xl bg-purple-50/70 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/50 text-xs flex items-center justify-between">
+                    <span className="font-semibold text-purple-900 dark:text-purple-200 flex items-center gap-1.5">
                       <GeminiIcon size={16} />
                       <span>Generated using: <strong>{activeProvider}</strong></span>
                     </span>
-                    <span className="text-[11px] text-purple-700 font-medium">
+                    <span className="text-[11px] text-purple-700 dark:text-purple-300 font-medium">
                       All variations strictly comply with {activeRule.name} rules
                     </span>
                   </div>
@@ -737,26 +737,26 @@ export default function GeminiAiStudioPage() {
                     return (
                       <div
                         key={v.id}
-                        className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-3 relative group hover:border-purple-300 transition"
+                        className="p-5 rounded-2xl bg-white dark:bg-[#151518] border border-slate-200/90 dark:border-white/10 shadow-sm space-y-3 relative group hover:border-purple-300 dark:hover:border-purple-500/40 transition"
                       >
-                        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/10">
                           <div className="flex items-center gap-2">
-                            <span className="px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800 text-xs font-bold">
+                            <span className="px-2.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 text-xs font-bold">
                               {v.label || `Variation ${v.id}`}
                             </span>
                             {/* Compliance Badge */}
                             <span
                               className={`px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 ${
                                 validation.isCompliant
-                                  ? "bg-purple-50 text-purple-700 border border-purple-200"
-                                  : "bg-amber-50 text-amber-700 border border-amber-200"
+                                  ? "bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/40"
+                                  : "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/40"
                               }`}
                             >
                               <ShieldCheck className="w-3 h-3" />
                               {validation.charCount} / {validation.maxChars} chars
                             </span>
 
-                            <span className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[10px] font-bold border border-indigo-200">
+                            <span className="px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold border border-indigo-200 dark:border-indigo-800/40">
                               Hook Score: {validation.hookScore}/100
                             </span>
                           </div>
@@ -772,7 +772,7 @@ export default function GeminiAiStudioPage() {
                                   setEditedText(v.caption);
                                 }
                               }}
-                              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 text-xs font-medium flex items-center gap-1 transition"
+                              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-medium flex items-center gap-1 transition"
                             >
                               <Edit3 className="w-3.5 h-3.5" />
                               <span>{editingId === v.id ? "Save" : "Edit"}</span>
@@ -781,12 +781,12 @@ export default function GeminiAiStudioPage() {
                             <button
                               type="button"
                               onClick={() => handleCopy(v.id, v.caption)}
-                              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 text-xs font-medium flex items-center gap-1 transition"
+                              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-medium flex items-center gap-1 transition"
                             >
                               {copiedId === v.id ? (
                                 <>
-                                  <Check className="w-3.5 h-3.5 text-purple-600" />
-                                  <span className="text-purple-600 font-bold">Copied</span>
+                                  <Check className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                                  <span className="text-purple-600 dark:text-purple-400 font-bold">Copied</span>
                                 </>
                               ) : (
                                 <>
@@ -800,8 +800,8 @@ export default function GeminiAiStudioPage() {
 
                         {/* Hook */}
                         {v.hook && (
-                          <div className="text-xs font-semibold text-purple-700 bg-purple-50/60 p-2.5 rounded-xl border border-purple-100">
-                            <span className="text-[10px] uppercase tracking-wider text-purple-500 block mb-0.5">
+                          <div className="text-xs font-semibold text-purple-700 dark:text-purple-300 bg-purple-50/60 dark:bg-purple-950/30 p-2.5 rounded-xl border border-purple-100 dark:border-purple-800/30">
+                            <span className="text-[10px] uppercase tracking-wider text-purple-500 dark:text-purple-400 block mb-0.5">
                               Opening Hook ({v.hook.length} chars):
                             </span>
                             &ldquo;{v.hook}&rdquo;
@@ -814,10 +814,10 @@ export default function GeminiAiStudioPage() {
                             rows={6}
                             value={editedText}
                             onChange={(e) => setEditedText(e.target.value)}
-                            className="w-full text-xs p-3 rounded-xl border border-purple-300 focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 text-slate-800 font-sans leading-relaxed"
+                            className="w-full text-xs p-3 rounded-xl border border-purple-300 dark:border-purple-500/60 bg-white dark:bg-[#1C1C22] text-slate-800 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 font-sans leading-relaxed"
                           />
                         ) : (
-                          <p className="text-xs text-slate-700 whitespace-pre-wrap leading-relaxed">
+                          <p className="text-xs text-slate-700 dark:text-slate-200 whitespace-pre-wrap leading-relaxed">
                             {v.caption}
                           </p>
                         )}
@@ -828,7 +828,7 @@ export default function GeminiAiStudioPage() {
                             {v.hashtags.map((tag, idx) => (
                               <span
                                 key={idx}
-                                className="text-[11px] font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md hover:bg-purple-100 transition cursor-pointer"
+                                className="text-[11px] font-medium text-purple-600 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/50 px-2 py-0.5 rounded-md hover:bg-purple-100 dark:hover:bg-purple-900/50 transition cursor-pointer"
                               >
                                 {tag}
                               </span>
@@ -838,15 +838,15 @@ export default function GeminiAiStudioPage() {
 
                         {/* Strategic First Comment */}
                         {v.firstComment && (
-                          <div className="text-[11px] text-slate-500 bg-slate-50 p-2 rounded-lg border border-slate-200/60">
-                            <strong className="text-slate-700">Recommended 1st Comment:</strong>{" "}
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-white/5 p-2 rounded-lg border border-slate-200/60 dark:border-white/10">
+                            <strong className="text-slate-700 dark:text-slate-200">Recommended 1st Comment:</strong>{" "}
                             {v.firstComment}
                           </div>
                         )}
 
                         {/* Card Bottom Actions */}
-                        <div className="pt-2 flex items-center justify-between border-t border-slate-100">
-                          <span className="text-[10px] text-slate-400">
+                        <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-white/10">
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500">
                             Strict {activeRule.name} Regulation Standard
                           </span>
 
@@ -865,26 +865,26 @@ export default function GeminiAiStudioPage() {
                   })}
                 </>
               ) : (
-                <div className="bg-white p-12 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col items-center justify-center text-center space-y-4">
-                  <div className="w-16 h-16 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600 border border-purple-100">
+                <div className="bg-white dark:bg-[#151518] p-12 rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs flex flex-col items-center justify-center text-center space-y-4">
+                  <div className="w-16 h-16 rounded-2xl bg-purple-50 dark:bg-purple-950/50 flex items-center justify-center text-purple-600 dark:text-purple-300 border border-purple-100 dark:border-purple-800/40">
                     <Sparkles className="w-8 h-8" />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-slate-800">
+                    <h3 className="text-base font-bold text-slate-800 dark:text-white">
                       Gemini 3.8 Flash Engine Ready
                     </h3>
-                    <p className="text-xs text-slate-500 mt-1 max-w-sm">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm">
                       Enter a topic on the left to generate 3 multi-platform variations tailored to the strict rules and character limits of {activeRule.name}.
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-                    <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">
+                    <span className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 border border-transparent dark:border-white/10 text-xs font-medium">
                       ✓ 280-char X hard cap
                     </span>
-                    <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">
+                    <span className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 border border-transparent dark:border-white/10 text-xs font-medium">
                       ✓ Instagram 1st comment tags
                     </span>
-                    <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">
+                    <span className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 border border-transparent dark:border-white/10 text-xs font-medium">
                       ✓ LinkedIn whitespace formatting
                     </span>
                   </div>
@@ -900,13 +900,13 @@ export default function GeminiAiStudioPage() {
         {activeTab === "image" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Left Controls (5 cols) */}
-            <div className="lg:col-span-5 bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm space-y-5">
+            <div className="lg:col-span-5 bg-white dark:bg-[#151518] p-6 rounded-2xl border border-slate-200/90 dark:border-white/10 shadow-sm space-y-5">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block">
+                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider block">
                     Describe your image in detail
                   </label>
-                  <span className="text-[10px] font-semibold text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] font-semibold text-pink-600 dark:text-pink-300 bg-pink-50 dark:bg-pink-950/60 px-2 py-0.5 rounded-full border border-pink-200/60 dark:border-pink-800/60">
                     Flux.1 Pro + Gemini Enhancer
                   </span>
                 </div>
@@ -915,12 +915,12 @@ export default function GeminiAiStudioPage() {
                   value={imagePrompt}
                   onChange={(e) => setImagePrompt(e.target.value)}
                   placeholder="e.g. Lord Hanuman with divine golden aura, majestic temple in background, cinematic volumetric lighting..."
-                  className="w-full text-xs p-3.5 rounded-xl border border-slate-200 text-slate-800 placeholder:text-slate-400 focus:outline-hidden focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition resize-none leading-relaxed"
+                  className="w-full text-xs p-3.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#1C1C22] text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-hidden focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition resize-none leading-relaxed"
                 />
 
                 {/* Quick Inspiration Chips */}
                 <div className="mt-2.5">
-                  <span className="text-[10px] font-semibold text-slate-400 block mb-1.5">
+                  <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 block mb-1.5">
                     Quick Prompt Ideas:
                   </span>
                   <div className="flex flex-wrap gap-1.5">
@@ -929,7 +929,7 @@ export default function GeminiAiStudioPage() {
                         key={idx}
                         type="button"
                         onClick={() => setImagePrompt(chip)}
-                        className="text-[10px] px-2 py-1 rounded-lg bg-slate-50 hover:bg-pink-50 hover:text-pink-700 text-slate-600 border border-slate-200/60 transition truncate max-w-[200px]"
+                        className="text-[10px] px-2 py-1 rounded-lg bg-slate-50 dark:bg-white/5 hover:bg-pink-50 dark:hover:bg-pink-950/40 hover:text-pink-700 dark:hover:text-pink-300 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-white/10 transition truncate max-w-[200px]"
                       >
                         {chip}
                       </button>
@@ -940,7 +940,7 @@ export default function GeminiAiStudioPage() {
 
               {/* Image Engine */}
               <div>
-                <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-2">
+                <label className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider block mb-2">
                   Image Generator Engine
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -951,12 +951,12 @@ export default function GeminiAiStudioPage() {
                       onClick={() => setSelectedImageModel(m.id)}
                       className={`p-2.5 rounded-xl border text-left transition ${
                         selectedImageModel === m.id
-                          ? "border-pink-500 bg-pink-50/60 text-pink-900 ring-1 ring-pink-500 shadow-xs"
-                          : "border-slate-200 hover:border-slate-300 text-slate-700 bg-white"
+                          ? "border-pink-500 bg-pink-50/80 text-pink-900 ring-1 ring-pink-500 shadow-xs dark:bg-pink-950/50 dark:text-pink-200 dark:border-pink-500"
+                          : "border-slate-200 hover:border-slate-300 text-slate-700 bg-white dark:bg-[#1C1C22] dark:border-white/10 dark:text-slate-300 dark:hover:border-white/20"
                       }`}
                     >
                       <span className="text-xs font-bold block">{m.name}</span>
-                      <span className="text-[10px] text-slate-500 block leading-tight mt-0.5">
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block leading-tight mt-0.5">
                         {m.desc}
                       </span>
                     </button>
@@ -966,7 +966,7 @@ export default function GeminiAiStudioPage() {
 
               {/* Style Selector */}
               <div>
-                <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-2">
+                <label className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider block mb-2">
                   Visual Aesthetic / Style
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -977,8 +977,8 @@ export default function GeminiAiStudioPage() {
                       onClick={() => setSelectedStyle(st.id)}
                       className={`p-2 rounded-xl border text-center transition flex flex-col items-center gap-1 ${
                         selectedStyle === st.id
-                          ? "border-pink-500 bg-pink-50 text-pink-900 font-bold shadow-xs"
-                          : "border-slate-200 hover:border-slate-300 text-slate-600 bg-white"
+                          ? "border-pink-500 bg-pink-50 text-pink-900 font-bold shadow-xs dark:bg-pink-950/50 dark:text-pink-200 dark:border-pink-500"
+                          : "border-slate-200 hover:border-slate-300 text-slate-600 bg-white dark:bg-[#1C1C22] dark:border-white/10 dark:text-slate-300 dark:hover:border-white/20"
                       }`}
                     >
                       <span className="text-base">{st.icon}</span>
@@ -990,7 +990,7 @@ export default function GeminiAiStudioPage() {
 
               {/* Aspect Ratio */}
               <div>
-                <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-2">
+                <label className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider block mb-2">
                   Aspect Ratio & Resolution
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -1001,26 +1001,26 @@ export default function GeminiAiStudioPage() {
                       onClick={() => setSelectedAspect(ar.id)}
                       className={`p-2.5 rounded-xl border text-left transition ${
                         selectedAspect === ar.id
-                          ? "border-pink-500 bg-pink-50 text-pink-900 font-bold shadow-xs"
-                          : "border-slate-200 hover:border-slate-300 text-slate-600 bg-white"
+                          ? "border-pink-500 bg-pink-50 text-pink-900 font-bold shadow-xs dark:bg-pink-950/50 dark:text-pink-200 dark:border-pink-500"
+                          : "border-slate-200 hover:border-slate-300 text-slate-600 bg-white dark:bg-[#1C1C22] dark:border-white/10 dark:text-slate-300 dark:hover:border-white/20"
                       }`}
                     >
                       <span className="text-xs block font-bold">{ar.label}</span>
-                      <span className="text-[10px] text-slate-500 block leading-tight">{ar.sub}</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block leading-tight">{ar.sub}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Gemini Prompt Enhancer Toggle */}
-              <div className="p-3 rounded-xl bg-purple-50/70 border border-purple-200 flex items-center justify-between">
+              <div className="p-3 rounded-xl bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800/40 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <GeminiIcon size={16} />
                   <div>
-                    <span className="text-xs font-bold text-purple-900 block">
+                    <span className="text-xs font-bold text-purple-900 dark:text-purple-200 block">
                       Gemini 3.8 Prompt Enhancer
                     </span>
-                    <span className="text-[10px] text-slate-500 block">
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 block">
                       Enriches prompts into photorealistic 8K cinema specs
                     </span>
                   </div>
@@ -1159,13 +1159,13 @@ export default function GeminiAiStudioPage() {
         {/* ============================================================ */}
         {activeTab === "rules" && (
           <div className="space-y-6">
-            <div className="p-5 rounded-2xl bg-indigo-50/70 border border-indigo-200 flex items-start gap-3">
-              <ShieldCheck className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
+            <div className="p-5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/40 flex items-start gap-3">
+              <ShieldCheck className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
               <div>
-                <h3 className="text-sm font-bold text-indigo-900">
+                <h3 className="text-sm font-bold text-indigo-900 dark:text-indigo-200">
                   Global Social Media Regulations & Publishing Standards
                 </h3>
-                <p className="text-xs text-indigo-700 mt-1 leading-relaxed">
+                <p className="text-xs text-indigo-700 dark:text-indigo-300 mt-1 leading-relaxed">
                   Every social network enforces strict character caps, hashtag quotas, hook truncation thresholds, and formatting algorithms. PulseSocial&apos;s Gemini 3.8 Flash engine automatically validates every piece of generated content against these official guidelines.
                 </p>
               </div>
@@ -1175,40 +1175,40 @@ export default function GeminiAiStudioPage() {
               {Object.values(PLATFORM_RULES).map((rule) => (
                 <div
                   key={rule.id}
-                  className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3 flex flex-col justify-between hover:border-indigo-300 transition"
+                  className="p-5 rounded-2xl bg-white dark:bg-[#151518] border border-slate-200 dark:border-white/10 shadow-sm space-y-3 flex flex-col justify-between hover:border-indigo-300 dark:hover:border-indigo-500/40 transition"
                 >
                   <div>
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                      <h4 className="text-sm font-bold text-slate-900">{rule.name}</h4>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/10">
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">{rule.name}</h4>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 border border-transparent dark:border-white/10">
                         {rule.maxChars.toLocaleString()} chars cap
                       </span>
                     </div>
 
                     <div className="mt-3 space-y-1.5 text-xs">
-                      <div className="flex items-center justify-between text-slate-600">
+                      <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
                         <span>Recommended Length:</span>
-                        <strong className="text-slate-800">{rule.recommendedMaxChars} chars</strong>
+                        <strong className="text-slate-800 dark:text-slate-200">{rule.recommendedMaxChars} chars</strong>
                       </div>
-                      <div className="flex items-center justify-between text-slate-600">
+                      <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
                         <span>Max Hashtags:</span>
-                        <strong className="text-slate-800">{rule.maxHashtags} tags</strong>
+                        <strong className="text-slate-800 dark:text-slate-200">{rule.maxHashtags} tags</strong>
                       </div>
-                      <div className="flex items-center justify-between text-slate-600">
+                      <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
                         <span>Hashtag Placement:</span>
-                        <strong className="text-slate-800 capitalize">{rule.hashtagPlacement.replace("_", " ")}</strong>
+                        <strong className="text-slate-800 dark:text-slate-200 capitalize">{rule.hashtagPlacement.replace("_", " ")}</strong>
                       </div>
-                      <div className="flex items-center justify-between text-slate-600">
+                      <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
                         <span>Hook Truncation:</span>
-                        <strong className="text-slate-800">&lt; {rule.idealHookLength} chars</strong>
+                        <strong className="text-slate-800 dark:text-slate-200">&lt; {rule.idealHookLength} chars</strong>
                       </div>
                     </div>
 
-                    <div className="mt-3 pt-3 border-t border-slate-100">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                    <div className="mt-3 pt-3 border-t border-slate-100 dark:border-white/10">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-1">
                         Key Rules:
                       </span>
-                      <ul className="space-y-1 text-[11px] text-slate-600 list-disc list-inside leading-tight">
+                      <ul className="space-y-1 text-[11px] text-slate-600 dark:text-slate-300 list-disc list-inside leading-tight">
                         {rule.rules.slice(0, 3).map((r, i) => (
                           <li key={i}>{r}</li>
                         ))}
@@ -1222,7 +1222,7 @@ export default function GeminiAiStudioPage() {
                       setPlatform(rule.name);
                       setActiveTab("text");
                     }}
-                    className="w-full mt-4 py-2 rounded-xl bg-slate-50 hover:bg-indigo-50 text-indigo-700 text-xs font-bold border border-slate-200 hover:border-indigo-200 transition"
+                    className="w-full mt-4 py-2 rounded-xl bg-slate-50 dark:bg-white/5 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-bold border border-slate-200 dark:border-white/10 hover:border-indigo-200 dark:hover:border-indigo-800/40 transition cursor-pointer"
                   >
                     Generate for {rule.name}
                   </button>

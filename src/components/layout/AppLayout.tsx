@@ -1459,7 +1459,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto flex flex-col justify-between">
+        <main className="flex-1 overflow-y-auto flex flex-col justify-between bg-slate-50 dark:bg-[#0D0D0E] text-slate-900 dark:text-[#9CA3AF]">
           <div className="flex-1">{children}</div>
           <DashboardFooter />
         </main>

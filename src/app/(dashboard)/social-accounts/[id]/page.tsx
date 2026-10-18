@@ -346,7 +346,7 @@ export default function SocialAccountDetailsPage() {
               <span>Platform Capability Matrix (Real Official API)</span>
             </h2>
             <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-              API Version: 202503 (REST)
+              API Version: 202601 (REST)
             </span>
           </div>
 

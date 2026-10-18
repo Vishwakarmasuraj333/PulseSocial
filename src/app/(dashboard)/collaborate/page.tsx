@@ -72,30 +72,30 @@ export default function CollaboratePage() {
 
   return (
     <AppLayout>
-      <div className="bg-[#f2f5f8] dark:bg-slate-950 min-h-[calc(100vh-60px)] font-sans flex flex-col">
-        <div className="flex-1 flex flex-col md:flex-row max-w-[1600px] w-full mx-auto">
+      <div className="bg-slate-50 dark:bg-[#0D0D0E] min-h-[calc(100vh-64px)] p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto font-sans text-slate-800 dark:text-[#9CA3AF]">
+        <div className="flex flex-col md:flex-row gap-6 w-full">
           
           {/* ============================================================ */}
-          {/* LEFT SIDEBAR: Collaborate Filter Tabs (Matching Screenshot)  */}
+          {/* LEFT SIDEBAR: Collaborate Filter Tabs                        */}
           {/* ============================================================ */}
-          <aside className="w-full md:w-56 shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200/90 dark:border-slate-800 p-3 sm:p-4 select-none">
+          <aside className="w-full md:w-60 shrink-0 bg-white dark:bg-[#111113] border border-slate-200/90 dark:border-white/7 rounded-2xl p-3 sm:p-4 shadow-xs select-none h-fit">
             {/* All Feeds */}
             <button
               type="button"
               onClick={() => setActiveFilter("all")}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer text-left border ${
                 activeFilter === "all"
-                  ? "bg-[#f0f2f5] dark:bg-slate-800 text-slate-900 dark:text-white"
-                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                  ? "bg-slate-100 text-slate-900 dark:bg-amber-500/15 dark:text-[#FBBF24] border-transparent dark:border-[#E08738]/30 shadow-xs"
+                  : "text-slate-600 dark:text-[#9CA3AF] border-transparent hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
-              <List className="w-4 h-4 text-slate-500" />
+              <List className="w-4 h-4 text-slate-500 dark:text-[#6B7280]" />
               <span>All Feeds</span>
             </button>
 
             {/* FILTER BY Header */}
             <div className="pt-5 pb-2">
-              <span className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+              <span className="px-3 text-[10px] font-bold text-slate-400 dark:text-[#6B7280] uppercase tracking-wider block">
                 FILTER BY
               </span>
             </div>
@@ -119,13 +119,13 @@ export default function CollaboratePage() {
                     key={item.id}
                     type="button"
                     onClick={() => setActiveFilter(item.id)}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer text-left ${
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer text-left border ${
                       activeFilter === item.id
-                        ? "bg-[#f0f2f5] dark:bg-slate-800 text-slate-900 dark:text-white"
-                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                        ? "bg-slate-100 text-slate-900 dark:bg-amber-500/15 dark:text-[#FBBF24] border-transparent dark:border-[#E08738]/30 shadow-xs"
+                        : "text-slate-600 dark:text-[#9CA3AF] border-transparent hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
                     }`}
                   >
-                    <Icon className="w-4 h-4 text-slate-500" />
+                    <Icon className="w-4 h-4 text-slate-500 dark:text-[#6B7280]" />
                     <span>{item.label}</span>
                   </button>
                 );
@@ -134,9 +134,9 @@ export default function CollaboratePage() {
           </aside>
 
           {/* ============================================================ */}
-          {/* MAIN AREA: "What's cooking?" + Team Illustration (Screenshot) */}
+          {/* MAIN AREA: "What's cooking?" + Team Illustration             */}
           {/* ============================================================ */}
-          <main className="flex-1 bg-white dark:bg-slate-900 p-6 sm:p-8 flex flex-col min-w-0">
+          <main className="flex-1 bg-white dark:bg-[#17171A] border border-slate-200/90 dark:border-white/7 rounded-2xl p-6 sm:p-8 flex flex-col min-w-0 shadow-xs">
             
             {/* Top Post Input: Avatar circle + speech bubble input */}
             <form onSubmit={handlePostNote} className="flex items-center gap-3 max-w-3xl mb-8">
@@ -146,20 +146,20 @@ export default function CollaboratePage() {
 
               <div className="flex-1 relative flex items-center">
                 {/* Speech bubble pointer notch */}
-                <div className="w-2.5 h-2.5 bg-white dark:bg-slate-800 border-l border-b border-slate-200 dark:border-slate-700 rotate-45 -mr-1.5 z-10 hidden sm:block" />
+                <div className="w-2.5 h-2.5 bg-white dark:bg-[#111113] border-l border-b border-slate-200 dark:border-white/10 rotate-45 -mr-1.5 z-10 hidden sm:block" />
                 
                 <input
                   type="text"
                   value={whatsCookingText}
                   onChange={(e) => setWhatsCookingText(e.target.value)}
                   placeholder="What's cooking?"
-                  className="w-full px-4 py-2.5 text-xs sm:text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 placeholder:italic focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-2xs"
+                  className="w-full px-4 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#111113] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#6B7280] placeholder:italic focus:outline-none focus:ring-1 focus:ring-[#5846A8] dark:focus:ring-[#E08738] shadow-2xs"
                 />
 
                 {whatsCookingText.trim() && (
                   <button
                     type="submit"
-                    className="absolute right-2 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold shadow-xs transition"
+                    className="absolute right-2 px-3 py-1 bg-[#5846A8] hover:bg-[#48388d] dark:bg-[#E08738] dark:hover:bg-[#D97706] text-white dark:text-[#0F0F11] rounded-lg text-xs font-semibold shadow-xs transition"
                   >
                     Share
                   </button>
@@ -263,7 +263,7 @@ export default function CollaboratePage() {
                     <button
                       type="button"
                       onClick={() => setIsInviteModalOpen(true)}
-                      className="px-6 py-2 rounded-full border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition active:scale-95 cursor-pointer"
+                      className="px-6 py-2 rounded-full border border-slate-300 dark:border-white/10 hover:border-slate-400 bg-white dark:bg-[#111113] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-white text-xs font-semibold shadow-2xs transition active:scale-95 cursor-pointer"
                     >
                       Invite Team Members
                     </button>

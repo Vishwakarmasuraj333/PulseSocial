@@ -156,6 +156,70 @@ export class LinkedInProvider implements SocialProvider {
     };
   }
 
+  private async fetchWithLinkedInVersion(
+    url: string,
+    accessToken: string,
+    init: {
+      method?: string;
+      body?: any;
+      headers?: Record<string, string>;
+    } = {}
+  ): Promise<Response> {
+    const candidateVersions = Array.from(
+      new Set([
+        SOCIAL_API_VERSIONS.LINKEDIN_REST,
+        "202601",
+        "202602",
+        "202603",
+        "202610",
+        "202512",
+      ])
+    );
+
+    let lastRes: Response | null = null;
+    let lastErrText = "";
+
+    for (const version of candidateVersions) {
+      const headers: Record<string, string> = {
+        Authorization: `Bearer ${accessToken}`,
+        "LinkedIn-Version": version,
+        "X-Restli-Protocol-Version": SOCIAL_API_VERSIONS.LINKEDIN_RESTLI_PROTOCOL,
+        "Content-Type": "application/json",
+        ...(init.headers || {}),
+      };
+
+      try {
+        const res = await fetch(url, {
+          method: init.method || "GET",
+          headers,
+          body: init.body !== undefined ? JSON.stringify(init.body) : undefined,
+        });
+
+        if (res.status === 426) {
+          lastRes = res;
+          lastErrText = await res.clone().text().catch(() => "");
+          continue;
+        }
+
+        if (!res.ok) {
+          const cloned = res.clone();
+          const errJson = await cloned.json().catch(() => ({}));
+          if (typeof errJson.message === "string" && (errJson.message.includes("is not active") || errJson.message.includes("NONEXISTENT_VERSION"))) {
+            lastRes = res;
+            lastErrText = errJson.message;
+            continue;
+          }
+        }
+
+        return res;
+      } catch (err: any) {
+        lastErrText = err?.message || "Network error";
+      }
+    }
+
+    return lastRes || new Response(JSON.stringify({ message: lastErrText || "All LinkedIn candidate versions failed" }), { status: 426 });
+  }
+
   async publishPost(accessToken: string, post: PublishPostPayload): Promise<PublishResult> {
     try {
       const authorUrn = post.targetAccountId?.startsWith("urn:li:")
@@ -207,15 +271,9 @@ export class LinkedInProvider implements SocialProvider {
         }
       }
 
-      const res = await fetch("https://api.linkedin.com/rest/posts", {
+      const res = await this.fetchWithLinkedInVersion("https://api.linkedin.com/rest/posts", accessToken, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "LinkedIn-Version": SOCIAL_API_VERSIONS.LINKEDIN_REST,
-          "X-Restli-Protocol-Version": SOCIAL_API_VERSIONS.LINKEDIN_RESTLI_PROTOCOL,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(restPayload),
+        body: restPayload,
       });
 
       if (res.status === 201 || res.ok) {
@@ -276,20 +334,18 @@ export class LinkedInProvider implements SocialProvider {
     }
     const buffer = Buffer.from(await mediaRes.arrayBuffer());
 
-    const initRes = await fetch("https://api.linkedin.com/rest/images?action=initializeUpload", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "LinkedIn-Version": SOCIAL_API_VERSIONS.LINKEDIN_REST,
-        "X-Restli-Protocol-Version": SOCIAL_API_VERSIONS.LINKEDIN_RESTLI_PROTOCOL,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        initializeUploadRequest: {
-          owner: ownerUrn,
+    const initRes = await this.fetchWithLinkedInVersion(
+      "https://api.linkedin.com/rest/images?action=initializeUpload",
+      accessToken,
+      {
+        method: "POST",
+        body: {
+          initializeUploadRequest: {
+            owner: ownerUrn,
+          },
         },
-      }),
-    });
+      }
+    );
 
     if (!initRes.ok) {
       const err = await initRes.json().catch(() => ({}));
@@ -332,23 +388,21 @@ export class LinkedInProvider implements SocialProvider {
     }
     const buffer = Buffer.from(await mediaRes.arrayBuffer());
 
-    const initRes = await fetch("https://api.linkedin.com/rest/videos?action=initializeUpload", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "LinkedIn-Version": SOCIAL_API_VERSIONS.LINKEDIN_REST,
-        "X-Restli-Protocol-Version": SOCIAL_API_VERSIONS.LINKEDIN_RESTLI_PROTOCOL,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        initializeUploadRequest: {
-          owner: ownerUrn,
-          fileSizeBytes: buffer.length,
-          uploadCaptions: false,
-          uploadThumbnail: false,
+    const initRes = await this.fetchWithLinkedInVersion(
+      "https://api.linkedin.com/rest/videos?action=initializeUpload",
+      accessToken,
+      {
+        method: "POST",
+        body: {
+          initializeUploadRequest: {
+            owner: ownerUrn,
+            fileSizeBytes: buffer.length,
+            uploadCaptions: false,
+            uploadThumbnail: false,
+          },
         },
-      }),
-    });
+      }
+    );
 
     if (!initRes.ok) {
       const err = await initRes.json().catch(() => ({}));

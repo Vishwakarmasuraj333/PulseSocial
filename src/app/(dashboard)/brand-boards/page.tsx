@@ -125,20 +125,20 @@ export default function BrandBoardsPage() {
 
   return (
     <AppLayout>
-      <div className="bg-[#f8fafc] dark:bg-slate-950 min-h-[calc(100vh-60px)] p-4 sm:p-6 lg:p-8 space-y-6">
+      <div className="bg-slate-50 dark:bg-[#0D0D0E] min-h-[calc(100vh-64px)] p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto font-sans text-slate-800 dark:text-[#9CA3AF]">
         
         {/* Top Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-white/7 pb-5">
           <div>
             <div className="flex items-center gap-2">
-              <span className="p-2 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-[#5846A8] dark:text-purple-300">
+              <span className="p-2 rounded-xl bg-purple-100 dark:bg-amber-500/15 text-[#5846A8] dark:text-[#FBBF24]">
                 <LayoutGrid className="w-5 h-5" />
               </span>
               <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
                 Brand Boards
               </h1>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-xs text-slate-500 dark:text-[#9CA3AF] mt-1">
               Curate visual campaigns, dynamic moodboards, and marketing asset collections for {activeBrand.name}.
             </p>
           </div>
@@ -146,14 +146,14 @@ export default function BrandBoardsPage() {
           <div className="flex items-center gap-2.5">
             <Link
               href="/social-accounts"
-              className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 transition"
+              className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-white dark:bg-[#17171A] border border-slate-200 dark:border-white/7 text-slate-700 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/5 transition"
             >
               Social Planner Settings
             </Link>
             <button
               type="button"
               onClick={() => setIsCreateOpen(true)}
-              className="px-4 py-2 text-xs font-bold rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
+              className="px-4 py-2 text-xs font-bold rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white dark:bg-[#E08738] dark:hover:bg-[#d97706] dark:text-[#0F0F11] shadow-md shadow-purple-900/20 dark:shadow-amber-900/20 flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Create New Board</span>
@@ -162,9 +162,9 @@ export default function BrandBoardsPage() {
         </div>
 
         {/* Search & Filter Bar */}
-        <div className="flex items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+        <div className="flex items-center justify-between gap-3 bg-white dark:bg-[#17171A] p-3 rounded-2xl border border-slate-200/90 dark:border-white/7 shadow-xs">
           <div className="flex items-center gap-2 flex-1 px-2">
-            <Search className="w-4 h-4 text-slate-400" />
+            <Search className="w-4 h-4 text-slate-400 dark:text-[#9CA3AF]" />
             <input
               type="text"
               placeholder="Search boards by name or category..."
@@ -173,7 +173,7 @@ export default function BrandBoardsPage() {
               className="w-full text-xs bg-transparent outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400"
             />
           </div>
-          <span className="text-xs text-slate-400 font-mono pr-2">
+          <span className="text-xs text-slate-400 dark:text-[#6B7280] font-mono pr-2">
             {filteredBoards.length} board{filteredBoards.length === 1 ? "" : "s"}
           </span>
         </div>
@@ -183,7 +183,7 @@ export default function BrandBoardsPage() {
           {filteredBoards.map((board) => (
             <div
               key={board.id}
-              className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs hover:shadow-md transition group flex flex-col"
+              className="bg-white dark:bg-[#17171A] rounded-2xl border border-slate-200/90 dark:border-white/7 overflow-hidden shadow-xs hover:shadow-md transition group flex flex-col"
             >
               {/* Cover Preview Image */}
               <div className="relative h-44 bg-slate-950 overflow-hidden">
@@ -215,21 +215,21 @@ export default function BrandBoardsPage() {
                   ))}
                 </div>
 
-                <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
-                  <span className="text-[11px] text-slate-400">{board.updatedAt}</span>
+                <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-white/7 text-xs">
+                  <span className="text-[11px] text-slate-400 dark:text-[#6B7280]">{board.updatedAt}</span>
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() => handleCopyLink(board.id)}
-                      className="p-1.5 rounded-lg text-slate-500 hover:text-[#5846A8] hover:bg-purple-50 dark:hover:bg-slate-800 transition cursor-pointer"
+                      className="p-1.5 rounded-lg text-slate-500 hover:text-[#5846A8] dark:hover:text-[#FBBF24] hover:bg-purple-50 dark:hover:bg-white/5 transition cursor-pointer"
                       title="Copy Share Link"
                     >
-                      {copiedId === board.id ? <Check className="w-3.5 h-3.5 text-purple-600" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copiedId === board.id ? <Check className="w-3.5 h-3.5 text-purple-600 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDelete(board.id)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-800 transition cursor-pointer"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition cursor-pointer"
                       title="Delete Board"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -244,12 +244,12 @@ export default function BrandBoardsPage() {
         {/* Create Modal */}
         {isCreateOpen && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-6 shadow-2xl animate-in zoom-in-95 duration-150 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div className="bg-white dark:bg-[#17171A] rounded-2xl border border-slate-200/90 dark:border-white/10 max-w-md w-full p-6 shadow-2xl animate-in zoom-in-95 duration-150 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 pb-3">
                 <h3 className="font-bold text-sm text-slate-900 dark:text-white">Create New Brand Board</h3>
                 <button
                   onClick={() => setIsCreateOpen(false)}
-                  className="text-slate-400 hover:text-slate-600 text-xs font-bold"
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-white text-xs font-bold"
                 >
                   ✕
                 </button>
@@ -266,7 +266,7 @@ export default function BrandBoardsPage() {
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
                     placeholder="e.g. Summer Q3 Campaign Assets"
-                    className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 outline-none focus:ring-2 focus:ring-purple-500/20"
+                    className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#111113] text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-[#E08738]/20 focus:border-[#E08738]"
                   />
                 </div>
 
@@ -277,7 +277,7 @@ export default function BrandBoardsPage() {
                   <select
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
-                    className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 outline-none cursor-pointer"
+                    className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#111113] text-slate-900 dark:text-white outline-none cursor-pointer focus:border-[#E08738]"
                   >
                     <option value="Visual Campaign">Visual Campaign</option>
                     <option value="Social Video Hooks">Social Video Hooks</option>
@@ -291,13 +291,13 @@ export default function BrandBoardsPage() {
                   <button
                     type="button"
                     onClick={() => setIsCreateOpen(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded-xl text-xs font-bold bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-[#5846A8] hover:bg-[#48388d] text-white dark:bg-[#E08738] dark:hover:bg-[#d97706] dark:text-[#0F0F11] shadow-md shadow-purple-900/20 dark:shadow-amber-900/20 cursor-pointer"
                   >
                     Create Board
                   </button>

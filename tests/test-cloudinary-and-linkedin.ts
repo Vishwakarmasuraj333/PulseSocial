@@ -59,7 +59,7 @@ async function runTests() {
 
   // Test 3: LinkedIn Active Version Check
   try {
-    if (SOCIAL_API_VERSIONS.LINKEDIN_REST === "202503") {
+    if (SOCIAL_API_VERSIONS.LINKEDIN_REST === "202601") {
       console.log("✅ Test 3 Passed: LinkedIn active API version declared correctly:", SOCIAL_API_VERSIONS.LINKEDIN_REST);
       passed++;
     } else {

@@ -292,21 +292,21 @@ export default function CalendarPage() {
 
   return (
     <AppLayout>
-      <div className="bg-[#f8fafc] dark:bg-slate-950 min-h-[calc(100vh-60px)] font-sans">
+      <div className="bg-slate-50 dark:bg-[#0D0D0E] min-h-[calc(100vh-64px)] font-sans text-slate-800 dark:text-[#9CA3AF]">
         
-        {/* Top Control Toolbar matching Reference Screenshot */}
-        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+        {/* Top Control Toolbar */}
+        <div className="bg-white dark:bg-[#111113] border-b border-slate-200 dark:border-white/7">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
             
             {/* Left Tools: Filter views All & Filters */}
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-700 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/5 transition"
               >
-                <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
+                <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500 dark:text-[#9CA3AF]" />
                 <span>Filter views</span>
-                <span className="font-bold text-indigo-600 dark:text-indigo-400">All</span>
+                <span className="font-bold text-[#5846A8] dark:text-[#FBBF24]">All</span>
               </button>
 
               <button
@@ -317,17 +317,17 @@ export default function CalendarPage() {
                   filterCriteria.approvalStatuses.length > 0 ||
                   filterCriteria.campaigns.length > 0 ||
                   filterCriteria.contentTypes.length > 0
-                    ? "bg-purple-50 dark:bg-purple-950/40 border-[#5846A8] text-[#5846A8] dark:text-purple-300 shadow-2xs font-bold"
-                    : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                    ? "bg-purple-50 dark:bg-amber-500/15 border-[#5846A8] dark:border-amber-500/30 text-[#5846A8] dark:text-[#FBBF24] shadow-2xs font-bold"
+                    : "border-slate-200 dark:border-white/10 text-slate-700 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/5"
                 }`}
               >
-                <Filter className="w-3.5 h-3.5 text-[#5846A8]" />
+                <Filter className="w-3.5 h-3.5 text-[#5846A8] dark:text-[#FBBF24]" />
                 <span>Filters</span>
                 {(filterCriteria.platforms.length > 0 ||
                   filterCriteria.approvalStatuses.length > 0 ||
                   filterCriteria.campaigns.length > 0 ||
                   filterCriteria.contentTypes.length > 0) && (
-                  <span className="w-4 h-4 rounded-full bg-[#5846A8] text-white text-[10px] flex items-center justify-center font-bold">
+                  <span className="w-4 h-4 rounded-full bg-[#5846A8] dark:bg-[#E08738] text-white dark:text-[#0F0F11] text-[10px] flex items-center justify-center font-bold">
                     {filterCriteria.platforms.length +
                       filterCriteria.approvalStatuses.length +
                       filterCriteria.campaigns.length +
@@ -469,7 +469,7 @@ export default function CalendarPage() {
               </div>
 
               {/* View Switcher: List View / Calendar View */}
-              <div className="flex items-center border border-slate-200 dark:border-slate-700 rounded-lg p-0.5 bg-slate-50 dark:bg-slate-850">
+              <div className="flex items-center border border-slate-200 dark:border-white/10 rounded-lg p-0.5 bg-slate-50 dark:bg-[#17171A]">
                 <Link
                   href="/posts"
                   className="p-1.5 rounded-md text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition"
@@ -479,7 +479,7 @@ export default function CalendarPage() {
                 </Link>
                 <button
                   type="button"
-                  className="p-1.5 rounded-md bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-2xs"
+                  className="p-1.5 rounded-md bg-white dark:bg-[#111113] text-[#5846A8] dark:text-[#FBBF24] shadow-2xs"
                   title="Calendar View"
                 >
                   <CalendarIcon className="w-3.5 h-3.5" />
@@ -496,11 +496,11 @@ export default function CalendarPage() {
               {monthName} {year}
             </h2>
 
-            <div className="flex items-center border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900 p-0.5 shadow-2xs">
+            <div className="flex items-center border border-slate-200 dark:border-white/10 rounded-xl bg-white dark:bg-[#17171A] p-0.5 shadow-2xs">
               <button
                 type="button"
                 onClick={prevPeriod}
-                className="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-100 dark:hover:bg-white/5 transition cursor-pointer"
                 title="Previous Month"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -508,7 +508,7 @@ export default function CalendarPage() {
               <button
                 type="button"
                 onClick={nextPeriod}
-                className="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-100 dark:hover:bg-white/5 transition cursor-pointer"
                 title="Next Month"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -518,21 +518,21 @@ export default function CalendarPage() {
             <button
               type="button"
               onClick={() => setCurrentDate(new Date())}
-              className="px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 transition shadow-2xs cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#17171A] text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer"
             >
               Today
             </button>
           </div>
 
           {/* Month / Week Toggle */}
-          <div className="flex items-center border border-slate-200 dark:border-slate-800 rounded-xl p-0.5 bg-white dark:bg-slate-900 shadow-2xs">
+          <div className="flex items-center border border-slate-200 dark:border-white/10 rounded-xl p-0.5 bg-white dark:bg-[#17171A] shadow-2xs">
             <button
               type="button"
               onClick={() => setView("month")}
               className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
                 view === "month"
-                  ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white shadow-2xs"
-                  : "text-slate-500 hover:text-slate-900"
+                  ? "bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white shadow-2xs"
+                  : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               Month
@@ -542,8 +542,8 @@ export default function CalendarPage() {
               onClick={() => setView("week")}
               className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
                 view === "week"
-                  ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white shadow-2xs"
-                  : "text-slate-500 hover:text-slate-900"
+                  ? "bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white shadow-2xs"
+                  : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               Week
@@ -552,21 +552,21 @@ export default function CalendarPage() {
         </div>
 
         {/* ============================================================ */}
-        {/* CALENDAR GRID VIEW (Matching Reference Screenshot EXACTLY)   */}
+        {/* CALENDAR GRID VIEW                                           */}
         {/* ============================================================ */}
         <div className="max-w-[1700px] mx-auto px-4 sm:px-6 pb-12">
           {isLoading ? (
-            <div className="py-24 flex flex-col items-center justify-center space-y-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
-              <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
-              <p className="text-xs font-semibold text-slate-500">
+            <div className="py-24 flex flex-col items-center justify-center space-y-3 bg-white dark:bg-[#17171A] rounded-2xl border border-slate-200/90 dark:border-white/7">
+              <Loader2 className="w-8 h-8 text-[#5846A8] dark:text-[#E08738] animate-spin" />
+              <p className="text-xs font-semibold text-slate-500 dark:text-[#9CA3AF]">
                 Loading calendar posts from active workspace...
               </p>
             </div>
           ) : view === "month" ? (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+            <div className="bg-white dark:bg-[#17171A] rounded-2xl border border-slate-200/90 dark:border-white/7 shadow-xs overflow-hidden">
               
-              {/* Day Header Row: Sun in red, others in dark */}
-              <div className="grid grid-cols-7 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-center py-3 text-xs font-bold divide-x divide-slate-100 dark:divide-slate-800">
+              {/* Day Header Row */}
+              <div className="grid grid-cols-7 border-b border-slate-200 dark:border-white/7 bg-white dark:bg-[#111113] text-center py-3 text-xs font-bold divide-x divide-slate-100 dark:divide-white/7">
                 <div className="text-rose-500">Sun</div>
                 <div className="text-slate-700 dark:text-slate-300">Mon</div>
                 <div className="text-slate-700 dark:text-slate-300">Tue</div>
@@ -577,12 +577,12 @@ export default function CalendarPage() {
               </div>
 
               {/* Day Cells Grid */}
-              <div className="grid grid-cols-7 divide-x divide-y divide-slate-100 dark:divide-slate-800">
+              <div className="grid grid-cols-7 divide-x divide-y divide-slate-100 dark:divide-white/7">
                 {/* Empty leading offset days */}
                 {Array.from({ length: firstDayIndex }).map((_, idx) => (
                   <div
                     key={`empty-${idx}`}
-                    className="min-h-[180px] bg-slate-50/20 dark:bg-slate-950/20 p-2"
+                    className="min-h-[180px] bg-slate-50/20 dark:bg-black/20 p-2"
                   />
                 ))}
 

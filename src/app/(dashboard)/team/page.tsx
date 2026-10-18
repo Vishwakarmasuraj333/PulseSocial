@@ -98,46 +98,46 @@ export default function TeamPage() {
 
   return (
     <AppLayout>
-      <div className="space-y-6">
+      <div className="bg-slate-50 dark:bg-[#0D0D0E] min-h-[calc(100vh-64px)] p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto font-sans text-slate-800 dark:text-[#9CA3AF]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               Team &amp; Access Governance
             </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-[#9CA3AF] mt-0.5">
               Role-based access controls, post approvers, and channel scope assignments
             </p>
           </div>
 
           <Button
             onClick={() => setIsInviteOpen(true)}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20"
+            className="h-9 px-4 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white dark:bg-[#E08738] dark:hover:bg-[#d97706] dark:text-[#0F0F11] text-xs font-bold shadow-xs hover:shadow-purple-500/20 dark:hover:shadow-[0_0_16px_rgba(224,135,56,0.35)] transition cursor-pointer"
           >
-            <Plus className="w-4 h-4 mr-1.5" /> Invite Team Member
+            <Plus className="w-4 h-4 mr-1.5 stroke-[2.5]" /> Invite Team Member
           </Button>
         </div>
 
         {/* Loading Indicator */}
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center p-12 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl">
-            <Loader2 className="w-6 h-6 animate-spin text-indigo-600 mb-2" />
-            <p className="text-xs text-slate-500">Loading team governance...</p>
+          <div className="flex flex-col items-center justify-center p-12 bg-white dark:bg-[#17171A] border border-slate-200/90 dark:border-white/7 rounded-2xl shadow-xs">
+            <Loader2 className="w-6 h-6 animate-spin text-[#5846A8] dark:text-[#E08738] mb-2" />
+            <p className="text-xs text-slate-500 dark:text-[#9CA3AF]">Loading team governance...</p>
           </div>
         ) : members.length === 0 ? (
-          <div className="text-center p-12 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl">
-            <Users className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">No team members yet</p>
-            <p className="text-xs text-slate-500 mt-1">Invite your teammates to collaborate on this workspace.</p>
+          <div className="text-center p-12 bg-white dark:bg-[#17171A] border border-slate-200/90 dark:border-white/7 rounded-2xl shadow-xs">
+            <Users className="w-8 h-8 text-slate-400 dark:text-[#6B7280] mx-auto mb-2" />
+            <p className="text-sm font-semibold text-slate-700 dark:text-white">No team members yet</p>
+            <p className="text-xs text-slate-500 dark:text-[#9CA3AF] mt-1">Invite your teammates to collaborate on this workspace.</p>
           </div>
         ) : (
           <>
             {/* Mobile Cards View (<md) */}
             <div className="md:hidden space-y-3">
               {members.map((m) => (
-                <Card key={m.id} className="p-4 border border-slate-200/80 dark:border-slate-800 space-y-3">
+                <Card key={m.id} className="p-4 bg-white dark:bg-[#17171A] border border-slate-200/90 dark:border-white/7 shadow-xs space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-200 shrink-0">
+                      <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-200 dark:bg-white/10 shrink-0">
                         {m.avatar ? (
                           <Image
                             src={m.avatar}
@@ -147,28 +147,28 @@ export default function TeamPage() {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center font-bold text-slate-600">
+                          <div className="w-full h-full flex items-center justify-center font-bold text-slate-600 dark:text-white">
                             {m.name.charAt(0)}
                           </div>
                         )}
                       </div>
                       <div>
                         <p className="font-bold text-slate-900 dark:text-white text-xs">{m.name}</p>
-                        <p className="text-[11px] text-slate-400">{m.email}</p>
+                        <p className="text-[11px] text-slate-400 dark:text-[#9CA3AF]">{m.email}</p>
                       </div>
                     </div>
-                    <Badge variant={m.role === "OWNER" ? "default" : "secondary"} className="text-[10px]">
+                    <Badge variant={m.role === "OWNER" ? "default" : "secondary"} className="text-[10px] dark:bg-white/10 dark:text-white">
                       {m.role}
                     </Badge>
                   </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
-                    <span className="text-slate-500 dark:text-slate-400 text-[11px] font-medium">{m.channels}</span>
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-white/7 text-xs">
+                    <span className="text-slate-500 dark:text-[#9CA3AF] text-[11px] font-medium">{m.channels}</span>
                     {m.isApprover ? (
-                      <span className="inline-flex items-center gap-1 text-purple-600 font-semibold text-[11px]">
+                      <span className="inline-flex items-center gap-1 text-[#5846A8] dark:text-[#FBBF24] font-semibold text-[11px]">
                         <CheckCircle2 className="w-3.5 h-3.5" /> Approver
                       </span>
                     ) : (
-                      <span className="text-slate-400 text-[11px]">Standard</span>
+                      <span className="text-slate-400 dark:text-[#6B7280] text-[11px]">Standard</span>
                     )}
                   </div>
                 </Card>
@@ -176,11 +176,11 @@ export default function TeamPage() {
             </div>
 
             {/* Desktop Team Table Card (>=md) */}
-            <Card className="hidden md:block overflow-hidden border-slate-200/80">
+            <Card className="hidden md:block overflow-hidden bg-white dark:bg-[#17171A] border border-slate-200/90 dark:border-white/7 shadow-xs rounded-2xl">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 text-slate-500 uppercase font-semibold">
+                    <tr className="border-b border-slate-200 dark:border-white/7 bg-slate-50/70 dark:bg-[#111113] text-slate-500 dark:text-[#9CA3AF] uppercase font-semibold">
                       <th className="p-4">Member</th>
                       <th className="p-4">Assigned Role</th>
                       <th className="p-4">Channel Scope</th>
@@ -188,63 +188,63 @@ export default function TeamPage() {
                       <th className="p-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  <tbody className="divide-y divide-slate-100 dark:divide-white/7">
                     {members.map((m) => (
-                  <tr key={m.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
-                    <td className="p-4 flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-200 shrink-0">
-                        {m.avatar ? (
-                          <Image
-                            src={m.avatar}
-                            alt={m.name}
-                            width={36}
-                            height={36}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center font-bold text-slate-600">
-                            {m.name.charAt(0)}
+                      <tr key={m.id} className="hover:bg-slate-50/80 dark:hover:bg-white/5 transition-colors">
+                        <td className="p-4 flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-200 dark:bg-white/10 shrink-0">
+                            {m.avatar ? (
+                              <Image
+                                src={m.avatar}
+                                alt={m.name}
+                                width={36}
+                                height={36}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center font-bold text-slate-600 dark:text-white">
+                                {m.name.charAt(0)}
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-bold text-slate-900 dark:text-white">{m.name}</p>
-                        <p className="text-slate-400">{m.email}</p>
-                      </div>
-                    </td>
+                          <div>
+                            <p className="font-bold text-slate-900 dark:text-white">{m.name}</p>
+                            <p className="text-slate-400 dark:text-[#9CA3AF]">{m.email}</p>
+                          </div>
+                        </td>
 
-                    <td className="p-4">
-                      <Badge variant={m.role === "OWNER" ? "default" : "secondary"}>
-                        {m.role}
-                      </Badge>
-                    </td>
+                        <td className="p-4">
+                          <Badge variant={m.role === "OWNER" ? "default" : "secondary"} className="dark:bg-white/10 dark:text-white">
+                            {m.role}
+                          </Badge>
+                        </td>
 
-                    <td className="p-4 text-slate-600 dark:text-slate-300 font-medium">
-                      {m.channels}
-                    </td>
+                        <td className="p-4 text-slate-600 dark:text-[#9CA3AF] font-medium">
+                          {m.channels}
+                        </td>
 
-                    <td className="p-4">
-                      {m.isApprover ? (
-                        <span className="inline-flex items-center gap-1 text-purple-600 font-semibold">
-                          <CheckCircle2 className="w-4 h-4" /> Authorized Approver
-                        </span>
-                      ) : (
-                        <span className="text-slate-400">Standard</span>
-                      )}
-                    </td>
+                        <td className="p-4">
+                          {m.isApprover ? (
+                            <span className="inline-flex items-center gap-1 text-[#5846A8] dark:text-[#FBBF24] font-semibold">
+                              <CheckCircle2 className="w-4 h-4" /> Authorized Approver
+                            </span>
+                          ) : (
+                            <span className="text-slate-400 dark:text-[#6B7280]">Standard</span>
+                          )}
+                        </td>
 
-                    <td className="p-4 text-right">
-                      <Button variant="ghost" size="sm" className="text-xs">
-                        Configure
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-        </>
+                        <td className="p-4 text-right">
+                          <Button variant="ghost" size="sm" className="text-xs hover:bg-slate-100 dark:hover:bg-white/10 dark:text-white">
+                            Configure
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </>
         )}
 
         {/* Invite Modal matching Screenshot 3 */}
@@ -268,6 +268,7 @@ export default function TeamPage() {
                 placeholder="colleague@company.com"
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
+                className="dark:bg-[#1C1C20] dark:border-white/10 dark:text-white"
               />
             </div>
 
@@ -281,7 +282,7 @@ export default function TeamPage() {
                   aria-label="Select role"
                   value={inviteRole}
                   onChange={(e) => setInviteRole(e.target.value)}
-                  className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm shadow-sm dark:border-slate-800 dark:bg-slate-950"
+                  className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm shadow-sm dark:border-white/10 dark:bg-[#1C1C20] dark:text-white"
                 >
                   <option value="Brand Admin">Brand Admin</option>
                   <option value="User">User</option>
@@ -297,7 +298,7 @@ export default function TeamPage() {
                 <select
                   id="invite-channels-select"
                   aria-label="Select channels"
-                  className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm shadow-sm dark:border-slate-800 dark:bg-slate-950"
+                  className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm shadow-sm dark:border-white/10 dark:bg-[#1C1C20] dark:text-white"
                 >
                   <option value="ALL">All Channels</option>
                   <option value="INSTAGRAM">Instagram Profile</option>
@@ -311,7 +312,7 @@ export default function TeamPage() {
                   type="checkbox"
                   checked={isApprover}
                   onChange={(e) => setIsApprover(e.target.checked)}
-                  className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4"
+                  className="rounded border-slate-300 text-[#5846A8] dark:text-[#E08738] focus:ring-[#5846A8] dark:focus:ring-[#E08738] w-4 h-4 dark:bg-[#1C1C20] dark:border-white/10"
                 />
                 <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                   Add as an Approver
@@ -319,18 +320,19 @@ export default function TeamPage() {
               </label>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-white/10">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsInviteOpen(false)}
+                className="dark:border-white/10 dark:text-white dark:hover:bg-white/5"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 isLoading={isSending}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                className="bg-[#5846A8] hover:bg-[#48388d] text-white dark:bg-[#E08738] dark:hover:bg-[#d97706] dark:text-[#0F0F11] font-bold"
               >
                 Send Invite
               </Button>

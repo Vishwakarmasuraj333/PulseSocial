@@ -125,13 +125,11 @@ export function FacebookPostPreview({
               className="w-full max-h-[380px] object-contain bg-black"
             />
           ) : (
-            <div className="relative w-full aspect-4/5 max-h-[380px] bg-slate-100 dark:bg-slate-900">
-              <Image
+            <div className="relative w-full flex items-center justify-center p-1.5 bg-black/40 min-h-[220px]">
+              <img
                 src={media[activeMediaIndex].url}
                 alt="Facebook media"
-                fill
-                className="object-cover object-top"
-                unoptimized
+                className="w-auto h-auto max-h-[460px] max-w-full object-contain shadow-xs"
               />
             </div>
           )}

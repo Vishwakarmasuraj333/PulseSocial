@@ -13,7 +13,8 @@ export type SupportedPlatform =
   | "whatsapp"
   | "reddit"
   | "bluesky"
-  | "telegram";
+  | "telegram"
+  | "shopify";
 
 export interface PlatformCapabilities {
   publish: boolean;
@@ -209,6 +210,18 @@ export const PLATFORM_CAPABILITY_MATRIX: Record<SupportedPlatform, PlatformCapab
     webhooks: true,
     characterLimit: 4096,
     notes: "Telegram Bot API & Channel publishing for broadcasts and media.",
+  },
+  shopify: {
+    publish: true,
+    schedule: true,
+    comments: false,
+    messages: false,
+    analytics: true,
+    mediaUpload: true,
+    videoPublish: false,
+    webhooks: true,
+    characterLimit: 5000,
+    notes: "Shopify Store API for e-commerce catalog sync, product tagging, and store updates.",
   },
 };
 
@@ -439,6 +452,17 @@ export const PLATFORM_ACTION_CAPABILITIES: Record<SupportedPlatform, PlatformAct
     save: false,
   },
   telegram: {
+    like: false,
+    unlike: false,
+    comment: false,
+    reply: false,
+    deleteComment: false,
+    hideComment: false,
+    share: false,
+    repost: false,
+    save: false,
+  },
+  shopify: {
     like: false,
     unlike: false,
     comment: false,

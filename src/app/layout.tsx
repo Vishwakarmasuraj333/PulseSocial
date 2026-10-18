@@ -169,7 +169,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className="h-full antialiased font-sans bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100"
+        className="h-full antialiased font-sans bg-slate-50 dark:bg-[#0D0D0E] text-slate-900 dark:text-[#9CA3AF]"
         suppressHydrationWarning
       >
         <ToastProvider>

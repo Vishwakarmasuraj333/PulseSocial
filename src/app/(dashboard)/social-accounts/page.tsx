@@ -273,20 +273,20 @@ export default function SocialAccountsPage() {
 
   return (
     <AppLayout>
-      <div className="bg-[#f8fafc] dark:bg-slate-950 min-h-[calc(100vh-60px)] font-sans">
+      <div className="bg-slate-50 dark:bg-[#0D0D0E] min-h-[calc(100vh-64px)] font-sans text-slate-800 dark:text-[#9CA3AF]">
         
         {/* Top Marketing / Social Planner Sub-Navigation Bar matching Screenshot */}
-        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+        <div className="bg-white dark:bg-[#111113] border-b border-slate-200/90 dark:border-white/7">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-12">
               <div className="flex items-center gap-6 overflow-x-auto scrollbar-none text-xs">
                 <span className="font-bold text-slate-900 dark:text-white shrink-0">
                   Marketing
                 </span>
-                <div className="flex items-center gap-5 text-slate-600 dark:text-slate-400 font-semibold shrink-0">
+                <div className="flex items-center gap-5 text-slate-600 dark:text-[#9CA3AF] font-semibold shrink-0">
                   <Link
                     href="/social-accounts"
-                    className="text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 py-3.5"
+                    className="text-[#5846A8] dark:text-[#FBBF24] border-b-2 border-[#5846A8] dark:border-[#E08738] py-3.5"
                   >
                     Social Planner
                   </Link>
@@ -299,17 +299,17 @@ export default function SocialAccountsPage() {
                   <Link href="/links" className="hover:text-slate-900 dark:hover:text-white transition">
                     Trigger Links
                   </Link>
-                  <span className="text-slate-400 dark:text-slate-500 cursor-default flex items-center gap-1">
-                    Emails <span className="text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">Coming soon</span>
+                  <span className="text-slate-400 dark:text-[#6B7280] cursor-default flex items-center gap-1">
+                    Emails <span className="text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-white/5 text-slate-400">Coming soon</span>
                   </span>
-                  <span className="text-slate-400 dark:text-slate-500 cursor-default flex items-center gap-1">
-                    Countdown Timers <span className="text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">Coming soon</span>
+                  <span className="text-slate-400 dark:text-[#6B7280] cursor-default flex items-center gap-1">
+                    Countdown Timers <span className="text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-white/5 text-slate-400">Coming soon</span>
                   </span>
-                  <span className="text-slate-400 dark:text-slate-500 cursor-default flex items-center gap-1">
-                    Affiliate Manager <span className="text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">Coming soon</span>
+                  <span className="text-slate-400 dark:text-[#6B7280] cursor-default flex items-center gap-1">
+                    Affiliate Manager <span className="text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-white/5 text-slate-400">Coming soon</span>
                   </span>
-                  <span className="text-slate-400 dark:text-slate-500 cursor-default flex items-center gap-1">
-                    Ad Manager <span className="text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">Coming soon</span>
+                  <span className="text-slate-400 dark:text-[#6B7280] cursor-default flex items-center gap-1">
+                    Ad Manager <span className="text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-white/5 text-slate-400">Coming soon</span>
                   </span>
                 </div>
               </div>
@@ -321,7 +321,7 @@ export default function SocialAccountsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
           <Link
             href="/posts"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-[#9CA3AF] hover:text-slate-900 dark:hover:text-white transition"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Social planner settings</span>
@@ -336,15 +336,15 @@ export default function SocialAccountsPage() {
             {/* LEFT SIDEBAR: Social Planner Settings Tabs (Screenshot exact) */}
             {/* ============================================================ */}
             <aside className="w-full lg:w-60 shrink-0">
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-2 shadow-xs space-y-1">
+              <div className="bg-white dark:bg-[#17171A] rounded-2xl border border-slate-200/90 dark:border-white/7 p-2 shadow-xs space-y-1">
                 
                 <button
                   type="button"
                   onClick={() => setActiveSettingsTab("social_accounts")}
                   className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
                     activeSettingsTab === "social_accounts"
-                      ? "bg-[#eef4ff] text-[#1877F2] dark:bg-blue-950/60 dark:text-blue-400"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                      ? "bg-purple-50 text-[#5846A8] dark:bg-amber-500/15 dark:text-[#FBBF24] dark:border dark:border-amber-500/30"
+                      : "text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
                   <span className="text-sm font-bold">@</span>
@@ -356,8 +356,8 @@ export default function SocialAccountsPage() {
                   onClick={() => setActiveSettingsTab("notifications")}
                   className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
                     activeSettingsTab === "notifications"
-                      ? "bg-[#eef4ff] text-[#1877F2] dark:bg-blue-950/60 dark:text-blue-400"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                      ? "bg-purple-50 text-[#5846A8] dark:bg-amber-500/15 dark:text-[#FBBF24] dark:border dark:border-amber-500/30"
+                      : "text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
                   <Bell className="w-4 h-4" />
@@ -369,8 +369,8 @@ export default function SocialAccountsPage() {
                   onClick={() => setActiveSettingsTab("social_categories")}
                   className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
                     activeSettingsTab === "social_categories"
-                      ? "bg-[#eef4ff] text-[#1877F2] dark:bg-blue-950/60 dark:text-blue-400"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                      ? "bg-purple-50 text-[#5846A8] dark:bg-amber-500/15 dark:text-[#FBBF24] dark:border dark:border-amber-500/30"
+                      : "text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
                   <Folder className="w-4 h-4" />
@@ -382,8 +382,8 @@ export default function SocialAccountsPage() {
                   onClick={() => setActiveSettingsTab("watermark")}
                   className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
                     activeSettingsTab === "watermark"
-                      ? "bg-[#eef4ff] text-[#1877F2] dark:bg-blue-950/60 dark:text-blue-400"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                      ? "bg-purple-50 text-[#5846A8] dark:bg-amber-500/15 dark:text-[#FBBF24] dark:border dark:border-amber-500/30"
+                      : "text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
                   <ImageIcon className="w-4 h-4" />
@@ -395,8 +395,8 @@ export default function SocialAccountsPage() {
                   onClick={() => setActiveSettingsTab("global_settings")}
                   className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
                     activeSettingsTab === "global_settings"
-                      ? "bg-[#eef4ff] text-[#1877F2] dark:bg-blue-950/60 dark:text-blue-400"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                      ? "bg-purple-50 text-[#5846A8] dark:bg-amber-500/15 dark:text-[#FBBF24] dark:border dark:border-amber-500/30"
+                      : "text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
                   <Settings className="w-4 h-4" />
@@ -408,15 +408,15 @@ export default function SocialAccountsPage() {
                   onClick={() => setActiveSettingsTab("manage_links")}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
                     activeSettingsTab === "manage_links"
-                      ? "bg-[#eef4ff] text-[#1877F2] dark:bg-blue-950/60 dark:text-blue-400"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900"
+                      ? "bg-purple-50 text-[#5846A8] dark:bg-amber-500/15 dark:text-[#FBBF24] dark:border dark:border-amber-500/30"
+                      : "text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <LinkIcon className="w-4 h-4" />
                     <span>Manage links</span>
                   </div>
-                  <span className="px-1.5 py-0.2 rounded-md bg-amber-400 text-slate-950 text-[10px] font-black uppercase tracking-wider">
+                  <span className="px-1.5 py-0.2 rounded-md bg-[#E08738] text-[#0F0F11] text-[10px] font-black uppercase tracking-wider">
                     New
                   </span>
                 </button>
@@ -426,7 +426,7 @@ export default function SocialAccountsPage() {
             {/* ============================================================ */}
             {/* RIGHT MAIN PANEL: Active Tab Content                         */}
             {/* ============================================================ */}
-            <main className="flex-1 min-w-0 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-xs">
+            <main className="flex-1 min-w-0 bg-white dark:bg-[#17171A] rounded-2xl border border-slate-200/90 dark:border-white/7 p-6 shadow-xs">
               
               {/* TAB 1: SOCIAL ACCOUNTS (MAIN VIEW MATCHING SCREENSHOT) */}
               {activeSettingsTab === "social_accounts" && (
@@ -450,16 +450,16 @@ export default function SocialAccountsPage() {
                           setConnectModalPlatform(null);
                           setIsConnectModalOpen(true);
                         }}
-                        className="px-4 py-2.5 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white text-xs font-bold flex items-center gap-2 transition cursor-pointer shadow-sm active:scale-[0.98]"
+                        className="h-9 px-4 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white dark:bg-[#E08738] dark:hover:bg-[#d97706] dark:text-[#0F0F11] text-xs font-bold flex items-center gap-2 transition cursor-pointer shadow-xs hover:shadow-purple-500/20 dark:hover:shadow-[0_0_16px_rgba(224,135,56,0.35)]"
                       >
-                        <Plus className="w-4 h-4" />
+                        <Plus className="w-4 h-4 stroke-[2.5]" />
                         <span>Connect Social Channel</span>
                       </button>
                     </div>
                   </div>
 
                   {/* Horizontal Scrollable Platform Filter Tabs */}
-                  <div className="border-b border-slate-200 dark:border-slate-800 pb-1">
+                  <div className="border-b border-slate-200/90 dark:border-white/7 pb-1">
                     <div className="flex items-center gap-6 overflow-x-auto scrollbar-thin pb-2">
                       {PLATFORM_NAV_ITEMS.map((item) => {
                         const isSelected = selectedPlatform === item.id;
@@ -470,8 +470,8 @@ export default function SocialAccountsPage() {
                             onClick={() => setSelectedPlatform(item.id)}
                             className={`flex items-center gap-2 text-xs font-bold shrink-0 transition relative py-1 cursor-pointer ${
                               isSelected
-                                ? "text-[#1877F2] dark:text-blue-400"
-                                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                                ? "text-[#5846A8] dark:text-[#FBBF24]"
+                                : "text-slate-600 dark:text-[#9CA3AF] hover:text-slate-900 dark:hover:text-white"
                             }`}
                           >
                             {item.id !== "all" && (
@@ -482,7 +482,7 @@ export default function SocialAccountsPage() {
                             <span>{item.name}</span>
 
                             {isSelected && (
-                              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1877F2] rounded-full" />
+                              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#5846A8] dark:bg-[#E08738] rounded-full" />
                             )}
                           </button>
                         );
@@ -498,10 +498,10 @@ export default function SocialAccountsPage() {
                       <button
                         type="button"
                         onClick={() => setStatusFilter("all")}
-                        className={`px-3 py-1 rounded-full text-xs font-bold transition cursor-pointer ${
+                        className={`px-3 py-1 rounded-full text-xs font-bold transition cursor-pointer border ${
                           statusFilter === "all"
-                            ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white shadow-2xs"
-                            : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850"
+                            ? "bg-purple-50 text-[#5846A8] border-purple-200 dark:bg-amber-500/15 dark:text-[#FBBF24] dark:border-amber-500/30"
+                            : "bg-slate-100 dark:bg-white/5 border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/10"
                         }`}
                       >
                         All
@@ -509,10 +509,10 @@ export default function SocialAccountsPage() {
                       <button
                         type="button"
                         onClick={() => setStatusFilter("active")}
-                        className={`px-3 py-1 rounded-full text-xs font-bold transition cursor-pointer ${
+                        className={`px-3 py-1 rounded-full text-xs font-bold transition cursor-pointer border ${
                           statusFilter === "active"
-                            ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white shadow-2xs"
-                            : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850"
+                            ? "bg-purple-50 text-[#5846A8] border-purple-200 dark:bg-amber-500/15 dark:text-[#FBBF24] dark:border-amber-500/30"
+                            : "bg-slate-100 dark:bg-white/5 border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/10"
                         }`}
                       >
                         Active
@@ -520,10 +520,10 @@ export default function SocialAccountsPage() {
                       <button
                         type="button"
                         onClick={() => setStatusFilter("expired")}
-                        className={`px-3 py-1 rounded-full text-xs font-bold transition cursor-pointer ${
+                        className={`px-3 py-1 rounded-full text-xs font-bold transition cursor-pointer border ${
                           statusFilter === "expired"
-                            ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white shadow-2xs"
-                            : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850"
+                            ? "bg-purple-50 text-[#5846A8] border-purple-200 dark:bg-amber-500/15 dark:text-[#FBBF24] dark:border-amber-500/30"
+                            : "bg-slate-100 dark:bg-white/5 border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/10"
                         }`}
                       >
                         Expired
@@ -533,24 +533,24 @@ export default function SocialAccountsPage() {
                     {/* Search Input & View Toggle */}
                     <div className="flex items-center gap-2.5">
                       <div className="relative w-full sm:w-64">
-                        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <Search className="w-3.5 h-3.5 text-slate-400 dark:text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2" />
                         <input
                           type="text"
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           placeholder="Search for a social"
-                          className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#1C1C20] text-xs text-slate-800 dark:text-white focus:outline-none focus:border-[#5846A8] dark:focus:border-[#E08738]"
                         />
                       </div>
 
-                      <div className="flex items-center border border-slate-200 dark:border-slate-800 rounded-xl p-0.5 bg-slate-50 dark:bg-slate-850">
+                      <div className="flex items-center border border-slate-200/80 dark:border-white/10 rounded-xl p-0.5 bg-slate-50 dark:bg-[#111113]">
                         <button
                           type="button"
                           onClick={() => setViewMode("table")}
                           className={`p-1.5 rounded-lg transition ${
                             viewMode === "table"
-                              ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs"
-                              : "text-slate-400 hover:text-slate-600"
+                              ? "bg-white dark:bg-[#1C1C20] text-slate-900 dark:text-white shadow-2xs"
+                              : "text-slate-400 hover:text-slate-600 dark:hover:text-white"
                           }`}
                           title="Table View"
                         >
@@ -561,8 +561,8 @@ export default function SocialAccountsPage() {
                           onClick={() => setViewMode("grid")}
                           className={`p-1.5 rounded-lg transition ${
                             viewMode === "grid"
-                              ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs"
-                              : "text-slate-400 hover:text-slate-600"
+                              ? "bg-white dark:bg-[#1C1C20] text-slate-900 dark:text-white shadow-2xs"
+                              : "text-slate-400 hover:text-slate-600 dark:hover:text-white"
                           }`}
                           title="Card Grid View"
                         >
@@ -577,21 +577,21 @@ export default function SocialAccountsPage() {
                   {/* ============================================================ */}
                   {isLoading ? (
                     <div className="py-16 flex flex-col items-center justify-center space-y-3">
-                      <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
-                      <p className="text-xs font-semibold text-slate-500">
+                      <Loader2 className="w-8 h-8 text-[#5846A8] dark:text-[#E08738] animate-spin" />
+                      <p className="text-xs font-semibold text-slate-500 dark:text-[#9CA3AF]">
                         Retrieving authenticated social accounts...
                       </p>
                     </div>
                   ) : filteredAccounts.length === 0 ? (
-                    <div className="py-16 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-8 space-y-4">
-                      <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 mx-auto flex items-center justify-center">
+                    <div className="py-16 text-center border border-dashed border-slate-200 dark:border-white/10 bg-white dark:bg-[#111113] rounded-2xl p-8 space-y-4">
+                      <div className="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-amber-500/15 text-[#5846A8] dark:text-[#FBBF24] mx-auto flex items-center justify-center">
                         <Users className="w-6 h-6" />
                       </div>
                       <div className="max-w-md mx-auto space-y-1">
                         <h3 className="text-sm font-bold text-slate-900 dark:text-white">
                           No connected social accounts found
                         </h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                        <p className="text-xs text-slate-500 dark:text-[#9CA3AF]">
                           Connect your Facebook Pages, Instagram Professional profiles, LinkedIn, YouTube, or Google Business accounts to publish and sync posts.
                         </p>
                       </div>
@@ -601,16 +601,16 @@ export default function SocialAccountsPage() {
                           setConnectModalPlatform(null);
                           setIsConnectModalOpen(true);
                         }}
-                        className="px-4 py-2 rounded-xl bg-[#1877F2] hover:bg-blue-600 text-white text-xs font-bold inline-flex items-center gap-1.5 transition shadow-xs cursor-pointer"
+                        className="px-4 py-2 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white dark:bg-[#E08738] dark:hover:bg-[#d97706] dark:text-[#0F0F11] text-xs font-bold inline-flex items-center gap-1.5 transition shadow-xs cursor-pointer"
                       >
-                        <Plus className="w-4 h-4" />
+                        <Plus className="w-4 h-4 stroke-[2.5]" />
                         <span>Connect Social Account</span>
                       </button>
                     </div>
                   ) : viewMode === "table" ? (
-                    <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-2xl">
+                    <div className="overflow-x-auto border border-slate-200/90 dark:border-white/7 rounded-2xl">
                       <table className="w-full text-left text-xs">
-                        <thead className="bg-[#f8fafc] dark:bg-slate-850/80 text-slate-600 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-800">
+                        <thead className="bg-[#f8fafc] dark:bg-[#111113] text-slate-600 dark:text-[#9CA3AF] font-bold border-b border-slate-200/90 dark:border-white/7">
                           <tr>
                             <th className="py-3 px-4 flex items-center gap-2">
                               <span>@</span>
@@ -618,13 +618,13 @@ export default function SocialAccountsPage() {
                             </th>
                             <th className="py-3 px-4">
                               <div className="flex items-center gap-1.5">
-                                <Clock className="w-3.5 h-3.5 text-slate-400" />
+                                <Clock className="w-3.5 h-3.5 text-slate-400 dark:text-[#6B7280]" />
                                 <span>Status</span>
                               </div>
                             </th>
                             <th className="py-3 px-4">
                               <div className="flex items-center gap-1.5">
-                                <span className="font-mono text-[11px] border border-slate-300 dark:border-slate-600 px-1 rounded">
+                                <span className="font-mono text-[11px] border border-slate-300 dark:border-white/10 px-1 rounded">
                                   A
                                 </span>
                                 <span>Type</span>
@@ -632,36 +632,36 @@ export default function SocialAccountsPage() {
                             </th>
                             <th className="py-3 px-4">
                               <div className="flex items-center gap-1.5">
-                                <Clock className="w-3.5 h-3.5 text-slate-400" />
+                                <Clock className="w-3.5 h-3.5 text-slate-400 dark:text-[#6B7280]" />
                                 <span>Validity</span>
                               </div>
                             </th>
                             <th className="py-3 px-4 text-center">
                               <div className="flex items-center justify-center gap-1.5">
-                                <RefreshCw className="w-3.5 h-3.5 text-slate-400" />
+                                <RefreshCw className="w-3.5 h-3.5 text-slate-400 dark:text-[#6B7280]" />
                                 <span>Sync posts</span>
                               </div>
                             </th>
                             <th className="py-3 px-4 text-right">
-                              <RefreshCw className="w-3.5 h-3.5 text-slate-400 inline-block" />
+                              <RefreshCw className="w-3.5 h-3.5 text-slate-400 dark:text-[#6B7280] inline-block" />
                             </th>
                           </tr>
                         </thead>
 
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
+                        <tbody className="divide-y divide-slate-100 dark:divide-white/7 bg-white dark:bg-[#17171A]">
                           {filteredAccounts.map((account) => {
                             const isSyncing = syncingAccountId === account.id;
 
                             return (
                               <tr
                                 key={account.id}
-                                className="hover:bg-slate-50/60 dark:hover:bg-slate-850/40 transition group"
+                                className="hover:bg-slate-50/60 dark:hover:bg-white/5 transition group"
                               >
                                 {/* Column 1: Social Account Avatar + Badge + Name */}
                                 <td className="py-3.5 px-4">
                                   <div className="flex items-center gap-3">
                                     <div className="relative shrink-0">
-                                      <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden">
+                                      <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center overflow-hidden">
                                         {account.profileImageUrl ? (
                                           // eslint-disable-next-line @next/next/no-img-element
                                           <img
@@ -670,12 +670,12 @@ export default function SocialAccountsPage() {
                                             className="w-full h-full object-cover"
                                           />
                                         ) : (
-                                          <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                          <span className="text-xs font-bold text-slate-700 dark:text-white">
                                             {account.displayName.charAt(0).toUpperCase()}
                                           </span>
                                         )}
                                       </div>
-                                      <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-white dark:bg-slate-900 p-0.5 shadow-2xs flex items-center justify-center">
+                                      <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-white dark:bg-[#17171A] p-0.5 shadow-2xs flex items-center justify-center border border-slate-200/60 dark:border-white/10">
                                         {renderPlatformIcon(account.provider, 14)}
                                       </div>
                                     </div>
@@ -683,12 +683,12 @@ export default function SocialAccountsPage() {
                                     <div className="min-w-0">
                                       <Link
                                         href={`/social-accounts/${account.id}`}
-                                        className="font-bold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition truncate block max-w-xs"
+                                        className="font-bold text-slate-900 dark:text-white hover:text-[#5846A8] dark:hover:text-[#FBBF24] transition truncate block max-w-xs"
                                       >
                                         {account.displayName}
                                       </Link>
                                       {account.username && (
-                                        <span className="text-[11px] text-slate-400 block truncate">
+                                        <span className="text-[11px] text-slate-400 dark:text-[#9CA3AF] block truncate">
                                           @{account.username}
                                         </span>
                                       )}
@@ -698,18 +698,18 @@ export default function SocialAccountsPage() {
 
                                 {/* Column 2: Status */}
                                 <td className="py-3.5 px-4 whitespace-nowrap">
-                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#EAF8ED] text-[#22C55E] dark:bg-purple-950/60 dark:text-purple-400">
+                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#EAF8ED] text-[#22C55E] dark:bg-emerald-500/15 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/30">
                                     {account.status === "CONNECTED" ? "Connected" : account.status}
                                   </span>
                                 </td>
 
                                 {/* Column 3: Type */}
-                                <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">
+                                <td className="py-3.5 px-4 text-slate-600 dark:text-[#9CA3AF] font-medium whitespace-nowrap">
                                   {account.accountType || "Page"}
                                 </td>
 
                                 {/* Column 4: Validity */}
-                                <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">
+                                <td className="py-3.5 px-4 text-slate-600 dark:text-[#9CA3AF] font-medium whitespace-nowrap">
                                   {account.validityDays !== undefined
                                     ? account.validityDays > 300
                                       ? "Permanent"
@@ -728,8 +728,8 @@ export default function SocialAccountsPage() {
                                     <div
                                       className={`w-9 h-5 flex items-center rounded-full p-0.5 transition duration-200 ease-in-out ${
                                         account.syncPosts !== false
-                                          ? "bg-[#1877F2]"
-                                          : "bg-slate-300 dark:bg-slate-700"
+                                          ? "bg-[#5846A8] dark:bg-[#E08738]"
+                                          : "bg-slate-300 dark:bg-white/10"
                                       }`}
                                     >
                                       <div
@@ -748,10 +748,10 @@ export default function SocialAccountsPage() {
                                       type="button"
                                       onClick={() => handleSyncAccount(account)}
                                       disabled={isSyncing}
-                                      className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer disabled:opacity-50"
+                                      className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer disabled:opacity-50"
                                       title="Sync posts & profile data"
                                     >
-                                      <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin text-indigo-600" : ""}`} />
+                                      <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin text-[#5846A8] dark:text-[#E08738]" : ""}`} />
                                     </button>
 
                                     <button
@@ -765,7 +765,7 @@ export default function SocialAccountsPage() {
 
                                     <Link
                                       href={`/social-accounts/${account.id}`}
-                                      className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                                      className="p-1.5 rounded-lg text-slate-400 hover:text-[#5846A8] dark:hover:text-[#FBBF24] hover:bg-slate-100 dark:hover:bg-white/10 transition"
                                       title="View account security & permissions"
                                     >
                                       <ExternalLink className="w-3.5 h-3.5" />
@@ -787,12 +787,12 @@ export default function SocialAccountsPage() {
                         return (
                           <div
                             key={account.id}
-                            className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs flex flex-col justify-between space-y-4 hover:shadow-md transition"
+                            className="p-5 rounded-2xl border border-slate-200/90 dark:border-white/7 bg-white dark:bg-[#17171A] shadow-xs flex flex-col justify-between space-y-4 hover:border-purple-300 dark:hover:border-[#E08738]/50 transition"
                           >
                             <div className="flex items-start justify-between">
                               <div className="flex items-center gap-3">
                                 <div className="relative">
-                                  <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden">
+                                  <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center overflow-hidden">
                                     {account.profileImageUrl ? (
                                       // eslint-disable-next-line @next/next/no-img-element
                                       <img
@@ -801,12 +801,12 @@ export default function SocialAccountsPage() {
                                         className="w-full h-full object-cover"
                                       />
                                     ) : (
-                                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                      <span className="text-xs font-bold text-slate-700 dark:text-white">
                                         {account.displayName.charAt(0).toUpperCase()}
                                       </span>
                                     )}
                                   </div>
-                                  <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-white dark:bg-slate-900 p-0.5 shadow-2xs flex items-center justify-center">
+                                  <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-white dark:bg-[#17171A] p-0.5 shadow-2xs flex items-center justify-center border border-slate-200/60 dark:border-white/10">
                                     {renderPlatformIcon(account.provider, 14)}
                                   </div>
                                 </div>
@@ -814,22 +814,22 @@ export default function SocialAccountsPage() {
                                 <div>
                                   <Link
                                     href={`/social-accounts/${account.id}`}
-                                    className="font-bold text-xs text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition block truncate max-w-[160px]"
+                                    className="font-bold text-xs text-slate-900 dark:text-white hover:text-[#5846A8] dark:hover:text-[#FBBF24] transition block truncate max-w-[160px]"
                                   >
                                     {account.displayName}
                                   </Link>
-                                  <span className="text-[11px] text-slate-400 block">
+                                  <span className="text-[11px] text-slate-400 dark:text-[#6B7280] block">
                                     {account.accountType || "Page"}
                                   </span>
                                 </div>
                               </div>
 
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400">
+                              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#EAF8ED] text-[#22C55E] dark:bg-emerald-500/15 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/30">
                                 {account.status}
                               </span>
                             </div>
 
-                            <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
+                            <div className="flex items-center justify-between text-xs text-slate-500 dark:text-[#9CA3AF] pt-2 border-t border-slate-100 dark:border-white/7">
                               <span>Sync Posts</span>
                               <button
                                 type="button"
@@ -839,8 +839,8 @@ export default function SocialAccountsPage() {
                                 <div
                                   className={`w-8 h-4 flex items-center rounded-full p-0.5 transition duration-200 ease-in-out ${
                                     account.syncPosts !== false
-                                      ? "bg-[#1877F2]"
-                                      : "bg-slate-300 dark:bg-slate-700"
+                                      ? "bg-[#5846A8] dark:bg-[#E08738]"
+                                      : "bg-slate-300 dark:bg-white/10"
                                   }`}
                                 >
                                   <div
@@ -853,7 +853,7 @@ export default function SocialAccountsPage() {
                             </div>
 
                             <div className="flex items-center justify-between pt-1">
-                              <span className="text-[11px] text-slate-400">
+                              <span className="text-[11px] text-slate-400 dark:text-[#6B7280]">
                                 Validity: {account.validityDays ? `${account.validityDays}d` : "42d"}
                               </span>
 
@@ -862,10 +862,10 @@ export default function SocialAccountsPage() {
                                   type="button"
                                   onClick={() => handleSyncAccount(account)}
                                   disabled={isSyncing}
-                                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
+                                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white transition"
                                   title="Sync account"
                                 >
-                                  <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin text-indigo-600" : ""}`} />
+                                  <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin text-[#5846A8] dark:text-[#E08738]" : ""}`} />
                                 </button>
                                 <button
                                   type="button"

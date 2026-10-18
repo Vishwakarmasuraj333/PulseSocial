@@ -713,132 +713,133 @@ function SettingsContent() {
 
   return (
     <AppLayout>
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs overflow-hidden min-h-[780px] flex flex-col md:flex-row font-sans text-slate-800 dark:text-slate-100">
-        {/* ============================================================ */}
-        {/* LEFT SETTINGS SIDEBAR (Exact Visual Match to Screenshot)     */}
-        {/* ============================================================ */}
-        <aside className="w-full md:w-60 border-r border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-950/40 p-3 shrink-0 select-none">
-          {/* Back button */}
-          <div className="mb-4 pt-1 px-1">
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1877F2] hover:underline transition"
-              title="Return to Dashboard"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back</span>
-            </Link>
-          </div>
-
-          {/* Group 1: BRAND SETTINGS */}
-          <div className="mb-4">
-            <div className="flex items-center gap-2 px-2.5 pb-2">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                BRAND SETTINGS
-              </span>
-              <div className="flex-1 h-px bg-slate-200/70 dark:bg-slate-800" />
+      <div className="bg-slate-50 dark:bg-[#0D0D0E] min-h-[calc(100vh-64px)] p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto font-sans text-slate-800 dark:text-[#9CA3AF]">
+        <div className="bg-white dark:bg-[#17171A] rounded-2xl border border-slate-200/90 dark:border-white/7 shadow-xs overflow-hidden min-h-[780px] flex flex-col md:flex-row font-sans text-slate-800 dark:text-[#9CA3AF]">
+          {/* ============================================================ */}
+          {/* LEFT SETTINGS SIDEBAR (Matte Obsidian & Warm Amber)           */}
+          {/* ============================================================ */}
+          <aside className="w-full md:w-60 border-r border-slate-200/90 dark:border-white/7 bg-slate-50/50 dark:bg-[#111113] p-3 shrink-0 select-none">
+            {/* Back button */}
+            <div className="mb-4 pt-1 px-1">
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#5846A8] dark:text-[#FBBF24] hover:underline transition"
+                title="Return to Dashboard"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Back</span>
+              </Link>
             </div>
 
-            <nav className="space-y-0.5 text-xs font-medium">
-              {[
-                { id: "brand_info", label: "Brand Information", icon: Info },
-                { id: "social_channels", label: "Social Channels", icon: Share2 },
-                { id: "integrations", label: "Integrations", icon: Sliders },
-                { id: "brand_members", label: "Brand Members", icon: Users },
-                { id: "publishing", label: "Publishing", icon: Send },
-                { id: "inbox_pref", label: "Inbox Preferences", icon: Inbox },
-                { id: "roles", label: "Roles & Permissions", icon: Key },
-                { id: "notifications", label: "Notifications", icon: Bell },
-              ].map((item) => {
-                const Icon = item.icon;
-                const isActive = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => handleTabChange(item.id as SettingsTab)}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition cursor-pointer text-xs ${
-                      isActive
-                        ? "bg-blue-50/80 dark:bg-blue-950/40 text-[#1877F2] font-bold border-l-3 border-[#1877F2]"
-                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white"
-                    }`}
-                  >
-                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-[#1877F2]" : "text-slate-400"}`} />
-                    <span className="truncate">{item.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
+            {/* Group 1: BRAND SETTINGS */}
+            <div className="mb-4">
+              <div className="flex items-center gap-2 px-2.5 pb-2">
+                <span className="text-[10px] font-bold text-slate-400 dark:text-[#6B7280] uppercase tracking-wider">
+                  BRAND SETTINGS
+                </span>
+                <div className="flex-1 h-px bg-slate-200/70 dark:bg-white/7" />
+              </div>
 
-          {/* Group 2: GENERAL SETTINGS */}
-          <div>
-            <div className="flex items-center gap-2 px-2.5 pb-2">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                GENERAL SETTINGS
-              </span>
-              <div className="flex-1 h-px bg-slate-200/70 dark:bg-slate-800" />
-            </div>
-
-            <nav className="space-y-0.5 text-xs font-medium">
-              {[
-                { id: "general_pref", label: "Preference", icon: SlidersHorizontal },
-                { id: "all_members", label: "All Members", icon: Users },
-                { id: "portal_settings", label: "Portal Settings", icon: Settings },
-                { id: "audit_log", label: "Audit Log", icon: FileSpreadsheet },
-              ].map((item) => {
-                const Icon = item.icon;
-                const isActive = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => handleTabChange(item.id as SettingsTab)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition cursor-pointer text-xs ${
-                      isActive
-                        ? "bg-blue-50/80 dark:bg-blue-950/40 text-[#1877F2] font-bold border-l-3 border-[#1877F2]"
-                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 truncate">
-                      <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-[#1877F2]" : "text-slate-400"}`} />
+              <nav className="space-y-0.5 text-xs font-medium">
+                {[
+                  { id: "brand_info", label: "Brand Information", icon: Info },
+                  { id: "social_channels", label: "Social Channels", icon: Share2 },
+                  { id: "integrations", label: "Integrations", icon: Sliders },
+                  { id: "brand_members", label: "Brand Members", icon: Users },
+                  { id: "publishing", label: "Publishing", icon: Send },
+                  { id: "inbox_pref", label: "Inbox Preferences", icon: Inbox },
+                  { id: "roles", label: "Roles & Permissions", icon: Key },
+                  { id: "notifications", label: "Notifications", icon: Bell },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => handleTabChange(item.id as SettingsTab)}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition cursor-pointer text-xs ${
+                        isActive
+                          ? "bg-purple-50 dark:bg-amber-500/15 text-[#5846A8] dark:text-[#FBBF24] font-bold border-l-3 border-[#5846A8] dark:border-[#E08738]"
+                          : "text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-100/80 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
+                      }`}
+                    >
+                      <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-[#5846A8] dark:text-[#FBBF24]" : "text-slate-400 dark:text-[#6B7280]"}`} />
                       <span className="truncate">{item.label}</span>
-                    </div>
-                    {(item as any).hasDot && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0 ml-1" />
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-        </aside>
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
 
-        {/* ============================================================ */}
-        {/* RIGHT CONTENT WORKSPACE                                      */}
-        {/* ============================================================ */}
-        <main className="flex-1 p-6 sm:p-8 overflow-y-auto">
-          {/* ============================================================ */}
-          {/* TAB 1: Brand Information (Exact Visual Match to Screenshot)  */}
-          {/* ============================================================ */}
-          {activeTab === "brand_info" && (
-            <div className="max-w-4xl space-y-6">
-              {/* Header with Title & Action Buttons */}
-              <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
-                <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
-                  Brand Information
-                </h1>
+            {/* Group 2: GENERAL SETTINGS */}
+            <div>
+              <div className="flex items-center gap-2 px-2.5 pb-2">
+                <span className="text-[10px] font-bold text-slate-400 dark:text-[#6B7280] uppercase tracking-wider">
+                  GENERAL SETTINGS
+                </span>
+                <div className="flex-1 h-px bg-slate-200/70 dark:bg-white/7" />
+              </div>
 
-                <div className="flex items-center gap-2.5">
-                  {/* Edit Button matching screenshot */}
-                  <button
-                    type="button"
-                    onClick={openEditModal}
-                    className="px-4 py-1.5 rounded-md border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition cursor-pointer shadow-2xs hover:border-slate-400"
-                  >
-                    <Edit2 className="w-3.5 h-3.5 text-blue-600" />
-                    <span>Edit</span>
-                  </button>
+              <nav className="space-y-0.5 text-xs font-medium">
+                {[
+                  { id: "general_pref", label: "Preference", icon: SlidersHorizontal },
+                  { id: "all_members", label: "All Members", icon: Users },
+                  { id: "portal_settings", label: "Portal Settings", icon: Settings },
+                  { id: "audit_log", label: "Audit Log", icon: FileSpreadsheet },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => handleTabChange(item.id as SettingsTab)}
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition cursor-pointer text-xs ${
+                        isActive
+                          ? "bg-purple-50 dark:bg-amber-500/15 text-[#5846A8] dark:text-[#FBBF24] font-bold border-l-3 border-[#5846A8] dark:border-[#E08738]"
+                          : "text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-100/80 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 truncate">
+                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-[#5846A8] dark:text-[#FBBF24]" : "text-slate-400 dark:text-[#6B7280]"}`} />
+                        <span className="truncate">{item.label}</span>
+                      </div>
+                      {(item as any).hasDot && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0 ml-1" />
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+          </aside>
+
+          {/* ============================================================ */}
+          {/* RIGHT CONTENT WORKSPACE                                      */}
+          {/* ============================================================ */}
+          <main className="flex-1 p-6 sm:p-8 overflow-y-auto bg-white dark:bg-[#17171A]">
+            {/* ============================================================ */}
+            {/* TAB 1: Brand Information                                     */}
+            {/* ============================================================ */}
+            {activeTab === "brand_info" && (
+              <div className="max-w-4xl space-y-6">
+                {/* Header with Title & Action Buttons */}
+                <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-white/7">
+                  <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    Brand Information
+                  </h1>
+
+                  <div className="flex items-center gap-2.5">
+                    {/* Edit Button */}
+                    <button
+                      type="button"
+                      onClick={openEditModal}
+                      className="px-4 py-1.5 rounded-xl border border-slate-300 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition cursor-pointer shadow-2xs hover:border-slate-400"
+                    >
+                      <Edit2 className="w-3.5 h-3.5 text-[#5846A8] dark:text-[#E08738]" />
+                      <span>Edit</span>
+                    </button>
 
                   {/* Delete Brand Button matching screenshot */}
                   <button
@@ -1907,6 +1908,7 @@ function SettingsContent() {
           )}
         </main>
       </div>
+    </div>
 
       {/* ============================================================ */}
       {/* REAL "EDIT BRAND INFORMATION" MODAL                          */}

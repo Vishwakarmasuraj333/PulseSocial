@@ -154,14 +154,14 @@ export function AdvancedFiltersModal({
           {/* Header */}
           <div className="px-6 py-4 border-b border-slate-100 dark:border-white/7 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#E08738] to-[#F59E0B] flex items-center justify-center text-[#0F0F11] font-bold shadow-md shadow-amber-900/20">
+              <div className="w-8 h-8 rounded-xl bg-[#5846A8] text-white shadow-md shadow-purple-900/20 dark:bg-gradient-to-tr dark:from-[#E08738] dark:to-[#F59E0B] dark:text-[#0F0F11] font-bold dark:shadow-amber-900/20 flex items-center justify-center">
                 <Filter className="w-4 h-4" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-sm font-bold tracking-tight">Advanced Post Filters</h3>
                   {activeCount > 0 && (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E08738] text-[#0F0F11]">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-[#5846A8] dark:bg-[#E08738] dark:text-[#0F0F11]">
                       {activeCount} Active
                     </span>
                   )}
@@ -356,7 +356,7 @@ export function AdvancedFiltersModal({
               <button
                 type="button"
                 onClick={handleApply}
-                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-gradient-to-r from-[#E08738] to-[#F59E0B] hover:brightness-105 text-[#0F0F11] text-xs font-bold shadow-md shadow-amber-900/20 transition cursor-pointer active:scale-95"
+                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 hover:shadow-purple-900/35 dark:bg-gradient-to-r dark:from-[#E08738] dark:to-[#F59E0B] dark:text-[#0F0F11] dark:shadow-amber-900/20 hover:brightness-105 text-xs font-bold transition cursor-pointer active:scale-95"
               >
                 <Check className="w-3.5 h-3.5" />
                 <span>Apply Filters {activeCount > 0 ? `(${activeCount})` : ""}</span>

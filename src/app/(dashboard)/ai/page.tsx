@@ -61,7 +61,7 @@ export default function AIPage() {
               <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                 PulseAI Studio
               </h1>
-              <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-amber-500/10 text-[#E08738] dark:text-[#FBBF24] border border-amber-500/20">
+              <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-purple-50 text-[#5846A8] border border-purple-200 dark:bg-amber-500/10 dark:text-[#FBBF24] dark:border-amber-500/20">
                 Google Gemini 3.8 Flash
               </span>
             </div>
@@ -72,7 +72,7 @@ export default function AIPage() {
 
           <a
             href="/ai-assistant"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#E08738] to-[#F59E0B] hover:from-[#D97706] hover:to-[#E08738] text-[#0F0F11] font-bold text-xs shadow-md shadow-amber-900/20 transition self-start sm:self-auto"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 dark:bg-gradient-to-r dark:from-[#E08738] dark:to-[#F59E0B] dark:hover:from-[#D97706] dark:hover:to-[#E08738] dark:text-[#0F0F11] dark:shadow-amber-900/20 font-bold text-xs transition self-start sm:self-auto cursor-pointer"
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>Launch Full Gemini AI Studio</span>
@@ -85,7 +85,7 @@ export default function AIPage() {
           {/* Left: Generation Controls */}
           <div className="lg:col-span-6 bg-white dark:bg-[#17171A] rounded-2xl border border-slate-200/90 dark:border-white/7 p-6 shadow-xs">
             <h2 className="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-              <Wand2 className="w-4 h-4 text-[#E08738]" />
+              <Wand2 className="w-4 h-4 text-[#5846A8] dark:text-[#E08738]" />
               <span>Prompt & Parameters</span>
             </h2>
 
@@ -103,7 +103,7 @@ export default function AIPage() {
                       onClick={() => setPlatform(p)}
                       className={`py-2 px-2.5 text-xs font-medium rounded-lg border transition text-center cursor-pointer ${
                         platform === p
-                          ? "bg-amber-500/10 dark:bg-amber-500/15 border-[#E08738] text-[#E08738] dark:text-[#FBBF24] font-semibold"
+                          ? "bg-purple-50 border-[#5846A8] text-[#5846A8] dark:bg-amber-500/15 dark:border-[#E08738] dark:text-[#FBBF24] font-semibold shadow-xs"
                           : "border-slate-200 dark:border-white/7 text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/5"
                       }`}
                     >
@@ -121,7 +121,7 @@ export default function AIPage() {
                 <select
                   value={tone}
                   onChange={(e) => setTone(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#1C1C20] text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#E08738]"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#1C1C20] text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#5846A8] focus:border-[#5846A8] dark:focus:ring-[#E08738] dark:focus:border-[#E08738]"
                 >
                   <option value="Engaging">Engaging & Conversational</option>
                   <option value="Professional">Professional & Corporate</option>
@@ -142,7 +142,7 @@ export default function AIPage() {
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
                   placeholder="e.g. Announcing our new SaaS AI features, highlighting 30% time saved for marketing managers..."
-                  className="w-full p-3 text-xs rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#1C1C20] text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#E08738] resize-none leading-relaxed"
+                  className="w-full p-3 text-xs rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#1C1C20] text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#5846A8] focus:border-[#5846A8] dark:focus:ring-[#E08738] dark:focus:border-[#E08738] resize-none leading-relaxed"
                 />
               </div>
 
@@ -150,7 +150,7 @@ export default function AIPage() {
               <button
                 type="submit"
                 disabled={isGenerating || !topic.trim()}
-                className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#E08738] to-[#F59E0B] hover:from-[#D97706] hover:to-[#E08738] text-[#0F0F11] text-xs font-bold shadow-md shadow-amber-900/20 transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="w-full py-2.5 px-4 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 dark:bg-gradient-to-r dark:from-[#E08738] dark:to-[#F59E0B] dark:hover:from-[#D97706] dark:hover:to-[#E08738] dark:text-[#0F0F11] dark:shadow-amber-900/20 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 active:scale-98"
               >
                 <Sparkles className="w-4 h-4" />
                 <span>{isGenerating ? "Generating Content..." : "Generate with PulseAI"}</span>
@@ -169,9 +169,9 @@ export default function AIPage() {
                   <button
                     type="button"
                     onClick={handleCopy}
-                    className="text-xs font-medium text-[#E08738] hover:text-[#D97706] dark:text-[#FBBF24] flex items-center gap-1 cursor-pointer"
+                    className="text-xs font-medium text-[#5846A8] hover:text-[#48388d] dark:text-[#FBBF24] dark:hover:text-[#E08738] flex items-center gap-1 cursor-pointer"
                   >
-                    {copied ? <Check className="w-3.5 h-3.5 text-amber-500" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copied ? "Copied" : "Copy text"}</span>
                   </button>
                 )}
@@ -183,7 +183,7 @@ export default function AIPage() {
                 </div>
               ) : (
                 <div className="h-48 flex flex-col items-center justify-center text-center text-slate-400 p-6">
-                  <Sparkles className="w-8 h-8 text-amber-500/40 mb-2" />
+                  <Sparkles className="w-8 h-8 text-[#5846A8]/40 dark:text-amber-500/40 mb-2" />
                   <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
                     Your AI copy will appear here.
                   </p>
@@ -203,7 +203,7 @@ export default function AIPage() {
                     sessionStorage.setItem("pulse_draft", generatedResult);
                     window.location.href = "/compose";
                   }}
-                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#E08738] to-[#F59E0B] hover:from-[#D97706] hover:to-[#E08738] text-[#0F0F11] font-bold text-xs shadow-md shadow-amber-900/20 flex items-center gap-1.5 transition cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 dark:bg-gradient-to-r dark:from-[#E08738] dark:to-[#F59E0B] dark:hover:from-[#D97706] dark:hover:to-[#E08738] dark:text-[#0F0F11] dark:shadow-amber-900/20 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer active:scale-98"
                 >
                   <span>Open in Post Composer</span>
                   <ArrowRight className="w-3.5 h-3.5" />

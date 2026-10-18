@@ -2011,7 +2011,7 @@ export function PostComposerModal({
                 type="button"
                 onClick={() => setSendForApproval(!sendForApproval)}
                 className={`w-9 h-5 rounded-full transition-colors relative cursor-pointer ${
-                  sendForApproval ? "bg-[#E08738]" : "bg-slate-200 dark:bg-white/10"
+                  sendForApproval ? "bg-[#5846A8] dark:bg-[#E08738]" : "bg-slate-200 dark:bg-white/10"
                 }`}
               >
                 <span
@@ -2030,7 +2030,7 @@ export function PostComposerModal({
                   name="publishing_opt"
                   checked={publishingOption === "now"}
                   onChange={() => setPublishingOption("now")}
-                  className="accent-[#E08738] w-4 h-4"
+                  className="accent-[#5846A8] dark:accent-[#E08738] w-4 h-4"
                 />
                 <span>Publish Now</span>
               </label>
@@ -2041,7 +2041,7 @@ export function PostComposerModal({
                   name="publishing_opt"
                   checked={publishingOption === "schedule"}
                   onChange={() => setPublishingOption("schedule")}
-                  className="accent-[#E08738] w-4 h-4"
+                  className="accent-[#5846A8] dark:accent-[#E08738] w-4 h-4"
                 />
                 <span>Schedule for a Specific Date</span>
               </label>
@@ -2069,7 +2069,7 @@ export function PostComposerModal({
                   name="publishing_opt"
                   checked={publishingOption === "queue"}
                   onChange={() => setPublishingOption("queue")}
-                  className="accent-[#E08738] w-4 h-4"
+                  className="accent-[#5846A8] dark:accent-[#E08738] w-4 h-4"
                 />
                 <span className="flex items-center gap-1">
                   Add to Queue (your queue slot) <Info className="w-3 h-3 text-slate-400" />
@@ -2082,7 +2082,7 @@ export function PostComposerModal({
                   name="publishing_opt"
                   checked={publishingOption === "smartq"}
                   onChange={() => setPublishingOption("smartq")}
-                  className="accent-[#E08738] w-4 h-4"
+                  className="accent-[#5846A8] dark:accent-[#E08738] w-4 h-4"
                 />
                 <span className="flex items-center gap-1">
                   Choose a Slot (next available queue slot) <Info className="w-3 h-3 text-slate-400" />
@@ -2182,7 +2182,7 @@ export function PostComposerModal({
                 (!content.trim() && media.length === 0 && !attachedUrlData) ||
                 selectedAccountIds.length === 0
               }
-              className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#E08738] to-[#F59E0B] hover:from-[#D97706] hover:to-[#E08738] text-[#0F0F11] font-bold text-xs shadow-md shadow-amber-900/20 hover:shadow-amber-500/25 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
+              className="px-6 py-2 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 hover:shadow-purple-900/35 dark:bg-gradient-to-r dark:from-[#E08738] dark:to-[#F59E0B] dark:hover:from-[#D97706] dark:hover:to-[#E08738] dark:text-[#0F0F11] dark:shadow-amber-900/20 dark:hover:shadow-amber-500/25 font-bold text-xs transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
             >
               {isUploadingMedia ? (
                 <>

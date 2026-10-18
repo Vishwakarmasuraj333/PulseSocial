@@ -843,7 +843,7 @@ export function CommandPalette({
         {/* TOP SEARCH BAR                                           */}
         {/* ======================================================== */}
         <div className="p-4 sm:p-4.5 border-b border-slate-200/80 dark:border-white/7 flex items-center gap-3 bg-slate-50/80 dark:bg-[#111113]">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#E08738] to-[#F59E0B] text-[#0F0F11] flex items-center justify-center shrink-0 shadow-md shadow-amber-900/20 font-bold">
+          <div className="w-10 h-10 rounded-2xl bg-[#5846A8] text-white shadow-md shadow-purple-900/20 dark:bg-gradient-to-br dark:from-[#E08738] dark:to-[#F59E0B] dark:text-[#0F0F11] dark:shadow-amber-900/20 flex items-center justify-center shrink-0 font-bold">
             <Search className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
 

@@ -294,7 +294,7 @@ export default function ComposePage() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-[#f5f3ff] dark:bg-purple-950/20 border border-[#ede9fe] dark:border-purple-800/40">
                   <div>
                     <p className="text-xs font-bold text-slate-900 dark:text-white">No social accounts connected yet.</p>
-                    <p className="text-[11px] text-slate-500">Connect a social channel to author and publish multi-channel updates.</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">Connect a social channel to author and publish multi-channel updates.</p>
                   </div>
                   <Link
                     href="/connections"

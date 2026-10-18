@@ -2130,7 +2130,11 @@ export function PostComposerModal({
 
           {/* ============================================================ */}
           {/* COLUMN 3: Live Platform Post Preview (4 cols)                 */}
-          <div className="lg:col-span-4 p-4 sm:p-5 bg-slate-50/70 dark:bg-[#0B0B0D] overflow-y-auto max-h-[78vh] scrollbar-thin">
+          <div
+            className={`lg:col-span-4 p-4 sm:p-5 bg-slate-50/70 dark:bg-[#0B0B0D] overflow-y-auto max-h-[78vh] scrollbar-thin ${
+              modalActiveTab === "preview" ? "block" : "hidden lg:block"
+            }`}
+          >
             <div>
               <PostPreview
                 accounts={effectiveChannels.filter((c) => selectedAccountIds.includes(c.id))}

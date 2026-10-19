@@ -55,6 +55,7 @@ import {
   Link2,
   FileCode,
   Zap,
+  Video,
 } from "lucide-react";
 import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
 import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
@@ -523,6 +524,12 @@ export function AppLayout({ children }: AppLayoutProps) {
           icon: Bell,
           match: (p: string) => p.startsWith("/notifications") || p.includes("tab=all"),
           badge: unreadNotificationsCount > 0 ? unreadNotificationsCount.toString() : undefined,
+        },
+        {
+          label: "Video Calls",
+          href: "/calls",
+          icon: Video,
+          match: (p: string) => p.startsWith("/calls"),
         },
       ],
     },

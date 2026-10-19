@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,9 +10,10 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
-import { Users, Plus, ShieldCheck, Mail, CheckCircle2, Loader2 } from "lucide-react";
+import { Users, Plus, ShieldCheck, Mail, CheckCircle2, Loader2, Video } from "lucide-react";
 
 export default function TeamPage() {
+  const router = useRouter();
   const { toast } = useToast();
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
@@ -234,9 +236,21 @@ export default function TeamPage() {
                         </td>
 
                         <td className="p-4 text-right">
-                          <Button variant="ghost" size="sm" className="text-xs hover:bg-slate-100 dark:hover:bg-white/10 dark:text-white">
-                            Configure
-                          </Button>
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => router.push(`/calls/call-${m.id}`)}
+                              className="text-xs flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
+                              title={`Start Video Call with ${m.name}`}
+                            >
+                              <Video className="w-3.5 h-3.5" />
+                              <span>Call</span>
+                            </Button>
+                            <Button variant="ghost" size="sm" className="text-xs hover:bg-slate-100 dark:hover:bg-white/10 dark:text-white">
+                              Configure
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))}

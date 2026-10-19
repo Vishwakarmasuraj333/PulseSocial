@@ -67,7 +67,8 @@ export class PinterestProvider implements SocialProvider {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || "Failed to exchange authorization code with Pinterest");
+      const errMsg = err.message || err.error_description || err.error || "Failed to exchange authorization code with Pinterest";
+      throw new Error(`Pinterest OAuth Error: ${errMsg}`);
     }
 
     const data = await res.json();
@@ -75,7 +76,7 @@ export class PinterestProvider implements SocialProvider {
       accessToken: data.access_token,
       expiresIn: data.expires_in,
       refreshToken: data.refresh_token,
-      scopes: (data.scope || "").split(","),
+      scopes: data.scope ? data.scope.split(/[\s,]+/).filter(Boolean) : [],
     };
   }
 

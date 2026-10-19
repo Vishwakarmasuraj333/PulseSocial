@@ -17,6 +17,7 @@ import { runStudioComposerAndHubUnitTests } from "./unit/studio-composer-and-hub
 import { runFooterAndLinkedInPreviewUnitTests } from "./unit/footer-and-linkedin-preview.test";
 import { runHeaderAndDemoRemovalUnitTests } from "./unit/header-and-demo-removal.test";
 import { runPostsQueueSingleSidebarUnitTests } from "./unit/posts-queue-single-sidebar.test";
+import { runVideoCallsUnitTests } from "./unit/video-calls.test";
 import { prisma } from "../src/lib/prisma";
 
 async function main() {
@@ -26,7 +27,7 @@ async function main() {
 
   const startTime = Date.now();
   let passedSuites = 0;
-  const totalSuites = 19;
+  const totalSuites = 20;
 
   const baseUrl = process.env.BASE_URL || (process.env.APP_URL || "https://pulsesocial1.vercel.app");
   process.env.BASE_URL = baseUrl;
@@ -91,6 +92,10 @@ async function main() {
 
     // Suite 19: Posts & Queue Single Sidebar & Unified Workspace Verification
     await runPostsQueueSingleSidebarUnitTests();
+    passedSuites++;
+
+    // Suite 20: WebRTC Video Calling, Conversations & Pinterest OAuth Verification
+    await runVideoCallsUnitTests();
     passedSuites++;
 
     // HTTP Integration Suites

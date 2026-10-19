@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { InviteTeamModal } from "@/components/team/InviteTeamModal";
 import { useToast } from "@/components/ui/toast";
@@ -21,6 +22,7 @@ import {
   Send,
   ThumbsUp,
   MessageCircle,
+  Video,
 } from "lucide-react";
 
 interface FeedItem {
@@ -34,6 +36,7 @@ interface FeedItem {
 }
 
 export default function CollaboratePage() {
+  const router = useRouter();
   const { toast } = useToast();
   const { activeBrand } = useBrand();
 
@@ -258,14 +261,22 @@ export default function CollaboratePage() {
                     Bring your team on board by inviting them here.
                   </h3>
 
-                  {/* Action Pill Button */}
-                  <div className="pt-1">
+                  {/* Action Pill Buttons */}
+                  <div className="pt-1 flex flex-wrap items-center justify-center gap-3">
                     <button
                       type="button"
                       onClick={() => setIsInviteModalOpen(true)}
                       className="px-6 py-2 rounded-full border border-slate-300 dark:border-white/10 hover:border-slate-400 bg-white dark:bg-[#111113] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-white text-xs font-semibold shadow-2xs transition active:scale-95 cursor-pointer"
                     >
                       Invite Team Members
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => router.push("/calls")}
+                      className="px-6 py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-sm transition active:scale-95 cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Video className="w-3.5 h-3.5" />
+                      <span>Start Video Call</span>
                     </button>
                   </div>
                 </div>

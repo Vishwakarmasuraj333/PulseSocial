@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
 import { useToast } from "@/components/ui/toast";
@@ -20,6 +20,7 @@ import {
   Sparkles,
   ArrowLeft,
   X,
+  Video,
 } from "lucide-react";
 
 interface Message {
@@ -41,6 +42,7 @@ interface Thread {
 }
 
 function MessagesContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const requestedUser = searchParams.get("user");
   const { toast } = useToast();
@@ -344,6 +346,15 @@ function MessagesContent() {
                 </div>
 
                 <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => router.push(`/calls/chat-${encodeURIComponent(activeThread.id)}`)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-xs font-medium transition-all"
+                    title={`Start Live Video Call with ${activeThread.name}`}
+                  >
+                    <Video className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Video Call</span>
+                  </button>
                   <button
                     type="button"
                     onClick={() => setSelectedThreadId(null)}

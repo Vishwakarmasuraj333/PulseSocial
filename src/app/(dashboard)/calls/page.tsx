@@ -617,15 +617,15 @@ export default function WhatsAppCallsHubPage() {
                 <img
                   src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
                   alt="Profile"
-                  className="w-10 h-10 rounded-full object-cover ring-2 ring-emerald-500/30"
+                  className="w-10 h-10 rounded-full object-cover ring-2 ring-[#5846A8]/30 dark:ring-amber-400/40"
                 />
-                <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-[#202C33]" />
+                <span className="absolute bottom-0 right-0 w-3 h-3 bg-[#5846A8] dark:bg-amber-400 rounded-full border-2 border-white dark:border-[#202C33]" />
               </div>
               <div>
                 <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-tight">
                   PulseSocial Hub
                 </h2>
-                <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                <span className="text-[11px] font-semibold text-[#5846A8] dark:text-amber-400">
                   Calls &amp; Conversations
                 </span>
               </div>
@@ -636,7 +636,7 @@ export default function WhatsAppCallsHubPage() {
               <button
                 type="button"
                 onClick={() => startVoiceCall()}
-                className="p-2 rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition cursor-pointer"
+                className="p-2 rounded-full text-slate-600 dark:text-slate-300 hover:text-[#5846A8] dark:hover:text-amber-400 hover:bg-purple-50 dark:hover:bg-amber-500/10 transition cursor-pointer"
                 title="Quick Voice Call"
               >
                 <Phone className="w-5 h-5" />
@@ -644,7 +644,7 @@ export default function WhatsAppCallsHubPage() {
               <button
                 type="button"
                 onClick={() => startVideoCall()}
-                className="p-2 rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition cursor-pointer"
+                className="p-2 rounded-full text-slate-600 dark:text-slate-300 hover:text-[#5846A8] dark:hover:text-amber-400 hover:bg-purple-50 dark:hover:bg-amber-500/10 transition cursor-pointer"
                 title="Quick Video Call"
               >
                 <Video className="w-5 h-5" />
@@ -659,7 +659,7 @@ export default function WhatsAppCallsHubPage() {
               onClick={() => setActiveTab("chats")}
               className={`flex-1 py-3 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === "chats"
-                  ? "border-[#00A884] text-[#00A884]"
+                  ? "border-[#5846A8] text-[#5846A8] dark:border-amber-400 dark:text-amber-400"
                   : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
               }`}
             >
@@ -671,13 +671,13 @@ export default function WhatsAppCallsHubPage() {
               onClick={() => setActiveTab("calls")}
               className={`flex-1 py-3 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === "calls"
-                  ? "border-[#00A884] text-[#00A884]"
+                  ? "border-[#5846A8] text-[#5846A8] dark:border-amber-400 dark:text-amber-400"
                   : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
               }`}
             >
               <PhoneCall className="w-4 h-4" />
               <span>CALLS</span>
-              <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px]">
+              <span className="px-1.5 py-0.2 rounded-full bg-purple-100 text-[#5846A8] dark:bg-amber-400/20 dark:text-amber-300 text-[10px] font-bold">
                 {callLogs.length}
               </span>
             </button>
@@ -686,7 +686,7 @@ export default function WhatsAppCallsHubPage() {
               onClick={() => setActiveTab("rooms")}
               className={`flex-1 py-3 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === "rooms"
-                  ? "border-[#00A884] text-[#00A884]"
+                  ? "border-[#5846A8] text-[#5846A8] dark:border-amber-400 dark:text-amber-400"
                   : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
               }`}
             >
@@ -704,7 +704,7 @@ export default function WhatsAppCallsHubPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search or start new conversation..."
-                className="w-full pl-9 pr-4 py-1.5 text-xs rounded-lg bg-[#F0F2F5] dark:bg-[#202C33] text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none focus:ring-1 focus:ring-emerald-500 transition"
+                className="w-full pl-9 pr-4 py-1.5 text-xs rounded-lg bg-[#F0F2F5] dark:bg-[#202C33] text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none focus:ring-1 focus:ring-[#5846A8] dark:focus:ring-amber-400 transition"
               />
             </div>
           </div>
@@ -721,8 +721,8 @@ export default function WhatsAppCallsHubPage() {
                     onClick={() => setSelectedContactId(contact.id)}
                     className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition ${
                       isSelected
-                        ? "bg-[#F0F2F5] dark:bg-[#2A3942]"
-                        : "hover:bg-slate-50 dark:hover:bg-[#202C33]"
+                        ? "bg-purple-50/80 dark:bg-[#201C14] border-l-3 border-[#5846A8] dark:border-amber-400"
+                        : "hover:bg-slate-50 dark:hover:bg-[#1A2228]"
                     }`}
                   >
                     <div className="relative shrink-0">
@@ -732,7 +732,7 @@ export default function WhatsAppCallsHubPage() {
                         className="w-12 h-12 rounded-full object-cover"
                       />
                       {contact.status === "online" && (
-                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-[#111B21]" />
+                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-[#5846A8] dark:bg-amber-400 rounded-full border-2 border-white dark:border-[#111B21]" />
                       )}
                     </div>
 
@@ -755,7 +755,7 @@ export default function WhatsAppCallsHubPage() {
                             : lastMsg?.text || contact.role}
                         </p>
                         {contact.unreadCount > 0 && (
-                          <span className="w-5 h-5 rounded-full bg-[#25D366] text-white text-[10px] font-bold flex items-center justify-center shrink-0">
+                          <span className="w-5 h-5 rounded-full bg-[#5846A8] dark:bg-amber-400 text-white dark:text-slate-950 text-[10px] font-bold flex items-center justify-center shrink-0">
                             {contact.unreadCount}
                           </span>
                         )}
@@ -812,7 +812,7 @@ export default function WhatsAppCallsHubPage() {
                           const contact = contacts.find((c) => c.id === log.contactId);
                           startVoiceCall(contact);
                         }}
-                        className="p-2 rounded-full text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition cursor-pointer"
+                        className="p-2 rounded-full text-[#5846A8] dark:text-amber-400 hover:bg-purple-50 dark:hover:bg-amber-400/10 transition cursor-pointer"
                         title="Call Back (Voice)"
                       >
                         <Phone className="w-4 h-4" />
@@ -824,7 +824,7 @@ export default function WhatsAppCallsHubPage() {
                           const contact = contacts.find((c) => c.id === log.contactId);
                           startVideoCall(contact);
                         }}
-                        className="p-2 rounded-full text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition cursor-pointer"
+                        className="p-2 rounded-full text-[#5846A8] dark:text-amber-400 hover:bg-purple-50 dark:hover:bg-amber-400/10 transition cursor-pointer"
                         title="Call Back (Video)"
                       >
                         <Video className="w-4 h-4" />
@@ -839,16 +839,16 @@ export default function WhatsAppCallsHubPage() {
           {/* TAB 3: INSTANT WebRTC ROOMS */}
           {activeTab === "rooms" && (
             <div className="flex-1 p-5 space-y-4 overflow-y-auto">
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-lg shadow-emerald-600/20">
-                <Radio className="w-6 h-6 mb-2 animate-pulse" />
-                <h3 className="font-bold text-sm">Instant Video Conference</h3>
-                <p className="text-xs text-white/80 mt-1 leading-relaxed">
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-[#4E3B99] via-[#5846A8] to-[#6C55C4] dark:bg-gradient-to-br dark:from-[#2E220F] dark:to-[#1A1408] dark:border dark:border-amber-500/30 text-white shadow-lg shadow-purple-600/20 dark:shadow-amber-500/10">
+                <Radio className="w-6 h-6 mb-2 text-white dark:text-amber-400 animate-pulse" />
+                <h3 className="font-bold text-sm text-white dark:text-amber-200">Instant Video Conference</h3>
+                <p className="text-xs text-white/80 dark:text-amber-200/70 mt-1 leading-relaxed">
                   Start or enter a secure WebRTC meeting room for multi-member standups.
                 </p>
                 <button
                   type="button"
                   onClick={() => handleJoinOrCreateRoom(`pulse-${Math.random().toString(36).substring(2, 7)}`)}
-                  className="mt-3 px-4 py-2 bg-white text-emerald-800 rounded-xl font-bold text-xs shadow-md hover:bg-emerald-50 transition cursor-pointer flex items-center gap-2"
+                  className="mt-3 px-4 py-2 bg-white text-[#5846A8] dark:bg-amber-400 dark:text-slate-950 rounded-xl font-bold text-xs shadow-md hover:bg-purple-50 dark:hover:bg-amber-300 transition cursor-pointer flex items-center gap-2"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Start New Meeting</span>
@@ -865,12 +865,12 @@ export default function WhatsAppCallsHubPage() {
                     value={roomCodeInput}
                     onChange={(e) => setRoomCodeInput(e.target.value)}
                     placeholder="e.g. pulse-standup"
-                    className="flex-1 px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-white/10 bg-[#F0F2F5] dark:bg-[#202C33] text-slate-800 dark:text-slate-100 outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="flex-1 px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-white/10 bg-[#F0F2F5] dark:bg-[#202C33] text-slate-800 dark:text-slate-100 outline-none focus:ring-1 focus:ring-[#5846A8] dark:focus:ring-amber-400"
                   />
                   <button
                     type="button"
                     onClick={() => handleJoinOrCreateRoom()}
-                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition cursor-pointer"
+                    className="px-4 py-2 rounded-xl bg-[#5846A8] hover:bg-[#4E3B99] dark:bg-amber-400 dark:hover:bg-amber-300 text-white dark:text-slate-950 font-bold text-xs transition cursor-pointer"
                   >
                     Join
                   </button>
@@ -887,10 +887,10 @@ export default function WhatsAppCallsHubPage() {
                       key={code}
                       type="button"
                       onClick={() => handleJoinOrCreateRoom(code)}
-                      className="w-full px-3 py-2 text-left rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-xs font-semibold text-slate-700 dark:text-slate-200 transition flex items-center justify-between cursor-pointer"
+                      className="w-full px-3 py-2 text-left rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-purple-50 dark:hover:bg-amber-500/10 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-[#5846A8] dark:hover:text-amber-300 transition flex items-center justify-between cursor-pointer"
                     >
                       <span className="font-mono">#{code}</span>
-                      <Video className="w-3.5 h-3.5 text-emerald-500" />
+                      <Video className="w-3.5 h-3.5 text-[#5846A8] dark:text-amber-400" />
                     </button>
                   ))}
                 </div>
@@ -913,7 +913,7 @@ export default function WhatsAppCallsHubPage() {
                   className="w-10 h-10 rounded-full object-cover"
                 />
                 {activeContact.status === "online" && (
-                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-white dark:border-[#202C33]" />
+                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#5846A8] dark:bg-amber-400 rounded-full border border-white dark:border-[#202C33]" />
                 )}
               </div>
 
@@ -922,11 +922,13 @@ export default function WhatsAppCallsHubPage() {
                   {activeContact.name}
                 </h3>
                 <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                  {isTyping
-                    ? "typing..."
-                    : activeContact.status === "online"
-                    ? "online"
-                    : activeContact.lastSeen || "offline"}
+                  {isTyping ? (
+                    <span className="text-[#5846A8] dark:text-amber-400 font-semibold">typing...</span>
+                  ) : activeContact.status === "online" ? (
+                    <span className="text-[#5846A8] dark:text-amber-400 font-semibold">online</span>
+                  ) : (
+                    activeContact.lastSeen || "offline"
+                  )}
                 </p>
               </div>
             </div>
@@ -936,7 +938,7 @@ export default function WhatsAppCallsHubPage() {
               <button
                 type="button"
                 onClick={() => startVoiceCall()}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-white/10 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border border-slate-200 dark:border-white/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold transition shadow-xs cursor-pointer active:scale-95"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-white/10 hover:bg-purple-50 dark:hover:bg-amber-500/15 border border-purple-200/80 dark:border-amber-500/30 text-[#5846A8] dark:text-amber-300 text-xs font-bold transition shadow-xs cursor-pointer active:scale-95"
                 title="Start WhatsApp Voice Call"
               >
                 <Phone className="w-4 h-4" />
@@ -946,7 +948,7 @@ export default function WhatsAppCallsHubPage() {
               <button
                 type="button"
                 onClick={() => startVideoCall()}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-md shadow-emerald-600/25 cursor-pointer active:scale-95"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#4E3B99] via-[#5846A8] to-[#6C55C4] hover:opacity-95 dark:from-amber-400 dark:to-yellow-500 text-white dark:text-slate-950 text-xs font-bold transition shadow-md shadow-purple-600/25 dark:shadow-[0_0_15px_rgba(251,191,36,0.3)] cursor-pointer active:scale-95"
                 title="Start WhatsApp Video Call"
               >
                 <Video className="w-4 h-4" />
@@ -1000,9 +1002,9 @@ export default function WhatsAppCallsHubPage() {
                   <div key={msg.id} className="flex justify-center my-2">
                     <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 dark:bg-[#182229] border border-slate-200/60 dark:border-white/10 text-xs text-slate-700 dark:text-slate-300 shadow-xs">
                       {msg.callType === "voice" ? (
-                        <PhoneCall className="w-3.5 h-3.5 text-emerald-500" />
+                        <PhoneCall className="w-3.5 h-3.5 text-[#5846A8] dark:text-amber-400" />
                       ) : (
-                        <Video className="w-3.5 h-3.5 text-emerald-500" />
+                        <Video className="w-3.5 h-3.5 text-[#5846A8] dark:text-amber-400" />
                       )}
                       <span className="font-semibold">
                         {msg.callType === "voice" ? "Voice call ended" : "Video call ended"}
@@ -1028,21 +1030,21 @@ export default function WhatsAppCallsHubPage() {
                   <div
                     className={`max-w-[78%] sm:max-w-[65%] rounded-2xl px-3.5 py-2 shadow-xs text-xs relative leading-relaxed ${
                       isMe
-                        ? "bg-[#D9FDD3] dark:bg-[#005C4B] text-slate-900 dark:text-white rounded-tr-xs"
-                        : "bg-white dark:bg-[#202C33] text-slate-900 dark:text-white rounded-tl-xs"
+                        ? "bg-[#EBE7FF] dark:bg-gradient-to-br dark:from-[#2B2315] dark:to-[#1E180E] text-[#221648] dark:text-amber-100 border border-purple-200/70 dark:border-amber-500/30 rounded-tr-xs"
+                        : "bg-white dark:bg-[#1E272D] text-slate-900 dark:text-slate-100 rounded-tl-xs"
                     }`}
                   >
                     {msg.type === "voice" ? (
                       <div className="flex items-center gap-3 py-1 min-w-[200px]">
                         <button
                           type="button"
-                          className="w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center transition cursor-pointer"
+                          className="w-8 h-8 rounded-full bg-[#5846A8] hover:bg-[#4E3B99] dark:bg-amber-400 dark:hover:bg-amber-300 text-white dark:text-slate-950 flex items-center justify-center transition cursor-pointer"
                         >
                           <Play className="w-3.5 h-3.5 ml-0.5" />
                         </button>
                         <div className="flex-1 space-y-1">
                           <div className="h-1 bg-slate-300 dark:bg-white/20 rounded-full overflow-hidden">
-                            <div className="w-1/3 h-full bg-emerald-500" />
+                            <div className="w-1/3 h-full bg-[#5846A8] dark:bg-amber-400" />
                           </div>
                           <span className="text-[10px] font-mono text-slate-500 dark:text-slate-300">
                             {msg.duration || "0:14"}
@@ -1058,7 +1060,7 @@ export default function WhatsAppCallsHubPage() {
                         {msg.timestamp}
                       </span>
                       {isMe && (
-                        <CheckCheck className="w-3.5 h-3.5 text-blue-500 dark:text-emerald-300" />
+                        <CheckCheck className="w-3.5 h-3.5 text-[#5846A8] dark:text-amber-400" />
                       )}
                     </div>
                   </div>
@@ -1069,9 +1071,9 @@ export default function WhatsAppCallsHubPage() {
             {isTyping && (
               <div className="flex justify-start">
                 <div className="px-3.5 py-2 rounded-2xl bg-white dark:bg-[#202C33] text-xs text-slate-500 dark:text-slate-400 shadow-xs flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce" />
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce [animation-delay:0.2s]" />
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce [animation-delay:0.4s]" />
+                  <span className="w-2 h-2 rounded-full bg-[#5846A8] dark:bg-amber-400 animate-bounce" />
+                  <span className="w-2 h-2 rounded-full bg-[#5846A8] dark:bg-amber-400 animate-bounce [animation-delay:0.2s]" />
+                  <span className="w-2 h-2 rounded-full bg-[#5846A8] dark:bg-amber-400 animate-bounce [animation-delay:0.4s]" />
                   <span className="text-[11px] ml-1">{activeContact.name} is typing...</span>
                 </div>
               </div>
@@ -1129,13 +1131,13 @@ export default function WhatsAppCallsHubPage() {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder="Type a message..."
-                className="flex-1 py-2 px-4 rounded-xl bg-white dark:bg-[#2A3942] text-slate-900 dark:text-white placeholder:text-slate-400 text-xs outline-none focus:ring-1 focus:ring-emerald-500 transition"
+                className="flex-1 py-2 px-4 rounded-xl bg-white dark:bg-[#2A3942] text-slate-900 dark:text-white placeholder:text-slate-400 text-xs outline-none focus:ring-1 focus:ring-[#5846A8] dark:focus:ring-amber-400 transition"
               />
 
               {inputMessage.trim() ? (
                 <button
                   type="submit"
-                  className="p-2.5 rounded-full bg-[#00A884] hover:bg-[#008f70] text-white transition shadow-sm cursor-pointer active:scale-95 flex items-center justify-center"
+                  className="p-2.5 rounded-full bg-[#5846A8] hover:bg-[#4E3B99] dark:bg-gradient-to-r dark:from-amber-400 dark:to-yellow-500 text-white dark:text-slate-950 transition shadow-sm cursor-pointer active:scale-95 flex items-center justify-center"
                   title="Send message"
                 >
                   <Send className="w-4 h-4" />
@@ -1162,7 +1164,7 @@ export default function WhatsAppCallsHubPage() {
                       [activeContact.id]: [...(prev[activeContact.id] || []), voiceMsg],
                     }));
                   }}
-                  className="p-2.5 rounded-full bg-[#00A884] hover:bg-[#008f70] text-white transition shadow-sm cursor-pointer active:scale-95 flex items-center justify-center"
+                  className="p-2.5 rounded-full bg-[#5846A8] hover:bg-[#4E3B99] dark:bg-gradient-to-r dark:from-amber-400 dark:to-yellow-500 text-white dark:text-slate-950 transition shadow-sm cursor-pointer active:scale-95 flex items-center justify-center"
                   title="Send voice note"
                 >
                   <Mic className="w-4 h-4" />
@@ -1180,7 +1182,7 @@ export default function WhatsAppCallsHubPage() {
         <div className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-2xl flex flex-col justify-between items-center py-12 px-4 animate-in fade-in duration-200 select-none">
           {/* Top header */}
           <div className="text-center space-y-1">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-emerald-400 text-xs font-semibold">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#5846A8]/25 text-purple-300 dark:bg-amber-400/20 dark:text-amber-300 text-xs font-semibold">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>WhatsApp End-to-End Encrypted Voice Call</span>
             </span>
@@ -1189,12 +1191,12 @@ export default function WhatsAppCallsHubPage() {
           {/* Center Contact Info with Pulsing Rings */}
           <div className="flex flex-col items-center text-center">
             <div className="relative mb-6">
-              <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping [animation-duration:2s]" />
-              <div className="absolute -inset-4 rounded-full bg-emerald-500/10 animate-pulse" />
+              <div className="absolute inset-0 rounded-full bg-[#5846A8]/30 dark:bg-amber-400/20 animate-ping [animation-duration:2s]" />
+              <div className="absolute -inset-4 rounded-full bg-[#5846A8]/15 dark:bg-amber-400/10 animate-pulse" />
               <img
                 src={activeContact.avatar}
                 alt={activeContact.name}
-                className="w-32 h-32 rounded-full object-cover relative z-10 ring-4 ring-emerald-500 shadow-2xl"
+                className="w-32 h-32 rounded-full object-cover relative z-10 ring-4 ring-[#5846A8] dark:ring-amber-400 shadow-2xl"
               />
             </div>
 
@@ -1203,7 +1205,7 @@ export default function WhatsAppCallsHubPage() {
             </h2>
             <p className="text-xs font-medium text-slate-400 mt-1">{activeContact.role}</p>
 
-            <div className="mt-4 px-4 py-1.5 rounded-full bg-white/10 text-emerald-300 font-mono text-sm font-bold tracking-wider">
+            <div className="mt-4 px-4 py-1.5 rounded-full bg-white/10 text-purple-300 dark:text-amber-300 font-mono text-sm font-bold tracking-wider">
               {voiceCallStatus === "ringing" ? "Ringing..." : formatDuration(callTimer)}
             </div>
           </div>
@@ -1282,12 +1284,12 @@ export default function WhatsAppCallsHubPage() {
               <img
                 src={activeContact.avatar}
                 alt={activeContact.name}
-                className="w-32 h-32 sm:w-40 sm:h-40 rounded-full object-cover ring-4 ring-emerald-500/50 shadow-2xl mb-4"
+                className="w-32 h-32 sm:w-40 sm:h-40 rounded-full object-cover ring-4 ring-[#5846A8]/60 dark:ring-amber-400/60 shadow-2xl mb-4"
               />
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
                 {activeContact.name}
               </h2>
-              <p className="text-xs text-emerald-400 mt-1 font-mono">
+              <p className="text-xs text-purple-300 dark:text-amber-400 mt-1 font-mono">
                 {videoCallStatus === "connecting"
                   ? "Connecting live video..."
                   : `Live Video (${formatDuration(videoCallTimer)})`}

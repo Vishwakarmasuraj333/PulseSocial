@@ -56,6 +56,8 @@ import {
   FileCode,
   Zap,
   Video,
+  PhoneCall,
+  Phone,
 } from "lucide-react";
 import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
 import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
@@ -526,9 +528,9 @@ export function AppLayout({ children }: AppLayoutProps) {
           badge: unreadNotificationsCount > 0 ? unreadNotificationsCount.toString() : undefined,
         },
         {
-          label: "Video Calls",
+          label: "Calls & Chat",
           href: "/calls",
-          icon: Video,
+          icon: PhoneCall,
           match: (p: string) => p.startsWith("/calls"),
         },
       ],

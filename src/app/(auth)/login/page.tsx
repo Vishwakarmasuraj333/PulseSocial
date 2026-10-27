@@ -20,6 +20,7 @@ import { useToast } from "@/components/ui/toast";
 import { OtpSixBoxInput } from "@/components/auth/OtpSixBoxInput";
 import { OtpTopBanner, maskEmail } from "@/components/auth/OtpTopBanner";
 import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
+import { ThemeSwitcher } from "@/components/layout/ThemeSwitcher";
 import {
   FacebookIcon,
   InstagramIcon,
@@ -438,37 +439,41 @@ export default function LoginPage() {
         onClose={() => setShowOtpBanner(false)}
       />
 
-      <div className="min-h-screen w-full flex flex-col md:flex-row bg-white font-sans selection:bg-purple-600 selection:text-white">
+      <div className="min-h-screen w-full flex flex-col md:flex-row bg-white dark:bg-[#0E1117] font-sans selection:bg-purple-600 selection:text-white transition-colors duration-200">
         {/* ============================================================ */}
         {/* LEFT COLUMN: Clean Form Panel matching user's Image 1         */}
         {/* ============================================================ */}
-        <div className="w-full md:w-1/2 flex flex-col justify-between p-6 sm:p-12 lg:p-16 min-h-screen bg-white">
-          {/* Brand Logo Header */}
-          <div className="flex items-center justify-between">
+        <div className="w-full md:w-1/2 flex flex-col justify-between p-6 sm:p-12 lg:p-16 min-h-screen bg-white dark:bg-[#0E1117] transition-colors duration-200">
+          {/* Brand Logo & Controls Header */}
+          <div className="flex items-center justify-between gap-3">
             <PulseSocialLogo size="md" variant="full" href="/" />
 
-            {authStep === "otp" ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setAuthStep("credentials");
-                  setErrorMessage("");
-                }}
-                className="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 hover:text-slate-900 transition cursor-pointer"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Back to sign in</span>
-              </button>
-            ) : (
-              <Link
-                href="/signup"
-                onClick={handleNavigateToSignup}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#5846a8] transition group"
-              >
-                <span>Don&apos;t have an account? <strong className="text-[#5846a8] group-hover:underline">Sign up</strong></span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-            )}
+            <div className="flex items-center gap-3">
+              <ThemeSwitcher />
+
+              {authStep === "otp" ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthStep("credentials");
+                    setErrorMessage("");
+                  }}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition cursor-pointer px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Back to sign in</span>
+                </button>
+              ) : (
+                <Link
+                  href="/signup"
+                  onClick={handleNavigateToSignup}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-[#5846a8] dark:hover:text-purple-300 transition group"
+                >
+                  <span>Don&apos;t have an account? <strong className="text-[#5846a8] dark:text-purple-400 group-hover:underline">Sign up</strong></span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              )}
+            </div>
           </div>
 
           {/* Form Content Area */}
@@ -476,11 +481,11 @@ export default function LoginPage() {
             {/* Error Message Alert */}
             {errorMessage && (
               <div
-                className={`mb-5 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2 animate-in fade-in duration-150 ${
+                className={`mb-5 p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2 animate-in fade-in duration-150 ${
                   shakeError ? "animate-shake" : ""
                 }`}
               >
-                <XCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                <XCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
                 <span className="leading-snug">{errorMessage}</span>
               </div>
             )}
@@ -491,29 +496,29 @@ export default function LoginPage() {
             {authStep === "credentials" && (
               <div className="animate-in fade-in duration-200">
                 {/* Switcher Pills between Sign In and Sign Up */}
-                <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl mb-5 w-fit border border-slate-200/60">
-                  <span className="px-3.5 py-1.5 rounded-lg bg-white text-slate-900 font-bold text-xs shadow-xs">
+                <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-[#1A1D27] rounded-xl mb-5 w-fit border border-slate-200/60 dark:border-white/10">
+                  <span className="px-3.5 py-1.5 rounded-lg bg-white dark:bg-[#262A38] text-slate-900 dark:text-white font-bold text-xs shadow-xs border border-transparent dark:border-white/10">
                     Sign In
                   </span>
                   <Link
                     href="/signup"
                     onClick={handleNavigateToSignup}
-                    className="px-3.5 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 font-semibold text-xs transition inline-flex items-center gap-1"
+                    className="px-3.5 py-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-semibold text-xs transition inline-flex items-center gap-1"
                   >
                     <span>Sign Up</span>
-                    <ArrowRight className="w-3 h-3 text-slate-400" />
+                    <ArrowRight className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                   </Link>
                 </div>
 
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                   Welcome back
                 </h1>
-                <p className="text-sm text-slate-500 mt-1 mb-5 font-normal">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 mb-5 font-normal">
                   Sign in to access your PulseSocial workspace
                 </p>
 
                 {/* Professional Auth Method Switcher Tabs */}
-                <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-6 border border-slate-200/80">
+                <div className="flex p-1 bg-slate-100 dark:bg-[#1A1D27] rounded-xl mb-6 border border-slate-200/80 dark:border-white/10">
                   <button
                     type="button"
                     onClick={() => {
@@ -522,8 +527,8 @@ export default function LoginPage() {
                     }}
                     className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                       loginMethod === "password"
-                        ? "bg-white text-slate-900 shadow-sm"
-                        : "text-slate-500 hover:text-slate-800"
+                        ? "bg-white dark:bg-[#262A38] text-slate-900 dark:text-white shadow-xs border border-transparent dark:border-white/10"
+                        : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                     }`}
                   >
                     Password Sign In
@@ -536,8 +541,8 @@ export default function LoginPage() {
                     }}
                     className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                       loginMethod === "otp"
-                        ? "bg-white text-slate-900 shadow-sm"
-                        : "text-slate-500 hover:text-slate-800"
+                        ? "bg-white dark:bg-[#262A38] text-slate-900 dark:text-white shadow-xs border border-transparent dark:border-white/10"
+                        : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                     }`}
                   >
                     Sign In with Email OTP
@@ -549,8 +554,8 @@ export default function LoginPage() {
                   <form onSubmit={handleLoginSubmit} className="space-y-4">
                     {/* Email address input */}
                     <div>
-                      <label className="block text-sm font-semibold text-slate-800 mb-1.5">
-                        Email address
+                      <label className="block text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1.5">
+                        Email Address
                       </label>
                       <input
                         type="email"
@@ -559,13 +564,13 @@ export default function LoginPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Enter your email"
-                        className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#5846a8] focus:ring-2 focus:ring-[#5846a8]/20 transition"
+                        className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-[#151821] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-[#5846a8] dark:focus:border-[#7B61FF] focus:ring-2 focus:ring-[#5846a8]/20 dark:focus:ring-[#7B61FF]/30 transition"
                       />
                     </div>
 
                     {/* Password input */}
                     <div>
-                      <label className="block text-sm font-semibold text-slate-800 mb-1.5">
+                      <label className="block text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1.5">
                         Password
                       </label>
                       <div className="relative">
@@ -574,13 +579,13 @@ export default function LoginPage() {
                           required
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          placeholder="••••••••"
-                          className="w-full px-3.5 py-2.5 pr-10 text-sm rounded-lg border border-slate-300 text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#5846a8] focus:ring-2 focus:ring-[#5846a8]/20 transition"
+                          placeholder="Enter your password"
+                          className="w-full px-3.5 py-2.5 pr-10 text-sm rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-[#151821] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-[#5846a8] dark:focus:border-[#7B61FF] focus:ring-2 focus:ring-[#5846a8]/20 dark:focus:ring-[#7B61FF]/30 transition"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-200 p-1 cursor-pointer"
                           title={showPassword ? "Hide password" : "Show password"}
                         >
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -595,16 +600,16 @@ export default function LoginPage() {
                           type="checkbox"
                           checked={rememberMe}
                           onChange={(e) => setRememberMe(e.target.checked)}
-                          className="w-4 h-4 rounded border-slate-300 text-[#5846a8] focus:ring-[#5846a8] cursor-pointer"
+                          className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-[#151821] text-[#5846a8] focus:ring-[#5846a8] cursor-pointer"
                         />
-                        <span className="text-xs text-slate-600 font-medium">Remember for 30 days</span>
+                        <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">Remember for 30 days</span>
                       </label>
 
                       <Link
                         href="/forgot-password"
-                        className="text-xs text-[#8F74BD] font-semibold hover:underline"
+                        className="text-xs text-[#5846A8] dark:text-purple-400 font-semibold hover:underline"
                       >
-                        Forgot password
+                        Forgot password?
                       </Link>
                     </div>
 
@@ -612,15 +617,15 @@ export default function LoginPage() {
                     <button
                       type="submit"
                       disabled={isLoading || !email.trim() || !password}
-                      className="w-full py-2.5 px-4 mt-2 rounded-lg bg-[#5846A8] hover:bg-[#48378E] text-white text-sm font-semibold shadow-md transition active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                      className="w-full py-2.5 px-4 mt-2 rounded-lg bg-[#5846A8] hover:bg-[#48378E] text-white text-sm font-bold shadow-md shadow-purple-600/25 transition active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
                     >
                       {isLoading ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Verifying & Sending OTP...</span>
+                          <span>Signing in...</span>
                         </>
                       ) : (
-                        <span>Sign in (with Email OTP)</span>
+                        <span>Sign In</span>
                       )}
                     </button>
 
@@ -630,7 +635,7 @@ export default function LoginPage() {
                       onClick={() => {
                         window.location.href = "/api/auth/google";
                       }}
-                      className="w-full py-2.5 px-4 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold shadow-2xs transition flex items-center justify-center gap-2.5 cursor-pointer"
+                      className="w-full py-2.5 px-4 rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-[#151821] hover:bg-slate-50 dark:hover:bg-[#1C202C] text-slate-700 dark:text-slate-200 text-sm font-semibold shadow-2xs transition flex items-center justify-center gap-2.5 cursor-pointer"
                     >
                       <svg width="18" height="18" viewBox="0 0 24 24">
                         <path
@@ -663,8 +668,8 @@ export default function LoginPage() {
                     className="space-y-4"
                   >
                     <div>
-                      <label className="block text-sm font-semibold text-slate-800 mb-1.5">
-                        Your registered email address
+                      <label className="block text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1.5">
+                        Your Registered Email Address
                       </label>
                       <input
                         type="email"
@@ -673,23 +678,23 @@ export default function LoginPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Enter your email"
-                        className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#5846a8] focus:ring-2 focus:ring-[#5846a8]/20 transition"
+                        className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-[#151821] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-[#5846a8] dark:focus:border-[#7B61FF] focus:ring-2 focus:ring-[#5846a8]/20 dark:focus:ring-[#7B61FF]/30 transition"
                       />
                     </div>
 
-                    <p className="text-xs text-slate-500 leading-relaxed">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                       We&apos;ll send a secure 6-digit one-time verification code to this email address. No password required.
                     </p>
 
                     <button
                       type="submit"
                       disabled={isOtpSending || !email.trim()}
-                      className="w-full py-2.5 px-4 mt-2 rounded-lg bg-[#5846A8] hover:bg-[#48378E] text-white text-sm font-semibold shadow-md transition active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                      className="w-full py-2.5 px-4 mt-2 rounded-lg bg-[#5846A8] hover:bg-[#48378E] text-white text-sm font-bold shadow-md shadow-purple-600/25 transition active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
                     >
                       {isOtpSending ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Sending OTP to inbox...</span>
+                          <span>Sending verification code...</span>
                         </>
                       ) : (
                         <span>Send Verification Code</span>
@@ -701,7 +706,7 @@ export default function LoginPage() {
                       onClick={() => {
                         window.location.href = "/api/auth/google";
                       }}
-                      className="w-full py-2.5 px-4 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold shadow-2xs transition flex items-center justify-center gap-2.5 cursor-pointer"
+                      className="w-full py-2.5 px-4 rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-[#151821] hover:bg-slate-50 dark:hover:bg-[#1C202C] text-slate-700 dark:text-slate-200 text-sm font-semibold shadow-2xs transition flex items-center justify-center gap-2.5 cursor-pointer"
                     >
                       <svg width="18" height="18" viewBox="0 0 24 24">
                         <path
@@ -727,12 +732,12 @@ export default function LoginPage() {
                 )}
 
                 {/* Footer sign up link */}
-                <div className="mt-8 text-center text-xs text-slate-500">
+                <div className="mt-8 text-center text-xs text-slate-500 dark:text-slate-400">
                   <span>Don&apos;t have an account? </span>
                   <Link
                     href="/signup"
                     onClick={handleNavigateToSignup}
-                    className="text-[#5846A8] font-bold hover:underline"
+                    className="text-[#5846A8] dark:text-purple-400 font-bold hover:underline"
                   >
                     Sign up
                   </Link>
@@ -745,7 +750,7 @@ export default function LoginPage() {
             {/* -------------------------------------------------------- */}
             {authStep === "otp" && (
               <div className="animate-in fade-in zoom-in-95 duration-200 text-center py-2">
-                {/* Circular Blue Shield Icon Badge */}
+                {/* Circular Purple Shield Icon Badge */}
                 <div className="w-16 h-16 rounded-full bg-[#5846A8] mx-auto flex items-center justify-center shadow-lg shadow-purple-600/30">
                   <svg
                     className="w-8 h-8 text-white"
@@ -762,22 +767,22 @@ export default function LoginPage() {
                 </div>
 
                 {/* Title */}
-                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 mt-5">
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white mt-5">
                   Verify your code
                 </h1>
 
                 {/* Subtitle with real masked email text */}
-                <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
                   We have sent a verification code to your email
                 </p>
-                <div className="font-semibold text-xs text-slate-800 mt-0.5 tracking-wide">
+                <div className="font-semibold text-xs text-slate-800 dark:text-slate-200 mt-1 tracking-wide px-3 py-1 bg-slate-100 dark:bg-[#1A1D27] rounded-full inline-block border border-slate-200 dark:border-white/10 font-mono">
                   {maskedEmailText}
                 </div>
 
                 {/* 5-Minute Expiry Countdown Timer */}
-                <div className="flex items-center justify-center gap-1.5 text-[11px] font-mono text-slate-500 mt-2 mb-3">
+                <div className="flex items-center justify-center gap-1.5 text-[11px] font-mono text-slate-500 dark:text-slate-400 mt-2 mb-3">
                   <span>Code expires in:</span>
-                  <span className="font-bold text-[#5846A8]">{formatTimer(timeLeft)}</span>
+                  <span className="font-bold text-[#5846A8] dark:text-purple-400">{formatTimer(timeLeft)}</span>
                 </div>
 
                 {/* The 6-Box OTP Input */}
@@ -802,7 +807,7 @@ export default function LoginPage() {
                   <button
                     type="submit"
                     disabled={isLoading || isOtpSuccess || digits.join("").length !== 6}
-                    className="w-full py-3.5 px-4 rounded-xl bg-[#5846A8] hover:bg-[#48378E] text-white text-sm font-semibold shadow-md shadow-purple-600/25 transition active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full py-3.5 px-4 rounded-xl bg-[#5846A8] hover:bg-[#48378E] text-white text-sm font-bold shadow-md shadow-purple-600/25 transition active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
                   >
                     {isLoading ? (
                       <>
@@ -821,13 +826,13 @@ export default function LoginPage() {
                 </form>
 
                 {/* Bottom text matching reference image */}
-                <div className="mt-6 pt-3 border-t border-slate-100 flex items-center justify-center gap-1 text-xs text-slate-500">
+                <div className="mt-6 pt-3 border-t border-slate-100 dark:border-white/10 flex items-center justify-center gap-1 text-xs text-slate-500 dark:text-slate-400">
                   <span>Didn&apos;t receive code?</span>
                   <button
                     type="button"
                     disabled={cooldown > 0 || isLoading}
                     onClick={handleResendOtp}
-                    className="font-semibold text-[#5846A8] hover:underline disabled:opacity-50 disabled:no-underline cursor-pointer inline-flex items-center gap-1"
+                    className="font-semibold text-[#5846A8] dark:text-purple-400 hover:underline disabled:opacity-50 disabled:no-underline cursor-pointer inline-flex items-center gap-1"
                   >
                     <span>{cooldown > 0 ? `Resend (${cooldown}s)` : "Resend"}</span>
                     {isLoading && <RotateCw className="w-3 h-3 animate-spin" />}
@@ -838,7 +843,7 @@ export default function LoginPage() {
           </div>
 
           {/* Simple Bottom Copyright */}
-          <div className="text-center text-xs text-slate-500">
+          <div className="text-center text-xs text-slate-400 dark:text-slate-500">
             © {new Date().getFullYear()} PulseSocial Corporation. All rights reserved.
           </div>
         </div>

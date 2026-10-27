@@ -21,6 +21,7 @@ import {
 import { OtpSixBoxInput } from "@/components/auth/OtpSixBoxInput";
 import { OtpTopBanner, maskEmail } from "@/components/auth/OtpTopBanner";
 import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
+import { ThemeSwitcher } from "@/components/layout/ThemeSwitcher";
 import { useToast } from "@/components/ui/toast";
 
 export default function ForgotPasswordPage() {
@@ -212,22 +213,26 @@ export default function ForgotPasswordPage() {
         onClose={() => setShowOtpBanner(false)}
       />
 
-      <div className="min-h-screen w-full flex flex-col md:flex-row bg-white font-sans selection:bg-[#5846a8] selection:text-white">
+      <div className="min-h-screen w-full flex flex-col md:flex-row bg-white dark:bg-[#0E1117] font-sans selection:bg-[#5846a8] selection:text-white transition-colors duration-200">
         {/* ============================================================ */}
         {/* LEFT COLUMN: Clean Form Panel matching Login Screen           */}
         {/* ============================================================ */}
-        <div className="w-full md:w-1/2 flex flex-col justify-between p-6 sm:p-12 lg:p-16 min-h-screen bg-white">
+        <div className="w-full md:w-1/2 flex flex-col justify-between p-6 sm:p-12 lg:p-16 min-h-screen bg-white dark:bg-[#0E1117] transition-colors duration-200">
           {/* Top Header */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <PulseSocialLogo size="md" variant="full" href="/" />
 
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#5846a8] transition"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back to Sign In</span>
-            </Link>
+            <div className="flex items-center gap-3">
+              <ThemeSwitcher />
+
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-[#5846a8] dark:hover:text-purple-300 transition px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Back to Sign In</span>
+              </Link>
+            </div>
           </div>
 
           {/* Center Form Container */}
@@ -250,20 +255,20 @@ export default function ForgotPasswordPage() {
             {step === "email" && (
               <div className="space-y-6 animate-in fade-in duration-200">
                 <div className="space-y-2">
-                  <div className="w-12 h-12 rounded-xl bg-[#5846a8]/10 border border-[#5846a8]/20 flex items-center justify-center text-[#5846a8] mb-3">
+                  <div className="w-12 h-12 rounded-xl bg-[#5846a8]/10 dark:bg-purple-900/30 border border-[#5846a8]/20 dark:border-purple-700/40 flex items-center justify-center text-[#5846a8] dark:text-purple-300 mb-3">
                     <KeyRound className="w-6 h-6" />
                   </div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                     Reset your password
                   </h1>
-                  <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-normal">
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
                     Enter your registered email address and we will dispatch a 6-digit verification code with a 5-minute validity window.
                   </p>
                 </div>
 
                 <form onSubmit={handleRequestCode} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-800 mb-1.5">
+                    <label className="block text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1.5">
                       Email Address
                     </label>
                     <div className="relative">
@@ -275,7 +280,7 @@ export default function ForgotPasswordPage() {
                         placeholder="name@company.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#5846a8] focus:ring-2 focus:ring-[#5846a8]/20 transition"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-[#151821] text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-[#5846a8] dark:focus:border-[#7B61FF] focus:ring-2 focus:ring-[#5846a8]/20 dark:focus:ring-[#7B61FF]/30 transition"
                       />
                     </div>
                   </div>
@@ -283,7 +288,7 @@ export default function ForgotPasswordPage() {
                   <button
                     type="submit"
                     disabled={isLoading || !email.trim()}
-                    className="w-full py-2.5 px-4 rounded-lg bg-[#5846a8] hover:bg-[#4b3b91] disabled:opacity-50 text-white font-semibold text-sm shadow-sm transition active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full py-2.5 px-4 rounded-lg bg-[#5846a8] hover:bg-[#48378E] disabled:opacity-50 text-white font-bold text-sm shadow-md shadow-purple-600/25 transition active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
                   >
                     {isLoading ? (
                       <>
@@ -302,7 +307,7 @@ export default function ForgotPasswordPage() {
                 <div className="text-center pt-2">
                   <Link
                     href="/login"
-                    className="text-xs text-[#5846a8] font-semibold hover:underline"
+                    className="text-xs text-[#5846a8] dark:text-purple-400 font-semibold hover:underline"
                   >
                     Remember your password? Sign in
                   </Link>
@@ -316,30 +321,30 @@ export default function ForgotPasswordPage() {
             {step === "reset" && (
               <div className="space-y-5 animate-in fade-in duration-200">
                 <div className="text-center space-y-2">
-                  <div className="w-14 h-14 rounded-full bg-[#2563eb] mx-auto flex items-center justify-center shadow-lg shadow-blue-600/30">
+                  <div className="w-14 h-14 rounded-full bg-[#5846A8] mx-auto flex items-center justify-center shadow-lg shadow-purple-600/30">
                     <ShieldCheck className="w-7 h-7 text-white" />
                   </div>
 
-                  <h2 className="text-2xl font-bold tracking-tight text-slate-900 mt-2">
+                  <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mt-2">
                     Enter code &amp; set password
                   </h2>
-                  <p className="text-xs text-slate-500 leading-relaxed">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                     We sent a 6-digit code to{" "}
-                    <strong className="text-slate-800 font-semibold font-mono">
+                    <strong className="text-slate-800 dark:text-slate-200 font-semibold font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-white/10">
                       {maskEmail(email)}
                     </strong>
                   </p>
 
-                  <div className="flex items-center justify-center gap-1.5 text-[11px] font-mono text-slate-500 pt-1">
+                  <div className="flex items-center justify-center gap-1.5 text-[11px] font-mono text-slate-500 dark:text-slate-400 pt-1">
                     <span>Code expires in:</span>
-                    <span className="font-bold text-[#2563eb]">{formatTimer(timeLeft)}</span>
+                    <span className="font-bold text-[#5846A8] dark:text-purple-400">{formatTimer(timeLeft)}</span>
                   </div>
                 </div>
 
                 <form onSubmit={handleResetPassword} className="space-y-4">
                   {/* 6-Box Discrete OTP Input */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-700 block text-center">
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block text-center">
                       6-Digit Verification Code
                     </label>
                     <OtpSixBoxInput
@@ -353,7 +358,7 @@ export default function ForgotPasswordPage() {
 
                   {/* New Password */}
                   <div>
-                    <label className="block text-sm font-semibold text-slate-800 mb-1.5">
+                    <label className="block text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1.5">
                       New Password
                     </label>
                     <div className="relative">
@@ -364,12 +369,12 @@ export default function ForgotPasswordPage() {
                         placeholder="At least 8 characters"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className="w-full pl-10 pr-10 py-2.5 rounded-lg border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#5846a8] focus:ring-2 focus:ring-[#5846a8]/20 transition"
+                        className="w-full pl-10 pr-10 py-2.5 rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-[#151821] text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-[#5846a8] dark:focus:border-[#7B61FF] focus:ring-2 focus:ring-[#5846a8]/20 dark:focus:ring-[#7B61FF]/30 transition"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-200 p-1 cursor-pointer"
                       >
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -378,7 +383,7 @@ export default function ForgotPasswordPage() {
 
                   {/* Confirm Password */}
                   <div>
-                    <label className="block text-sm font-semibold text-slate-800 mb-1.5">
+                    <label className="block text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1.5">
                       Confirm New Password
                     </label>
                     <div className="relative">
@@ -389,12 +394,12 @@ export default function ForgotPasswordPage() {
                         placeholder="Repeat new password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="w-full pl-10 pr-10 py-2.5 rounded-lg border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#5846a8] focus:ring-2 focus:ring-[#5846a8]/20 transition"
+                        className="w-full pl-10 pr-10 py-2.5 rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-[#151821] text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-[#5846a8] dark:focus:border-[#7B61FF] focus:ring-2 focus:ring-[#5846a8]/20 dark:focus:ring-[#7B61FF]/30 transition"
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-200 p-1 cursor-pointer"
                       >
                         {showConfirmPassword ? (
                           <EyeOff className="w-4 h-4" />
@@ -409,7 +414,7 @@ export default function ForgotPasswordPage() {
                   <button
                     type="submit"
                     disabled={isLoading || digits.join("").length !== 6 || !newPassword || !confirmPassword}
-                    className="w-full py-2.5 px-4 mt-2 rounded-lg bg-[#5846a8] hover:bg-[#4b3b91] disabled:opacity-50 text-white font-semibold text-sm shadow-sm transition active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full py-2.5 px-4 mt-2 rounded-lg bg-[#5846a8] hover:bg-[#48378E] disabled:opacity-50 text-white font-bold text-sm shadow-md shadow-purple-600/25 transition active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
                   >
                     {isLoading ? (
                       <>
@@ -425,10 +430,10 @@ export default function ForgotPasswordPage() {
                   </button>
 
                   {/* Resend Cooldown Action */}
-                  <div className="pt-2 text-center text-xs text-slate-500 flex items-center justify-center gap-1.5">
+                  <div className="pt-2 text-center text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5">
                     <span>Didn&apos;t receive code?</span>
                     {cooldown > 0 ? (
-                      <span className="font-semibold text-slate-600">
+                      <span className="font-semibold text-slate-600 dark:text-slate-300">
                         Resend in {cooldown}s
                       </span>
                     ) : (
@@ -436,7 +441,7 @@ export default function ForgotPasswordPage() {
                         type="button"
                         disabled={isLoading}
                         onClick={handleResendCode}
-                        className="text-[#2563eb] font-bold hover:underline cursor-pointer inline-flex items-center gap-1"
+                        className="text-[#5846a8] dark:text-purple-400 font-bold hover:underline cursor-pointer inline-flex items-center gap-1"
                       >
                         <span>Resend code</span>
                         {isLoading && <RotateCw className="w-3 h-3 animate-spin" />}
@@ -452,15 +457,15 @@ export default function ForgotPasswordPage() {
             {/* ============================================================== */}
             {step === "success" && (
               <div className="text-center py-4 space-y-5 animate-in fade-in duration-200">
-                <div className="w-16 h-16 rounded-full bg-purple-100 border border-purple-300 text-purple-600 flex items-center justify-center mx-auto shadow-md shadow-purple-500/10">
+                <div className="w-16 h-16 rounded-full bg-purple-100 dark:bg-purple-900/40 border border-purple-300 dark:border-purple-700 text-purple-600 dark:text-purple-300 flex items-center justify-center mx-auto shadow-md shadow-purple-500/10">
                   <CheckCircle2 className="w-9 h-9" />
                 </div>
 
                 <div className="space-y-1.5">
-                  <h3 className="text-2xl font-bold text-slate-900">
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
                     Password Reset Successfully!
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-500 leading-relaxed max-w-xs mx-auto">
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-xs mx-auto">
                     Your account password has been updated securely. You can now log in to your PulseSocial workspace.
                   </p>
                 </div>
@@ -468,7 +473,7 @@ export default function ForgotPasswordPage() {
                 <div className="pt-2">
                   <Link
                     href="/login"
-                    className="w-full py-2.5 px-4 rounded-lg bg-[#5846a8] hover:bg-[#4b3b91] text-white font-semibold text-sm shadow-sm transition active:scale-[0.99] inline-flex items-center justify-center gap-2"
+                    className="w-full py-2.5 px-4 rounded-lg bg-[#5846a8] hover:bg-[#48378E] text-white font-bold text-sm shadow-md shadow-purple-600/25 transition active:scale-[0.99] inline-flex items-center justify-center gap-2"
                   >
                     <span>Sign In Now</span>
                     <ArrowRight className="w-4 h-4" />

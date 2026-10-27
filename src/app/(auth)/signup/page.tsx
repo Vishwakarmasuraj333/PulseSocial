@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { OtpSixBoxInput } from "@/components/auth/OtpSixBoxInput";
 import { OtpTopBanner, maskEmail } from "@/components/auth/OtpTopBanner";
+import { ThemeSwitcher } from "@/components/layout/ThemeSwitcher";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -269,37 +270,41 @@ export default function SignupPage() {
         onClose={() => setShowOtpBanner(false)}
       />
 
-      <div className="min-h-screen w-full flex flex-col md:flex-row bg-white font-sans selection:bg-[#5846a8] selection:text-white">
+      <div className="min-h-screen w-full flex flex-col md:flex-row bg-white dark:bg-[#0E1117] font-sans selection:bg-[#5846a8] selection:text-white transition-colors duration-200">
         {/* ============================================================ */}
         {/* LEFT COLUMN: Clean Form Panel matching Login Screen           */}
         {/* ============================================================ */}
-        <div className="w-full md:w-1/2 flex flex-col justify-between p-6 sm:p-12 lg:p-16 min-h-screen bg-white">
+        <div className="w-full md:w-1/2 flex flex-col justify-between p-6 sm:p-12 lg:p-16 min-h-screen bg-white dark:bg-[#0E1117] transition-colors duration-200">
           {/* Header */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <PulseSocialLogo size="md" variant="full" href="/" />
 
-            {step === "otp" ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setStep("form");
-                  setErrorMessage("");
-                }}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#5846a8] transition cursor-pointer"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Edit details</span>
-              </button>
-            ) : (
-              <Link
-                href="/login"
-                onClick={handleNavigateToLogin}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#5846a8] transition"
-              >
-                <span>Already have an account? Sign in</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            )}
+            <div className="flex items-center gap-3">
+              <ThemeSwitcher />
+
+              {step === "otp" ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep("form");
+                    setErrorMessage("");
+                  }}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-[#5846a8] dark:hover:text-purple-300 transition cursor-pointer px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Edit details</span>
+                </button>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={handleNavigateToLogin}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-[#5846a8] dark:hover:text-purple-300 transition group"
+                >
+                  <span>Already have an account? <strong className="text-[#5846a8] dark:text-purple-400 group-hover:underline">Sign in</strong></span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              )}
+            </div>
           </div>
 
           {/* Center Form Container */}
@@ -307,11 +312,11 @@ export default function SignupPage() {
             {/* Error Message */}
             {errorMessage && (
               <div
-                className={`mb-5 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2 animate-in fade-in duration-150 ${
+                className={`mb-5 p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2 animate-in fade-in duration-150 ${
                   shake ? "animate-shake" : ""
                 }`}
               >
-                <XCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                <XCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
                 <span className="leading-snug">{errorMessage}</span>
               </div>
             )}
@@ -320,31 +325,31 @@ export default function SignupPage() {
             {step === "form" && (
               <div className="animate-in fade-in duration-200">
                 {/* Switcher Pills between Sign In and Sign Up */}
-                <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl mb-5 w-fit border border-slate-200/60">
+                <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-[#1A1D27] rounded-xl mb-5 w-fit border border-slate-200/60 dark:border-white/10">
                   <Link
                     href="/login"
                     onClick={handleNavigateToLogin}
-                    className="px-3.5 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 font-semibold text-xs transition inline-flex items-center gap-1"
+                    className="px-3.5 py-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-semibold text-xs transition inline-flex items-center gap-1"
                   >
-                    <ArrowLeft className="w-3 h-3 text-slate-400" />
+                    <ArrowLeft className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                     <span>Sign In</span>
                   </Link>
-                  <span className="px-3.5 py-1.5 rounded-lg bg-white text-slate-900 font-bold text-xs shadow-xs">
+                  <span className="px-3.5 py-1.5 rounded-lg bg-white dark:bg-[#262A38] text-slate-900 dark:text-white font-bold text-xs shadow-xs border border-transparent dark:border-white/10">
                     Sign Up
                   </span>
                 </div>
 
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                   Get started with PulseSocial
                 </h1>
-                <p className="text-sm text-slate-500 mt-2 mb-6 font-normal">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 mb-6 font-normal">
                   Scale your social media workspace with multi-account publishing and analytics.
                 </p>
 
                 <form onSubmit={handleSignup} className="space-y-3.5">
                   {/* Full Name */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">
+                    <label className="block text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">
                       Full Name
                     </label>
                     <div className="relative">
@@ -356,14 +361,14 @@ export default function SignupPage() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Enter your full name"
-                        className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#5846a8] focus:ring-2 focus:ring-[#5846a8]/20 transition"
+                        className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-[#151821] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-[#5846a8] dark:focus:border-[#7B61FF] focus:ring-2 focus:ring-[#5846a8]/20 dark:focus:ring-[#7B61FF]/30 transition"
                       />
                     </div>
                   </div>
 
                   {/* Work Email */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">
+                    <label className="block text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">
                       Work Email
                     </label>
                     <div className="relative">
@@ -374,14 +379,14 @@ export default function SignupPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="name@company.com"
-                        className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#5846a8] focus:ring-2 focus:ring-[#5846a8]/20 transition"
+                        className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-[#151821] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-[#5846a8] dark:focus:border-[#7B61FF] focus:ring-2 focus:ring-[#5846a8]/20 dark:focus:ring-[#7B61FF]/30 transition"
                       />
                     </div>
                   </div>
 
                   {/* Password */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">
+                    <label className="block text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">
                       Password
                     </label>
                     <div className="relative">
@@ -392,12 +397,12 @@ export default function SignupPage() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Min. 8 characters"
-                        className="w-full pl-10 pr-10 py-2 text-sm rounded-lg border border-slate-300 text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#5846a8] focus:ring-2 focus:ring-[#5846a8]/20 transition"
+                        className="w-full pl-10 pr-10 py-2 text-sm rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-[#151821] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-[#5846a8] dark:focus:border-[#7B61FF] focus:ring-2 focus:ring-[#5846a8]/20 dark:focus:ring-[#7B61FF]/30 transition"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-200 p-1 cursor-pointer"
                       >
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -406,7 +411,7 @@ export default function SignupPage() {
 
                   {/* Confirm Password */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">
+                    <label className="block text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">
                       Confirm Password
                     </label>
                     <div className="relative">
@@ -417,12 +422,12 @@ export default function SignupPage() {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder="Repeat your password"
-                        className="w-full pl-10 pr-10 py-2 text-sm rounded-lg border border-slate-300 text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#5846a8] focus:ring-2 focus:ring-[#5846a8]/20 transition"
+                        className="w-full pl-10 pr-10 py-2 text-sm rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-[#151821] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-[#5846a8] dark:focus:border-[#7B61FF] focus:ring-2 focus:ring-[#5846a8]/20 dark:focus:ring-[#7B61FF]/30 transition"
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-200 p-1 cursor-pointer"
                       >
                         {showConfirmPassword ? (
                           <EyeOff className="w-4 h-4" />
@@ -441,18 +446,18 @@ export default function SignupPage() {
                       required
                       checked={agreedToTerms}
                       onChange={(e) => setAgreedToTerms(e.target.checked)}
-                      className="w-4 h-4 mt-0.5 rounded border-slate-300 text-[#5846a8] focus:ring-[#5846a8] cursor-pointer"
+                      className="w-4 h-4 mt-0.5 rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-[#151821] text-[#5846a8] focus:ring-[#5846a8] cursor-pointer"
                     />
                     <label
                       htmlFor="terms"
-                      className="text-xs text-slate-600 leading-snug cursor-pointer select-none"
+                      className="text-xs text-slate-600 dark:text-slate-400 leading-snug cursor-pointer select-none"
                     >
                       I agree to the{" "}
-                      <Link href="/terms" className="text-[#5846a8] font-semibold hover:underline">
+                      <Link href="/terms" className="text-[#5846a8] dark:text-purple-400 font-semibold hover:underline">
                         Terms of Service
                       </Link>{" "}
                       and{" "}
-                      <Link href="/privacy" className="text-[#5846a8] font-semibold hover:underline">
+                      <Link href="/privacy" className="text-[#5846a8] dark:text-purple-400 font-semibold hover:underline">
                         Privacy Policy
                       </Link>
                       .
@@ -463,12 +468,12 @@ export default function SignupPage() {
                   <button
                     type="submit"
                     disabled={isLoading || !name.trim() || !email.trim() || !password || !agreedToTerms}
-                    className="w-full py-2.5 px-4 mt-2 rounded-lg bg-[#5846a8] hover:bg-[#4b3b91] text-white text-sm font-semibold shadow-xs transition active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full py-2.5 px-4 mt-2 rounded-lg bg-[#5846a8] hover:bg-[#48378E] text-white text-sm font-bold shadow-md shadow-purple-600/25 transition active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
                   >
                     {isLoading ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Sending Verification Code...</span>
+                        <span>Sending verification code...</span>
                       </>
                     ) : (
                       <>
@@ -482,7 +487,7 @@ export default function SignupPage() {
                   <button
                     type="button"
                     onClick={handleGoogleSignup}
-                    className="w-full py-2.5 px-4 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold shadow-2xs transition flex items-center justify-center gap-2.5 cursor-pointer"
+                    className="w-full py-2.5 px-4 rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-[#151821] hover:bg-slate-50 dark:hover:bg-[#1C202C] text-slate-700 dark:text-slate-200 text-sm font-semibold shadow-2xs transition flex items-center justify-center gap-2.5 cursor-pointer"
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24">
                       <path
@@ -506,12 +511,12 @@ export default function SignupPage() {
                   </button>
                 </form>
 
-                <div className="mt-6 text-center text-xs text-slate-500">
+                <div className="mt-6 text-center text-xs text-slate-500 dark:text-slate-400">
                   <span>Already have an account? </span>
                   <Link
                     href="/login"
                     onClick={handleNavigateToLogin}
-                    className="text-[#5846a8] font-semibold hover:underline"
+                    className="text-[#5846a8] dark:text-purple-400 font-bold hover:underline"
                   >
                     Sign in
                   </Link>
@@ -522,7 +527,7 @@ export default function SignupPage() {
             {/* STEP 2: 6-Box OTP Verification Form */}
             {step === "otp" && (
               <div className="animate-in fade-in zoom-in-95 duration-200 text-center py-2">
-                <div className="w-16 h-16 rounded-full bg-[#2563eb] mx-auto flex items-center justify-center shadow-lg shadow-blue-600/30">
+                <div className="w-16 h-16 rounded-full bg-[#5846A8] mx-auto flex items-center justify-center shadow-lg shadow-purple-600/30">
                   {isSuccess ? (
                     <CheckCircle2 className="w-8 h-8 text-white animate-bounce" />
                   ) : (
@@ -530,19 +535,19 @@ export default function SignupPage() {
                   )}
                 </div>
 
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 mt-5">
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white mt-5">
                   Verify your work email
                 </h2>
-                <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                  We have sent a code to your email
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                  We have sent a 6-digit verification code to your email
                 </p>
-                <div className="font-semibold text-xs text-slate-700 mt-0.5 tracking-wide font-mono">
+                <div className="font-semibold text-xs text-slate-800 dark:text-slate-200 mt-1 tracking-wide font-mono px-3 py-1 bg-slate-100 dark:bg-[#1A1D27] rounded-full inline-block border border-slate-200 dark:border-white/10">
                   {maskEmail(email)}
                 </div>
 
-                <div className="flex items-center justify-center gap-1.5 text-[11px] font-mono text-slate-500 mt-2 mb-4">
+                <div className="flex items-center justify-center gap-1.5 text-[11px] font-mono text-slate-500 dark:text-slate-400 mt-2 mb-4">
                   <span>Code expires in:</span>
-                  <span className="font-bold text-[#2563eb]">{formatTimer(timeLeft)}</span>
+                  <span className="font-bold text-[#5846A8] dark:text-purple-400">{formatTimer(timeLeft)}</span>
                 </div>
 
                 <form
@@ -565,7 +570,7 @@ export default function SignupPage() {
                   <button
                     type="submit"
                     disabled={isLoading || isSuccess || digits.join("").length !== 6}
-                    className="w-full py-3.5 px-4 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-sm font-semibold shadow-md shadow-blue-600/25 transition active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full py-3.5 px-4 rounded-xl bg-[#5846A8] hover:bg-[#48378E] text-white text-sm font-bold shadow-md shadow-purple-600/25 transition active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
                   >
                     {isLoading ? (
                       <>
@@ -583,13 +588,13 @@ export default function SignupPage() {
                   </button>
                 </form>
 
-                <div className="mt-6 pt-3 border-t border-slate-100 flex items-center justify-center gap-1 text-xs text-slate-500">
+                <div className="mt-6 pt-3 border-t border-slate-100 dark:border-white/10 flex items-center justify-center gap-1 text-xs text-slate-500 dark:text-slate-400">
                   <span>Didn&apos;t receive code?</span>
                   <button
                     type="button"
                     disabled={cooldown > 0 || isLoading}
                     onClick={handleResendOtp}
-                    className="font-semibold text-[#2563eb] hover:underline disabled:opacity-50 disabled:no-underline cursor-pointer inline-flex items-center gap-1"
+                    className="font-semibold text-[#5846A8] dark:text-purple-400 hover:underline disabled:opacity-50 disabled:no-underline cursor-pointer inline-flex items-center gap-1"
                   >
                     <span>{cooldown > 0 ? `Resend (${cooldown}s)` : "Resend"}</span>
                     {isLoading && <RotateCw className="w-3 h-3 animate-spin" />}
@@ -600,8 +605,8 @@ export default function SignupPage() {
           </div>
 
           {/* Footer */}
-          <div className="text-center text-[11px] text-slate-400">
-            © 2026 PulseSocial Corporation. All rights reserved.
+          <div className="text-center text-xs text-slate-400 dark:text-slate-500">
+            © {new Date().getFullYear()} PulseSocial Corporation. All rights reserved.
           </div>
         </div>
 

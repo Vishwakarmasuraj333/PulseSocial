@@ -315,8 +315,8 @@ export function MarketingHeader() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`block px-3.5 py-2.5 text-sm font-bold rounded-xl transition ${
                     isActive
-                      ? "text-[#E08738] dark:text-[#FBBF24] bg-amber-500/10 border border-amber-500/25"
-                      : "text-slate-700 dark:text-slate-200 hover:bg-amber-500/10 dark:hover:bg-white/5"
+                      ? "text-[#5846A8] dark:text-[#FBBF24] bg-purple-50 dark:bg-amber-500/10 border border-purple-200 dark:border-amber-500/25"
+                      : "text-slate-700 dark:text-slate-200 hover:bg-purple-50 dark:hover:bg-white/5"
                   }`}
                 >
                   {link.label}

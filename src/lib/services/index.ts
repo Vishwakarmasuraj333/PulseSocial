@@ -230,6 +230,62 @@ export interface AnalyticsData {
   totalComments: number;
   totalShares: number;
   chartData: { date: string; followers: number; engagement: number; reach: number }[];
+  summary?: {
+    totalFollowers: number | null;
+    totalImpressions: number;
+    totalReach: number;
+    totalEngagement: number;
+    engagementRate: number;
+    postsPublished: number;
+    scheduledPosts: number;
+    commentsCount: number;
+    messagesCount: number;
+    totalClicks: number;
+    dataSource: string;
+    isDataAvailable: boolean;
+  };
+  trends?: { date: string; impressions: number; reach: number; engagement: number }[];
+  accounts?: any[];
+  platforms?: {
+    id: string;
+    name: string;
+    username?: string;
+    profileImageUrl?: string;
+    reach: number;
+    reachFormatted: string;
+    followers?: number;
+    followersFormatted?: string;
+    percentage: number;
+    status?: string;
+  }[];
+  contentTypes?: {
+    type: string;
+    reach: number;
+    engagementRate: string;
+    postsCount: number;
+    percentage: number;
+    color: string;
+  }[];
+  topPosts?: {
+    id: string;
+    platform: string;
+    platformLabel: string;
+    caption: string;
+    fullContent: string;
+    publishedAt: string;
+    likes: string;
+    reach: string;
+    rate: string;
+    comments?: string;
+    thumbnailUrl?: string;
+  }[];
+  engagementBreakdown?: {
+    date: string;
+    comments: number;
+    likes: number;
+    saves: number;
+    shares: number;
+  }[];
 }
 
 export const analyticsService = {

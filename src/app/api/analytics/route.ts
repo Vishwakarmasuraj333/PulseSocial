@@ -13,6 +13,10 @@ export async function GET(req: Request) {
     const platform = searchParams.get("platform");
     const timeframe = searchParams.get("timeframe") || "30d";
 
+    const numDays = timeframe === "7d" ? 7 : timeframe === "90d" ? 90 : 30;
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - numDays);
+
     const accounts = await prisma.socialAccount.findMany({
       where: {
         organizationId: session.activeOrgId,
@@ -21,8 +25,15 @@ export async function GET(req: Request) {
       include: {
         profile: true,
         analytics: {
+          where: {
+            metricDate: { gte: startDate },
+          },
           orderBy: { metricDate: "desc" },
           take: 30,
+        },
+        engagementSnapshots: {
+          orderBy: { createdAt: "desc" },
+          take: 50,
         },
       },
     });
@@ -33,6 +44,10 @@ export async function GET(req: Request) {
 
     const scheduledCount = await prisma.socialPost.count({
       where: { organizationId: session.activeOrgId, status: "SCHEDULED" },
+    });
+
+    const draftsCount = await prisma.socialPost.count({
+      where: { organizationId: session.activeOrgId, status: "DRAFT" },
     });
 
     const commentsCount = await prisma.socialComment.count({
@@ -80,11 +95,23 @@ export async function GET(req: Request) {
           });
         });
       }
+
+      // Also incorporate engagement snapshots if available
+      if (acc.engagementSnapshots && acc.engagementSnapshots.length > 0) {
+        acc.engagementSnapshots.forEach((snap) => {
+          totalLikes += snap.likes || 0;
+          totalShares += snap.shares || 0;
+          if (!hasRealAnalyticsRecords) {
+            totalImpressions += snap.impressions || 0;
+            totalReach += snap.reach || 0;
+          }
+        });
+      }
     });
 
-    // If no external analytics records are present, engagement is strictly from real database comments and messages
+    // If no external analytics records are present, engagement is strictly from real database comments, messages, and likes
     if (!hasRealAnalyticsRecords) {
-      totalEngagement = commentsCount + messagesCount;
+      totalEngagement = commentsCount + messagesCount + totalLikes + totalShares;
     }
 
     const calculatedEngagementRate =
@@ -97,7 +124,6 @@ export async function GET(req: Request) {
     const followerGrowthRate = 0;
 
     // Days count based on timeframe
-    const numDays = timeframe === "7d" ? 7 : timeframe === "90d" ? 90 : 30;
     const now = new Date();
     const trends: { date: string; impressions: number; reach: number; engagement: number }[] = [];
     const chartData: { date: string; followers: number | null; engagement: number; reach: number }[] = [];
@@ -124,6 +150,174 @@ export async function GET(req: Request) {
       });
     }
 
+    // Real comments in period for engagement area chart
+    const periodComments = await prisma.socialComment.findMany({
+      where: {
+        socialAccount: { organizationId: session.activeOrgId },
+        createdAt: { gte: startDate },
+      },
+      select: { createdAt: true },
+    });
+
+    // Subdivide into chart sample points (max 8 points for crisp visualization)
+    const step = Math.max(1, Math.floor(numDays / 8));
+    const engagementBreakdown: { date: string; comments: number; likes: number; saves: number; shares: number }[] = [];
+
+    for (let i = numDays - 1; i >= 0; i -= step) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const dStr = d.toISOString().split("T")[0];
+      const label = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+      const dayComments = periodComments.filter(
+        (c) => c.createdAt.toISOString().split("T")[0] === dStr
+      ).length;
+      const dayStat = dateMap.get(dStr);
+
+      engagementBreakdown.push({
+        date: label,
+        comments: dayComments,
+        likes: dayStat?.engagement ? Math.max(0, dayStat.engagement - dayComments) : 0,
+        saves: 0,
+        shares: 0,
+      });
+    }
+
+    // Real Top Performing Published Posts
+    const publishedPosts = await prisma.socialPost.findMany({
+      where: { organizationId: session.activeOrgId, status: "PUBLISHED" },
+      include: {
+        media: true,
+        targets: {
+          include: {
+            socialAccount: true,
+          },
+        },
+        comments: true,
+        engagementSnapshots: true,
+      },
+      orderBy: { publishedAt: "desc" },
+      take: 6,
+    });
+
+    const topPosts = publishedPosts.map((p) => {
+      const target = p.targets[0];
+      const prov = target?.socialAccount?.provider || "social";
+      const provLabel = target?.socialAccount?.displayName || (prov.charAt(0).toUpperCase() + prov.slice(1));
+      const likesCount = p.engagementSnapshots?.reduce((sum, s) => sum + (s.likes || 0), 0) || 0;
+      const reachCount = p.engagementSnapshots?.reduce((sum, s) => sum + (s.reach || 0), 0) || (target?.socialAccount?.profile?.followersCount || 0);
+      const commentsTotal = p.comments.length;
+
+      return {
+        id: p.id,
+        platform: prov,
+        platformLabel: provLabel,
+        caption: p.content.length > 95 ? p.content.slice(0, 95) + "..." : p.content,
+        fullContent: p.content,
+        publishedAt: p.publishedAt
+          ? new Date(p.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+          : "Recently",
+        likes: likesCount >= 1000 ? `${(likesCount / 1000).toFixed(1)}K` : String(likesCount),
+        reach: reachCount >= 1000 ? `${(reachCount / 1000).toFixed(1)}K` : String(reachCount),
+        rate: calculatedEngagementRate > 0 ? `${calculatedEngagementRate}%` : "0%",
+        comments: String(commentsTotal),
+        thumbnailUrl: p.media?.[0]?.url || undefined,
+      };
+    });
+
+    // Real Content Type Performance from DB
+    const allOrgPosts = await prisma.socialPost.findMany({
+      where: { organizationId: session.activeOrgId, status: "PUBLISHED" },
+      include: { media: true },
+    });
+
+    let videoCount = 0;
+    let carouselCount = 0;
+    let singleImageCount = 0;
+    let textCount = 0;
+
+    allOrgPosts.forEach((p) => {
+      if (p.media.some((m) => m.mediaType === "VIDEO")) {
+        videoCount++;
+      } else if (p.media.length > 1) {
+        carouselCount++;
+      } else if (p.media.length === 1) {
+        singleImageCount++;
+      } else {
+        textCount++;
+      }
+    });
+
+    const totalPublished = allOrgPosts.length;
+
+    const contentTypes = [
+      {
+        type: "Video & Reels",
+        reach: videoCount > 0 && totalReach > 0 ? Math.round((totalReach * videoCount) / totalPublished) : 0,
+        engagementRate: videoCount > 0 && calculatedEngagementRate > 0 ? `${calculatedEngagementRate}%` : "0%",
+        postsCount: videoCount,
+        percentage: totalPublished > 0 ? Math.round((videoCount / totalPublished) * 100) : 0,
+        color: "#0284C7",
+      },
+      {
+        type: "Carousel",
+        reach: carouselCount > 0 && totalReach > 0 ? Math.round((totalReach * carouselCount) / totalPublished) : 0,
+        engagementRate: carouselCount > 0 && calculatedEngagementRate > 0 ? `${calculatedEngagementRate}%` : "0%",
+        postsCount: carouselCount,
+        percentage: totalPublished > 0 ? Math.round((carouselCount / totalPublished) * 100) : 0,
+        color: "#3B82F6",
+      },
+      {
+        type: "Single Image",
+        reach: singleImageCount > 0 && totalReach > 0 ? Math.round((totalReach * singleImageCount) / totalPublished) : 0,
+        engagementRate: singleImageCount > 0 && calculatedEngagementRate > 0 ? `${calculatedEngagementRate}%` : "0%",
+        postsCount: singleImageCount,
+        percentage: totalPublished > 0 ? Math.round((singleImageCount / totalPublished) * 100) : 0,
+        color: "#60A5FA",
+      },
+      {
+        type: "Text Posts",
+        reach: textCount > 0 && totalReach > 0 ? Math.round((totalReach * textCount) / totalPublished) : 0,
+        engagementRate: textCount > 0 && calculatedEngagementRate > 0 ? `${calculatedEngagementRate}%` : "0%",
+        postsCount: textCount,
+        percentage: totalPublished > 0 ? Math.round((textCount / totalPublished) * 100) : 0,
+        color: "#93C5FD",
+      },
+    ];
+
+    // Real Reach by Platform strictly for CONNECTED accounts
+    const maxAccountReach = Math.max(
+      ...accounts.map((a) => {
+        let accR = 0;
+        a.analytics?.forEach((st) => { accR += st.reach || 0; });
+        return Math.max(accR, a.profile?.followersCount || 0);
+      }),
+      100
+    );
+
+    const platforms = accounts.map((a) => {
+      let accReach = 0;
+      if (a.analytics && a.analytics.length > 0) {
+        a.analytics.forEach((st) => { accReach += st.reach || 0; });
+      }
+      const followers = a.profile?.followersCount ?? 0;
+      const displayReach = accReach > 0 ? accReach : followers;
+      const pct = maxAccountReach > 0 ? Math.min(100, Math.round((displayReach / maxAccountReach) * 100)) : 0;
+
+      return {
+        id: a.provider.toLowerCase(),
+        name: a.displayName || (a.provider.charAt(0).toUpperCase() + a.provider.slice(1)),
+        username: a.username || a.displayName,
+        profileImageUrl: a.profileImageUrl,
+        reach: displayReach,
+        reachFormatted: displayReach >= 1000 ? `${(displayReach / 1000).toFixed(1)}K` : String(displayReach),
+        followers,
+        followersFormatted: followers >= 1000 ? `${(followers / 1000).toFixed(1)}K` : String(followers),
+        percentage: Math.max(pct, accounts.length === 1 ? 100 : 15),
+        status: a.status || "CONNECTED",
+      };
+    });
+
     const dataSource = hasRealAnalyticsRecords
       ? "API_SYNCED"
       : accounts.length > 0
@@ -138,6 +332,7 @@ export async function GET(req: Request) {
       engagementRate: calculatedEngagementRate,
       postsPublished: postsCount,
       scheduledPosts: scheduledCount,
+      draftsCount,
       commentsCount,
       messagesCount,
       totalClicks,
@@ -165,6 +360,10 @@ export async function GET(req: Request) {
       chartData,
       summary,
       trends,
+      platforms,
+      contentTypes,
+      topPosts,
+      engagementBreakdown,
       accounts: accounts.map((a) => {
         const accFollowers = typeof a.profile?.followersCount === "number" ? a.profile.followersCount : null;
         let accImpressions = 0;

@@ -28,21 +28,8 @@ export class WhatsAppProvider implements SocialProvider {
   }
 
   getAuthorizationUrl(state: string, redirectUri: string): string {
-    const appId = process.env.META_APP_ID;
-    if (!appId) {
-      throw new Error(
-        "META_APP_ID is required for WhatsApp Embedded Signup OAuth flow. For Direct Cloud API, configure WHATSAPP_PHONE_NUMBER_ID and WHATSAPP_ACCESS_TOKEN."
-      );
-    }
-    const scopes = ["whatsapp_business_messaging", "whatsapp_business_management"].join(",");
-    const params = new URLSearchParams({
-      client_id: appId,
-      redirect_uri: redirectUri,
-      scope: scopes,
-      response_type: "code",
-      state,
-    });
-    return `https://www.facebook.com/v19.0/dialog/oauth?${params.toString()}`;
+    // WhatsApp must NEVER redirect to facebook.com
+    return `/social/connect/whatsapp`;
   }
 
   async exchangeCode(code: string, redirectUri: string): Promise<OAuthTokenResult> {

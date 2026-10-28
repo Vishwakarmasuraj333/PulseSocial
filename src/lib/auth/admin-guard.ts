@@ -1,7 +1,17 @@
 import { getSession, SessionUser } from "./session";
-import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { isCompanyAdminEmail } from "./admin-emails";
 
+export { isCompanyAdminEmail, COMPANY_ADMIN_EMAILS } from "./admin-emails";
+
+/**
+ * Strict Global System Admin Verification Guard.
+ * 
+ * Only verified Company Super-Admins are permitted to access the master
+ * system console, system health, audit logs, or edit/delete platform users.
+ * Regular users with workspace roles (OWNER/ADMIN of their own workspace)
+ * are strictly restricted to their own tenant workspace.
+ */
 export async function verifyAdminAccess(): Promise<{
   authorized: boolean;
   session: SessionUser | null;
@@ -19,30 +29,8 @@ export async function verifyAdminAccess(): Promise<{
     };
   }
 
-  // 1. Direct role check from session
-  if (session.role === "OWNER" || session.role === "ADMIN") {
-    return { authorized: true, session };
-  }
-
-  // 2. Check if user is OWNER or ADMIN in any workspace membership
-  const adminMembership = await prisma.organizationMember.findFirst({
-    where: {
-      userId: session.id,
-      role: { in: ["OWNER", "ADMIN"] },
-    },
-  });
-
-  if (adminMembership) {
-    return { authorized: true, session };
-  }
-
-  // 3. System super-admin fallback by email
-  const adminEmails = [
-    "admin@pulsesocial.io",
-    "itsurya9930@gmail.com",
-    "itxsurajofficial@gmail.com",
-  ];
-  if (adminEmails.includes(session.email.toLowerCase())) {
+  // Strictly check if user is a verified Company Super-Admin
+  if (isCompanyAdminEmail(session.email)) {
     return { authorized: true, session };
   }
 
@@ -50,7 +38,10 @@ export async function verifyAdminAccess(): Promise<{
     authorized: false,
     session,
     errorResponse: NextResponse.json(
-      { error: "Forbidden: Administrative privileges required." },
+      {
+        error:
+          "Forbidden: Master administrative privileges are strictly reserved for company administrators.",
+      },
       { status: 403 }
     ),
   };

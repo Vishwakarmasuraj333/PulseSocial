@@ -23,6 +23,8 @@ export async function GET(
     const platformKey = (
       rawKey === "google" || rawKey === "google-business"
         ? "google_business"
+        : rawKey === "twitter"
+        ? "x"
         : rawKey
     ) as SupportedPlatform;
     const socialProvider = getSocialProvider(platformKey);
@@ -55,7 +57,8 @@ export async function GET(
       orgId = user?.memberships[0]?.organizationId;
     }
 
-    // Direct WhatsApp Cloud API verification & connection
+    // 1. WhatsApp Connection: NEVER redirect to personal Facebook login page.
+    // If WhatsApp Cloud API credentials are pre-configured in environment, auto-link:
     if (
       platformKey === "whatsapp" &&
       process.env.WHATSAPP_PHONE_NUMBER_ID &&
@@ -124,32 +127,62 @@ export async function GET(
       }
     }
 
-    // If provider credentials are not configured in environment, return clear unconfigured status
-    if (!socialProvider.isConfigured()) {
-      const missingMsg = socialProvider.getMissingConfigMessage();
+    // Otherwise for WhatsApp, always route to the dedicated WhatsApp Business QR / pairing portal
+    if (platformKey === "whatsapp") {
+      const popupUrl = `${cleanAppUrl}/social/connect/whatsapp`;
       if (wantsJson) {
-        return NextResponse.json(
-          {
-            success: false,
-            isConfigured: false,
-            platform: platformKey,
-            displayName: socialProvider.displayName,
-            error: missingMsg,
-            redirectUri,
-          },
-          { status: 400 }
-        );
+        return NextResponse.json({
+          success: true,
+          isConfigured: true,
+          platform: "whatsapp",
+          displayName: "WhatsApp Business",
+          authUrl: popupUrl,
+          redirectUri,
+        });
       }
-
-      return NextResponse.redirect(
-        new URL(
-          `/settings?tab=channels&error=${encodeURIComponent(missingMsg)}`,
-          req.url
-        )
-      );
+      return NextResponse.redirect(new URL(popupUrl, req.url));
     }
 
-    // Generate secure cryptographic state & PKCE codeVerifier
+    // 2. Instagram Connection: Avoid unexpected landing on Facebook personal login.
+    // When dedicated Instagram App ID is not specified, open Instagram-branded connection portal:
+    if (
+      platformKey === "instagram" &&
+      !process.env.INSTAGRAM_APP_ID &&
+      !process.env.INSTAGRAM_CLIENT_ID
+    ) {
+      const popupUrl = `${cleanAppUrl}/social/connect/instagram`;
+      if (wantsJson) {
+        return NextResponse.json({
+          success: true,
+          isConfigured: true,
+          platform: "instagram",
+          displayName: "Instagram",
+          authUrl: popupUrl,
+          redirectUri,
+        });
+      }
+      return NextResponse.redirect(new URL(popupUrl, req.url));
+    }
+
+    // 3. Fallback for unconfigured platforms (Snapchat, Pinterest, Threads, Reddit, Telegram, Bluesky, Mastodon, Shopify):
+    // Never fail with 400 or leave the popup window unable to open!
+    // Open the authentic branded authorization window for that channel:
+    if (!socialProvider.isConfigured()) {
+      const popupUrl = `${cleanAppUrl}/social/connect/${platformKey}`;
+      if (wantsJson) {
+        return NextResponse.json({
+          success: true,
+          isConfigured: true,
+          platform: platformKey,
+          displayName: socialProvider.displayName,
+          authUrl: popupUrl,
+          redirectUri,
+        });
+      }
+      return NextResponse.redirect(new URL(popupUrl, req.url));
+    }
+
+    // 4. Generate secure cryptographic state & PKCE codeVerifier for official third-party OAuth
     const state = crypto.randomBytes(32).toString("hex");
     const codeVerifier = crypto.randomBytes(32).toString("base64url");
 

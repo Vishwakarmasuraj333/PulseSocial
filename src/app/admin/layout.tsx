@@ -28,6 +28,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { PulseSocialLogo } from "@/components/brand/PulseSocialLogo";
+import { isCompanyAdminEmail } from "@/lib/auth/admin-emails";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -55,13 +56,24 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
       const cached = localStorage.getItem("pulsesocial_active_user");
       if (cached) {
-        setCurrentUser(JSON.parse(cached));
+        const u = JSON.parse(cached);
+        setCurrentUser(u);
+        if (u?.email && !isCompanyAdminEmail(u.email)) {
+          router.replace("/dashboard?error=unauthorized_admin");
+          return;
+        }
       }
     } catch {}
 
     // Check DB ping for admin header
     fetch("/api/admin/health")
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401 || res.status === 403) {
+          router.replace("/dashboard?error=unauthorized_admin");
+          return null;
+        }
+        return res.json();
+      })
       .then((data) => {
         if (data?.database) {
           setDbStatus({

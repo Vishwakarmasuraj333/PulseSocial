@@ -1,4 +1,5 @@
 "use client";
+import { isCompanyAdminEmail } from "@/lib/auth/admin-emails";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
@@ -126,6 +127,17 @@ export function CommandPalette({
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const [currentUserEmail, setCurrentUserEmail] = useState<string>("");
+
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem("pulsesocial_active_user");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed?.email) setCurrentUserEmail(parsed.email);
+      }
+    } catch {}
+  }, []);
 
   // Focus input when opened
   useEffect(() => {
@@ -692,6 +704,7 @@ export function CommandPalette({
     return list;
   }, [
     connectedAccounts,
+    currentUserEmail,
     onClose,
     onOpenComposer,
     onOpenAddBrand,

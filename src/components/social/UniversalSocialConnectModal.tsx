@@ -361,92 +361,97 @@ export function UniversalSocialConnectModal({
       return;
     }
 
-    try {
-      const targetApiId = ch.id === "twitter" ? "x" : ch.id;
-      const res = await fetch(`/api/social/${targetApiId}/connect?format=json`);
-      const data = await res.json();
+    const targetApiId = ch.id === "twitter" ? "x" : ch.id;
 
-      if (!res.ok || !data.success || !data.authUrl) {
-        setOauthError(
-          data.error ||
-            `OAuth credentials for ${ch.name} are not configured in your environment variables. You can enter an access token below.`
-        );
-        setConnectingChannelId(null);
-        return;
-      }
+    // Calculate centered popup coordinates
+    const width = 560;
+    const height = 740;
+    const left = Math.max(0, Math.floor(window.screenX + (window.outerWidth - width) / 2));
+    const top = Math.max(0, Math.floor(window.screenY + (window.outerHeight - height) / 2));
 
-      // Calculate centered popup coordinates
-      const width = 640;
-      const height = 760;
-      const left = Math.max(0, Math.floor(window.screenX + (window.outerWidth - width) / 2));
-      const top = Math.max(0, Math.floor(window.screenY + (window.outerHeight - height) / 2));
+    // SYNCHRONOUS POPUP LAUNCH:
+    // Calling window.open synchronously immediately in the click event ensures
+    // that modern browser popup blockers (Chrome, Safari, Edge, Firefox) NEVER block it.
+    const initialUrl = `/social/connect/${targetApiId}`;
+    const popup = window.open(
+      initialUrl,
+      `pulsesocial_oauth_${targetApiId}`,
+      `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes,scrollbars=yes`
+    );
 
-      const popup = window.open(
-        data.authUrl,
-        `pulsesocial_oauth_${targetApiId}`,
-        `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes,scrollbars=yes`
+    if (!popup || popup.closed || typeof popup.closed === "undefined") {
+      setOauthError(
+        `Popup was blocked by your browser. Please click the button below to open authorization:`
       );
+      setFallbackUrl(initialUrl);
+      setConnectingChannelId(null);
+      return;
+    }
 
-      if (!popup || popup.closed || typeof popup.closed === "undefined") {
-        // Popup was blocked by browser
-        setOauthError(
-          `Popup was blocked by your browser. Please click the button below to open authorization:`
-        );
-        setFallbackUrl(data.authUrl);
+    // For official platforms (YouTube, Google Business, Facebook, LinkedIn, X, TikTok),
+    // check if live third-party OAuth is configured:
+    if (["youtube", "facebook", "linkedin", "x", "tiktok", "google_business"].includes(targetApiId)) {
+      try {
+        const res = await fetch(`/api/social/${targetApiId}/connect?format=json`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.authUrl && !data.authUrl.includes("/social/connect/")) {
+            if (popup && !popup.closed) {
+              popup.location.href = data.authUrl;
+            }
+          }
+        }
+      } catch (err) {
+        console.error("OAuth init fetch error:", err);
+      }
+    }
+
+    // Smooth polling while popup is open
+    if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+
+    let attempts = 0;
+    pollIntervalRef.current = setInterval(async () => {
+      attempts++;
+      const updatedProvs = await loadConnectedAccounts();
+
+      if (
+        updatedProvs &&
+        (updatedProvs.has(ch.id) || (ch.id === "twitter" && updatedProvs.has("x")))
+      ) {
+        if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
         setConnectingChannelId(null);
+
+        try {
+          if (popup && !popup.closed) popup.close();
+        } catch {}
+
+        toast({
+          title: "Channel Connected!",
+          message: `${ch.name} successfully linked to your workspace.`,
+          type: "success",
+        });
+
+        window.dispatchEvent(new Event("pulsesocial_account_connected"));
+        if (onSuccess) onSuccess({ platform: ch.id });
+        if (onAccountConnected) onAccountConnected({ platform: ch.id });
         return;
       }
 
-      // Smooth polling while popup is open
-      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+      // Check if popup closed by user
+      if (popup.closed) {
+        if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+        setConnectingChannelId(null);
+      }
 
-      let attempts = 0;
-      pollIntervalRef.current = setInterval(async () => {
-        attempts++;
-        const updatedProvs = await loadConnectedAccounts();
-
-        if (
-          updatedProvs &&
-          (updatedProvs.has(ch.id) || (ch.id === "twitter" && updatedProvs.has("x")))
-        ) {
-          if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
-          pollIntervalRef.current = null;
-          setConnectingChannelId(null);
-
-          try {
-            if (popup && !popup.closed) popup.close();
-          } catch {}
-
-          toast({
-            title: "Channel Connected!",
-            message: `${ch.name} successfully linked to your workspace.`,
-            type: "success",
-          });
-
-          window.dispatchEvent(new Event("pulsesocial_account_connected"));
-          if (onSuccess) onSuccess({ platform: ch.id });
-          if (onAccountConnected) onAccountConnected({ platform: ch.id });
-          return;
-        }
-
-        // Check if popup closed by user
-        if (popup.closed) {
-          if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
-          pollIntervalRef.current = null;
-          setConnectingChannelId(null);
-        }
-
-        // Timeout after 3 minutes
-        if (attempts > 90) {
-          if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
-          pollIntervalRef.current = null;
-          setConnectingChannelId(null);
-        }
-      }, 2000);
-    } catch (err: unknown) {
-      setOauthError((err as Error).message || "Unable to initiate authorization.");
-      setConnectingChannelId(null);
-    }
+      // Timeout after 3 minutes
+      if (attempts > 90) {
+        if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+        setConnectingChannelId(null);
+      }
+    }, 1500);
   };
 
   // Direct manual token submission for developer / testing mode

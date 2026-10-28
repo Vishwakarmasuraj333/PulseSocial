@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { jwtVerify } from "jose";
+import { isCompanyAdminEmail } from "@/lib/auth/admin-emails";
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "pulsesocial_super_secure_jwt_secret_token_change_in_production_32chars"
@@ -93,6 +94,7 @@ const PROTECTED_PREFIXES = [
   "/trigger-links",
   "/onboarding",
   "/admin",
+  "/social/connect",
 ];
 
 export async function middleware(req: NextRequest) {
@@ -105,6 +107,7 @@ export async function middleware(req: NextRequest) {
 
   let isAuthenticated = false;
   let isEmailVerified = false;
+  let sessionEmail = "";
 
   if (sessionCookie) {
     try {
@@ -113,10 +116,12 @@ export async function middleware(req: NextRequest) {
         isAuthenticated = true;
         // Verified if emailVerified is true or not explicitly false
         isEmailVerified = payload.emailVerified !== false;
+        sessionEmail = typeof payload.email === "string" ? payload.email : "";
       }
     } catch {
       isAuthenticated = false;
       isEmailVerified = false;
+      sessionEmail = "";
     }
   }
 
@@ -184,7 +189,16 @@ export async function middleware(req: NextRequest) {
     return res;
   }
 
-  // 8. If Visiting Auth Pages (/login, /signup) While Already Authenticated -> Send to /dashboard
+  // 8. STRICT SYSTEM ADMIN GUARD: Only Company Super-Admins can access /admin routes
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+    if (!isCompanyAdminEmail(sessionEmail)) {
+      const dashboardUrl = new URL("/dashboard", req.url);
+      dashboardUrl.searchParams.set("error", "unauthorized_admin");
+      return NextResponse.redirect(dashboardUrl);
+    }
+  }
+
+  // 9. If Visiting Auth Pages (/login, /signup) While Already Authenticated -> Send to /dashboard
   if (AUTH_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`))) {
     if (isAuthenticated && isEmailVerified) {
       return NextResponse.redirect(new URL("/dashboard", req.url));

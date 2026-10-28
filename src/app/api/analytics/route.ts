@@ -190,7 +190,7 @@ export async function GET(req: Request) {
         media: true,
         targets: {
           include: {
-            socialAccount: true,
+            socialAccount: { include: { profile: true } },
           },
         },
         comments: true,

@@ -1,4 +1,5 @@
 "use client";
+import { isCompanyAdminEmail } from "@/lib/auth/admin-emails";
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -676,11 +677,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         },
       ],
     },
-    ...(user?.role?.toUpperCase() === "OWNER" ||
-    user?.role?.toUpperCase() === "ADMIN" ||
-    ["admin@pulsesocial.io", "itsurya9930@gmail.com", "itxsurajofficial@gmail.com"].includes(
-      user?.email?.toLowerCase() || ""
-    )
+    ...(isCompanyAdminEmail(user?.email)
       ? [
           {
             title: "ADMINISTRATION",
@@ -1431,11 +1428,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                       <span className="text-[10px] text-slate-400 font-semibold">{isDarkMode ? "On" : "Off"}</span>
                     </button>
 
-                    {(user?.role?.toUpperCase() === "OWNER" ||
-                      user?.role?.toUpperCase() === "ADMIN" ||
-                      ["admin@pulsesocial.io", "itsurya9930@gmail.com", "itxsurajofficial@gmail.com"].includes(
-                        user?.email?.toLowerCase() || ""
-                      )) && (
+                    {(isCompanyAdminEmail(user?.email)) && (
                       <Link
                         href="/admin"
                         onClick={() => setIsUserMenuOpen(false)}

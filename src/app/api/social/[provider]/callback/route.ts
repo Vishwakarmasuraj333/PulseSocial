@@ -20,7 +20,9 @@ export async function GET(
 
     const { provider } = await params;
     const url = new URL(req.url);
-    const code = url.searchParams.get("code");
+    const rawCode = url.searchParams.get("code") || "";
+    // Instagram redirects may append '#_' to the authorization code
+    const code = rawCode.replace(/#_$/, "").trim();
     const state = url.searchParams.get("state");
     const errorParam = url.searchParams.get("error") || url.searchParams.get("error_reason");
     const errorDesc = url.searchParams.get("error_description") || url.searchParams.get("error_message");
@@ -38,6 +40,8 @@ export async function GET(
       let friendlyError = errorDesc || errorParam;
       if (rawKey === "linkedin" && (errorParam.includes("scope") || errorDesc?.toLowerCase().includes("scope"))) {
         friendlyError = "LinkedIn OAuth Error: Required scopes are not enabled on your LinkedIn App. In LinkedIn Developer Portal -> Products tab, click 'Request access' for 'Share on LinkedIn' and 'Sign In with LinkedIn using OpenID Connect'.";
+      } else if (rawKey === "instagram" && (errorParam === "access_denied" || errorParam.includes("denied"))) {
+        friendlyError = "Instagram authorization was cancelled or requested permissions were declined.";
       }
       return NextResponse.redirect(
         new URL(

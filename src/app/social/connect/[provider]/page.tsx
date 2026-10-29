@@ -9,6 +9,7 @@ import {
   AlertCircle,
   QrCode,
   Smartphone,
+  ExternalLink,
 } from "lucide-react";
 import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
 
@@ -160,7 +161,18 @@ export default function SocialChannelConnectPopupPage() {
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const queryError = searchParams?.get("error");
+  const [errorMsg, setErrorMsg] = useState<string | null>(queryError || null);
+
+  // Auto-redirect to official Instagram Login if accessed directly and no error is present
+  useEffect(() => {
+    if (provider === "instagram" && !queryError) {
+      const timer = setTimeout(() => {
+        window.location.href = "/api/social/instagram/connect";
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [provider, queryError]);
 
   // Sync if username updates from config
   useEffect(() => {
@@ -419,67 +431,89 @@ export default function SocialChannelConnectPopupPage() {
               </div>
             )}
 
-            {/* INSTAGRAM DEDICATED EXPERIENCE - 100% PURE DIRECT INSTAGRAM, ZERO FACEBOOK REDIRECT */}
+            {/* INSTAGRAM DEDICATED EXPERIENCE - OFFICIAL INSTAGRAM LOGIN FOR BUSINESS */}
             {provider === "instagram" && (
-              <form onSubmit={handleConnect} className="space-y-3.5">
-                <div>
-                  <label className="text-[11px] font-bold text-slate-400 block mb-1">
-                    Instagram Professional Handle
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-2 text-xs text-slate-500 font-bold">@</span>
-                    <input
-                      type="text"
-                      value={username.replace(/^@/, "")}
-                      onChange={(e) => setUsername(e.target.value)}
-                      placeholder="yourbrand"
-                      className="w-full pl-7 pr-3 py-2 text-xs rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-hidden focus:border-[#FD1D1D]"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-bold text-slate-400 block mb-1">
-                    Account Category
-                  </label>
-                  <select
-                    value={accountType}
-                    onChange={(e) => setAccountType(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-hidden"
-                  >
-                    <option value="BUSINESS">Business Account (Brand, Retail, Enterprise)</option>
-                    <option value="CREATOR">Creator Account (Influencer, Media, Artist)</option>
-                  </select>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 text-[11px] text-slate-400 space-y-1">
-                  <p className="font-semibold text-white flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Instagram API Permissions:</span>
-                  </p>
-                  <p>• Auto-publish feed posts, carousels &amp; Reels</p>
-                  <p>• Schedule auto-first comments &amp; hashtag groups</p>
-                  <p>• Track follower reach and engagement insights</p>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className={`w-full py-2.5 px-4 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-98 ${config.buttonClass}`}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Authorizing Instagram...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Check className="w-4 h-4 stroke-[2.5]" />
-                      <span>Continue with Instagram (@{username.replace(/^@/, "")})</span>
-                    </>
-                  )}
-                </button>
-              </form>
+              <div className="space-y-4 text-center py-4">
+                {errorMsg ? (
+                  <>
+                    <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400">
+                      <AlertCircle className="w-7 h-7" />
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="text-sm font-bold text-white">Instagram Authorization Notice</h3>
+                      <p className="text-xs text-amber-300 max-w-sm mx-auto leading-relaxed">
+                        {errorMsg}
+                      </p>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 text-[11px] text-slate-400 space-y-1 text-left">
+                      <p className="font-semibold text-white flex items-center gap-1.5">
+                        <ShieldCheck className="w-3.5 h-3.5 text-purple-400" />
+                        <span>Setup Requirements:</span>
+                      </p>
+                      <p>• Meta Developer App with <b>Instagram</b> product added</p>
+                      <p>• INSTAGRAM_APP_ID (or META_APP_ID) and Secret in .env</p>
+                      <p>• Valid OAuth Redirect URI registered: <code>/api/social/instagram/callback</code></p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (typeof window !== "undefined" && window.opener && !window.opener.closed) {
+                            window.close();
+                          } else {
+                            router.push("/social-accounts");
+                          }
+                        }}
+                        className="w-1/2 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition cursor-pointer"
+                      >
+                        Close Window
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setErrorMsg(null);
+                          window.location.href = "/api/social/instagram/connect";
+                        }}
+                        className={`w-1/2 py-2.5 px-3 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer ${config.buttonClass}`}
+                      >
+                        <span>Retry</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#833AB4] via-[#FD1D1D] to-[#F77737] flex items-center justify-center mx-auto shadow-lg shadow-pink-500/25">
+                      <Loader2 className="w-7 h-7 text-white animate-spin" />
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="text-sm font-bold text-white">Opening Official Instagram Login...</h3>
+                      <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                        Redirecting to Meta&apos;s direct Instagram authorization consent screen for Professional accounts.
+                      </p>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 text-[11px] text-slate-400 space-y-1 text-left">
+                      <p className="font-semibold text-white flex items-center gap-1.5">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Official Meta Business Login:</span>
+                      </p>
+                      <p>• Direct authorization on instagram.com (Zero Facebook redirects)</p>
+                      <p>• Eligible for Instagram Professional (Business or Creator) accounts</p>
+                      <p>• Server-side token exchange and secure AES-256 storage</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        window.location.href = "/api/social/instagram/connect";
+                      }}
+                      className={`w-full py-2.5 px-4 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-98 ${config.buttonClass}`}
+                    >
+                      <span>Authorize with Instagram Login</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </button>
+                  </>
+                )}
+              </div>
             )}
 
             {/* GENERAL STANDALONE PROVIDERS (Snapchat, Pinterest, Threads, Reddit, Telegram, Bluesky, Mastodon, Shopify) */}

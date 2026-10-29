@@ -1,22 +1,33 @@
 import assert from "assert";
 import { MetaProvider } from "../../src/lib/social/providers/meta";
+import { InstagramProvider } from "../../src/lib/social/providers/instagram";
 
 export async function runMetaApiIntegrationTests() {
   console.log("\n▶ Running Suite 14: Meta Graph API & Instagram Container Integration Tests...");
+
+  process.env.META_APP_ID = process.env.META_APP_ID || "1427242679545054";
+  process.env.META_APP_SECRET = process.env.META_APP_SECRET || "mock_meta_app_secret";
 
   const meta = new MetaProvider();
 
   // Test 1: OAuth URL generation for Facebook & Instagram
   const fbAuthUrl = meta.getAuthUrl("test-csrf-state-xyz", "https://pulsesocial1.vercel.app/api/social/facebook/callback");
-  assert.ok(fbAuthUrl.includes("https://www.facebook.com/"), "Auth URL must use Facebook OAuth dialog");
+  assert.ok(fbAuthUrl.includes("https://www.facebook.com/"), "Facebook Auth URL must use Facebook OAuth dialog");
   assert.ok(fbAuthUrl.includes("state=test-csrf-state-xyz"), "Auth URL must include CSRF state parameter");
   assert.ok(fbAuthUrl.includes("pages_manage_posts"), "Facebook Auth URL must request pages_manage_posts scope");
   assert.ok(fbAuthUrl.includes("redirect_uri="), "Facebook Auth URL must include redirect URI");
 
-  const igAuthMeta = new MetaProvider("instagram");
-  const igAuthUrl = igAuthMeta.getAuthUrl("test-csrf-state-xyz", "https://pulsesocial1.vercel.app/api/social/instagram/callback");
-  assert.ok(igAuthUrl.includes("instagram_content_publish"), "Instagram Auth URL must request instagram_content_publish scope");
-  console.log("  ✔ Test 1 Passed: Meta OAuth authorization URLs correctly configured with CSRF state and required scopes for Facebook & Instagram.");
+  const igProvider = new InstagramProvider();
+  const igAuthUrl = igProvider.getAuthUrl("test-csrf-state-xyz", "https://pulsesocial1.vercel.app/api/social/instagram/callback");
+  assert.ok(igAuthUrl.startsWith("https://www.instagram.com/oauth/authorize?"), "Instagram Auth URL must use official Instagram OAuth dialog");
+  assert.ok(igAuthUrl.includes("enable_fb_login=0"), "Instagram Auth URL must disable Facebook login redirect (enable_fb_login=0)");
+  assert.ok(igAuthUrl.includes("force_authentication=1"), "Instagram Auth URL must include force_authentication=1");
+  assert.ok(
+    igAuthUrl.includes("instagram_business_content_publish") || igAuthUrl.includes("instagram_content_publish"),
+    "Instagram Auth URL must request instagram_business_content_publish scope"
+  );
+  assert.ok(!igAuthUrl.includes("facebook.com"), "Instagram Auth URL must NEVER redirect to facebook.com");
+  console.log("  ✔ Test 1 Passed: Meta & Instagram OAuth authorization URLs correctly configured with pure Instagram flow and zero Facebook redirects.");
 
   // Test 2: App credentials validation (zero hardcoding, checks env)
   try {
@@ -48,7 +59,6 @@ export async function runMetaApiIntegrationTests() {
   console.log("  ✔ Test 4 Passed: Facebook Page publishing validates response and returns structured error contract.");
 
   // Test 5: Instagram Media Container 2-Step Workflow contract (requires media attachment)
-  const igProvider = new MetaProvider("instagram");
   const igResult = await igProvider.publishPost("test_token", {
     content: "Instagram requires media attachment",
     targetAccountId: "ig_test_123",

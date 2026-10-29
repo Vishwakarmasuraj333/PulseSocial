@@ -1,5 +1,6 @@
 import { SupportedPlatform, SocialProvider } from "./types";
 import { MetaProvider } from "./providers/meta";
+import { InstagramProvider } from "./providers/instagram";
 import { LinkedInProvider } from "./providers/linkedin";
 import { TikTokProvider } from "./providers/tiktok";
 import { XProvider } from "./providers/x";
@@ -13,12 +14,11 @@ import { WhatsAppProvider } from "./providers/whatsapp";
 import { RedditProvider } from "./providers/reddit";
 import { BlueskyProvider } from "./providers/bluesky";
 import { TelegramProvider } from "./providers/telegram";
-
 import { ShopifyProvider } from "./providers/shopify";
 
 const providerFactories: Record<SupportedPlatform, () => SocialProvider> = {
   facebook: () => new MetaProvider("facebook"),
-  instagram: () => new MetaProvider("instagram"),
+  instagram: () => new InstagramProvider(),
   linkedin: () => new LinkedInProvider(),
   x: () => new XProvider(),
   youtube: () => new YouTubeProvider(),

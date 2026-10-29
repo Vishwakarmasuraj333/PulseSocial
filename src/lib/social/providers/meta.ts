@@ -105,22 +105,21 @@ export class MetaProvider implements SocialProvider {
       }
     }
 
-    // Check if a dedicated Instagram App ID is configured
-    const dedicatedIgAppId = process.env.INSTAGRAM_APP_ID || process.env.INSTAGRAM_CLIENT_ID;
-
+    // Instagram must use official Instagram Login for Business with enable_fb_login=0
     if (this.platform === "instagram") {
-      if (dedicatedIgAppId) {
-        const igParams = new URLSearchParams({
-          client_id: dedicatedIgAppId,
-          redirect_uri: redirectUri,
-          state,
-          scope: "user_profile,user_media",
-          response_type: "code",
-        });
-        return `https://api.instagram.com/oauth/authorize?${igParams.toString()}`;
-      }
-      // Instagram must NEVER open facebook.com URL
-      return `/social/connect/instagram`;
+      const igAppId = process.env.INSTAGRAM_APP_ID || process.env.INSTAGRAM_CLIENT_ID || appId;
+      const igParams = new URLSearchParams({
+        client_id: igAppId,
+        redirect_uri: redirectUri,
+        state,
+        scope:
+          process.env.INSTAGRAM_SCOPES ||
+          "instagram_business_basic,instagram_business_content_publish,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_manage_insights",
+        response_type: "code",
+        enable_fb_login: "0",
+        force_authentication: "1",
+      });
+      return `https://www.instagram.com/oauth/authorize?${igParams.toString()}`;
     }
 
     // Facebook OAuth dialog

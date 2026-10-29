@@ -388,9 +388,9 @@ export function UniversalSocialConnectModal({
       return;
     }
 
-    // For official platforms (YouTube, Google Business, Facebook, LinkedIn, X, TikTok),
+    // For official platforms (YouTube, Instagram, Facebook, LinkedIn, X, TikTok, Google Business),
     // check if live third-party OAuth is configured:
-    if (["youtube", "facebook", "linkedin", "x", "tiktok", "google_business"].includes(targetApiId)) {
+    if (["youtube", "instagram", "facebook", "linkedin", "x", "tiktok", "google_business"].includes(targetApiId)) {
       try {
         const res = await fetch(`/api/social/${targetApiId}/connect?format=json`);
         if (res.ok) {
@@ -400,6 +400,19 @@ export function UniversalSocialConnectModal({
               popup.location.href = data.authUrl;
             }
           }
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          const errMsg = errData.error || `Could not initiate ${ch.name} authorization.`;
+          setOauthError(errMsg);
+          setConnectingChannelId(null);
+          try {
+            if (popup && !popup.closed) popup.close();
+          } catch {}
+          toast({
+            title: `${ch.name} Setup Required`,
+            message: errMsg,
+            type: "warning",
+          });
         }
       } catch (err) {
         console.error("OAuth init fetch error:", err);

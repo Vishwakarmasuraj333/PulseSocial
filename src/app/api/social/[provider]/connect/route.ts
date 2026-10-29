@@ -57,8 +57,7 @@ export async function GET(
       orgId = user?.memberships[0]?.organizationId;
     }
 
-    // 1. WhatsApp Connection: NEVER redirect to personal Facebook login page.
-    // If WhatsApp Cloud API credentials are pre-configured in environment, auto-link:
+    // 1. WhatsApp Connection: Auto-link if WhatsApp Cloud API credentials are pre-configured in environment:
     if (
       platformKey === "whatsapp" &&
       process.env.WHATSAPP_PHONE_NUMBER_ID &&
@@ -127,7 +126,7 @@ export async function GET(
       }
     }
 
-    // Otherwise for WhatsApp, always route to the dedicated WhatsApp Business QR / pairing portal
+    // Otherwise for WhatsApp, route to the dedicated WhatsApp Business QR / pairing portal
     if (platformKey === "whatsapp") {
       const popupUrl = `${cleanAppUrl}/social/connect/whatsapp`;
       if (wantsJson) {
@@ -143,29 +142,28 @@ export async function GET(
       return NextResponse.redirect(new URL(popupUrl, req.url));
     }
 
-    // 2. Instagram Connection: Avoid unexpected landing on Facebook personal login.
-    // When dedicated Instagram App ID is not specified, open Instagram-branded connection portal:
-    if (
-      platformKey === "instagram" &&
-      !process.env.INSTAGRAM_APP_ID &&
-      !process.env.INSTAGRAM_CLIENT_ID
-    ) {
-      const popupUrl = `${cleanAppUrl}/social/connect/instagram`;
+    // 2. Instagram: Strict requirement that Instagram must NEVER open mock username dialog or Facebook login.
+    // If not configured, return an actionable configuration error.
+    if (platformKey === "instagram" && !socialProvider.isConfigured()) {
+      const missingMsg = socialProvider.getMissingConfigMessage();
       if (wantsJson) {
-        return NextResponse.json({
-          success: true,
-          isConfigured: true,
-          platform: "instagram",
-          displayName: "Instagram",
-          authUrl: popupUrl,
-          redirectUri,
-        });
+        return NextResponse.json(
+          {
+            success: false,
+            isConfigured: false,
+            platform: "instagram",
+            displayName: "Instagram",
+            error: missingMsg,
+          },
+          { status: 400 }
+        );
       }
-      return NextResponse.redirect(new URL(popupUrl, req.url));
+      return NextResponse.redirect(
+        new URL(`/social/connect/instagram?error=${encodeURIComponent(missingMsg)}`, req.url)
+      );
     }
 
     // 3. Fallback for unconfigured platforms (Snapchat, Pinterest, Threads, Reddit, Telegram, Bluesky, Mastodon, Shopify):
-    // Never fail with 400 or leave the popup window unable to open!
     // Open the authentic branded authorization window for that channel:
     if (!socialProvider.isConfigured()) {
       const popupUrl = `${cleanAppUrl}/social/connect/${platformKey}`;

@@ -109,6 +109,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Social provider identifier is required." }, { status: 400 });
     }
 
+    // STRICT PROHIBITION: Never allow an Instagram connection via typed username alone.
+    // Instagram accounts must authenticate via official Instagram Login for Business.
+    if (normalizedProvider === "instagram") {
+      return NextResponse.json(
+        {
+          error:
+            "Instagram accounts cannot be connected via username alone. You must authenticate through official Instagram Login for Professional accounts.",
+        },
+        { status: 400 }
+      );
+    }
+
     const cleanUsername = body.username ? String(body.username).replace(/^@/, "").trim() : null;
     const providerAccountId =
       body.providerAccountId ||

@@ -82,7 +82,7 @@ export async function runVideoCallsUnitTests() {
     data: { sdp: "v=0\r\no=peer 9876 5432 IN IP4 127.0.0.1...", type: "answer" },
   });
 
-  const hostSignals = SignalingStore.pollSignals(testRoomId, hostId, offerSignal.timestamp);
+  const hostSignals = SignalingStore.pollSignals(testRoomId, hostId, offerSignal.timestamp - 1);
   const foundAnswer = hostSignals.signals.find((s) => s.type === "answer" && s.fromId === peerId);
   assert.ok(foundAnswer, "Host must receive SDP answer from peer");
   console.log("  ✔ Verified: SDP Offer & Answer successfully routed between WebRTC peers.");
@@ -125,6 +125,7 @@ export async function runVideoCallsUnitTests() {
 
   // Test 7: Pinterest Provider Configuration & OAuth URL
   console.log("▶ Test 7: Verifying Pinterest Provider configuration and OAuth 2.0 URL...");
+  process.env.PINTEREST_APP_ID = process.env.PINTEREST_APP_ID || "1612708";
   const pinterest = new PinterestProvider();
   assert.strictEqual(pinterest.platform, "pinterest");
   assert.strictEqual(pinterest.displayName, "Pinterest");

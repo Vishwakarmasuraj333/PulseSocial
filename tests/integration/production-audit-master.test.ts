@@ -1,6 +1,7 @@
 import assert from "assert";
 import { prisma } from "../../src/lib/prisma";
 import { MetaProvider } from "../../src/lib/social/providers/meta";
+import { InstagramProvider } from "../../src/lib/social/providers/instagram";
 import { encryptToken, decryptToken } from "../../src/lib/security/encryption";
 
 export async function runProductionAuditMasterTests() {
@@ -41,7 +42,7 @@ export async function runProductionAuditMasterTests() {
   assert.strictEqual(fbProvider.platform, "facebook");
   assert.strictEqual(fbProvider.displayName, "Facebook");
 
-  const igProvider = new MetaProvider("instagram");
+  const igProvider = new InstagramProvider();
   assert.strictEqual(igProvider.platform, "instagram");
   assert.strictEqual(igProvider.displayName, "Instagram");
 
@@ -57,11 +58,14 @@ export async function runProductionAuditMasterTests() {
   assert.ok(fbAuthUrl.includes("pages_read_engagement"));
 
   const igAuthUrl = igProvider.getAuthorizationUrl(testState, igRedirectUri);
-  assert.ok(igAuthUrl.startsWith("https://www.facebook.com/v20.0/dialog/oauth?"));
+  assert.ok(igAuthUrl.startsWith("https://www.instagram.com/oauth/authorize?"), "Instagram Auth URL must use official instagram.com dialog");
   assert.ok(igAuthUrl.includes(`redirect_uri=${encodeURIComponent(igRedirectUri)}`));
-  assert.ok(igAuthUrl.includes("instagram_basic"));
-  assert.ok(igAuthUrl.includes("instagram_content_publish"));
-  console.log("  ✔ Facebook and Instagram OAuth URL generation, state, and scopes verified independently");
+  assert.ok(igAuthUrl.includes("enable_fb_login=0"), "Instagram Auth URL must contain enable_fb_login=0 to prevent Facebook redirects");
+  assert.ok(igAuthUrl.includes("force_authentication=1"), "Instagram Auth URL must include force_authentication=1");
+  assert.ok(igAuthUrl.includes("instagram_business_basic") || igAuthUrl.includes("instagram_basic"));
+  assert.ok(igAuthUrl.includes("instagram_business_content_publish") || igAuthUrl.includes("instagram_content_publish"));
+  assert.ok(!igAuthUrl.includes("facebook.com"), "Instagram Auth URL must NEVER redirect to facebook.com");
+  console.log("  ✔ Facebook (Facebook OAuth dialog) and Instagram (pure Instagram Login, zero Facebook redirect) verified independently");
 
   // 4. Regression: Missing valid authorization token rejection
   await assert.rejects(

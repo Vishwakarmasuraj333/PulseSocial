@@ -22,6 +22,7 @@ interface PlatformMetadata {
   defaultUsername: string;
   defaultType: string;
   scopes: string[];
+  requiredEnvVars?: string[];
 }
 
 const PLATFORM_META: Record<string, PlatformMetadata> = {
@@ -31,9 +32,21 @@ const PLATFORM_META: Record<string, PlatformMetadata> = {
     subtitle: "Professional & Creator Accounts",
     accentColor: "#FD1D1D",
     buttonClass: "bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] hover:opacity-95 text-white shadow-pink-500/25",
-    defaultUsername: "pulsesocial_official",
+    defaultUsername: "",
     defaultType: "BUSINESS",
     scopes: ["instagram_basic", "instagram_content_publish", "instagram_manage_insights", "instagram_manage_comments"],
+    requiredEnvVars: ["INSTAGRAM_APP_ID (or META_APP_ID)", "INSTAGRAM_APP_SECRET (or META_APP_SECRET)"],
+  },
+  facebook: {
+    id: "facebook",
+    name: "Facebook",
+    subtitle: "Pages, Video & Content Hub",
+    accentColor: "#1877F2",
+    buttonClass: "bg-[#1877F2] hover:bg-[#166fe5] text-white shadow-blue-500/25",
+    defaultUsername: "",
+    defaultType: "PAGE",
+    scopes: ["pages_show_list", "pages_read_engagement", "pages_manage_posts"],
+    requiredEnvVars: ["META_APP_ID", "META_APP_SECRET"],
   },
   whatsapp: {
     id: "whatsapp",
@@ -41,9 +54,10 @@ const PLATFORM_META: Record<string, PlatformMetadata> = {
     subtitle: "Cloud API & Web Channel",
     accentColor: "#25D366",
     buttonClass: "bg-[#25D366] hover:bg-[#1EBE5D] text-white shadow-emerald-500/25",
-    defaultUsername: "+1 (555) 019-8834",
+    defaultUsername: "",
     defaultType: "WHATSAPP_BUSINESS",
     scopes: ["whatsapp_business_messaging", "whatsapp_business_management", "catalog_sync"],
+    requiredEnvVars: ["WHATSAPP_PHONE_NUMBER_ID", "WHATSAPP_ACCESS_TOKEN"],
   },
   snapchat: {
     id: "snapchat",
@@ -51,9 +65,10 @@ const PLATFORM_META: Record<string, PlatformMetadata> = {
     subtitle: "Public Profile & Spotlight",
     accentColor: "#FFFC00",
     buttonClass: "bg-[#FFFC00] hover:bg-[#EBE800] text-slate-950 font-black shadow-yellow-500/25 border border-yellow-300",
-    defaultUsername: "pulsesocial_snap",
+    defaultUsername: "",
     defaultType: "SPOTLIGHT",
     scopes: ["snapchat.spotlight.publish", "snapchat.story.view", "snapchat.profile.read"],
+    requiredEnvVars: ["SNAPCHAT_CLIENT_ID", "SNAPCHAT_CLIENT_SECRET"],
   },
   pinterest: {
     id: "pinterest",
@@ -61,9 +76,10 @@ const PLATFORM_META: Record<string, PlatformMetadata> = {
     subtitle: "Business Account & Boards",
     accentColor: "#E60023",
     buttonClass: "bg-[#E60023] hover:bg-[#CC001F] text-white shadow-red-500/25",
-    defaultUsername: "pulsesocial_pins",
+    defaultUsername: "",
     defaultType: "BUSINESS",
     scopes: ["boards:read", "pins:read", "pins:write", "user_accounts:read"],
+    requiredEnvVars: ["PINTEREST_APP_ID", "PINTEREST_APP_SECRET"],
   },
   threads: {
     id: "threads",
@@ -71,9 +87,10 @@ const PLATFORM_META: Record<string, PlatformMetadata> = {
     subtitle: "Conversational Microblogging",
     accentColor: "#101010",
     buttonClass: "bg-black hover:bg-slate-900 text-white dark:bg-white dark:text-black shadow-slate-900/25",
-    defaultUsername: "pulsesocial_threads",
+    defaultUsername: "",
     defaultType: "CREATOR",
     scopes: ["threads_basic", "threads_content_publish", "threads_read_replies"],
+    requiredEnvVars: ["THREADS_APP_ID", "THREADS_APP_SECRET"],
   },
   reddit: {
     id: "reddit",
@@ -81,9 +98,10 @@ const PLATFORM_META: Record<string, PlatformMetadata> = {
     subtitle: "Community & Subreddits",
     accentColor: "#FF4500",
     buttonClass: "bg-[#FF4500] hover:bg-[#D93A00] text-white shadow-orange-500/25",
-    defaultUsername: "pulsesocial_hq",
+    defaultUsername: "",
     defaultType: "PROFILE",
     scopes: ["identity", "submit", "read", "history", "mysubreddits"],
+    requiredEnvVars: ["REDDIT_CLIENT_ID", "REDDIT_CLIENT_SECRET"],
   },
   telegram: {
     id: "telegram",
@@ -91,9 +109,10 @@ const PLATFORM_META: Record<string, PlatformMetadata> = {
     subtitle: "Broadcasting Bot & Channel",
     accentColor: "#24A1DE",
     buttonClass: "bg-[#24A1DE] hover:bg-[#1E8EC4] text-white shadow-sky-500/25",
-    defaultUsername: "pulsesocial_channel",
+    defaultUsername: "",
     defaultType: "CHANNEL",
     scopes: ["bot_broadcast", "channel_publish", "media_upload"],
+    requiredEnvVars: ["TELEGRAM_BOT_TOKEN"],
   },
   bluesky: {
     id: "bluesky",
@@ -101,9 +120,10 @@ const PLATFORM_META: Record<string, PlatformMetadata> = {
     subtitle: "AT Protocol Network",
     accentColor: "#1185FE",
     buttonClass: "bg-[#1185FE] hover:bg-[#0A73DF] text-white shadow-blue-500/25",
-    defaultUsername: "pulsesocial.bsky.social",
+    defaultUsername: "",
     defaultType: "PROFILE",
     scopes: ["atproto_publish", "timeline_read", "record_create"],
+    requiredEnvVars: ["BLUESKY_IDENTIFIER", "BLUESKY_APP_PASSWORD"],
   },
   mastodon: {
     id: "mastodon",
@@ -111,9 +131,10 @@ const PLATFORM_META: Record<string, PlatformMetadata> = {
     subtitle: "Fediverse Server Instance",
     accentColor: "#6364FF",
     buttonClass: "bg-[#6364FF] hover:bg-[#5253EA] text-white shadow-indigo-500/25",
-    defaultUsername: "pulsesocial@mastodon.social",
+    defaultUsername: "",
     defaultType: "PROFILE",
     scopes: ["read", "write", "follow"],
+    requiredEnvVars: ["MASTODON_INSTANCE_URL", "MASTODON_ACCESS_TOKEN"],
   },
   shopify: {
     id: "shopify",
@@ -121,9 +142,10 @@ const PLATFORM_META: Record<string, PlatformMetadata> = {
     subtitle: "E-Commerce Catalog Sync",
     accentColor: "#96BF48",
     buttonClass: "bg-[#96BF48] hover:bg-[#7ea23b] text-white shadow-emerald-500/25",
-    defaultUsername: "pulsesocial-store.myshopify.com",
+    defaultUsername: "",
     defaultType: "STORE",
     scopes: ["read_products", "read_inventory", "write_products"],
+    requiredEnvVars: ["SHOPIFY_API_KEY", "SHOPIFY_API_SECRET"],
   },
 };
 
@@ -141,47 +163,43 @@ export default function SocialChannelConnectPopupPage() {
       subtitle: "Social Channel",
       accentColor: "#6F52B5",
       buttonClass: "bg-[#6F52B5] hover:bg-[#5C4299] text-white",
-      defaultUsername: `pulsesocial_${provider}`,
+      defaultUsername: "",
       defaultType: "PAGE",
       scopes: ["basic_read", "content_publish"],
+      requiredEnvVars: [`${provider.toUpperCase()}_CLIENT_ID`, `${provider.toUpperCase()}_CLIENT_SECRET`],
     };
 
   // Form State
   const [activeTab, setActiveTab] = useState<"direct" | "secondary">("direct");
-  const [username, setUsername] = useState(config.defaultUsername);
+  const [username, setUsername] = useState("");
   const [accountType, setAccountType] = useState(config.defaultType);
-  const [customField, setCustomField] = useState(
-    provider === "telegram"
-      ? "7182938492:AAH-x9281394"
-      : provider === "mastodon"
-      ? "https://mastodon.social"
-      : provider === "shopify"
-      ? "pulsesocial-store.myshopify.com"
-      : ""
-  );
+  const [customField, setCustomField] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const queryError = searchParams?.get("error");
   const [errorMsg, setErrorMsg] = useState<string | null>(queryError || null);
 
-  // Auto-redirect to official Instagram Login if accessed directly and no error is present
+  // Auto-redirect to live OAuth if accessed directly and no error is present
   useEffect(() => {
-    if (provider === "instagram" && !queryError) {
-      const timer = setTimeout(() => {
-        window.location.href = "/api/social/instagram/connect";
-      }, 500);
-      return () => clearTimeout(timer);
+    if (!queryError) {
+      if (provider === "instagram") {
+        const timer = setTimeout(() => {
+          window.location.href = "/api/social/instagram/connect";
+        }, 400);
+        return () => clearTimeout(timer);
+      }
     }
   }, [provider, queryError]);
 
-  // Sync if username updates from config
-  useEffect(() => {
-    setUsername(config.defaultUsername);
-    setAccountType(config.defaultType);
-  }, [config]);
-
   const handleConnect = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    if (errorMsg) return; // Disallow submission when credentials are unconfigured
+
+    if (!username.trim() && !customField.trim()) {
+      setErrorMsg("Please enter your account identifier or credentials.");
+      return;
+    }
+
     setIsSubmitting(true);
     setErrorMsg(null);
 
@@ -195,6 +213,7 @@ export default function SocialChannelConnectPopupPage() {
             : `${config.name} (@${username.trim().replace(/^@/, "")})`,
         accountType,
         scopes: config.scopes,
+        accessToken: customField.trim() || undefined,
         metadata: {
           connectedVia: "popup_direct_dialog",
           customField,
@@ -267,8 +286,8 @@ export default function SocialChannelConnectPopupPage() {
               <h1 className="text-xl font-extrabold text-white tracking-tight leading-tight">
                 Connect {config.name}
               </h1>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                Verified OAuth
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-500/15 text-violet-300 border border-violet-500/30">
+                Official Integration
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">{config.subtitle}</p>
@@ -293,320 +312,283 @@ export default function SocialChannelConnectPopupPage() {
           </div>
         ) : (
           <div>
-            {/* WHATSAPP DEDICATED EXPERIENCE */}
-            {provider === "whatsapp" && (
-              <div className="space-y-4">
-                {/* Mode Tabs */}
-                <div className="flex p-1 bg-slate-900 rounded-xl border border-slate-800 text-xs font-bold">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("direct")}
-                    className={`flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition ${
-                      activeTab === "direct"
-                        ? "bg-[#25D366] text-slate-950 font-black shadow-xs"
-                        : "text-slate-400 hover:text-white"
-                    }`}
-                  >
-                    <QrCode className="w-3.5 h-3.5" />
-                    <span>WhatsApp Web QR Code</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("secondary")}
-                    className={`flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition ${
-                      activeTab === "secondary"
-                        ? "bg-[#25D366] text-slate-950 font-black shadow-xs"
-                        : "text-slate-400 hover:text-white"
-                    }`}
-                  >
-                    <Smartphone className="w-3.5 h-3.5" />
-                    <span>Cloud API Number</span>
-                  </button>
+            {/* If Credentials are not configured, display professional instructions and DO NOT allow fake connect */}
+            {errorMsg ? (
+              <div className="space-y-4 text-center py-4 animate-in fade-in">
+                <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400">
+                  <AlertCircle className="w-7 h-7" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-sm font-bold text-white">{config.name} Credentials Required</h3>
+                  <p className="text-xs text-amber-300 max-w-sm mx-auto leading-relaxed">
+                    {errorMsg}
+                  </p>
                 </div>
 
-                {activeTab === "direct" ? (
-                  /* QR Pairing Card */
-                  <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800/80 text-center space-y-3.5">
-                    <div className="p-3 bg-white rounded-xl inline-block shadow-lg mx-auto relative group">
-                      {/* Realistic Interactive QR Pattern */}
-                      <svg
-                        width="140"
-                        height="140"
-                        viewBox="0 0 140 140"
-                        className="rounded-lg"
-                      >
-                        <rect width="140" height="140" fill="#FFFFFF" />
-                        {/* Corner markers */}
-                        <rect x="10" y="10" width="36" height="36" rx="4" fill="#1EBE5D" />
-                        <rect x="16" y="16" width="24" height="24" rx="2" fill="#FFFFFF" />
-                        <rect x="22" y="22" width="12" height="12" rx="1" fill="#1EBE5D" />
+                <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 text-[11px] text-slate-400 space-y-1.5 text-left">
+                  <p className="font-semibold text-white flex items-center gap-1.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-violet-400" />
+                    <span>Required Server Environment Variables:</span>
+                  </p>
+                  <p className="text-[10px] text-slate-400">
+                    Add the following credentials to your <code className="px-1 py-0.5 rounded bg-slate-800 text-slate-200">.env</code> to enable live OAuth:
+                  </p>
+                  <div className="p-2.5 rounded-lg bg-slate-950 font-mono text-[10px] text-emerald-400 space-y-1 select-all overflow-x-auto">
+                    {(config.requiredEnvVars || [`${provider.toUpperCase()}_CLIENT_ID`, `${provider.toUpperCase()}_CLIENT_SECRET`]).map(
+                      (v) => (
+                        <div key={v}>{v}=&quot;your_{provider}_credentials&quot;</div>
+                      )
+                    )}
+                  </div>
+                </div>
 
-                        <rect x="94" y="10" width="36" height="36" rx="4" fill="#1EBE5D" />
-                        <rect x="100" y="16" width="24" height="24" rx="2" fill="#FFFFFF" />
-                        <rect x="106" y="22" width="12" height="12" rx="1" fill="#1EBE5D" />
-
-                        <rect x="10" y="94" width="36" height="36" rx="4" fill="#1EBE5D" />
-                        <rect x="16" y="100" width="24" height="24" rx="2" fill="#FFFFFF" />
-                        <rect x="22" y="106" width="12" height="12" rx="1" fill="#1EBE5D" />
-
-                        {/* QR Matrix lines */}
-                        <rect x="52" y="14" width="8" height="30" fill="#000000" />
-                        <rect x="68" y="22" width="16" height="8" fill="#000000" />
-                        <rect x="20" y="54" width="20" height="8" fill="#000000" />
-                        <rect x="52" y="52" width="36" height="36" rx="4" fill="#25D366" />
-                        <rect x="98" y="54" width="28" height="8" fill="#000000" />
-                        <rect x="54" y="96" width="14" height="30" fill="#000000" />
-                        <rect x="76" y="100" width="24" height="8" fill="#000000" />
-                        <rect x="108" y="96" width="16" height="30" fill="#000000" />
-                      </svg>
-                    </div>
-
-                    <div className="text-left text-xs space-y-1.5 px-2 text-slate-300">
-                      <p className="font-bold text-white">How to connect with QR code:</p>
-                      <p>1. Open WhatsApp on your phone</p>
-                      <p>2. Tap Menu (⋮) or Settings and select <strong>Linked Devices</strong></p>
-                      <p>3. Tap <strong>Link a device</strong> and point your phone at this screen</p>
-                    </div>
-
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (typeof window !== "undefined" && window.opener && !window.opener.closed) {
+                        window.close();
+                      } else {
+                        router.push("/social-accounts");
+                      }
+                    }}
+                    className="w-1/2 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition cursor-pointer"
+                  >
+                    Close Window
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setErrorMsg(null);
+                      window.location.href = `/api/social/${provider}/connect`;
+                    }}
+                    className={`w-1/2 py-2.5 px-3 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer ${config.buttonClass}`}
+                  >
+                    <span>Retry Connection</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* WHATSAPP DEDICATED EXPERIENCE */
+              provider === "whatsapp" ? (
+                <div className="space-y-4">
+                  {/* Mode Tabs */}
+                  <div className="flex p-1 bg-slate-900 rounded-xl border border-slate-800 text-xs font-bold">
                     <button
                       type="button"
-                      onClick={() => handleConnect()}
-                      disabled={isSubmitting}
-                      className="w-full py-2.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/20 active:scale-98"
+                      onClick={() => setActiveTab("direct")}
+                      className={`flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition ${
+                        activeTab === "direct"
+                          ? "bg-[#25D366] text-slate-950 font-black shadow-xs"
+                          : "text-slate-400 hover:text-white"
+                      }`}
                     >
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Pairing WhatsApp...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Check className="w-4 h-4 stroke-[2.5]" />
-                          <span>Pair &amp; Link Device (+1 555-0199)</span>
-                        </>
-                      )}
+                      <QrCode className="w-3.5 h-3.5" />
+                      <span>WhatsApp Web QR Code</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("secondary")}
+                      className={`flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition ${
+                        activeTab === "secondary"
+                          ? "bg-[#25D366] text-slate-950 font-black shadow-xs"
+                          : "text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      <Smartphone className="w-3.5 h-3.5" />
+                      <span>Cloud API Number</span>
                     </button>
                   </div>
-                ) : (
-                  /* Cloud API Inputs */
-                  <form onSubmit={handleConnect} className="space-y-3">
-                    <div>
-                      <label className="text-[11px] font-bold text-slate-400 block mb-1">
-                        Phone Number or Display Name
-                      </label>
-                      <input
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        placeholder="+1 (555) 019-8834"
-                        className="w-full px-3 py-2 text-xs rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-hidden focus:border-[#25D366]"
-                      />
+
+                  {activeTab === "direct" ? (
+                    /* QR Pairing Card */
+                    <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800/80 text-center space-y-3.5">
+                      <div className="p-3 bg-white rounded-xl inline-block shadow-lg mx-auto relative group">
+                        <svg
+                          width="140"
+                          height="140"
+                          viewBox="0 0 140 140"
+                          className="rounded-lg"
+                        >
+                          <rect width="140" height="140" fill="#FFFFFF" />
+                          <rect x="10" y="10" width="36" height="36" rx="4" fill="#1EBE5D" />
+                          <rect x="16" y="16" width="24" height="24" rx="2" fill="#FFFFFF" />
+                          <rect x="22" y="22" width="12" height="12" rx="1" fill="#1EBE5D" />
+
+                          <rect x="94" y="10" width="36" height="36" rx="4" fill="#1EBE5D" />
+                          <rect x="100" y="16" width="24" height="24" rx="2" fill="#FFFFFF" />
+                          <rect x="106" y="22" width="12" height="12" rx="1" fill="#1EBE5D" />
+
+                          <rect x="10" y="94" width="36" height="36" rx="4" fill="#1EBE5D" />
+                          <rect x="16" y="100" width="24" height="24" rx="2" fill="#FFFFFF" />
+                          <rect x="22" y="106" width="12" height="12" rx="1" fill="#1EBE5D" />
+
+                          <rect x="52" y="14" width="8" height="30" fill="#000000" />
+                          <rect x="68" y="22" width="16" height="8" fill="#000000" />
+                          <rect x="20" y="54" width="20" height="8" fill="#000000" />
+                          <rect x="52" y="52" width="36" height="36" rx="4" fill="#25D366" />
+                          <rect x="98" y="54" width="28" height="8" fill="#000000" />
+                          <rect x="54" y="96" width="14" height="30" fill="#000000" />
+                          <rect x="76" y="100" width="24" height="8" fill="#000000" />
+                          <rect x="108" y="96" width="16" height="30" fill="#000000" />
+                        </svg>
+                      </div>
+
+                      <div className="text-left text-xs space-y-1.5 px-2 text-slate-300">
+                        <p className="font-bold text-white">How to connect with QR code:</p>
+                        <p>1. Open WhatsApp on your phone</p>
+                        <p>2. Tap Menu (⋮) or Settings and select <strong>Linked Devices</strong></p>
+                        <p>3. Tap <strong>Link a device</strong> and point your phone at this screen</p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleConnect()}
+                        disabled={isSubmitting}
+                        className="w-full py-2.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/20 active:scale-98"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Pairing WhatsApp...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Check className="w-4 h-4 stroke-[2.5]" />
+                            <span>Pair &amp; Link Device (+1 555-0199)</span>
+                          </>
+                        )}
+                      </button>
                     </div>
+                  ) : (
+                    /* Cloud API Inputs */
+                    <form onSubmit={handleConnect} className="space-y-3">
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-400 block mb-1">
+                          Phone Number or Display Name
+                        </label>
+                        <input
+                          type="text"
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value)}
+                          placeholder="+1 (555) 019-8834"
+                          className="w-full px-3 py-2 text-xs rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-hidden focus:border-[#25D366]"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-400 block mb-1">
+                          Meta Cloud API Phone Number ID
+                        </label>
+                        <input
+                          type="text"
+                          value={customField}
+                          onChange={(e) => setCustomField(e.target.value)}
+                          placeholder="109283746582"
+                          className="w-full px-3 py-2 text-xs rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-hidden focus:border-[#25D366]"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={isSubmitting || !username.trim()}
+                        className="w-full py-2.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-98 disabled:opacity-50"
+                      >
+                        {isSubmitting ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Check className="w-4 h-4" />
+                        )}
+                        <span>Connect Cloud API Endpoint</span>
+                      </button>
+                    </form>
+                  )}
+                </div>
+              ) : provider === "telegram" || provider === "mastodon" ? (
+                /* TOKEN/URL BASED CHANNELS */
+                <form onSubmit={handleConnect} className="space-y-3.5">
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-400 block mb-1">
+                      {provider === "telegram" ? "Telegram Channel (@username)" : "Mastodon Account Handle"}
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder={provider === "telegram" ? "@my_channel" : "user@mastodon.social"}
+                      className="w-full px-3 py-2 text-xs rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-hidden focus:border-amber-500"
+                    />
+                  </div>
+
+                  {provider === "telegram" && (
                     <div>
                       <label className="text-[11px] font-bold text-slate-400 block mb-1">
-                        Meta Cloud API Phone Number ID
+                        BotFather Bot Token
                       </label>
                       <input
                         type="text"
+                        required
                         value={customField}
                         onChange={(e) => setCustomField(e.target.value)}
-                        placeholder="109283746582"
-                        className="w-full px-3 py-2 text-xs rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-hidden focus:border-[#25D366]"
+                        placeholder="7182938492:AAH-x..."
+                        className="w-full px-3 py-2 text-xs rounded-xl bg-slate-900 border border-slate-800 font-mono text-white focus:outline-hidden"
                       />
                     </div>
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full py-2.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-98"
-                    >
-                      {isSubmitting ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Check className="w-4 h-4" />
-                      )}
-                      <span>Connect Cloud API Endpoint</span>
-                    </button>
-                  </form>
-                )}
-              </div>
-            )}
-
-            {/* INSTAGRAM DEDICATED EXPERIENCE - OFFICIAL INSTAGRAM LOGIN FOR BUSINESS */}
-            {provider === "instagram" && (
-              <div className="space-y-4 text-center py-4">
-                {errorMsg ? (
-                  <>
-                    <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400">
-                      <AlertCircle className="w-7 h-7" />
-                    </div>
-                    <div className="space-y-1">
-                      <h3 className="text-sm font-bold text-white">Instagram Authorization Notice</h3>
-                      <p className="text-xs text-amber-300 max-w-sm mx-auto leading-relaxed">
-                        {errorMsg}
-                      </p>
-                    </div>
-                    <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 text-[11px] text-slate-400 space-y-1 text-left">
-                      <p className="font-semibold text-white flex items-center gap-1.5">
-                        <ShieldCheck className="w-3.5 h-3.5 text-purple-400" />
-                        <span>Setup Requirements:</span>
-                      </p>
-                      <p>• Meta Developer App with <b>Instagram</b> product added</p>
-                      <p>• INSTAGRAM_APP_ID (or META_APP_ID) and Secret in .env</p>
-                      <p>• Valid OAuth Redirect URI registered: <code>/api/social/instagram/callback</code></p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (typeof window !== "undefined" && window.opener && !window.opener.closed) {
-                            window.close();
-                          } else {
-                            router.push("/social-accounts");
-                          }
-                        }}
-                        className="w-1/2 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition cursor-pointer"
-                      >
-                        Close Window
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setErrorMsg(null);
-                          window.location.href = "/api/social/instagram/connect";
-                        }}
-                        className={`w-1/2 py-2.5 px-3 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer ${config.buttonClass}`}
-                      >
-                        <span>Retry</span>
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#833AB4] via-[#FD1D1D] to-[#F77737] flex items-center justify-center mx-auto shadow-lg shadow-pink-500/25">
-                      <Loader2 className="w-7 h-7 text-white animate-spin" />
-                    </div>
-                    <div className="space-y-1">
-                      <h3 className="text-sm font-bold text-white">Opening Official Instagram Login...</h3>
-                      <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                        Redirecting to Meta&apos;s direct Instagram authorization consent screen for Professional accounts.
-                      </p>
-                    </div>
-                    <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 text-[11px] text-slate-400 space-y-1 text-left">
-                      <p className="font-semibold text-white flex items-center gap-1.5">
-                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Official Meta Business Login:</span>
-                      </p>
-                      <p>• Direct authorization on instagram.com (Zero Facebook redirects)</p>
-                      <p>• Eligible for Instagram Professional (Business or Creator) accounts</p>
-                      <p>• Server-side token exchange and secure AES-256 storage</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        window.location.href = "/api/social/instagram/connect";
-                      }}
-                      className={`w-full py-2.5 px-4 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-98 ${config.buttonClass}`}
-                    >
-                      <span>Authorize with Instagram Login</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </button>
-                  </>
-                )}
-              </div>
-            )}
-
-            {/* GENERAL STANDALONE PROVIDERS (Snapchat, Pinterest, Threads, Reddit, Telegram, Bluesky, Mastodon, Shopify) */}
-            {provider !== "whatsapp" && provider !== "instagram" && (
-              <form onSubmit={handleConnect} className="space-y-3.5">
-                <div>
-                  <label className="text-[11px] font-bold text-slate-400 block mb-1">
-                    {provider === "shopify"
-                      ? "Shopify Store Domain"
-                      : provider === "telegram"
-                      ? "Telegram Channel Username"
-                      : `${config.name} Handle / Username`}
-                  </label>
-                  <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder={config.defaultUsername}
-                    className="w-full px-3 py-2 text-xs rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-hidden focus:border-amber-500"
-                  />
-                </div>
-
-                {/* Platform specific optional field */}
-                {provider === "telegram" && (
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-400 block mb-1">
-                      BotFather Bot Token
-                    </label>
-                    <input
-                      type="text"
-                      value={customField}
-                      onChange={(e) => setCustomField(e.target.value)}
-                      placeholder="7182938492:AAH-x..."
-                      className="w-full px-3 py-2 text-xs rounded-xl bg-slate-900 border border-slate-800 font-mono text-white focus:outline-hidden"
-                    />
-                  </div>
-                )}
-
-                {provider === "mastodon" && (
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-400 block mb-1">
-                      Mastodon Instance URL
-                    </label>
-                    <input
-                      type="text"
-                      value={customField}
-                      onChange={(e) => setCustomField(e.target.value)}
-                      placeholder="https://mastodon.social"
-                      className="w-full px-3 py-2 text-xs rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-hidden"
-                    />
-                  </div>
-                )}
-
-                {/* Permissions Breakdown */}
-                <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 text-[11px] text-slate-400 space-y-1">
-                  <p className="font-semibold text-white flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Requested Permissions:</span>
-                  </p>
-                  {config.scopes.map((s) => (
-                    <p key={s} className="font-mono text-[10px] text-slate-300">
-                      ✓ {s.replace(/[._:]/g, " ")}
-                    </p>
-                  ))}
-                </div>
-
-                {/* Error Banner */}
-                {errorMsg && (
-                  <div className="p-3 rounded-xl bg-rose-950/50 border border-rose-800/80 text-rose-300 text-xs flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
-                    <span>{errorMsg}</span>
-                  </div>
-                )}
-
-                {/* Primary Authorize Button */}
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className={`w-full py-2.5 px-4 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-98 ${config.buttonClass}`}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Authorizing {config.name}...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Check className="w-4 h-4 stroke-[2.5]" />
-                      <span>Authorize &amp; Connect {config.name}</span>
-                    </>
                   )}
-                </button>
-              </form>
+
+                  {provider === "mastodon" && (
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-400 block mb-1">
+                        Mastodon Instance URL
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={customField}
+                        onChange={(e) => setCustomField(e.target.value)}
+                        placeholder="https://mastodon.social"
+                        className="w-full px-3 py-2 text-xs rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-hidden"
+                      />
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting || !username.trim()}
+                    className={`w-full py-2.5 px-4 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-98 disabled:opacity-50 ${config.buttonClass}`}
+                  >
+                    {isSubmitting ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Check className="w-4 h-4" />
+                    )}
+                    <span>Authorize &amp; Link {config.name}</span>
+                  </button>
+                </form>
+              ) : (
+                /* LIVE OAUTH REDIRECTION SCREEN */
+                <div className="space-y-4 text-center py-4">
+                  <div className="w-14 h-14 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto shadow-lg">
+                    <Loader2 className="w-7 h-7 text-white animate-spin" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-bold text-white">Opening {config.name} Authorization...</h3>
+                    <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                      Connecting to official {config.name} OAuth server for workspace access.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.location.href = `/api/social/${provider}/connect`;
+                    }}
+                    className={`w-full py-2.5 px-4 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-98 ${config.buttonClass}`}
+                  >
+                    <span>Authorize with {config.name}</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )
             )}
           </div>
         )}

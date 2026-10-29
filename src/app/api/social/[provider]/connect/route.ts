@@ -142,45 +142,31 @@ export async function GET(
       return NextResponse.redirect(new URL(popupUrl, req.url));
     }
 
-    // 2. Instagram: Strict requirement that Instagram must NEVER open mock username dialog or Facebook login.
-    // If not configured, return an actionable configuration error.
-    if (platformKey === "instagram" && !socialProvider.isConfigured()) {
+    // 2. Strict Check: If provider is NOT configured in server environment,
+    // NEVER fake-connect or claim isConfigured: true. Return an actionable error.
+    if (!socialProvider.isConfigured()) {
       const missingMsg = socialProvider.getMissingConfigMessage();
       if (wantsJson) {
         return NextResponse.json(
           {
             success: false,
             isConfigured: false,
-            platform: "instagram",
-            displayName: "Instagram",
+            platform: platformKey,
+            displayName: socialProvider.displayName,
             error: missingMsg,
           },
           { status: 400 }
         );
       }
       return NextResponse.redirect(
-        new URL(`/social/connect/instagram?error=${encodeURIComponent(missingMsg)}`, req.url)
+        new URL(
+          `/social/connect/${platformKey}?error=${encodeURIComponent(missingMsg)}`,
+          req.url
+        )
       );
     }
 
-    // 3. Fallback for unconfigured platforms (Snapchat, Pinterest, Threads, Reddit, Telegram, Bluesky, Mastodon, Shopify):
-    // Open the authentic branded authorization window for that channel:
-    if (!socialProvider.isConfigured()) {
-      const popupUrl = `${cleanAppUrl}/social/connect/${platformKey}`;
-      if (wantsJson) {
-        return NextResponse.json({
-          success: true,
-          isConfigured: true,
-          platform: platformKey,
-          displayName: socialProvider.displayName,
-          authUrl: popupUrl,
-          redirectUri,
-        });
-      }
-      return NextResponse.redirect(new URL(popupUrl, req.url));
-    }
-
-    // 4. Generate secure cryptographic state & PKCE codeVerifier for official third-party OAuth
+    // 3. Generate secure cryptographic state & PKCE codeVerifier for official third-party OAuth
     const state = crypto.randomBytes(32).toString("hex");
     const codeVerifier = crypto.randomBytes(32).toString("base64url");
 

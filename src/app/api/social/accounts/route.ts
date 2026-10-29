@@ -4,6 +4,7 @@ import { getSession } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 import { encryptToken } from "@/lib/security/encryption";
 import { logAudit } from "@/lib/audit/logger";
+import { getSocialProvider } from "@/lib/social/registry";
 
 export async function GET() {
   try {
@@ -27,6 +28,28 @@ export async function GET() {
         },
         orderBy: { createdAt: "desc" },
       });
+
+      // Filter out and auto-prune any legacy fake/dummy mock accounts (e.g. pulsesocial_facebook, pulsesocial_snap)
+      const fakeAccounts = accounts.filter(
+        (a) =>
+          a.username?.toLowerCase().startsWith("pulsesocial_") ||
+          a.displayName?.toLowerCase().includes("(@pulsesocial_") ||
+          a.providerAccountId?.toLowerCase().includes("_pulsesocial_") ||
+          a.providerAccountId?.startsWith("fb_page_mock")
+      );
+
+      if (fakeAccounts.length > 0) {
+        const fakeIds = fakeAccounts.map((a) => a.id);
+        try {
+          await prisma.socialToken.deleteMany({ where: { socialAccountId: { in: fakeIds } } });
+          await prisma.socialProfile.deleteMany({ where: { socialAccountId: { in: fakeIds } } });
+          await prisma.socialPostTarget.deleteMany({ where: { socialAccountId: { in: fakeIds } } });
+          await prisma.socialAccount.deleteMany({ where: { id: { in: fakeIds } } });
+        } catch (pruneErr) {
+          console.warn("[PRUNE_FAKE_ACCOUNTS_ERR]", pruneErr);
+        }
+        accounts = accounts.filter((a) => !fakeIds.includes(a.id));
+      }
     } catch (dbErr) {
       console.warn("[SOCIAL_ACCOUNTS_DB_OFFLINE]", (dbErr as Error)?.message || dbErr);
       return NextResponse.json({ success: true, accounts: [] });
@@ -115,7 +138,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Social provider identifier is required." }, { status: 400 });
     }
 
-    // STRICT PROHIBITION: Never allow an Instagram connection via typed username alone.
+    // 1. STRICT PROHIBITION: Never allow an Instagram connection via typed username alone.
     // Instagram accounts must authenticate via official Instagram Login for Business.
     if (normalizedProvider === "instagram") {
       return NextResponse.json(
@@ -128,6 +151,68 @@ export async function POST(req: Request) {
     }
 
     const cleanUsername = body.username ? String(body.username).replace(/^@/, "").trim() : null;
+
+    // 2. Reject mock or placeholder demo usernames (e.g. pulsesocial_facebook, pulsesocial_snap)
+    if (
+      cleanUsername &&
+      (cleanUsername.toLowerCase().startsWith("pulsesocial_") ||
+        cleanUsername.toLowerCase() === "pulsesocial_facebook" ||
+        cleanUsername.toLowerCase() === "pulsesocial_snap")
+    ) {
+      return NextResponse.json(
+        { error: "Demo and placeholder accounts cannot be connected. Real platform credentials required." },
+        { status: 400 }
+      );
+    }
+
+    // 3. STRICT VALIDATION: Require real OAuth token or explicit API credentials. NEVER auto-generate fake tokens!
+    const cleanAccessToken =
+      body.accessToken?.trim() ||
+      body.token?.trim() ||
+      (normalizedProvider === "telegram" || normalizedProvider === "mastodon"
+        ? body.metadata?.customField?.trim()
+        : "");
+
+    if (!cleanAccessToken) {
+      return NextResponse.json(
+        {
+          error: `Cannot connect ${normalizedProvider.toUpperCase()} without valid OAuth authorization or access token. Please add your credentials to .env and authenticate through the official provider login.`,
+        },
+        { status: 400 }
+      );
+    }
+
+    // 4. For OAuth providers, enforce that provider is configured in environment
+    const oauthProviders = [
+      "facebook",
+      "instagram",
+      "snapchat",
+      "x",
+      "linkedin",
+      "youtube",
+      "tiktok",
+      "pinterest",
+      "threads",
+      "reddit",
+      "google_business",
+    ];
+
+    if (oauthProviders.includes(normalizedProvider)) {
+      try {
+        const socialProvider = getSocialProvider(normalizedProvider);
+        if (!socialProvider.isConfigured()) {
+          return NextResponse.json(
+            {
+              error: `${socialProvider.displayName} integration is not configured on the server. ${socialProvider.getMissingConfigMessage()}`,
+            },
+            { status: 400 }
+          );
+        }
+      } catch (err: any) {
+        return NextResponse.json({ error: err?.message || "Invalid provider" }, { status: 400 });
+      }
+    }
+
     const providerAccountId =
       body.providerAccountId ||
       `${normalizedProvider}_${(cleanUsername || session.id).replace(/[^a-zA-Z0-9_-]/g, "")}_${Date.now().toString(36)}`;
@@ -136,11 +221,7 @@ export async function POST(req: Request) {
       body.displayName ||
       (cleanUsername ? `@${cleanUsername} (${normalizedProvider.toUpperCase()})` : `${normalizedProvider.toUpperCase()} Account`);
 
-    const tokenToSave =
-      body.accessToken?.trim() ||
-      `token_${normalizedProvider}_${Date.now()}_${crypto.randomBytes(16).toString("hex")}`;
-    const encAccess = encryptToken(tokenToSave);
-
+    const encAccess = encryptToken(cleanAccessToken);
     const tokenExpiresAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); // 90 days validity
 
     const account = await prisma.socialAccount.upsert({

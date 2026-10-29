@@ -49,6 +49,13 @@ export async function GET() {
           },
         },
       });
+
+      // Filter out any mock/placeholder demo accounts
+      connectedAccounts = connectedAccounts.filter(
+        (a) =>
+          !a.username?.toLowerCase().startsWith("pulsesocial_") &&
+          !a.displayName?.toLowerCase().includes("(@pulsesocial_")
+      );
     } catch (dbErr) {
       console.warn("[SOCIAL_PROVIDERS_DB_OFFLINE]", (dbErr as Error)?.message || dbErr);
       connectedAccounts = [];

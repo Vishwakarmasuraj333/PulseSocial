@@ -390,7 +390,7 @@ export function UniversalSocialConnectModal({
 
     // For official platforms (YouTube, Instagram, Facebook, LinkedIn, X, TikTok, Google Business),
     // check if live third-party OAuth is configured:
-    if (["youtube", "instagram", "facebook", "linkedin", "x", "tiktok", "google_business"].includes(targetApiId)) {
+    if (targetApiId !== "start_page") {
       try {
         const res = await fetch(`/api/social/${targetApiId}/connect?format=json`);
         if (res.ok) {

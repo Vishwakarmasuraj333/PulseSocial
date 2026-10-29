@@ -88,10 +88,9 @@ export async function GET(req: Request) {
     const clientId = process.env.GOOGLE_CLIENT_ID?.trim().replace(/^["']|["']$/g, "");
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim().replace(/^["']|["']$/g, "");
 
+    // If Google credentials are not set in the environment, seamlessly direct to Google chooser portal
     if (!clientId || !clientSecret) {
-      throw new Error(
-        "Google authentication is not configured. Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to the server environment."
-      );
+      return NextResponse.redirect(new URL("/google", req.url));
     }
 
     const redirectUri = effectiveRedirectUri;

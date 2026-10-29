@@ -14,6 +14,14 @@ const nextConfig = {
       { protocol: "https", hostname: "**" },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/auth/google",
+        destination: "/google",
+      },
+    ];
+  },
 };
 
 export default nextConfig;

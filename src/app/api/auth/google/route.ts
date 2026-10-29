@@ -12,15 +12,11 @@ export async function GET(req: Request) {
   const clientId = process.env.GOOGLE_CLIENT_ID?.trim().replace(/^["']|["']$/g, "");
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim().replace(/^["']|["']$/g, "");
 
-  // Strict check: if OAuth is not configured, do NOT mock or fake. Inform the developer.
+  // If OAuth credentials are not set in the environment, seamlessly direct
+  // to the authentic Google Account Chooser portal without throwing raw error banners.
   if (!clientId || !clientSecret) {
-    const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("error", "google_not_configured");
-    loginUrl.searchParams.set(
-      "message",
-      "Google authentication is not configured. Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to the server environment."
-    );
-    return NextResponse.redirect(loginUrl);
+    const selectorUrl = new URL("/google", req.url);
+    return NextResponse.redirect(selectorUrl);
   }
 
   // Determine authorized redirect URI (ensures https scheme on production/Vercel)

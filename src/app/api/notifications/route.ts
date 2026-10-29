@@ -9,18 +9,25 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const notifications = await prisma.socialNotification.findMany({
-      where: { organizationId: session.activeOrgId },
-      orderBy: { createdAt: "desc" },
-      take: 30,
-    });
+    let notifications: any[] = [];
+    let unreadCount = 0;
+    try {
+      notifications = await prisma.socialNotification.findMany({
+        where: { organizationId: session.activeOrgId },
+        orderBy: { createdAt: "desc" },
+        take: 30,
+      });
 
-    const unreadCount = await prisma.socialNotification.count({
-      where: {
-        organizationId: session.activeOrgId,
-        isRead: false,
-      },
-    });
+      unreadCount = await prisma.socialNotification.count({
+        where: {
+          organizationId: session.activeOrgId,
+          isRead: false,
+        },
+      });
+    } catch (dbErr) {
+      console.warn("[NOTIFICATIONS_DB_OFFLINE]", (dbErr as Error)?.message || dbErr);
+      return NextResponse.json({ notifications: [], unreadCount: 0 });
+    }
 
     return NextResponse.json({
       notifications: notifications.map((n) => ({

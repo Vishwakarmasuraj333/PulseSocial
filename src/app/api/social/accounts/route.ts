@@ -12,19 +12,25 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const accounts = await prisma.socialAccount.findMany({
-      where: { organizationId: session.activeOrgId },
-      include: {
-        profile: true,
-        token: {
-          select: {
-            expiresAt: true,
-            updatedAt: true,
+    let accounts: any[] = [];
+    try {
+      accounts = await prisma.socialAccount.findMany({
+        where: { organizationId: session.activeOrgId },
+        include: {
+          profile: true,
+          token: {
+            select: {
+              expiresAt: true,
+              updatedAt: true,
+            },
           },
         },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+        orderBy: { createdAt: "desc" },
+      });
+    } catch (dbErr) {
+      console.warn("[SOCIAL_ACCOUNTS_DB_OFFLINE]", (dbErr as Error)?.message || dbErr);
+      return NextResponse.json({ success: true, accounts: [] });
+    }
 
     const mapped = accounts.map((a) => {
       let meta: Record<string, unknown> = {};

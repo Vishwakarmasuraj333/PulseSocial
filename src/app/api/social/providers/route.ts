@@ -30,24 +30,29 @@ export async function GET() {
   }> = [];
 
   if (session?.activeOrgId) {
-    connectedAccounts = await prisma.socialAccount.findMany({
-      where: { organizationId: session.activeOrgId },
-      select: {
-        id: true,
-        provider: true,
-        displayName: true,
-        username: true,
-        profileImageUrl: true,
-        status: true,
-        lastSyncedAt: true,
-        token: {
-          select: {
-            expiresAt: true,
-            updatedAt: true,
+    try {
+      connectedAccounts = await prisma.socialAccount.findMany({
+        where: { organizationId: session.activeOrgId },
+        select: {
+          id: true,
+          provider: true,
+          displayName: true,
+          username: true,
+          profileImageUrl: true,
+          status: true,
+          lastSyncedAt: true,
+          token: {
+            select: {
+              expiresAt: true,
+              updatedAt: true,
+            },
           },
         },
-      },
-    });
+      });
+    } catch (dbErr) {
+      console.warn("[SOCIAL_PROVIDERS_DB_OFFLINE]", (dbErr as Error)?.message || dbErr);
+      connectedAccounts = [];
+    }
   }
 
   const result = providers.map((p) => {

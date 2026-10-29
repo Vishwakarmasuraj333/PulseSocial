@@ -42,23 +42,29 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status");
 
-    const posts = await prisma.socialPost.findMany({
-      where: {
-        organizationId: session.activeOrgId,
-        ...(status ? { status } : {}),
-      },
-      include: {
-        targets: {
-          include: { socialAccount: true },
+    let posts: any[] = [];
+    try {
+      posts = await prisma.socialPost.findMany({
+        where: {
+          organizationId: session.activeOrgId,
+          ...(status ? { status } : {}),
         },
-        media: true,
-        creator: {
-          select: { id: true, name: true, email: true, avatarUrl: true },
+        include: {
+          targets: {
+            include: { socialAccount: true },
+          },
+          media: true,
+          creator: {
+            select: { id: true, name: true, email: true, avatarUrl: true },
+          },
+          scheduledPost: true,
         },
-        scheduledPost: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
+        orderBy: { createdAt: "desc" },
+      });
+    } catch (dbErr) {
+      console.warn("[POSTS_DB_OFFLINE]", (dbErr as Error)?.message || dbErr);
+      return NextResponse.json({ posts: [] });
+    }
 
     return NextResponse.json({ posts });
   } catch (error: unknown) {

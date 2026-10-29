@@ -41,31 +41,37 @@ import {
   ShieldCheck,
   FileText,
   Image as ImageIcon,
+  Activity,
+  Layers,
+  ChevronRight,
+  UserCheck,
 } from "lucide-react";
 
-interface Contact {
+export interface Contact {
   id: string;
   name: string;
   role: string;
   avatar: string;
-  status: "online" | "offline" | "typing";
+  status: "online" | "in_call" | "offline" | "typing";
   lastSeen?: string;
   unreadCount: number;
 }
 
-interface Message {
+export interface Message {
   id: string;
   sender: "me" | "contact" | "system";
   text?: string;
-  type: "text" | "voice" | "call_log" | "image";
+  type: "text" | "voice" | "call_log" | "image" | "file";
   timestamp: string;
   duration?: string; // For voice notes
   callType?: "voice" | "video";
   callDuration?: string;
   status?: "sent" | "delivered" | "read";
+  fileName?: string;
+  fileSize?: string;
 }
 
-interface CallLog {
+export interface CallLog {
   id: string;
   contactId: string;
   contactName: string;
@@ -98,8 +104,7 @@ const INITIAL_CONTACTS: Contact[] = [
     name: "Alex Chen",
     role: "AI & Growth Strategist",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-    status: "offline",
-    lastSeen: "Today at 4:15 PM",
+    status: "in_call",
     unreadCount: 0,
   },
   {
@@ -116,7 +121,7 @@ const INITIAL_CONTACTS: Contact[] = [
     role: "Enterprise Partner",
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
     status: "offline",
-    lastSeen: "Yesterday",
+    lastSeen: "Today at 2:15 PM",
     unreadCount: 0,
   },
   {
@@ -134,7 +139,7 @@ const INITIAL_CONVERSATIONS: Record<string, Message[]> = {
     {
       id: "m1",
       sender: "contact",
-      text: "Hey! Just reviewed the multi-channel analytics for this week. Traffic is up 42%.",
+      text: "Hey! Just reviewed the cross-platform performance across Instagram, YouTube, and X. Traffic is up 42% this week.",
       type: "text",
       timestamp: "10:30 AM",
       status: "read",
@@ -142,7 +147,7 @@ const INITIAL_CONVERSATIONS: Record<string, Message[]> = {
     {
       id: "m2",
       sender: "me",
-      text: "That is fantastic! The new Pinterest and Instagram reels workflow worked wonders.",
+      text: "That is incredible! The new official Instagram Login and Pinterest boards workflow converted really well.",
       type: "text",
       timestamp: "10:32 AM",
       status: "read",
@@ -158,7 +163,7 @@ const INITIAL_CONVERSATIONS: Record<string, Message[]> = {
     {
       id: "m4",
       sender: "contact",
-      text: "Can we hop on a quick voice or video call to align on the next product release?",
+      text: "Let's hop on a live video huddle to align the Q4 roadmap and screen share the new analytics charts.",
       type: "text",
       timestamp: "10:40 AM",
       status: "read",
@@ -168,7 +173,7 @@ const INITIAL_CONVERSATIONS: Record<string, Message[]> = {
     {
       id: "s1",
       sender: "contact",
-      text: "All 12 scheduled posts for tomorrow have been reviewed and approved!",
+      text: "All 12 scheduled posts across LinkedIn and Instagram have been approved for publishing.",
       type: "text",
       timestamp: "09:15 AM",
       status: "read",
@@ -176,7 +181,7 @@ const INITIAL_CONVERSATIONS: Record<string, Message[]> = {
     {
       id: "s2",
       sender: "me",
-      text: "Awesome work Sophia! Let's monitor the engagement spikes around 2 PM.",
+      text: "Awesome work Sophia! Let's monitor the live reach analytics around 2 PM peak hours.",
       type: "text",
       timestamp: "09:20 AM",
       status: "read",
@@ -194,7 +199,7 @@ const INITIAL_CONVERSATIONS: Record<string, Message[]> = {
     {
       id: "a1",
       sender: "contact",
-      text: "Generated 5 AI carousel drafts using Gemini 3.8. Ready for your review.",
+      text: "Generated 5 AI carousel drafts using Gemini 2.5 Flash. The prompt enhancement works great.",
       type: "text",
       timestamp: "Yesterday",
       status: "read",
@@ -204,7 +209,7 @@ const INITIAL_CONVERSATIONS: Record<string, Message[]> = {
     {
       id: "e1",
       sender: "contact",
-      text: "Great branding consistency in the latest campaign! The royal purple look is sharp.",
+      text: "Love the executive styling and unified navigation! Everything looks crisp and unified.",
       type: "text",
       timestamp: "11:05 AM",
       status: "read",
@@ -214,7 +219,7 @@ const INITIAL_CONVERSATIONS: Record<string, Message[]> = {
     {
       id: "d1",
       sender: "contact",
-      text: "Received the Q4 social report. The enterprise stakeholder deck looks great.",
+      text: "Received the enterprise export deck. The security audit section is rock solid.",
       type: "text",
       timestamp: "Yesterday",
       status: "read",
@@ -224,7 +229,7 @@ const INITIAL_CONVERSATIONS: Record<string, Message[]> = {
     {
       id: "sa1",
       sender: "contact",
-      text: "Replying to pending customer mentions across Facebook & Twitter now.",
+      text: "Handling customer interactions across active social channels now. Zero pending backlog.",
       type: "text",
       timestamp: "11:50 AM",
       status: "read",
@@ -274,11 +279,11 @@ const INITIAL_CALL_LOGS: CallLog[] = [
   },
 ];
 
-export default function WhatsAppCallsHubPage() {
+export default function CallsCollaborationHubPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  // Active Tab: "chats" | "calls" | "rooms"
+  // Active Tab
   const [activeTab, setActiveTab] = useState<"chats" | "calls" | "rooms">("chats");
 
   // Contacts & Conversations State
@@ -293,12 +298,22 @@ export default function WhatsAppCallsHubPage() {
   // Call Logs
   const [callLogs, setCallLogs] = useState<CallLog[]>(INITIAL_CALL_LOGS);
 
+  // Responsive Mobile Chat View Toggle
+  const [isMobileChatOpen, setIsMobileChatOpen] = useState(false);
+
+  // Audio Memo Interactive Playback State
+  const [playingAudioId, setPlayingAudioId] = useState<string | null>(null);
+
+  // File Input Ref for Real Attachments
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // Voice Call Modal State
   const [isVoiceCallActive, setIsVoiceCallActive] = useState(false);
   const [voiceCallStatus, setVoiceCallStatus] = useState<"ringing" | "connected" | "ended">("ringing");
   const [callTimer, setCallTimer] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [isSpeakerOn, setIsSpeakerOn] = useState(true);
+  const [isVoiceChatOpen, setIsVoiceChatOpen] = useState(false);
 
   // Video Call Modal State
   const [isVideoCallActive, setIsVideoCallActive] = useState(false);
@@ -307,13 +322,20 @@ export default function WhatsAppCallsHubPage() {
   const [isVideoPaused, setIsVideoPaused] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [videoCallTimer, setVideoCallTimer] = useState(0);
+  const [isVideoChatOpen, setIsVideoChatOpen] = useState(false);
+  const [unreadInCallCount, setUnreadInCallCount] = useState(0);
+
+  // In-call chat input state
+  const [inCallChatInput, setInCallChatInput] = useState("");
 
   // WebRTC / Camera Refs
   const localVideoRef = useRef<HTMLVideoElement>(null);
+  const screenVideoRef = useRef<HTMLVideoElement>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const ringOscillatorRef = useRef<OscillatorNode | null>(null);
   const chatScrollRef = useRef<HTMLDivElement>(null);
+  const inCallChatScrollRef = useRef<HTMLDivElement>(null);
 
   // Quick Room joining state
   const [roomCodeInput, setRoomCodeInput] = useState("");
@@ -328,9 +350,16 @@ export default function WhatsAppCallsHubPage() {
     }
   }, [activeMessages, selectedContactId]);
 
+  // Scroll in-call chat drawer
+  useEffect(() => {
+    if (inCallChatScrollRef.current) {
+      inCallChatScrollRef.current.scrollTop = inCallChatScrollRef.current.scrollHeight;
+    }
+  }, [activeMessages, isVideoChatOpen, isVoiceChatOpen]);
+
   // Voice call timer
   useEffect(() => {
-    let interval: any;
+    let interval: NodeJS.Timeout;
     if (isVoiceCallActive && voiceCallStatus === "connected") {
       interval = setInterval(() => {
         setCallTimer((prev) => prev + 1);
@@ -341,7 +370,7 @@ export default function WhatsAppCallsHubPage() {
 
   // Video call timer
   useEffect(() => {
-    let interval: any;
+    let interval: NodeJS.Timeout;
     if (isVideoCallActive && videoCallStatus === "connected") {
       interval = setInterval(() => {
         setVideoCallTimer((prev) => prev + 1);
@@ -369,7 +398,7 @@ export default function WhatsAppCallsHubPage() {
       const gain = ctx.createGain();
       osc.type = "sine";
       osc.frequency.setValueAtTime(440, ctx.currentTime);
-      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.setValueAtTime(0.06, ctx.currentTime);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
@@ -392,7 +421,7 @@ export default function WhatsAppCallsHubPage() {
     } catch {}
   };
 
-  // Start WhatsApp Voice Call
+  // Start Executive Voice Huddle
   const startVoiceCall = (contact?: Contact) => {
     const target = contact || activeContact;
     setSelectedContactId(target.id);
@@ -400,15 +429,16 @@ export default function WhatsAppCallsHubPage() {
     setVoiceCallStatus("ringing");
     setCallTimer(0);
     setIsMuted(false);
+    setIsVoiceChatOpen(false);
     playRingTone();
 
-    // Auto connect after 2.5 seconds simulation
+    // Simulated peer answers after 2.5s
     setTimeout(() => {
       stopRingTone();
       setVoiceCallStatus("connected");
       toast({
         title: "Voice Call Connected",
-        message: `Talking with ${target.name}`,
+        message: `${target.name} joined the private voice huddle.`,
         type: "success",
       });
     }, 2500);
@@ -417,10 +447,11 @@ export default function WhatsAppCallsHubPage() {
   // End Voice Call
   const endVoiceCall = () => {
     stopRingTone();
-    const durationStr = formatDuration(callTimer);
     setIsVoiceCallActive(false);
+    setVoiceCallStatus("ended");
+    setIsVoiceChatOpen(false);
 
-    // Append to call log
+    const durationStr = formatDuration(callTimer);
     const newLog: CallLog = {
       id: `cl-${Date.now()}`,
       contactId: activeContact.id,
@@ -429,17 +460,17 @@ export default function WhatsAppCallsHubPage() {
       type: "voice",
       direction: "outgoing",
       timestamp: "Just now",
-      duration: durationStr !== "00:00" ? durationStr : "1m 12s",
+      duration: durationStr !== "00:00" ? durationStr : "1m 15s",
     };
     setCallLogs((prev) => [newLog, ...prev]);
 
     // Append call event to chat
     const newMsg: Message = {
-      id: `call-${Date.now()}`,
+      id: `call-log-${Date.now()}`,
       sender: "system",
       type: "call_log",
       callType: "voice",
-      callDuration: durationStr !== "00:00" ? durationStr : "1m 12s",
+      callDuration: durationStr !== "00:00" ? durationStr : "1m 15s",
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
     setConversations((prev) => ({
@@ -454,7 +485,7 @@ export default function WhatsAppCallsHubPage() {
     });
   };
 
-  // Start WhatsApp Video Call
+  // Start Executive HD Video Call (WebRTC)
   const startVideoCall = async (contact?: Contact) => {
     const target = contact || activeContact;
     setSelectedContactId(target.id);
@@ -463,39 +494,55 @@ export default function WhatsAppCallsHubPage() {
     setVideoCallTimer(0);
     setIsVideoMuted(false);
     setIsVideoPaused(false);
+    setIsScreenSharing(false);
+    setIsVideoChatOpen(false);
+    setUnreadInCallCount(0);
+    playRingTone();
 
+    // Acquire real user camera and microphone
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
+        video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" },
         audio: true,
       });
       mediaStreamRef.current = stream;
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
       }
-      setTimeout(() => {
-        setVideoCallStatus("connected");
-      }, 1500);
     } catch {
-      // Fallback if hardware permissions absent
-      setTimeout(() => {
-        setVideoCallStatus("connected");
-      }, 1500);
+      try {
+        const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaStreamRef.current = audioStream;
+        setIsVideoPaused(true);
+      } catch {
+        console.warn("Media devices not directly available or denied.");
+      }
     }
+
+    setTimeout(() => {
+      stopRingTone();
+      setVideoCallStatus("connected");
+      toast({
+        title: "Video Call Connected",
+        message: `${target.name} connected via HD WebRTC stream.`,
+        type: "success",
+      });
+    }, 2800);
   };
 
   // End Video Call
   const endVideoCall = () => {
+    stopRingTone();
     if (mediaStreamRef.current) {
       mediaStreamRef.current.getTracks().forEach((track) => track.stop());
       mediaStreamRef.current = null;
     }
     setIsVideoCallActive(false);
-    const durationStr = formatDuration(videoCallTimer);
+    setIsVideoChatOpen(false);
 
-    // Append to call log
+    const durationStr = formatDuration(videoCallTimer);
     const newLog: CallLog = {
-      id: `cl-${Date.now()}`,
+      id: `cl-v-${Date.now()}`,
       contactId: activeContact.id,
       contactName: activeContact.name,
       contactAvatar: activeContact.avatar,
@@ -527,10 +574,63 @@ export default function WhatsAppCallsHubPage() {
     });
   };
 
-  // Send WhatsApp message
-  const handleSendMessage = (e?: React.FormEvent) => {
+  // Handle Real File & Image Attachments
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const isImage = file.type.startsWith("image/");
+    const timeString = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+    if (isImage) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result as string;
+        const imgMsg: Message = {
+          id: `img-${Date.now()}`,
+          sender: "me",
+          type: "image",
+          text: dataUrl,
+          fileName: file.name,
+          fileSize: `${(file.size / 1024).toFixed(1)} KB`,
+          timestamp: timeString,
+          status: "read",
+        };
+        setConversations((prev) => ({
+          ...prev,
+          [activeContact.id]: [...(prev[activeContact.id] || []), imgMsg],
+        }));
+      };
+      reader.readAsDataURL(file);
+    } else {
+      const docMsg: Message = {
+        id: `file-${Date.now()}`,
+        sender: "me",
+        type: "file",
+        fileName: file.name,
+        fileSize: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
+        timestamp: timeString,
+        status: "read",
+      };
+      setConversations((prev) => ({
+        ...prev,
+        [activeContact.id]: [...(prev[activeContact.id] || []), docMsg],
+      }));
+    }
+
+    toast({
+      title: "Attachment Shared",
+      message: `${file.name} sent to ${activeContact.name}`,
+      type: "success",
+    });
+
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  // Send message in primary conversation
+  const handleSendMessage = (e?: React.FormEvent, customText?: string) => {
     if (e) e.preventDefault();
-    const text = inputMessage.trim();
+    const text = (customText || inputMessage).trim();
     if (!text) return;
 
     const timeString = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -550,7 +650,7 @@ export default function WhatsAppCallsHubPage() {
     setInputMessage("");
     setShowEmojiPicker(false);
 
-    // Deliver tick update
+    // Delivery tick update
     setTimeout(() => {
       setConversations((prev) => {
         const msgs = prev[activeContact.id] || [];
@@ -561,18 +661,18 @@ export default function WhatsAppCallsHubPage() {
           ),
         };
       });
-    }, 800);
+    }, 600);
 
     // Realistic smart response from contact
     setIsTyping(true);
     setTimeout(() => {
       setIsTyping(false);
       const replies = [
-        "Got it! I'm reviewing the scheduled posts now.",
-        "Perfect. Let's touch base on the video call shortly if needed.",
-        "Understood, publishing across all channels as scheduled!",
-        "Thanks for the update! The engagement metrics look solid.",
-        "Sounds great. I'll share the summary with the marketing team.",
+        "Received! Reviewing the draft posts now.",
+        "Perfect. I am checking the live metrics in our workspace.",
+        "Understood, scheduling across all approved social channels.",
+        "Great insights! I'll share the summary with the marketing team.",
+        "Sounds great, let me know if you need anything else on this campaign.",
       ];
       const randomReply = replies[Math.floor(Math.random() * replies.length)];
       const botMsg: Message = {
@@ -588,7 +688,22 @@ export default function WhatsAppCallsHubPage() {
         ...prev,
         [activeContact.id]: [...(prev[activeContact.id] || []), botMsg],
       }));
-    }, 2000);
+
+      // Increment in-call badge if call is active and chat drawer is closed
+      if ((isVideoCallActive && !isVideoChatOpen) || (isVoiceCallActive && !isVoiceChatOpen)) {
+        setUnreadInCallCount((prev) => prev + 1);
+      }
+    }, 1800);
+  };
+
+  // Send In-Call message directly while inside voice/video call
+  const handleSendInCallMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    const text = inCallChatInput.trim();
+    if (!text) return;
+
+    handleSendMessage(undefined, text);
+    setInCallChatInput("");
   };
 
   // Create or Join Instant Room
@@ -605,29 +720,30 @@ export default function WhatsAppCallsHubPage() {
 
   return (
     <AppLayout>
-      <div className="h-[calc(100vh-4rem)] w-full flex bg-[#F0F2F5] dark:bg-[#0C1317] font-sans overflow-hidden select-none">
+      <div className="h-[calc(100vh-4rem)] w-full flex bg-slate-50 dark:bg-[#0B0F19] text-slate-900 dark:text-white font-sans overflow-hidden select-none">
         {/* ============================================================ */}
-        {/* LEFT COLUMN: WhatsApp Navigation & Conversations Drawer       */}
+        {/* LEFT COLUMN: Team Channels & Collaborators Directory          */}
         {/* ============================================================ */}
-        <div className="w-full sm:w-[380px] lg:w-[420px] shrink-0 flex flex-col bg-white dark:bg-[#111B21] border-r border-slate-200 dark:border-white/10 h-full">
-          {/* Top WhatsApp Header */}
-          <div className="h-16 px-4 bg-[#F0F2F5] dark:bg-[#202C33] flex items-center justify-between border-b border-slate-200 dark:border-white/10">
+        <div className={`${isMobileChatOpen ? "hidden sm:flex" : "flex"} w-full sm:w-[380px] lg:w-[420px] shrink-0 flex-col bg-white dark:bg-slate-900/90 border-r border-slate-200/80 dark:border-slate-800/80 h-full backdrop-blur-md`}>
+          {/* Executive Header */}
+          <div className="h-16 px-4 bg-white/95 dark:bg-slate-900/95 flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80">
             <div className="flex items-center gap-3">
               <div className="relative">
                 <img
                   src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
                   alt="Profile"
-                  className="w-10 h-10 rounded-full object-cover ring-2 ring-[#5846A8]/30 dark:ring-amber-400/40"
+                  className="w-10 h-10 rounded-xl object-cover ring-2 ring-violet-500/30 dark:ring-violet-400/30"
                 />
-                <span className="absolute bottom-0 right-0 w-3 h-3 bg-[#5846A8] dark:bg-amber-400 rounded-full border-2 border-white dark:border-[#202C33]" />
+                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900 shadow-xs" />
               </div>
               <div>
-                <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-tight">
-                  PulseSocial Hub
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
+                  Pulse Collaboration
                 </h2>
-                <span className="text-[11px] font-semibold text-[#5846A8] dark:text-amber-400">
-                  Calls &amp; Conversations
-                </span>
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-violet-600 dark:text-violet-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-violet-600 dark:bg-violet-400 animate-pulse" />
+                  <span>Team Mesh Active</span>
+                </div>
               </div>
             </div>
 
@@ -636,126 +752,143 @@ export default function WhatsAppCallsHubPage() {
               <button
                 type="button"
                 onClick={() => startVoiceCall()}
-                className="p-2 rounded-full text-slate-600 dark:text-slate-300 hover:text-[#5846A8] dark:hover:text-amber-400 hover:bg-purple-50 dark:hover:bg-amber-500/10 transition cursor-pointer"
-                title="Quick Voice Call"
+                className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-500/10 transition cursor-pointer"
+                title="Start Voice Huddle"
               >
-                <Phone className="w-5 h-5" />
+                <Phone className="w-4 h-4" />
               </button>
               <button
                 type="button"
                 onClick={() => startVideoCall()}
-                className="p-2 rounded-full text-slate-600 dark:text-slate-300 hover:text-[#5846A8] dark:hover:text-amber-400 hover:bg-purple-50 dark:hover:bg-amber-500/10 transition cursor-pointer"
-                title="Quick Video Call"
+                className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-500/10 transition cursor-pointer"
+                title="Start HD Video Call"
               >
-                <Video className="w-5 h-5" />
+                <Video className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleJoinOrCreateRoom()}
+                className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-500/10 transition cursor-pointer"
+                title="Instant WebRTC Room"
+              >
+                <Radio className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          {/* Navigation Tabs (Chats, Calls, Instant Meeting Rooms) */}
-          <div className="flex border-b border-slate-200 dark:border-white/10 bg-white dark:bg-[#111B21]">
+          {/* Navigation Tabs (Chats, Call History, Multi-Party Rooms) */}
+          <div className="flex border-b border-slate-200/80 dark:border-slate-800/80 bg-slate-50/60 dark:bg-slate-900/60 px-2 pt-1.5 gap-1">
             <button
               type="button"
               onClick={() => setActiveTab("chats")}
-              className={`flex-1 py-3 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center justify-center gap-1.5 ${
+              className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === "chats"
-                  ? "border-[#5846A8] text-[#5846A8] dark:border-amber-400 dark:text-amber-400"
-                  : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+                  ? "bg-white dark:bg-slate-800 text-violet-700 dark:text-violet-400 shadow-xs border border-slate-200/60 dark:border-slate-700/60"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-800/50"
               }`}
             >
-              <MessageSquare className="w-4 h-4" />
+              <MessageSquare className="w-3.5 h-3.5" />
               <span>CHATS</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("calls")}
-              className={`flex-1 py-3 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center justify-center gap-1.5 ${
+              className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === "calls"
-                  ? "border-[#5846A8] text-[#5846A8] dark:border-amber-400 dark:text-amber-400"
-                  : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+                  ? "bg-white dark:bg-slate-800 text-violet-700 dark:text-violet-400 shadow-xs border border-slate-200/60 dark:border-slate-700/60"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-800/50"
               }`}
             >
-              <PhoneCall className="w-4 h-4" />
-              <span>CALLS</span>
-              <span className="px-1.5 py-0.2 rounded-full bg-purple-100 text-[#5846A8] dark:bg-amber-400/20 dark:text-amber-300 text-[10px] font-bold">
+              <PhoneCall className="w-3.5 h-3.5" />
+              <span>LOGS</span>
+              <span className="px-1.5 py-0.2 rounded-full bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300 text-[10px] font-bold">
                 {callLogs.length}
               </span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("rooms")}
-              className={`flex-1 py-3 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center justify-center gap-1.5 ${
+              className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === "rooms"
-                  ? "border-[#5846A8] text-[#5846A8] dark:border-amber-400 dark:text-amber-400"
-                  : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+                  ? "bg-white dark:bg-slate-800 text-violet-700 dark:text-violet-400 shadow-xs border border-slate-200/60 dark:border-slate-700/60"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-800/50"
               }`}
             >
-              <Radio className="w-4 h-4" />
+              <Radio className="w-3.5 h-3.5" />
               <span>ROOMS</span>
             </button>
           </div>
 
           {/* Search Bar */}
-          <div className="p-2.5 bg-white dark:bg-[#111B21] border-b border-slate-100 dark:border-white/5">
+          <div className="p-2.5 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/50">
             <div className="relative flex items-center">
               <Search className="absolute left-3 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search or start new conversation..."
-                className="w-full pl-9 pr-4 py-1.5 text-xs rounded-lg bg-[#F0F2F5] dark:bg-[#202C33] text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none focus:ring-1 focus:ring-[#5846A8] dark:focus:ring-amber-400 transition"
+                placeholder="Search teammates, messages, or channels..."
+                className="w-full pl-9 pr-4 py-1.5 text-xs rounded-xl bg-slate-100/80 dark:bg-slate-800/80 text-slate-900 dark:text-white placeholder:text-slate-400 border border-transparent focus:border-violet-500 dark:focus:border-violet-500 outline-none transition"
               />
             </div>
           </div>
 
-          {/* TAB 1: CHATS LIST */}
+          {/* TAB 1: TEAM CHATS DIRECTORY */}
           {activeTab === "chats" && (
-            <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-white/5">
+            <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/40">
               {filteredContacts.map((contact) => {
                 const isSelected = contact.id === selectedContactId;
                 const lastMsg = conversations[contact.id]?.slice(-1)[0];
                 return (
                   <div
                     key={contact.id}
-                    onClick={() => setSelectedContactId(contact.id)}
+                    onClick={() => {
+                      setSelectedContactId(contact.id);
+                      setIsMobileChatOpen(true);
+                    }}
                     className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition ${
                       isSelected
-                        ? "bg-purple-50/80 dark:bg-[#201C14] border-l-3 border-[#5846A8] dark:border-amber-400"
-                        : "hover:bg-slate-50 dark:hover:bg-[#1A2228]"
+                        ? "bg-violet-50/80 dark:bg-violet-950/25 border-l-4 border-violet-600 dark:border-violet-400"
+                        : "hover:bg-slate-50/80 dark:hover:bg-slate-800/40"
                     }`}
                   >
                     <div className="relative shrink-0">
                       <img
                         src={contact.avatar}
                         alt={contact.name}
-                        className="w-12 h-12 rounded-full object-cover"
+                        className="w-11 h-11 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-slate-700"
                       />
                       {contact.status === "online" && (
-                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-[#5846A8] dark:bg-amber-400 rounded-full border-2 border-white dark:border-[#111B21]" />
+                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900" title="Online" />
+                      )}
+                      {contact.status === "in_call" && (
+                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-violet-500 rounded-full border-2 border-white dark:border-slate-900" title="In a Huddle" />
+                      )}
+                      {contact.status === "offline" && (
+                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-slate-400 rounded-full border-2 border-white dark:border-slate-900" title="Offline" />
                       )}
                     </div>
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+                        <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
                           {contact.name}
                         </span>
-                        <span className="text-[11px] text-slate-400 shrink-0">
+                        <span className="text-[10px] text-slate-400 shrink-0 font-medium">
                           {lastMsg ? lastMsg.timestamp : "Recent"}
                         </span>
                       </div>
 
                       <div className="flex items-center justify-between mt-1">
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate pr-2">
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate pr-2">
                           {lastMsg?.type === "voice"
-                            ? "🎤 Voice message (0:24)"
+                            ? "🎤 Voice memo (0:24)"
                             : lastMsg?.type === "call_log"
                             ? `${lastMsg.callType === "voice" ? "📞 Voice call" : "📹 Video call"}`
                             : lastMsg?.text || contact.role}
                         </p>
                         {contact.unreadCount > 0 && (
-                          <span className="w-5 h-5 rounded-full bg-[#5846A8] dark:bg-amber-400 text-white dark:text-slate-950 text-[10px] font-bold flex items-center justify-center shrink-0">
+                          <span className="w-4 h-4 rounded-full bg-violet-600 text-white text-[9px] font-bold flex items-center justify-center shrink-0 shadow-xs">
                             {contact.unreadCount}
                           </span>
                         )}
@@ -769,37 +902,37 @@ export default function WhatsAppCallsHubPage() {
 
           {/* TAB 2: CALL LOGS */}
           {activeTab === "calls" && (
-            <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-white/5">
-              <div className="p-3 bg-slate-50 dark:bg-white/5 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                Recent Call Logs
+            <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/40">
+              <div className="px-4 py-2.5 bg-slate-50/70 dark:bg-slate-800/40 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Recent Telemetry &amp; Logs
               </div>
               {callLogs.map((log) => (
                 <div
                   key={log.id}
-                  className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-[#202C33] transition"
+                  className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition"
                 >
                   <div className="flex items-center gap-3">
                     <img
                       src={log.contactAvatar}
                       alt={log.contactName}
-                      className="w-11 h-11 rounded-full object-cover shrink-0"
+                      className="w-10 h-10 rounded-xl object-cover shrink-0 ring-1 ring-slate-200 dark:ring-slate-700"
                     />
                     <div>
-                      <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white">
                         {log.contactName}
                       </h4>
-                      <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                         {log.direction === "incoming" && (
                           <PhoneIncoming className="w-3.5 h-3.5 text-emerald-500" />
                         )}
                         {log.direction === "outgoing" && (
-                          <PhoneOutgoing className="w-3.5 h-3.5 text-blue-500" />
+                          <PhoneOutgoing className="w-3.5 h-3.5 text-violet-500" />
                         )}
                         {log.direction === "missed" && (
                           <PhoneMissed className="w-3.5 h-3.5 text-rose-500" />
                         )}
                         <span>{log.timestamp}</span>
-                        {log.duration && <span>• {log.duration}</span>}
+                        {log.duration && <span className="font-mono text-[10px]">({log.duration})</span>}
                       </div>
                     </div>
                   </div>
@@ -812,8 +945,8 @@ export default function WhatsAppCallsHubPage() {
                           const contact = contacts.find((c) => c.id === log.contactId);
                           startVoiceCall(contact);
                         }}
-                        className="p-2 rounded-full text-[#5846A8] dark:text-amber-400 hover:bg-purple-50 dark:hover:bg-amber-400/10 transition cursor-pointer"
-                        title="Call Back (Voice)"
+                        className="p-2 rounded-xl text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-500/10 transition cursor-pointer"
+                        title="Voice Call Back"
                       >
                         <Phone className="w-4 h-4" />
                       </button>
@@ -824,8 +957,8 @@ export default function WhatsAppCallsHubPage() {
                           const contact = contacts.find((c) => c.id === log.contactId);
                           startVideoCall(contact);
                         }}
-                        className="p-2 rounded-full text-[#5846A8] dark:text-amber-400 hover:bg-purple-50 dark:hover:bg-amber-400/10 transition cursor-pointer"
-                        title="Call Back (Video)"
+                        className="p-2 rounded-xl text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-500/10 transition cursor-pointer"
+                        title="Video Call Back"
                       >
                         <Video className="w-4 h-4" />
                       </button>
@@ -836,61 +969,61 @@ export default function WhatsAppCallsHubPage() {
             </div>
           )}
 
-          {/* TAB 3: INSTANT WebRTC ROOMS */}
+          {/* TAB 3: INSTANT WebRTC CONFERENCE ROOMS */}
           {activeTab === "rooms" && (
-            <div className="flex-1 p-5 space-y-4 overflow-y-auto">
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-[#4E3B99] via-[#5846A8] to-[#6C55C4] dark:bg-gradient-to-br dark:from-[#2E220F] dark:to-[#1A1408] dark:border dark:border-amber-500/30 text-white shadow-lg shadow-purple-600/20 dark:shadow-amber-500/10">
-                <Radio className="w-6 h-6 mb-2 text-white dark:text-amber-400 animate-pulse" />
-                <h3 className="font-bold text-sm text-white dark:text-amber-200">Instant Video Conference</h3>
-                <p className="text-xs text-white/80 dark:text-amber-200/70 mt-1 leading-relaxed">
-                  Start or enter a secure WebRTC meeting room for multi-member standups.
+            <div className="flex-1 p-4 space-y-4 overflow-y-auto">
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-violet-600 via-indigo-600 to-purple-700 text-white shadow-lg shadow-violet-600/20">
+                <Radio className="w-5 h-5 mb-2 text-violet-200 animate-pulse" />
+                <h3 className="font-bold text-sm text-white">Instant Team Standup Room</h3>
+                <p className="text-xs text-violet-100/80 mt-1 leading-relaxed">
+                  Spin up an isolated multi-participant WebRTC meeting room with screen sharing and encrypted audio.
                 </p>
                 <button
                   type="button"
                   onClick={() => handleJoinOrCreateRoom(`pulse-${Math.random().toString(36).substring(2, 7)}`)}
-                  className="mt-3 px-4 py-2 bg-white text-[#5846A8] dark:bg-amber-400 dark:text-slate-950 rounded-xl font-bold text-xs shadow-md hover:bg-purple-50 dark:hover:bg-amber-300 transition cursor-pointer flex items-center gap-2"
+                  className="mt-3 px-4 py-2 bg-white text-violet-700 rounded-xl font-bold text-xs shadow-sm hover:bg-violet-50 transition cursor-pointer flex items-center gap-2"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Start New Meeting</span>
+                  <span>Launch New Meeting</span>
                 </button>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 p-3.5 rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800">
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                  Enter Meeting Code:
+                  Enter Meeting Room Code:
                 </label>
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={roomCodeInput}
                     onChange={(e) => setRoomCodeInput(e.target.value)}
-                    placeholder="e.g. pulse-standup"
-                    className="flex-1 px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-white/10 bg-[#F0F2F5] dark:bg-[#202C33] text-slate-800 dark:text-slate-100 outline-none focus:ring-1 focus:ring-[#5846A8] dark:focus:ring-amber-400"
+                    placeholder="e.g. weekly-sync"
+                    className="flex-1 px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white outline-none focus:ring-1 focus:ring-violet-500"
                   />
                   <button
                     type="button"
                     onClick={() => handleJoinOrCreateRoom()}
-                    className="px-4 py-2 rounded-xl bg-[#5846A8] hover:bg-[#4E3B99] dark:bg-amber-400 dark:hover:bg-amber-300 text-white dark:text-slate-950 font-bold text-xs transition cursor-pointer"
+                    className="px-4 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs transition cursor-pointer"
                   >
                     Join
                   </button>
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 dark:border-white/10">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  Preset Team Channels:
+              <div className="space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Workspace Standup Channels:
                 </span>
-                <div className="mt-2 space-y-1.5">
+                <div className="space-y-1.5">
                   {["pulse-standup", "social-review", "weekly-sync"].map((code) => (
                     <button
                       key={code}
                       type="button"
                       onClick={() => handleJoinOrCreateRoom(code)}
-                      className="w-full px-3 py-2 text-left rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-purple-50 dark:hover:bg-amber-500/10 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-[#5846A8] dark:hover:text-amber-300 transition flex items-center justify-between cursor-pointer"
+                      className="w-full px-3 py-2 text-left rounded-xl bg-white dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800 hover:border-violet-500/40 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-violet-600 dark:hover:text-violet-400 transition flex items-center justify-between cursor-pointer"
                     >
                       <span className="font-mono">#{code}</span>
-                      <Video className="w-3.5 h-3.5 text-[#5846A8] dark:text-amber-400" />
+                      <Video className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
                     </button>
                   ))}
                 </div>
@@ -900,117 +1033,118 @@ export default function WhatsAppCallsHubPage() {
         </div>
 
         {/* ============================================================ */}
-        {/* RIGHT COLUMN: WhatsApp Active Conversation Canvas             */}
+        {/* RIGHT COLUMN: Executive Active Collaboration Workspace        */}
         {/* ============================================================ */}
-        <div className="hidden sm:flex flex-1 flex-col h-full bg-[#EFEAE2] dark:bg-[#0B141A] relative">
-          {/* WhatsApp Header for Active Contact */}
-          <div className="h-16 px-5 bg-[#F0F2F5] dark:bg-[#202C33] flex items-center justify-between border-b border-slate-200 dark:border-white/10 z-10">
-            <div className="flex items-center gap-3">
+        <div className={`${isMobileChatOpen ? "flex" : "hidden sm:flex"} flex-1 flex-col h-full bg-slate-50/70 dark:bg-[#0B0F19] relative`}>
+          {/* Active Teammate Header */}
+          <div className="h-16 px-4 sm:px-6 bg-white/95 dark:bg-slate-900/95 flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80 z-10 backdrop-blur-md">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                type="button"
+                onClick={() => setIsMobileChatOpen(false)}
+                className="sm:hidden p-1.5 -ml-1 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                title="Back to Directory"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
               <div className="relative">
                 <img
                   src={activeContact.avatar}
                   alt={activeContact.name}
-                  className="w-10 h-10 rounded-full object-cover"
+                  className="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-slate-700"
                 />
                 {activeContact.status === "online" && (
-                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#5846A8] dark:bg-amber-400 rounded-full border border-white dark:border-[#202C33]" />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900" />
+                )}
+                {activeContact.status === "in_call" && (
+                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-violet-500 rounded-full border-2 border-white dark:border-slate-900" />
                 )}
               </div>
 
               <div>
-                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-tight">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
                   {activeContact.name}
                 </h3>
                 <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                   {isTyping ? (
-                    <span className="text-[#5846A8] dark:text-amber-400 font-semibold">typing...</span>
+                    <span className="text-violet-600 dark:text-violet-400 font-semibold">typing...</span>
                   ) : activeContact.status === "online" ? (
-                    <span className="text-[#5846A8] dark:text-amber-400 font-semibold">online</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">online now</span>
+                  ) : activeContact.status === "in_call" ? (
+                    <span className="text-violet-600 dark:text-violet-400 font-semibold">in active huddle</span>
                   ) : (
                     activeContact.lastSeen || "offline"
                   )}
+                  {" • "}
+                  <span>{activeContact.role}</span>
                 </p>
               </div>
             </div>
 
-            {/* Direct WhatsApp Voice Call & Video Call Buttons */}
+            {/* Direct Huddle Launchers */}
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => startVoiceCall()}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-white/10 hover:bg-purple-50 dark:hover:bg-amber-500/15 border border-purple-200/80 dark:border-amber-500/30 text-[#5846A8] dark:text-amber-300 text-xs font-bold transition shadow-xs cursor-pointer active:scale-95"
-                title="Start WhatsApp Voice Call"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 text-xs font-bold transition cursor-pointer"
+                title="Start Voice Huddle"
               >
-                <Phone className="w-4 h-4" />
-                <span>Voice Call</span>
+                <Phone className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
+                <span>Voice Huddle</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => startVideoCall()}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#4E3B99] via-[#5846A8] to-[#6C55C4] hover:opacity-95 dark:from-amber-400 dark:to-yellow-500 text-white dark:text-slate-950 text-xs font-bold transition shadow-md shadow-purple-600/25 dark:shadow-[0_0_15px_rgba(251,191,36,0.3)] cursor-pointer active:scale-95"
-                title="Start WhatsApp Video Call"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold transition shadow-sm cursor-pointer"
+                title="Start Video Huddle"
               >
-                <Video className="w-4 h-4" />
-                <span>Video Call</span>
+                <Video className="w-3.5 h-3.5" />
+                <span>HD Video Call</span>
               </button>
 
-              <div className="h-5 w-px bg-slate-300 dark:bg-white/15 mx-1" />
+              <div className="h-5 w-px bg-slate-200 dark:bg-slate-800 mx-1" />
 
               <button
                 type="button"
-                className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition cursor-pointer"
-                title="Search conversation"
+                onClick={() => handleJoinOrCreateRoom()}
+                className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                title="Open Team Meeting Room"
               >
-                <Search className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition cursor-pointer"
-                title="More options"
-              >
-                <MoreVertical className="w-4 h-4" />
+                <Radio className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          {/* Messages Feed Area with WhatsApp Wallpaper Pattern */}
+          {/* Conversation Stream Canvas */}
           <div
             ref={chatScrollRef}
-            className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3 relative"
+            className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3.5 relative"
             style={{
-              backgroundImage:
-                "radial-gradient(circle at 50% 50%, rgba(0,0,0,0.02) 0%, transparent 100%)",
+              backgroundImage: "radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.03) 0%, transparent 100%)",
             }}
           >
-            {/* Encryption notice banner */}
-            <div className="w-fit max-w-md mx-auto text-center px-4 py-1.5 rounded-lg bg-amber-100/80 dark:bg-[#182229] border border-amber-200/50 dark:border-white/5 text-[11px] text-amber-800 dark:text-amber-200/90 shadow-2xs">
-              🔒 Messages and calls are end-to-end encrypted across your PulseSocial team.
-            </div>
-
-            {/* Date divider */}
-            <div className="flex items-center justify-center my-3">
-              <span className="px-3 py-1 rounded-md bg-white/90 dark:bg-[#182229] text-[11px] font-bold text-slate-600 dark:text-slate-300 shadow-2xs">
-                TODAY
-              </span>
+            {/* Security banner */}
+            <div className="w-fit max-w-md mx-auto text-center px-4 py-1.5 rounded-full bg-slate-200/60 dark:bg-slate-800/60 border border-slate-300/50 dark:border-slate-700/50 text-[10px] font-semibold text-slate-600 dark:text-slate-400">
+              🔒 End-to-end encrypted peer stream • Pulse Enterprise Mesh
             </div>
 
             {/* Conversation Bubbles */}
             {activeMessages.map((msg) => {
               if (msg.type === "call_log") {
                 return (
-                  <div key={msg.id} className="flex justify-center my-2">
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 dark:bg-[#182229] border border-slate-200/60 dark:border-white/10 text-xs text-slate-700 dark:text-slate-300 shadow-xs">
+                  <div key={msg.id} className="flex justify-center my-3">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 text-xs text-slate-700 dark:text-slate-300 shadow-xs">
                       {msg.callType === "voice" ? (
-                        <PhoneCall className="w-3.5 h-3.5 text-[#5846A8] dark:text-amber-400" />
+                        <PhoneCall className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
                       ) : (
-                        <Video className="w-3.5 h-3.5 text-[#5846A8] dark:text-amber-400" />
+                        <Video className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
                       )}
                       <span className="font-semibold">
-                        {msg.callType === "voice" ? "Voice call ended" : "Video call ended"}
+                        {msg.callType === "voice" ? "Voice huddle completed" : "Video call completed"}
                       </span>
                       {msg.callDuration && (
-                        <span className="text-slate-400 font-mono">({msg.callDuration})</span>
+                        <span className="text-slate-400 font-mono text-[11px]">({msg.callDuration})</span>
                       )}
                       <span className="text-[10px] text-slate-400 font-mono ml-1">
                         {msg.timestamp}
@@ -1028,39 +1162,87 @@ export default function WhatsAppCallsHubPage() {
                   className={`flex ${isMe ? "justify-end" : "justify-start"} animate-in fade-in duration-150`}
                 >
                   <div
-                    className={`max-w-[78%] sm:max-w-[65%] rounded-2xl px-3.5 py-2 shadow-xs text-xs relative leading-relaxed ${
+                    className={`max-w-[78%] sm:max-w-[65%] rounded-2xl px-4 py-2.5 shadow-xs text-xs relative leading-relaxed ${
                       isMe
-                        ? "bg-[#EBE7FF] dark:bg-gradient-to-br dark:from-[#2B2315] dark:to-[#1E180E] text-[#221648] dark:text-amber-100 border border-purple-200/70 dark:border-amber-500/30 rounded-tr-xs"
-                        : "bg-white dark:bg-[#1E272D] text-slate-900 dark:text-slate-100 rounded-tl-xs"
+                        ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-tr-xs"
+                        : "bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-200/80 dark:border-slate-700/70 rounded-tl-xs shadow-xs"
                     }`}
                   >
                     {msg.type === "voice" ? (
-                      <div className="flex items-center gap-3 py-1 min-w-[200px]">
+                      <div className="flex items-center gap-3 py-1 min-w-[210px]">
                         <button
                           type="button"
-                          className="w-8 h-8 rounded-full bg-[#5846A8] hover:bg-[#4E3B99] dark:bg-amber-400 dark:hover:bg-amber-300 text-white dark:text-slate-950 flex items-center justify-center transition cursor-pointer"
+                          onClick={() => setPlayingAudioId((prev) => (prev === msg.id ? null : msg.id))}
+                          className="w-8 h-8 rounded-full bg-violet-700 dark:bg-violet-500 text-white flex items-center justify-center transition cursor-pointer active:scale-95 shrink-0 shadow-xs"
+                          title={playingAudioId === msg.id ? "Pause Voice Memo" : "Play Voice Memo"}
                         >
-                          <Play className="w-3.5 h-3.5 ml-0.5" />
+                          {playingAudioId === msg.id ? (
+                            <Pause className="w-3.5 h-3.5" />
+                          ) : (
+                            <Play className="w-3.5 h-3.5 ml-0.5" />
+                          )}
                         </button>
                         <div className="flex-1 space-y-1">
-                          <div className="h-1 bg-slate-300 dark:bg-white/20 rounded-full overflow-hidden">
-                            <div className="w-1/3 h-full bg-[#5846A8] dark:bg-amber-400" />
+                          <div className="flex items-center gap-1 h-4">
+                            {[6, 14, 8, 18, 12, 16, 10, 20, 8, 14, 6].map((bar, i) => (
+                              <span
+                                key={i}
+                                style={{
+                                  height: `${
+                                    playingAudioId === msg.id ? Math.min(18, bar + (i % 3) * 2) : 6
+                                  }px`,
+                                }}
+                                className={`w-1 rounded-full transition-all duration-150 ${
+                                  isMe ? "bg-white/80" : "bg-violet-600 dark:bg-violet-400"
+                                }`}
+                              />
+                            ))}
                           </div>
-                          <span className="text-[10px] font-mono text-slate-500 dark:text-slate-300">
-                            {msg.duration || "0:14"}
+                          <span className="text-[10px] font-mono opacity-80 block">
+                            {playingAudioId === msg.id ? "Playing audio..." : msg.duration || "0:14"}
                           </span>
                         </div>
                       </div>
+                    ) : msg.type === "image" ? (
+                      <div className="space-y-1.5 py-1">
+                        <img
+                          src={msg.text}
+                          alt={msg.fileName || "Shared image"}
+                          className="max-w-[240px] max-h-56 rounded-xl object-cover border border-black/10 dark:border-white/10 shadow-xs"
+                        />
+                        {msg.fileName && (
+                          <div className="flex items-center justify-between text-[10px] opacity-80 pt-0.5">
+                            <span className="truncate max-w-[150px] font-medium">{msg.fileName}</span>
+                            {msg.fileSize && <span className="font-mono">{msg.fileSize}</span>}
+                          </div>
+                        )}
+                      </div>
+                    ) : msg.type === "file" ? (
+                      <div className="flex items-center gap-3 py-1.5 px-1 min-w-[200px]">
+                        <div
+                          className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                            isMe
+                              ? "bg-white/20 text-white"
+                              : "bg-violet-100 text-violet-600 dark:bg-violet-500/20 dark:text-violet-300"
+                          }`}
+                        >
+                          <FileText className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-bold truncate">{msg.fileName || "Document"}</p>
+                          <p className="text-[10px] opacity-80 font-mono">{msg.fileSize || "Attachment"}</p>
+                        </div>
+                      </div>
                     ) : (
-                      <p className="pr-12">{msg.text}</p>
+                      <p className="pr-10">{msg.text}</p>
                     )}
 
                     <div className="flex items-center gap-1 justify-end float-right -mt-2 -mr-1">
-                      <span className="text-[10px] text-slate-500 dark:text-white/60 font-mono">
+                      <span className={`text-[10px] font-mono ${isMe ? "text-violet-200" : "text-slate-400"}`}>
                         {msg.timestamp}
                       </span>
                       {isMe && (
-                        <CheckCheck className="w-3.5 h-3.5 text-[#5846A8] dark:text-amber-400" />
+                        <CheckCheck className="w-3.5 h-3.5 text-violet-200" />
                       )}
                     </div>
                   </div>
@@ -1070,10 +1252,10 @@ export default function WhatsAppCallsHubPage() {
 
             {isTyping && (
               <div className="flex justify-start">
-                <div className="px-3.5 py-2 rounded-2xl bg-white dark:bg-[#202C33] text-xs text-slate-500 dark:text-slate-400 shadow-xs flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#5846A8] dark:bg-amber-400 animate-bounce" />
-                  <span className="w-2 h-2 rounded-full bg-[#5846A8] dark:bg-amber-400 animate-bounce [animation-delay:0.2s]" />
-                  <span className="w-2 h-2 rounded-full bg-[#5846A8] dark:bg-amber-400 animate-bounce [animation-delay:0.4s]" />
+                <div className="px-3.5 py-2 rounded-2xl bg-white dark:bg-slate-800 text-xs text-slate-500 dark:text-slate-400 shadow-xs flex items-center gap-1.5 border border-slate-200/60 dark:border-slate-700/50">
+                  <span className="w-1.5 h-1.5 rounded-full bg-violet-600 dark:bg-violet-400 animate-bounce" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-violet-600 dark:bg-violet-400 animate-bounce [animation-delay:0.2s]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-violet-600 dark:bg-violet-400 animate-bounce [animation-delay:0.4s]" />
                   <span className="text-[11px] ml-1">{activeContact.name} is typing...</span>
                 </div>
               </div>
@@ -1082,7 +1264,7 @@ export default function WhatsAppCallsHubPage() {
 
           {/* Quick Reaction Emojis Popup */}
           {showEmojiPicker && (
-            <div className="absolute bottom-20 left-4 p-2 rounded-2xl bg-white dark:bg-[#202C33] border border-slate-200 dark:border-white/10 shadow-2xl flex items-center gap-2 z-20 animate-in fade-in zoom-in-95">
+            <div className="absolute bottom-20 left-4 p-2 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl flex items-center gap-2 z-20 animate-in fade-in zoom-in-95">
               {["👍", "❤️", "🔥", "🚀", "👏", "🎉", "🙏", "✅"].map((emoji) => (
                 <button
                   key={emoji}
@@ -1091,7 +1273,7 @@ export default function WhatsAppCallsHubPage() {
                     setInputMessage((prev) => prev + emoji);
                     setShowEmojiPicker(false);
                   }}
-                  className="w-8 h-8 rounded-xl hover:bg-slate-100 dark:hover:bg-white/10 text-base flex items-center justify-center transition cursor-pointer"
+                  className="w-8 h-8 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 text-base flex items-center justify-center transition cursor-pointer"
                 >
                   {emoji}
                 </button>
@@ -1099,30 +1281,33 @@ export default function WhatsAppCallsHubPage() {
             </div>
           )}
 
-          {/* Bottom WhatsApp Message Input Bar */}
-          <div className="px-4 py-3 bg-[#F0F2F5] dark:bg-[#202C33] flex items-center gap-2.5 z-10 border-t border-slate-200 dark:border-white/10">
+          {/* Message Input Bar */}
+          <div className="px-4 py-3 bg-white/95 dark:bg-slate-900/95 flex items-center gap-2 z-10 border-t border-slate-200/80 dark:border-slate-800/80">
+            {/* Hidden File Picker */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,.pdf,.doc,.docx,.xlsx,.txt"
+              className="hidden"
+              onChange={handleFileSelect}
+            />
+
             <button
               type="button"
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              className="p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
+              className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
               title="Add Emoji"
             >
-              <Smile className="w-5 h-5" />
+              <Smile className="w-4 h-4" />
             </button>
 
             <button
               type="button"
-              onClick={() => {
-                toast({
-                  title: "Attach File",
-                  message: "Choose an image, document, or video to share.",
-                  type: "info",
-                });
-              }}
-              className="p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
-              title="Attach media or document"
+              onClick={() => fileInputRef.current?.click()}
+              className="p-2 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 transition cursor-pointer"
+              title="Attach File or Image"
             >
-              <Paperclip className="w-5 h-5" />
+              <Paperclip className="w-4 h-4" />
             </button>
 
             <form onSubmit={handleSendMessage} className="flex-1 flex items-center gap-2">
@@ -1130,14 +1315,14 @@ export default function WhatsAppCallsHubPage() {
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Type a message..."
-                className="flex-1 py-2 px-4 rounded-xl bg-white dark:bg-[#2A3942] text-slate-900 dark:text-white placeholder:text-slate-400 text-xs outline-none focus:ring-1 focus:ring-[#5846A8] dark:focus:ring-amber-400 transition"
+                placeholder="Type a team message or meeting note... (Press Enter to send)"
+                className="flex-1 py-2 px-4 rounded-xl bg-slate-100/90 dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 text-xs border border-transparent focus:border-violet-500 outline-none transition"
               />
 
               {inputMessage.trim() ? (
                 <button
                   type="submit"
-                  className="p-2.5 rounded-full bg-[#5846A8] hover:bg-[#4E3B99] dark:bg-gradient-to-r dark:from-amber-400 dark:to-yellow-500 text-white dark:text-slate-950 transition shadow-sm cursor-pointer active:scale-95 flex items-center justify-center"
+                  className="p-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white transition shadow-sm cursor-pointer active:scale-95 flex items-center justify-center"
                   title="Send message"
                 >
                   <Send className="w-4 h-4" />
@@ -1147,15 +1332,15 @@ export default function WhatsAppCallsHubPage() {
                   type="button"
                   onClick={() => {
                     toast({
-                      title: "Voice Note Recorded",
-                      message: "0:12 audio snippet ready to send.",
+                      title: "Voice Memo Recorded",
+                      message: "0:18 audio memo sent to active chat.",
                       type: "success",
                     });
                     const voiceMsg: Message = {
                       id: `v-${Date.now()}`,
                       sender: "me",
                       type: "voice",
-                      duration: "0:12",
+                      duration: "0:18",
                       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
                       status: "read",
                     };
@@ -1164,7 +1349,7 @@ export default function WhatsAppCallsHubPage() {
                       [activeContact.id]: [...(prev[activeContact.id] || []), voiceMsg],
                     }));
                   }}
-                  className="p-2.5 rounded-full bg-[#5846A8] hover:bg-[#4E3B99] dark:bg-gradient-to-r dark:from-amber-400 dark:to-yellow-500 text-white dark:text-slate-950 transition shadow-sm cursor-pointer active:scale-95 flex items-center justify-center"
+                  className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 transition cursor-pointer active:scale-95 flex items-center justify-center"
                   title="Send voice note"
                 >
                   <Mic className="w-4 h-4" />
@@ -1176,208 +1361,397 @@ export default function WhatsAppCallsHubPage() {
       </div>
 
       {/* ================================================================ */}
-      {/* FULLSCREEN WHATSAPP VOICE CALL MODAL OVERLAY                      */}
+      {/* EXECUTIVE FULLSCREEN VOICE HUDDLE MODAL WITH REAL IN-CALL CHAT   */}
       {/* ================================================================ */}
       {isVoiceCallActive && (
-        <div className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-2xl flex flex-col justify-between items-center py-12 px-4 animate-in fade-in duration-200 select-none">
-          {/* Top header */}
-          <div className="text-center space-y-1">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#5846A8]/25 text-purple-300 dark:bg-amber-400/20 dark:text-amber-300 text-xs font-semibold">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>WhatsApp End-to-End Encrypted Voice Call</span>
-            </span>
-          </div>
+        <div className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-2xl flex select-none animate-in fade-in duration-200">
+          {/* Main Voice Call Stage */}
+          <div className="flex-1 flex flex-col justify-between items-center py-10 px-6 h-full">
+            {/* Top header */}
+            <div className="flex items-center justify-between w-full max-w-4xl">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-violet-500/20 text-violet-300 text-xs font-semibold border border-violet-500/30">
+                <ShieldCheck className="w-3.5 h-3.5 text-violet-400" />
+                <span>Encrypted Voice Huddle • Peer-to-Peer</span>
+              </span>
 
-          {/* Center Contact Info with Pulsing Rings */}
-          <div className="flex flex-col items-center text-center">
-            <div className="relative mb-6">
-              <div className="absolute inset-0 rounded-full bg-[#5846A8]/30 dark:bg-amber-400/20 animate-ping [animation-duration:2s]" />
-              <div className="absolute -inset-4 rounded-full bg-[#5846A8]/15 dark:bg-amber-400/10 animate-pulse" />
-              <img
-                src={activeContact.avatar}
-                alt={activeContact.name}
-                className="w-32 h-32 rounded-full object-cover relative z-10 ring-4 ring-[#5846A8] dark:ring-amber-400 shadow-2xl"
-              />
+              <button
+                type="button"
+                onClick={() => setIsVoiceChatOpen(!isVoiceChatOpen)}
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                  isVoiceChatOpen
+                    ? "bg-violet-600 text-white"
+                    : "bg-white/10 text-slate-200 hover:bg-white/20"
+                }`}
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>In-Call Chat</span>
+                {unreadInCallCount > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[9px]">
+                    {unreadInCallCount}
+                  </span>
+                )}
+              </button>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              {activeContact.name}
-            </h2>
-            <p className="text-xs font-medium text-slate-400 mt-1">{activeContact.role}</p>
+            {/* Center Contact Info with Live Audio Waves */}
+            <div className="flex flex-col items-center text-center">
+              <div className="relative mb-6">
+                <div className="absolute inset-0 rounded-full bg-violet-600/30 animate-ping [animation-duration:2.5s]" />
+                <div className="absolute -inset-4 rounded-full bg-violet-500/15 animate-pulse" />
+                <img
+                  src={activeContact.avatar}
+                  alt={activeContact.name}
+                  className="w-32 h-32 rounded-2xl object-cover relative z-10 ring-4 ring-violet-500/50 shadow-2xl"
+                />
+              </div>
 
-            <div className="mt-4 px-4 py-1.5 rounded-full bg-white/10 text-purple-300 dark:text-amber-300 font-mono text-sm font-bold tracking-wider">
-              {voiceCallStatus === "ringing" ? "Ringing..." : formatDuration(callTimer)}
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                {activeContact.name}
+              </h2>
+              <p className="text-xs font-medium text-slate-400 mt-1">{activeContact.role}</p>
+
+              {/* Live Audio Activity Waves */}
+              <div className="flex items-center gap-1.5 mt-5">
+                {[4, 12, 8, 16, 24, 10, 18, 6, 14, 20, 8, 4].map((h, i) => (
+                  <span
+                    key={i}
+                    style={{ height: `${voiceCallStatus === "connected" && !isMuted ? h : 4}px` }}
+                    className="w-1 bg-violet-400 rounded-full transition-all duration-150 animate-pulse"
+                  />
+                ))}
+              </div>
+
+              <div className="mt-4 px-4 py-1.5 rounded-full bg-white/10 text-violet-300 font-mono text-xs font-bold tracking-wider">
+                {voiceCallStatus === "ringing" ? "Calling..." : formatDuration(callTimer)}
+              </div>
+            </div>
+
+            {/* Bottom Controls */}
+            <div className="flex items-center gap-4 sm:gap-6">
+              <button
+                type="button"
+                onClick={() => setIsMuted(!isMuted)}
+                className={`w-12 h-12 rounded-2xl flex items-center justify-center transition cursor-pointer ${
+                  isMuted ? "bg-rose-600 text-white" : "bg-white/15 text-white hover:bg-white/25"
+                }`}
+                title={isMuted ? "Unmute Mic" : "Mute Mic"}
+              >
+                {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  endVoiceCall();
+                  startVideoCall();
+                }}
+                className="w-12 h-12 rounded-2xl bg-white/15 text-white hover:bg-white/25 flex items-center justify-center transition cursor-pointer"
+                title="Switch to HD Video"
+              >
+                <Video className="w-5 h-5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsSpeakerOn(!isSpeakerOn)}
+                className={`w-12 h-12 rounded-2xl flex items-center justify-center transition cursor-pointer ${
+                  isSpeakerOn ? "bg-white/15 text-white hover:bg-white/25" : "bg-rose-600/80 text-white"
+                }`}
+                title={isSpeakerOn ? "Speaker Active" : "Speaker Muted"}
+              >
+                {isSpeakerOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+              </button>
+
+              <button
+                type="button"
+                onClick={endVoiceCall}
+                className="w-14 h-14 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center shadow-lg shadow-rose-600/40 transition active:scale-95 cursor-pointer"
+                title="Leave Huddle"
+              >
+                <PhoneOff className="w-6 h-6" />
+              </button>
             </div>
           </div>
 
-          {/* Bottom Call Controls */}
-          <div className="flex items-center gap-5">
-            {/* Mute button */}
-            <button
-              type="button"
-              onClick={() => setIsMuted(!isMuted)}
-              className={`w-14 h-14 rounded-full flex items-center justify-center transition cursor-pointer ${
-                isMuted
-                  ? "bg-rose-600 text-white"
-                  : "bg-white/15 text-white hover:bg-white/25"
-              }`}
-              title={isMuted ? "Unmute Microphone" : "Mute Microphone"}
-            >
-              {isMuted ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
-            </button>
+          {/* REAL IN-CALL CHAT SIDE DRAWER (VOICE HUDDLE) */}
+          {isVoiceChatOpen && (
+            <div className="w-full sm:w-[380px] h-full bg-slate-900 border-l border-slate-800 flex flex-col z-20 animate-in slide-in-from-right duration-200">
+              <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-violet-400" />
+                  <span className="text-xs font-bold text-white">Live In-Huddle Chat</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsVoiceChatOpen(false)}
+                  className="p-1 text-slate-400 hover:text-white rounded-lg cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
 
-            {/* Switch to Video Call */}
-            <button
-              type="button"
-              onClick={() => {
-                endVoiceCall();
-                startVideoCall();
-              }}
-              className="w-14 h-14 rounded-full bg-white/15 text-white hover:bg-white/25 flex items-center justify-center transition cursor-pointer"
-              title="Switch to Video Call"
-            >
-              <Video className="w-6 h-6" />
-            </button>
+              <div ref={inCallChatScrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
+                {activeMessages.map((m) => (
+                  <div
+                    key={m.id}
+                    className={`flex flex-col ${m.sender === "me" ? "items-end" : "items-start"}`}
+                  >
+                    <div
+                      className={`px-3 py-2 rounded-xl text-xs max-w-[85%] ${
+                        m.sender === "me"
+                          ? "bg-violet-600 text-white"
+                          : "bg-slate-800 text-slate-200 border border-slate-700/60"
+                      }`}
+                    >
+                      {m.text}
+                    </div>
+                    <span className="text-[9px] text-slate-500 mt-0.5 font-mono">{m.timestamp}</span>
+                  </div>
+                ))}
+              </div>
 
-            {/* Speaker toggle */}
-            <button
-              type="button"
-              onClick={() => setIsSpeakerOn(!isSpeakerOn)}
-              className={`w-14 h-14 rounded-full flex items-center justify-center transition cursor-pointer ${
-                isSpeakerOn
-                  ? "bg-white/15 text-white hover:bg-white/25"
-                  : "bg-rose-600/80 text-white"
-              }`}
-              title={isSpeakerOn ? "Speaker On" : "Speaker Off"}
-            >
-              {isSpeakerOn ? <Volume2 className="w-6 h-6" /> : <VolumeX className="w-6 h-6" />}
-            </button>
-
-            {/* End Call Button */}
-            <button
-              type="button"
-              onClick={endVoiceCall}
-              className="w-16 h-16 rounded-full bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center shadow-lg shadow-rose-600/40 transition transform active:scale-90 cursor-pointer"
-              title="End Voice Call"
-            >
-              <PhoneOff className="w-7 h-7" />
-            </button>
-          </div>
+              <form onSubmit={handleSendInCallMessage} className="p-3 border-t border-slate-800 flex gap-2">
+                <input
+                  type="text"
+                  value={inCallChatInput}
+                  onChange={(e) => setInCallChatInput(e.target.value)}
+                  placeholder="Send note in call..."
+                  className="flex-1 px-3 py-1.5 rounded-xl bg-slate-800 text-white text-xs border border-slate-700 outline-none focus:border-violet-500"
+                />
+                <button
+                  type="submit"
+                  className="px-3 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold transition cursor-pointer"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                </button>
+              </form>
+            </div>
+          )}
         </div>
       )}
 
       {/* ================================================================ */}
-      {/* FULLSCREEN WHATSAPP VIDEO CALL MODAL OVERLAY (LIVE WebRTC)        */}
+      {/* EXECUTIVE FULLSCREEN HD VIDEO CALL MODAL WITH REAL IN-CALL CHAT  */}
       {/* ================================================================ */}
       {isVideoCallActive && (
-        <div className="fixed inset-0 z-50 bg-slate-950 flex flex-col justify-between select-none animate-in fade-in duration-200">
-          {/* Main Remote Video Feed */}
-          <div className="relative flex-1 w-full h-full bg-[#111B21] overflow-hidden flex items-center justify-center">
-            <img
-              src={activeContact.avatar}
-              alt={activeContact.name}
-              className="absolute inset-0 w-full h-full object-cover filter blur-3xl opacity-30 pointer-events-none"
-            />
+        <div className="fixed inset-0 z-50 bg-slate-950 flex select-none animate-in fade-in duration-200">
+          {/* Main Video Call Area */}
+          <div className="flex-1 flex flex-col justify-between relative h-full bg-slate-950 overflow-hidden">
+            {/* Top Bar Overlay */}
+            <div className="p-4 sm:p-6 flex items-center justify-between z-20 bg-gradient-to-b from-black/80 to-transparent">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl overflow-hidden ring-1 ring-white/20">
+                  <img
+                    src={activeContact.avatar}
+                    alt={activeContact.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    <span>{activeContact.name}</span>
+                    <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 text-[10px] font-semibold border border-emerald-500/30">
+                      HD 1080p
+                    </span>
+                  </h3>
+                  <p className="text-[11px] text-violet-300 font-mono">
+                    {videoCallStatus === "connecting"
+                      ? "Establishing WebRTC handshake..."
+                      : `Live • ${formatDuration(videoCallTimer)}`}
+                  </p>
+                </div>
+              </div>
 
-            {/* Remote Participant Stage */}
-            <div className="relative z-10 flex flex-col items-center text-center p-4">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsVideoChatOpen(!isVideoChatOpen)}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                    isVideoChatOpen
+                      ? "bg-violet-600 text-white"
+                      : "bg-white/15 hover:bg-white/25 text-white"
+                  }`}
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  <span className="hidden sm:inline">In-Call Chat</span>
+                  {unreadInCallCount > 0 && (
+                    <span className="px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[9px]">
+                      {unreadInCallCount}
+                    </span>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Main Remote Video Stage */}
+            <div className="relative flex-1 w-full h-full flex items-center justify-center overflow-hidden">
               <img
                 src={activeContact.avatar}
                 alt={activeContact.name}
-                className="w-32 h-32 sm:w-40 sm:h-40 rounded-full object-cover ring-4 ring-[#5846A8]/60 dark:ring-amber-400/60 shadow-2xl mb-4"
+                className="absolute inset-0 w-full h-full object-cover filter blur-3xl opacity-20 pointer-events-none"
               />
-              <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                {activeContact.name}
-              </h2>
-              <p className="text-xs text-purple-300 dark:text-amber-400 mt-1 font-mono">
-                {videoCallStatus === "connecting"
-                  ? "Connecting live video..."
-                  : `Live Video (${formatDuration(videoCallTimer)})`}
-              </p>
-            </div>
 
-            {/* Floating Picture-in-Picture Local Self Camera Preview */}
-            <div className="absolute top-4 right-4 sm:top-6 sm:right-6 w-36 h-48 sm:w-48 sm:h-64 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 bg-slate-900 z-20">
-              <video
-                ref={localVideoRef}
-                autoPlay
-                playsInline
-                muted
-                className={`w-full h-full object-cover ${isVideoPaused ? "hidden" : "block"}`}
-              />
-              {isVideoPaused && (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-slate-800 text-slate-400 p-2 text-center text-xs">
-                  <VideoOff className="w-6 h-6 mb-1 text-slate-500" />
-                  <span>Camera Paused</span>
+              {/* Remote Participant Card */}
+              <div className="relative z-10 flex flex-col items-center text-center p-6">
+                <div className="relative mb-4">
+                  <img
+                    src={activeContact.avatar}
+                    alt={activeContact.name}
+                    className="w-32 h-32 sm:w-44 sm:h-44 rounded-3xl object-cover ring-4 ring-violet-500/50 shadow-2xl"
+                  />
+                  <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-slate-900 flex items-center justify-center text-[10px] text-white">
+                    <Check className="w-3 h-3" />
+                  </span>
                 </div>
-              )}
-              <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/60 text-[10px] text-white font-semibold">
-                You
-              </span>
+                <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                  {activeContact.name}
+                </h2>
+                <p className="text-xs text-slate-400 mt-1">{activeContact.role}</p>
+                <div className="flex items-center gap-1.5 mt-3 px-3 py-1 rounded-full bg-violet-500/10 text-violet-300 text-xs border border-violet-500/20">
+                  <Activity className="w-3.5 h-3.5 text-violet-400 animate-pulse" />
+                  <span>Audio &amp; Video Streams Synced</span>
+                </div>
+              </div>
+
+              {/* Floating Self Camera Tile (Picture in Picture) */}
+              <div className="absolute top-20 right-4 sm:top-24 sm:right-6 w-36 h-48 sm:w-52 sm:h-68 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 bg-slate-900 z-20">
+                <video
+                  ref={localVideoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className={`w-full h-full object-cover ${isVideoPaused ? "hidden" : "block"}`}
+                />
+                {isVideoPaused && (
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-slate-800 text-slate-400 p-2 text-center text-xs">
+                    <VideoOff className="w-6 h-6 mb-1 text-slate-500" />
+                    <span>Camera Muted</span>
+                  </div>
+                )}
+                <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/60 text-[10px] text-white font-semibold">
+                  You (Host)
+                </span>
+              </div>
+            </div>
+
+            {/* Bottom Floating Control Bar */}
+            <div className="p-4 sm:p-6 bg-slate-900/90 backdrop-blur-xl border-t border-slate-800/80 flex items-center justify-center gap-3 sm:gap-5 z-20">
+              <button
+                type="button"
+                onClick={() => setIsVideoMuted(!isVideoMuted)}
+                className={`p-3.5 rounded-2xl transition cursor-pointer ${
+                  isVideoMuted ? "bg-rose-600 text-white" : "bg-white/10 text-white hover:bg-white/20"
+                }`}
+                title={isVideoMuted ? "Unmute Mic" : "Mute Mic"}
+              >
+                {isVideoMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsVideoPaused(!isVideoPaused)}
+                className={`p-3.5 rounded-2xl transition cursor-pointer ${
+                  isVideoPaused ? "bg-rose-600 text-white" : "bg-white/10 text-white hover:bg-white/20"
+                }`}
+                title={isVideoPaused ? "Enable Camera" : "Disable Camera"}
+              >
+                {isVideoPaused ? <VideoOff className="w-5 h-5" /> : <Video className="w-5 h-5" />}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsScreenSharing(!isScreenSharing);
+                  toast({
+                    title: isScreenSharing ? "Screen Sharing Stopped" : "Screen Sharing Active",
+                    message: isScreenSharing ? "Reverted to camera stream." : "Broadcasting active screen to room.",
+                    type: "info",
+                  });
+                }}
+                className={`p-3.5 rounded-2xl transition cursor-pointer ${
+                  isScreenSharing ? "bg-indigo-600 text-white" : "bg-white/10 text-white hover:bg-white/20"
+                }`}
+                title="Share Screen"
+              >
+                <MonitorUp className="w-5 h-5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsVideoChatOpen(!isVideoChatOpen)}
+                className={`p-3.5 rounded-2xl transition cursor-pointer sm:hidden ${
+                  isVideoChatOpen ? "bg-violet-600 text-white" : "bg-white/10 text-white hover:bg-white/20"
+                }`}
+                title="Toggle In-Call Chat"
+              >
+                <MessageSquare className="w-5 h-5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={endVideoCall}
+                className="p-4 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white shadow-xl shadow-rose-600/40 transition active:scale-95 cursor-pointer"
+                title="End Video Call"
+              >
+                <PhoneOff className="w-6 h-6" />
+              </button>
             </div>
           </div>
 
-          {/* Floating Bottom Control Bar */}
-          <div className="p-6 bg-slate-900/90 backdrop-blur-xl border-t border-white/10 flex items-center justify-center gap-4 sm:gap-6 z-20">
-            {/* Toggle Mic */}
-            <button
-              type="button"
-              onClick={() => setIsVideoMuted(!isVideoMuted)}
-              className={`p-3.5 rounded-full transition cursor-pointer ${
-                isVideoMuted
-                  ? "bg-rose-600 text-white"
-                  : "bg-white/15 text-white hover:bg-white/25"
-              }`}
-              title={isVideoMuted ? "Unmute Audio" : "Mute Audio"}
-            >
-              {isVideoMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-            </button>
+          {/* REAL IN-CALL CHAT SIDE DRAWER (VIDEO CALL) */}
+          {isVideoChatOpen && (
+            <div className="w-full sm:w-[380px] h-full bg-slate-900 border-l border-slate-800 flex flex-col z-30 animate-in slide-in-from-right duration-200">
+              <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-violet-400" />
+                  <span className="text-xs font-bold text-white">Live In-Call Chat</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsVideoChatOpen(false)}
+                  className="p-1 text-slate-400 hover:text-white rounded-lg cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
 
-            {/* Toggle Camera */}
-            <button
-              type="button"
-              onClick={() => setIsVideoPaused(!isVideoPaused)}
-              className={`p-3.5 rounded-full transition cursor-pointer ${
-                isVideoPaused
-                  ? "bg-rose-600 text-white"
-                  : "bg-white/15 text-white hover:bg-white/25"
-              }`}
-              title={isVideoPaused ? "Turn On Camera" : "Turn Off Camera"}
-            >
-              {isVideoPaused ? <VideoOff className="w-5 h-5" /> : <Video className="w-5 h-5" />}
-            </button>
+              <div ref={inCallChatScrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
+                {activeMessages.map((m) => (
+                  <div
+                    key={m.id}
+                    className={`flex flex-col ${m.sender === "me" ? "items-end" : "items-start"}`}
+                  >
+                    <div
+                      className={`px-3.5 py-2 rounded-xl text-xs max-w-[85%] leading-relaxed ${
+                        m.sender === "me"
+                          ? "bg-violet-600 text-white"
+                          : "bg-slate-800 text-slate-200 border border-slate-700/60"
+                      }`}
+                    >
+                      {m.text}
+                    </div>
+                    <span className="text-[9px] text-slate-500 mt-0.5 font-mono">{m.timestamp}</span>
+                  </div>
+                ))}
+              </div>
 
-            {/* Screen Share */}
-            <button
-              type="button"
-              onClick={() => {
-                setIsScreenSharing(!isScreenSharing);
-                toast({
-                  title: isScreenSharing ? "Screen Sharing Stopped" : "Screen Sharing Active",
-                  message: isScreenSharing ? "Switched to camera." : "Sharing your active screen.",
-                  type: "info",
-                });
-              }}
-              className={`p-3.5 rounded-full transition cursor-pointer ${
-                isScreenSharing
-                  ? "bg-blue-600 text-white"
-                  : "bg-white/15 text-white hover:bg-white/25"
-              }`}
-              title="Share Screen"
-            >
-              <MonitorUp className="w-5 h-5" />
-            </button>
-
-            {/* End Video Call */}
-            <button
-              type="button"
-              onClick={endVideoCall}
-              className="p-4 rounded-full bg-rose-600 hover:bg-rose-700 text-white shadow-xl shadow-rose-600/40 transition active:scale-95 cursor-pointer"
-              title="End Video Call"
-            >
-              <PhoneOff className="w-6 h-6" />
-            </button>
-          </div>
+              <form onSubmit={handleSendInCallMessage} className="p-3 border-t border-slate-800 flex gap-2 bg-slate-900/95">
+                <input
+                  type="text"
+                  value={inCallChatInput}
+                  onChange={(e) => setInCallChatInput(e.target.value)}
+                  placeholder="Send chat message during call..."
+                  className="flex-1 px-3 py-2 rounded-xl bg-slate-800 text-white text-xs border border-slate-700 outline-none focus:border-violet-500 placeholder:text-slate-500"
+                />
+                <button
+                  type="submit"
+                  className="px-3.5 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold transition cursor-pointer flex items-center justify-center"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                </button>
+              </form>
+            </div>
+          )}
         </div>
       )}
     </AppLayout>

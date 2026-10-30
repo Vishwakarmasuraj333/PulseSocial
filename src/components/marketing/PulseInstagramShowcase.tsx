@@ -53,7 +53,7 @@ const PLATFORMS_DATA: PlatformShowcase[] = [
     description:
       "Grow your presence on Instagram. Publish your best visuals, monitor your favorite hashtags, and repost user-generated content right from your desktop.",
     link: "/platforms#instagram",
-    iconRenderer: () => <InstagramIcon size={18} />,
+    iconRenderer: () => <InstagramIcon size={18} className="w-[18px] h-[18px]" />,
     cards: [
       {
         id: 0,
@@ -96,7 +96,7 @@ const PLATFORMS_DATA: PlatformShowcase[] = [
     description:
       "Upload 9:16 vertical videos, add trending audio tags, schedule peak evening drops, and analyze real-time watch-time retention effortlessly.",
     link: "/platforms#tiktok",
-    iconRenderer: () => <TikTokIcon size={18} />,
+    iconRenderer: () => <TikTokIcon size={18} className="w-[18px] h-[18px]" />,
     cards: [
       {
         id: 0,
@@ -139,7 +139,7 @@ const PLATFORMS_DATA: PlatformShowcase[] = [
     description:
       "Share carousel PDFs, long-form industry breakdowns, tag key collaborators, and turn meaningful discussions into authenticated CRM leads.",
     link: "/platforms#linkedin",
-    iconRenderer: () => <LinkedInIcon size={18} />,
+    iconRenderer: () => <LinkedInIcon size={18} className="w-[18px] h-[18px]" />,
     cards: [
       {
         id: 0,
@@ -182,7 +182,7 @@ const PLATFORMS_DATA: PlatformShowcase[] = [
     description:
       "Draft multi-tweet threads with inline image attachments, schedule breaking commentary, track brand keywords, and quote-post in seconds.",
     link: "/platforms#x",
-    iconRenderer: () => <XIcon size={18} />,
+    iconRenderer: () => <XIcon size={18} className="w-[18px] h-[18px]" />,
     cards: [
       {
         id: 0,
@@ -225,7 +225,7 @@ const PLATFORMS_DATA: PlatformShowcase[] = [
     description:
       "Manage Facebook Pages and Groups, automate customer responses, schedule link previews, and maximize organic algorithmic reach.",
     link: "/platforms#facebook",
-    iconRenderer: () => <FacebookIcon size={18} />,
+    iconRenderer: () => <FacebookIcon size={18} className="w-[18px] h-[18px]" />,
     cards: [
       {
         id: 0,
@@ -312,7 +312,7 @@ export function PulseInstagramShowcase() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-10">
         
         {/* Interactive Platform Tabs with Animated Progress Fill */}
-        <div className="flex flex-wrap items-center justify-center gap-2 max-w-4xl mx-auto">
+        <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 max-w-4xl mx-auto">
           {PLATFORMS_DATA.map((p, idx) => {
             const isSelected = idx === activePlatformIndex;
             return (
@@ -320,10 +320,10 @@ export function PulseInstagramShowcase() {
                 key={p.id}
                 type="button"
                 onClick={() => selectPlatform(idx)}
-                className={`relative overflow-hidden flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all duration-300 cursor-pointer ${
+                className={`relative overflow-hidden inline-flex items-center gap-2.5 px-4 sm:px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 cursor-pointer ${
                   isSelected
                     ? "bg-[#5846A8] text-white shadow-lg shadow-indigo-500/25 scale-105"
-                    : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:scale-102"
+                    : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:scale-102 border border-slate-200/50 dark:border-slate-800/80"
                 }`}
               >
                 {/* Progress bar inside active tab */}
@@ -333,10 +333,12 @@ export function PulseInstagramShowcase() {
                     style={{ width: `${progress}%` }}
                   />
                 )}
-                <span className="relative z-10">{p.iconRenderer()}</span>
-                <span className="relative z-10">{p.name}</span>
+                <span className="relative z-10 flex items-center justify-center w-[18px] h-[18px] shrink-0 leading-none">
+                  {p.iconRenderer()}
+                </span>
+                <span className="relative z-10 leading-none">{p.name}</span>
                 {isSelected && (
-                  <span className="relative z-10 w-2 h-2 rounded-full bg-purple-400 animate-pulse ml-0.5" />
+                  <span className="relative z-10 w-2 h-2 rounded-full bg-purple-400 animate-pulse ml-0.5 shrink-0" />
                 )}
               </button>
             );
@@ -499,13 +501,13 @@ export function PulseInstagramShowcase() {
         </div>
 
         {/* Dynamic cycling indicator dots */}
-        <div className="flex items-center justify-center gap-2 pt-2">
+        <div className="flex items-center justify-center gap-2.5 mt-10 sm:mt-12 pb-2">
           {PLATFORMS_DATA.map((_, i) => (
             <button
               key={i}
               type="button"
               onClick={() => selectPlatform(i)}
-              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+              className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
                 i === activePlatformIndex
                   ? "w-8 bg-indigo-600 shadow-xs"
                   : "w-2 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400"

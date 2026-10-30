@@ -2,13 +2,14 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Check, ArrowRight, HelpCircle, Sparkles } from "lucide-react";
+import { Check, ArrowRight, HelpCircle, Sparkles, Plus, Minus } from "lucide-react";
 import { MarketingHeader } from "@/components/marketing/MarketingHeader";
 import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 
 export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("annual");
   const [dynamicPlans, setDynamicPlans] = useState<any[]>([]);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   React.useEffect(() => {
     fetch("/api/pricing")
@@ -30,8 +31,8 @@ export default function PricingPage() {
       priceAnnual: "$15",
       badge: null,
       highlight: false,
-      ctaLabel: "Start with Starter",
-      ctaHref: "/signup",
+      ctaLabel: "Get Started",
+      ctaHref: "/signup?plan=starter",
       features: [
         "Up to 5 Social Accounts",
         "Unlimited Scheduled Posts",
@@ -49,8 +50,8 @@ export default function PricingPage() {
       period: "per month, billed annually",
       badge: "Most Popular",
       highlight: true,
-      ctaLabel: "Start Professional",
-      ctaHref: "/signup",
+      ctaLabel: "Choose Professional",
+      ctaHref: "/signup?plan=professional",
       features: [
         "Up to 15 Connected Accounts",
         "Gemini 2.5 Flash AI Assistant",
@@ -70,7 +71,7 @@ export default function PricingPage() {
       badge: "Agency Choice",
       highlight: false,
       ctaLabel: "Start Agency Plan",
-      ctaHref: "/signup",
+      ctaHref: "/signup?plan=agency",
       features: [
         "Unlimited Social Channels & Brands",
         "Dedicated IP & Custom Webhooks",
@@ -84,8 +85,8 @@ export default function PricingPage() {
 
   const faqs = [
     {
-      q: "Can I connect multiple accounts from the same social network?",
-      a: "Yes! PulseSocial supports multiple accounts per platform, such as 3 Instagram Professional profiles, 5 Facebook Pages, and 2 LinkedIn Company Pages within the same workspace.",
+      q: "Can I connect multiple accounts on the same social network?",
+      a: "Yes! PulseSocial supports multiple accounts per platform, such as 3 Instagram professional profiles, 5 Facebook pages, and 2 LinkedIn company pages within the same workspace.",
     },
     {
       q: "Does PulseSocial require my social media passwords?",
@@ -101,12 +102,15 @@ export default function PricingPage() {
     },
   ];
 
+  const displayPlans = dynamicPlans.length > 0 ? dynamicPlans : plans;
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-indigo-500 selection:text-white font-sans">
       <MarketingHeader />
 
-      <main className="pt-32 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-12 space-y-4">
+      <main className="pt-24 sm:pt-28 pb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header Section */}
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12 space-y-3 sm:space-y-4">
           <span className="text-xs font-bold uppercase tracking-wider text-[#5846A8] dark:text-[#FBBF24]">
             Simple, Transparent Pricing
           </span>
@@ -117,8 +121,8 @@ export default function PricingPage() {
             All plans include official OAuth integrations, secure token vaulting, and our core universal post composer.
           </p>
 
-          {/* Billing Cycle Switcher */}
-          <div className="pt-4 flex items-center justify-center gap-3">
+          {/* Billing Cycle Switcher with normalized spacing */}
+          <div className="mt-6 sm:mt-8 pt-2 flex items-center justify-center gap-3">
             <div className="p-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs inline-flex items-center">
               <button
                 type="button"
@@ -150,13 +154,20 @@ export default function PricingPage() {
         </div>
 
         {/* Pricing Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-          {(dynamicPlans.length > 0 ? dynamicPlans : plans).map((p) => {
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-10 sm:mb-12">
+          {displayPlans.map((p) => {
             const price = billingCycle === "annual" ? p.priceAnnual : p.priceMonthly;
+            const ctaText =
+              p.ctaLabel ||
+              (p.highlight ? "Choose Professional" : p.slug === "agency" ? "Start Agency Plan" : "Get Started");
+            const href = p.ctaHref
+              ? `${p.ctaHref.split("?")[0]}?plan=${p.slug || "starter"}&billing=${billingCycle}`
+              : `/signup?plan=${p.slug || "starter"}&billing=${billingCycle}`;
+
             return (
               <div
                 key={p.name}
-                className={`relative rounded-3xl p-6 bg-white dark:bg-[#16161D] border transition-all duration-200 flex flex-col justify-between ${
+                className={`relative rounded-3xl p-6 sm:p-7 bg-white dark:bg-[#16161D] border transition-all duration-200 flex flex-col justify-between ${
                   p.highlight
                     ? "border-[#5846A8] dark:border-[#E08738] shadow-xl ring-2 ring-[#5846A8]/20 dark:ring-[#E08738]/20"
                     : "border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md"
@@ -169,10 +180,10 @@ export default function PricingPage() {
                 )}
 
                 <div>
-                  <h3 className="text-base font-bold text-slate-950 dark:text-white mb-1">
+                  <h3 className="text-lg font-bold text-slate-950 dark:text-white mb-1">
                     {p.name}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 min-h-[32px]">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 min-h-[34px]">
                     {p.desc}
                   </p>
 
@@ -201,23 +212,47 @@ export default function PricingPage() {
                 </div>
 
                 <Link
-                  href={p.ctaHref || "/signup"}
-                  className={`w-full py-2.5 text-center rounded-xl text-xs font-bold transition hover:-translate-y-0.5 active:translate-y-0 active:scale-95 duration-200 cursor-pointer ${
+                  href={href}
+                  className={`w-full py-3 text-center rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer block focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-purple-400 active:scale-98 ${
                     p.highlight
-                      ? "bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 dark:bg-gradient-to-r dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:hover:brightness-105 dark:text-slate-950 dark:shadow-amber-500/25"
-                      : "border border-purple-200 dark:border-amber-500/30 text-[#5846A8] dark:text-[#FBBF24] hover:bg-purple-50 dark:hover:bg-white/5"
+                      ? "bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/30 dark:bg-gradient-to-r dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:hover:brightness-110 dark:text-slate-950 dark:shadow-amber-500/25"
+                      : "bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white border border-slate-700/80 shadow-xs"
                   }`}
                 >
-                  {p.ctaLabel}
+                  {ctaText}
                 </Link>
               </div>
             );
           })}
         </div>
 
+        {/* Enterprise Callout Banner with vertically balanced text & actions */}
+        <div className="mb-10 sm:mb-12 p-6 sm:p-7 rounded-3xl bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-1 text-center md:text-left flex-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#5846A8] dark:text-[#FBBF24]">
+              Custom Scalability
+            </span>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              Need custom volume, dedicated IP, or enterprise SLA?
+            </h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed max-w-xl">
+              Our engineering solutions team provides custom brand migration, bespoke approval topologies, and hardware security token vaults.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center justify-center md:justify-end gap-3 shrink-0 my-auto">
+            <Link
+              href="/contact"
+              className="px-5 py-2.5 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white font-bold text-xs transition shadow-md shadow-purple-900/20 flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>Contact Enterprise Sales</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </div>
+
         {/* FAQ Section */}
-        <div className="max-w-3xl mx-auto pt-8 border-t border-slate-200 dark:border-slate-800">
-          <div className="text-center mb-10">
+        <div className="max-w-3xl mx-auto pt-6 sm:pt-8 border-t border-slate-200 dark:border-slate-800">
+          <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-slate-950 dark:text-white">
               Frequently Asked Questions
             </h2>
@@ -226,20 +261,39 @@ export default function PricingPage() {
             </p>
           </div>
 
-          <div className="space-y-4">
-            {faqs.map((faq) => (
-              <div
-                key={faq.q}
-                className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800"
-              >
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1.5">
-                  {faq.q}
-                </h3>
-                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  {faq.a}
-                </p>
-              </div>
-            ))}
+          <div className="space-y-3 sm:space-y-4">
+            {faqs.map((faq, idx) => {
+              const isOpen = openFaqIndex === idx;
+              return (
+                <div
+                  key={faq.q}
+                  className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 transition-all duration-200 overflow-hidden"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                    aria-expanded={isOpen}
+                    className="w-full p-4 sm:p-5 flex items-center justify-between text-left cursor-pointer transition hover:bg-slate-50/50 dark:hover:bg-slate-850/50 select-none focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-purple-400"
+                  >
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white pr-4">
+                      {faq.q}
+                    </h3>
+                    <span className="shrink-0 w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-transform duration-200">
+                      {isOpen ? (
+                        <Minus className="w-3.5 h-3.5 text-purple-600 dark:text-amber-400" />
+                      ) : (
+                        <Plus className="w-3.5 h-3.5" />
+                      )}
+                    </span>
+                  </button>
+                  {isOpen && (
+                    <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-0 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 mt-1 animate-in fade-in duration-200">
+                      <p className="pt-3">{faq.a}</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </main>

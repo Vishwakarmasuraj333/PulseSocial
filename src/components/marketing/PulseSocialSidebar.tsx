@@ -348,15 +348,15 @@ export function PulseSocialSidebar() {
       {/* 1. FLOATING SLEEK TOGGLE PILL (Always Visible & Accessible) */}
       {/* ======================================================== */}
       {!isOpen && (
-        <div className="fixed right-0 top-1/2 -translate-y-1/2 z-40 select-none">
+        <div className="fixed right-2 sm:right-3.5 top-1/2 -translate-y-1/2 z-40 select-none">
           <button
             onClick={() => setIsOpen(true)}
-            className="flex items-center gap-2 pl-2.5 pr-2.5 py-2.5 rounded-l-2xl bg-white dark:bg-[#17171A] text-slate-800 dark:text-white border border-r-0 border-slate-200/90 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:pl-3.5 hover:shadow-2xl transition-all duration-300 group cursor-pointer"
+            className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-white dark:bg-[#17171A] text-slate-800 dark:text-white border border-slate-200/90 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:scale-105 hover:shadow-2xl transition-all duration-300 group cursor-pointer"
             title="Open connected social channels dock"
             aria-label="Open connected channels"
           >
-            <ChevronLeft className="w-4 h-4 text-slate-400 group-hover:text-[#5846A8] dark:group-hover:text-[#FBBF24] group-hover:-translate-x-0.5 transition-all" />
-            <div className="relative group-hover:scale-105 transition-transform">
+            <ChevronLeft className="w-4 h-4 text-slate-400 group-hover:text-[#5846A8] dark:group-hover:text-[#FBBF24] group-hover:-translate-x-0.5 transition-all shrink-0" />
+            <div className="relative group-hover:scale-105 transition-transform shrink-0">
               <PulseSocialLogo size="sm" variant="icon" />
               <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white dark:border-[#17171A] animate-pulse" />
             </div>

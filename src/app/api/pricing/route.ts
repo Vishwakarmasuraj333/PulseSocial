@@ -34,6 +34,8 @@ export async function GET() {
         limits,
         highlight: p.isPopular,
         badge: p.isPopular ? "Most Popular" : null,
+        ctaLabel: p.isPopular ? "Get Started with Pro" : p.slug === "agency" ? "Start Agency Plan" : "Get Started",
+        ctaHref: `/signup?plan=${p.slug}`,
       };
     });
 

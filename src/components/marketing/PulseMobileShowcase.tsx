@@ -6,7 +6,7 @@ import { ArrowRight, Smartphone, Sparkles, TrendingUp, Users, CheckCircle2 } fro
 
 export function PulseMobileShowcase() {
   return (
-    <section className="py-20 sm:py-28 bg-[#111827] text-white overflow-hidden relative">
+    <section className="py-24 sm:py-32 bg-[#111827] text-white overflow-hidden relative">
       {/* Background glow highlights */}
       <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-indigo-500/10 blur-[120px] rounded-full pointer-events-none" />
 
@@ -103,7 +103,7 @@ export function PulseMobileShowcase() {
           </div>
 
           {/* Right Copy matching PDF */}
-          <div className="lg:col-span-6 space-y-5 text-left order-1 lg:order-2">
+          <div className="lg:col-span-6 space-y-6 text-left order-1 lg:order-2 py-2 sm:py-4">
             <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
               Social media management on <br className="hidden sm:inline" />
               the go
@@ -116,7 +116,7 @@ export function PulseMobileShowcase() {
             </p>
 
             {/* App Store & Google Play Badges */}
-            <div className="pt-2 flex flex-wrap items-center gap-4">
+            <div className="pt-6 sm:pt-8 flex flex-wrap items-center gap-4">
               {/* App Store button */}
               <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-500 transition-colors shadow-md cursor-pointer select-none">
                 <svg className="w-6 h-6 fill-current text-white" viewBox="0 0 24 24">

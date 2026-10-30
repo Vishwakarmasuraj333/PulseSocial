@@ -51,7 +51,7 @@ export default function SolutionsPage() {
             Designed for the Way You Work
           </h1>
           <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
-            Whether you are a solo creator scheduling weekly content or a global marketing agency managing 50 client brands, PulseSocial scales to your exact needs.
+            Whether you're a solo creator scheduling weekly content or a global marketing agency managing 50 client brands, PulseSocial scales to your exact needs.
           </p>
         </div>
 

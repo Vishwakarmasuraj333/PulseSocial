@@ -115,7 +115,7 @@ export default function PlatformsPage() {
             15+ Supported Social Networks
           </h1>
           <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
-            Every platform integration is built strictly on official public and partner APIs with secure cryptographic OAuth 2.0 flows.
+            Every platform integration is built strictly on official public and partner APIs utilizing secure cryptographic OAuth 2.0 flows.
           </p>
         </div>
 

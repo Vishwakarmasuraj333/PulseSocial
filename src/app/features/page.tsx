@@ -133,9 +133,9 @@ export default function FeaturesPage() {
       ctaHref: "/connections",
       ctaLabel: "Inspect Social Connections",
       points: [
-        "Zero storage of client social passwords; official OAuth 2.0 PKCE only",
+        "Every platform integration is built strictly on official public and partner APIs utilizing secure cryptographic OAuth 2.0 flows.",
         "AES-256-GCM encryption with 16-byte random IVs and integrity tags",
-        "Automated token refresh before expiry and honest reconnect notifications",
+        "Automated token refresh before expiry and transparent reconnect notifications",
       ],
     },
     {

@@ -6,7 +6,7 @@ import { ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
 
 export function PulseFinalCta() {
   return (
-    <section className="py-20 sm:py-24 bg-white dark:bg-slate-950 border-t border-b border-slate-100 dark:border-slate-850 text-center">
+    <section className="pt-16 pb-12 sm:pt-20 sm:pb-14 bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-850 text-center">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         {/* Subtle decorative airplane vector */}
         <div className="flex justify-center">

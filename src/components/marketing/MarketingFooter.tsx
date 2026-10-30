@@ -92,20 +92,20 @@ export function MarketingFooter() {
         {/* TOP CONTACT & ADVISORY BANNER                                */}
         {/* ============================================================ */}
         <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/60 border border-slate-800 flex flex-col lg:flex-row items-center justify-between gap-6 shadow-xl">
-          <div className="space-y-1.5 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-semibold mb-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <div className="space-y-2 text-center lg:text-left flex-1">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-semibold">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
               <span>Direct Support &amp; Product Consultation</span>
             </div>
             <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
               Questions about PulseSocial or need custom onboarding?
             </h3>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-xl">
+            <p className="text-xs sm:text-sm text-slate-400 max-w-xl leading-relaxed">
               Connect directly with our engineering and growth advisory team. Fast-response support for creators, teams, and enterprises.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
+          <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3 shrink-0 my-auto">
             <a
               href={`tel:${CONTACT_CONFIG.phone.tel}`}
               className="px-4 py-2.5 rounded-xl bg-slate-850 hover:bg-slate-800 text-white font-semibold text-xs border border-slate-700 transition flex items-center gap-2 shadow-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-purple-400"
@@ -133,9 +133,9 @@ export function MarketingFooter() {
         {/* ============================================================ */}
         {/* MAIN NAVIGATION GRID                                         */}
         {/* ============================================================ */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-8 pb-12 border-b border-slate-800/80">
-          {/* Brand Column (Span 2 on large screens) */}
-          <div className="lg:col-span-2 space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 pb-12 border-b border-slate-800/80">
+          {/* Brand Column (Span 4 on large screens) */}
+          <div className="lg:col-span-4 space-y-4">
             <PulseSocialLogo size="md" theme="dark" variant="full" href="/" />
             <p className="text-xs text-slate-300 max-w-sm leading-relaxed">
               PulseSocial is the unified social media management SaaS platform for modern teams, creators, and enterprises. Publish, schedule, collaborate, and analyze from one powerful command center.
@@ -225,37 +225,39 @@ export function MarketingFooter() {
             </div>
           </div>
 
-          {/* Nav Links Columns */}
-          {footerSections.map((section) => (
-            <div key={section.title} className="space-y-3">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                {section.title}
-              </h4>
-              <ul className="space-y-2 text-xs">
-                {section.links.map((link: any) => (
-                  <li key={link.label}>
-                    {link.isCookieSettings ? (
-                      <button
-                        type="button"
-                        onClick={handleOpenCookieSettings}
-                        className="hover:text-white transition-colors cursor-pointer text-left focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-purple-400 rounded flex items-center gap-1.5"
-                      >
-                        <Sliders className="w-3 h-3 text-purple-400" />
-                        <span>{link.label}</span>
-                      </button>
-                    ) : (
-                      <Link
-                        href={link.href}
-                        className="hover:text-white transition-colors inline-block focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-purple-400 rounded"
-                      >
-                        {link.label}
-                      </Link>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {/* 5 Nav Link Columns (Span 8 on desktop, 5 clean columns) */}
+          <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 lg:gap-5 xl:gap-8">
+            {footerSections.map((section) => (
+              <div key={section.title} className="space-y-3">
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+                  {section.title}
+                </h4>
+                <ul className="space-y-2 text-xs">
+                  {section.links.map((link: any) => (
+                    <li key={link.label}>
+                      {link.isCookieSettings ? (
+                        <button
+                          type="button"
+                          onClick={handleOpenCookieSettings}
+                          className="hover:text-white transition-colors cursor-pointer text-left focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-purple-400 rounded flex items-center gap-1.5"
+                        >
+                          <Sliders className="w-3 h-3 text-purple-400" />
+                          <span>{link.label}</span>
+                        </button>
+                      ) : (
+                        <Link
+                          href={link.href}
+                          className="hover:text-white transition-colors inline-block focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-purple-400 rounded"
+                        >
+                          {link.label}
+                        </Link>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* ============================================================ */}

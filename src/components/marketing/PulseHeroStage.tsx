@@ -66,7 +66,7 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
     },
     {
       id: "col-2",
-      staggerClass: "-translate-y-3 sm:-translate-y-6 animate-float-down",
+      staggerClass: "-translate-y-2 sm:-translate-y-3",
       itemA: {
         platform: "Facebook",
         networkTag: "Pages & Groups Video Distribution",
@@ -90,7 +90,7 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
     },
     {
       id: "col-3",
-      staggerClass: "translate-y-1 sm:translate-y-4 animate-float-delayed",
+      staggerClass: "translate-y-1 sm:translate-y-2",
       itemA: {
         platform: "X (Twitter)",
         networkTag: "Thread Scheduling & Live Tracking",
@@ -114,7 +114,7 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
     },
     {
       id: "col-4",
-      staggerClass: "-translate-y-2 sm:-translate-y-4 animate-float-reverse",
+      staggerClass: "translate-y-0",
       itemA: {
         platform: "LinkedIn",
         networkTag: "Company Pages & Executive Profiles",
@@ -226,23 +226,23 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
           {/* STANDALONE BACKGROUND FLOATING ICONS (Only 4, on edges)*/}
           {/* ------------------------------------------------------ */}
           {/* Left Standalone: Telegram */}
-          <div className="hidden lg:flex absolute left-4 xl:left-8 top-[35%] -translate-y-1/2 w-11 h-11 items-center justify-center animate-float-up pointer-events-none z-10 transition-transform duration-300 hover:scale-125">
-            <Image src="/images/social/logos/telegram-icon.svg" width={42} height={42} alt="Telegram" className="w-10 h-10 drop-shadow-sm" />
+          <div className="hidden lg:flex absolute left-2 sm:left-4 xl:left-8 top-[28%] -translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10 transition-transform duration-300 hover:scale-110">
+            <Image src="/images/social/logos/telegram-icon.svg" width={40} height={40} alt="Telegram" className="w-10 h-10 drop-shadow-sm" />
           </div>
 
           {/* Left Standalone: Google Business */}
-          <div className="hidden lg:flex absolute left-5 xl:left-10 bottom-[18%] w-11 h-11 items-center justify-center animate-float-down pointer-events-none z-10 transition-transform duration-300 hover:scale-125">
-            <Image src="/images/social/logos/google.svg" width={42} height={42} alt="Google Business Profile" className="w-10 h-10 drop-shadow-sm" />
+          <div className="hidden lg:flex absolute left-2 sm:left-4 xl:left-8 bottom-[28%] translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10 transition-transform duration-300 hover:scale-110">
+            <Image src="/images/social/logos/google.svg" width={40} height={40} alt="Google Business Profile" className="w-10 h-10 drop-shadow-sm" />
           </div>
 
           {/* Right Standalone: YouTube */}
-          <div className="hidden lg:flex absolute right-5 xl:right-10 bottom-[22%] w-11 h-11 items-center justify-center animate-float-reverse pointer-events-none z-10 transition-transform duration-300 hover:scale-125">
-            <Image src="/images/social/logos/youtube-icon.svg" width={42} height={42} alt="YouTube" className="w-10 h-10 drop-shadow-sm" />
+          <div className="hidden lg:flex absolute right-2 sm:right-4 xl:right-8 bottom-[28%] translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10 transition-transform duration-300 hover:scale-110">
+            <Image src="/images/social/logos/youtube-icon.svg" width={40} height={40} alt="YouTube" className="w-10 h-10 drop-shadow-sm" />
           </div>
 
           {/* Right Standalone: Mastodon */}
-          <div className="hidden lg:flex absolute right-4 xl:right-8 top-[32%] w-11 h-11 items-center justify-center animate-float-up pointer-events-none z-10 transition-transform duration-300 hover:scale-125">
-            <Image src="/images/social/logos/mastodon-icon.svg" width={42} height={42} alt="Mastodon" className="w-10 h-10 drop-shadow-sm" />
+          <div className="hidden lg:flex absolute right-2 sm:right-4 xl:right-8 top-[28%] -translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10 transition-transform duration-300 hover:scale-110">
+            <Image src="/images/social/logos/mastodon-icon.svg" width={40} height={40} alt="Mastodon" className="w-10 h-10 drop-shadow-sm" />
           </div>
 
           {/* ------------------------------------------------------ */}
@@ -265,7 +265,7 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
                     } group`}
                   >
                     {/* Icon A */}
-                    <div className="mb-2 sm:mb-3 flex items-center justify-center transition-all duration-300 group-hover:-translate-y-1.5 group-hover:scale-115">
+                    <div className="mb-3 sm:mb-4 flex items-center justify-center h-10 transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-110">
                       <Image
                         src={col.itemA.logo}
                         width={40}
@@ -306,7 +306,7 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
                     } group`}
                   >
                     {/* Icon B */}
-                    <div className="mb-2 sm:mb-3 flex items-center justify-center transition-all duration-300 group-hover:-translate-y-1.5 group-hover:scale-115">
+                    <div className="mb-3 sm:mb-4 flex items-center justify-center h-10 transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-110">
                       <Image
                         src={col.itemB.logo}
                         width={40}
@@ -344,14 +344,14 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
           {/* ------------------------------------------------------ */}
           {/* SLIDE TOGGLE CONTROLS (Dots & Set Labels)              */}
           {/* ------------------------------------------------------ */}
-          <div className="relative z-30 mt-6 sm:mt-8 flex items-center justify-center gap-3">
+          <div className="relative z-30 mt-8 sm:mt-10 flex items-center justify-center gap-4 sm:gap-6">
             <button
               onClick={() => setActiveSlide(0)}
               aria-label="Show Set 1 (Instagram, Facebook, X, LinkedIn)"
-              className={`flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] font-bold transition-all duration-300 cursor-pointer ${
+              className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 cursor-pointer shadow-xs ${
                 activeSlide === 0
-                  ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-md scale-105"
-                  : "bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-white"
+                  ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-md scale-105 ring-2 ring-purple-500/30"
+                  : "bg-white/90 dark:bg-slate-800/90 text-slate-600 dark:text-slate-300 hover:bg-white hover:text-slate-900 border border-slate-200/60 dark:border-slate-700/60"
               }`}
             >
               <span className={`w-2 h-2 rounded-full ${activeSlide === 0 ? "bg-purple-500 animate-pulse" : "bg-slate-400"}`} />
@@ -361,10 +361,10 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
             <button
               onClick={() => setActiveSlide(1)}
               aria-label="Show Set 2 (YouTube, Bluesky, Threads, WhatsApp)"
-              className={`flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] font-bold transition-all duration-300 cursor-pointer ${
+              className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 cursor-pointer shadow-xs ${
                 activeSlide === 1
-                  ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-md scale-105"
-                  : "bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-white"
+                  ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-md scale-105 ring-2 ring-purple-500/30"
+                  : "bg-white/90 dark:bg-slate-800/90 text-slate-600 dark:text-slate-300 hover:bg-white hover:text-slate-900 border border-slate-200/60 dark:border-slate-700/60"
               }`}
             >
               <span className={`w-2 h-2 rounded-full ${activeSlide === 1 ? "bg-purple-500 animate-pulse" : "bg-slate-400"}`} />

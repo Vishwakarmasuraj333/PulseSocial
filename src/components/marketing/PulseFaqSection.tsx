@@ -22,7 +22,7 @@ export function PulseFaqSection() {
             <span className="font-semibold text-slate-800 dark:text-slate-200 underline decoration-slate-300">
               Social media management software
             </span>{" "}
-            is an application or software suite module that helps a company interact on social media effectively across multiple communication channels. Good software will help in the process of creating, publishing, scheduling, managing, and analyzing content on social media platforms, such as Facebook, X (formerly Twitter), Instagram, YouTube, LinkedIn, TikTok, and others.
+            is an application or software suite module that helps a company interact on social media effectively across multiple communication channels. Good software will help in the process of creating, publishing, scheduling, managing, and analyzing content on social media platforms, such as Facebook, X (formerly Twitter), Instagram, YouTube, LinkedIn, TikTok, and more.
           </p>
 
           <div>
@@ -133,10 +133,10 @@ export function PulseFaqSection() {
   };
 
   return (
-    <section className="py-20 sm:py-24 bg-white dark:bg-slate-950">
+    <section className="pt-8 sm:pt-10 pb-20 sm:pb-24 bg-white dark:bg-slate-950">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white text-center tracking-tight">
-          Frequently asked questions
+          Frequently Asked Questions
         </h2>
 
         {/* Accordion List */}

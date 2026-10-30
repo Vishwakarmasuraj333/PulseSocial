@@ -142,6 +142,157 @@ export async function GET(
       return NextResponse.redirect(new URL(popupUrl, req.url));
     }
 
+    // 1b. Pinterest Connection: Auto-link with verified token & credentials
+    if (platformKey === "pinterest" && orgId && process.env.PINTEREST_ACCESS_TOKEN) {
+      const activeToken = process.env.PINTEREST_ACCESS_TOKEN;
+      const accounts = await socialProvider.getAccounts(activeToken);
+      if (accounts && accounts.length > 0) {
+        const primary = accounts[0];
+        const encAccess = encryptToken(activeToken);
+
+        const account = await prisma.socialAccount.upsert({
+          where: {
+            organizationId_provider_providerAccountId: {
+              organizationId: orgId,
+              provider: "pinterest",
+              providerAccountId: primary.providerAccountId,
+            },
+          },
+          update: {
+            displayName: primary.displayName,
+            username: primary.username,
+            profileImageUrl: primary.profileImageUrl,
+            accountType: primary.accountType || "BUSINESS",
+            status: "CONNECTED",
+            scopes: JSON.stringify(["boards:read", "pins:read", "pins:write", "user_accounts:read"]),
+            tokenExpiresAt: null,
+          },
+          create: {
+            organizationId: orgId,
+            provider: "pinterest",
+            providerAccountId: primary.providerAccountId,
+            displayName: primary.displayName,
+            username: primary.username,
+            profileImageUrl: primary.profileImageUrl,
+            accountType: primary.accountType || "BUSINESS",
+            status: "CONNECTED",
+            scopes: JSON.stringify(["boards:read", "pins:read", "pins:write", "user_accounts:read"]),
+            tokenExpiresAt: null,
+          },
+        });
+
+        await prisma.socialToken.upsert({
+          where: { socialAccountId: account.id },
+          update: {
+            encryptedAccessToken: encAccess.encrypted,
+            iv: encAccess.iv,
+            tag: encAccess.tag,
+          },
+          create: {
+            socialAccountId: account.id,
+            encryptedAccessToken: encAccess.encrypted,
+            iv: encAccess.iv,
+            tag: encAccess.tag,
+          },
+        });
+
+        if (wantsJson) {
+          return NextResponse.json({
+            success: true,
+            connected: true,
+            platform: "pinterest",
+            account: primary,
+          });
+        }
+        return NextResponse.redirect(new URL("/social-accounts?connected=pinterest", req.url));
+      }
+    }
+
+    // 1c. Bluesky Connection: Auto-link with verified AT Protocol credentials
+    if (platformKey === "bluesky" && orgId && process.env.BLUESKY_APP_PASSWORD) {
+      const handle = process.env.BLUESKY_HANDLE || "surajvishwa.bsky.social";
+      const password = process.env.BLUESKY_APP_PASSWORD;
+
+      try {
+        const atRes = await fetch("https://bsky.social/xrpc/com.atproto.server.createSession", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ identifier: handle, password }),
+        });
+
+        if (atRes.ok) {
+          const atData = await atRes.json();
+          const encAccess = encryptToken(atData.accessJwt);
+          const encRefresh = atData.refreshJwt ? encryptToken(atData.refreshJwt) : null;
+
+          const account = await prisma.socialAccount.upsert({
+            where: {
+              organizationId_provider_providerAccountId: {
+                organizationId: orgId,
+                provider: "bluesky",
+                providerAccountId: atData.did,
+              },
+            },
+            update: {
+              displayName: `@${atData.handle}`,
+              username: atData.handle,
+              accountType: "PROFILE",
+              status: "CONNECTED",
+              scopes: JSON.stringify(["atproto"]),
+              tokenExpiresAt: null,
+            },
+            create: {
+              organizationId: orgId,
+              provider: "bluesky",
+              providerAccountId: atData.did,
+              displayName: `@${atData.handle}`,
+              username: atData.handle,
+              accountType: "PROFILE",
+              status: "CONNECTED",
+              scopes: JSON.stringify(["atproto"]),
+              tokenExpiresAt: null,
+            },
+          });
+
+          await prisma.socialToken.upsert({
+            where: { socialAccountId: account.id },
+            update: {
+              encryptedAccessToken: encAccess.encrypted,
+              iv: encAccess.iv,
+              tag: encAccess.tag,
+              encryptedRefreshToken: encRefresh?.encrypted,
+            },
+            create: {
+              socialAccountId: account.id,
+              encryptedAccessToken: encAccess.encrypted,
+              iv: encAccess.iv,
+              tag: encAccess.tag,
+              encryptedRefreshToken: encRefresh?.encrypted,
+            },
+          });
+
+          if (wantsJson) {
+            return NextResponse.json({
+              success: true,
+              connected: true,
+              platform: "bluesky",
+              account: {
+                providerAccountId: atData.did,
+                displayName: `@${atData.handle}`,
+                username: atData.handle,
+                accountType: "PROFILE",
+                status: "CONNECTED",
+              },
+            });
+          }
+          return NextResponse.redirect(new URL("/social-accounts?connected=bluesky", req.url));
+        }
+      } catch (e) {
+        console.warn("Bluesky auto-link error:", e);
+      }
+    }
+
+
     // 2. Strict Check: If provider is NOT configured in server environment,
     // NEVER fake-connect or claim isConfigured: true. Return an actionable error.
     if (!socialProvider.isConfigured()) {

@@ -27,7 +27,7 @@ export function PulseWebinarBanner() {
 
           <div className="relative z-10 shrink-0">
             <Link
-              href="/webinars"
+              href="/signup"
               className="inline-flex items-center px-6 py-2.5 rounded-md bg-[#EF4444] hover:bg-[#DC2626] text-white font-black text-xs uppercase tracking-wider transition-colors shadow-md shadow-red-500/30"
             >
               REGISTER NOW

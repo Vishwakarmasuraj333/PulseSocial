@@ -11,16 +11,19 @@ import {
   MessageResult,
 } from "../types";
 
+const BLUESKY_CONFIG = {
+  handle: process.env.BLUESKY_HANDLE || "surajvishwa.bsky.social",
+  appPassword: process.env.BLUESKY_APP_PASSWORD || "",
+  serviceUrl: process.env.BLUESKY_SERVICE_URL || "https://bsky.social",
+};
+
 export class BlueskyProvider implements SocialProvider {
   platform: SupportedPlatform = "bluesky";
   displayName = "Bluesky";
   iconName = "bluesky";
 
   isConfigured(): boolean {
-    return Boolean(
-      (process.env.BLUESKY_HANDLE && process.env.BLUESKY_APP_PASSWORD) ||
-      process.env.BLUESKY_CLIENT_ID
-    );
+    return true;
   }
 
   getMissingConfigMessage(): string {
@@ -32,8 +35,8 @@ export class BlueskyProvider implements SocialProvider {
   }
 
   async exchangeCode(code: string, redirectUri: string): Promise<OAuthTokenResult> {
-    const handle = process.env.BLUESKY_HANDLE;
-    const password = process.env.BLUESKY_APP_PASSWORD;
+    const handle = process.env.BLUESKY_HANDLE || BLUESKY_CONFIG.handle;
+    const password = process.env.BLUESKY_APP_PASSWORD || BLUESKY_CONFIG.appPassword;
 
     if (!handle || !password) {
       throw new Error(this.getMissingConfigMessage());

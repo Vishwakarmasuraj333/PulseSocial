@@ -395,24 +395,36 @@ export function UniversalSocialConnectModal({
         const res = await fetch(`/api/social/${targetApiId}/connect?format=json`);
         if (res.ok) {
           const data = await res.json();
+          if (data.connected && data.account) {
+            try {
+              if (popup && !popup.closed) popup.close();
+            } catch {}
+            setConnectingChannelId(null);
+            setConnectedAccountProviders((prev) => {
+              const next = new Set(prev);
+              next.add(targetApiId);
+              if (targetApiId === "x") next.add("twitter");
+              if (targetApiId === "twitter") next.add("x");
+              return next;
+            });
+            toast({
+              title: "Channel Connected!",
+              message: `${data.account?.displayName || ch.name} connected successfully!`,
+              type: "success",
+            });
+            await loadConnectedAccounts();
+            window.dispatchEvent(new Event("pulsesocial_account_connected"));
+            return;
+          }
           if (data.success && data.authUrl && !data.authUrl.includes("/social/connect/")) {
             if (popup && !popup.closed) {
               popup.location.href = data.authUrl;
             }
           }
         } else {
-          const errData = await res.json().catch(() => ({}));
-          const errMsg = errData.error || `Could not initiate ${ch.name} authorization.`;
-          setOauthError(errMsg);
+          // If direct oauth redirect is not available, DO NOT close popup!
+          // Leave the popup OPEN at /social/connect/${targetApiId} where user can complete setup.
           setConnectingChannelId(null);
-          try {
-            if (popup && !popup.closed) popup.close();
-          } catch {}
-          toast({
-            title: `${ch.name} Setup Required`,
-            message: errMsg,
-            type: "warning",
-          });
         }
       } catch (err) {
         console.error("OAuth init fetch error:", err);

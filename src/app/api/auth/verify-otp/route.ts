@@ -55,6 +55,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    if (user.status === "SUSPENDED") {
+      try {
+        await logAudit({
+          userId: user.id,
+          action: "LOGIN_BLOCKED_SUSPENDED",
+          resourceType: "User",
+          resourceId: user.id,
+          details: { email: user.email },
+        });
+      } catch {}
+      return NextResponse.json(
+        { error: "This account has been suspended by an administrator. Please contact support.", code: "FORBIDDEN" },
+        { status: 403 }
+      );
+    }
+
     // Verify OTP securely
     await verifyOTP(user.id, code);
 

@@ -14,6 +14,20 @@ const nextConfig = {
       { protocol: "https", hostname: "**" },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/register",
+        destination: "/signup",
+        permanent: true,
+      },
+      {
+        source: "/webinars",
+        destination: "/signup",
+        permanent: false,
+      },
+    ];
+  },
   async rewrites() {
     return [
       {

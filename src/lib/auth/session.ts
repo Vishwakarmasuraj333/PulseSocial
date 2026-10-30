@@ -55,6 +55,15 @@ export async function getSession(): Promise<SessionUser | null> {
     const userId = payload.sub as string;
     if (!userId) return null;
 
+    // Immediately reject suspended accounts from active session validation
+    const userStatusCheck = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { status: true },
+    }).catch(() => null);
+    if (userStatusCheck && userStatusCheck.status === "SUSPENDED") {
+      return null;
+    }
+
     let activeOrgId = (payload.activeOrgId as string) || undefined;
     let role = (payload.role as string) || undefined;
 

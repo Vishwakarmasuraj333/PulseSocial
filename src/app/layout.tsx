@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
 import { BrandProvider } from "@/context/BrandContext";
+import { CookieConsentBanner } from "@/components/consent/CookieConsentBanner";
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://pulsesocial1.vercel.app";
 
@@ -175,6 +176,7 @@ export default function RootLayout({
         <ToastProvider>
           <BrandProvider>
             {children}
+            <CookieConsentBanner />
           </BrandProvider>
         </ToastProvider>
       </body>

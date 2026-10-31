@@ -105,7 +105,7 @@ export function MarketingFooter() {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3 shrink-0 my-auto">
+          <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3 shrink-0 self-center">
             <a
               href={`tel:${CONTACT_CONFIG.phone.tel}`}
               className="px-4 py-2.5 rounded-xl bg-slate-850 hover:bg-slate-800 text-white font-semibold text-xs border border-slate-700 transition flex items-center gap-2 shadow-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-purple-400"
@@ -226,7 +226,7 @@ export function MarketingFooter() {
           </div>
 
           {/* 5 Nav Link Columns (Span 8 on desktop, 5 clean columns) */}
-          <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 lg:gap-5 xl:gap-8">
+          <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 lg:gap-6 xl:gap-8 justify-between">
             {footerSections.map((section) => (
               <div key={section.title} className="space-y-3">
                 <h4 className="text-xs font-bold text-white uppercase tracking-wider">

@@ -42,7 +42,7 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
   const columns = [
     {
       id: "col-1",
-      staggerClass: "translate-y-2 sm:translate-y-6 animate-float-up",
+      staggerClass: "translate-y-0 sm:translate-y-2",
       itemA: {
         platform: "Instagram",
         networkTag: "Reels & Direct Photo Publishing",
@@ -66,7 +66,7 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
     },
     {
       id: "col-2",
-      staggerClass: "-translate-y-2 sm:-translate-y-3",
+      staggerClass: "translate-y-0 sm:-translate-y-2",
       itemA: {
         platform: "Facebook",
         networkTag: "Pages & Groups Video Distribution",
@@ -90,7 +90,7 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
     },
     {
       id: "col-3",
-      staggerClass: "translate-y-1 sm:translate-y-2",
+      staggerClass: "translate-y-0 sm:translate-y-2",
       itemA: {
         platform: "X (Twitter)",
         networkTag: "Thread Scheduling & Live Tracking",
@@ -114,7 +114,7 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
     },
     {
       id: "col-4",
-      staggerClass: "translate-y-0",
+      staggerClass: "translate-y-0 sm:-translate-y-2",
       itemA: {
         platform: "LinkedIn",
         networkTag: "Company Pages & Executive Profiles",
@@ -226,22 +226,22 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
           {/* STANDALONE BACKGROUND FLOATING ICONS (Only 4, on edges)*/}
           {/* ------------------------------------------------------ */}
           {/* Left Standalone: Telegram */}
-          <div className="hidden lg:flex absolute left-2 sm:left-4 xl:left-8 top-[28%] -translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10 transition-transform duration-300 hover:scale-110">
+          <div className="hidden lg:flex absolute left-3 sm:left-5 xl:left-8 top-[32%] -translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10">
             <Image src="/images/social/logos/telegram-icon.svg" width={40} height={40} alt="Telegram" className="w-10 h-10 drop-shadow-sm" />
           </div>
 
           {/* Left Standalone: Google Business */}
-          <div className="hidden lg:flex absolute left-2 sm:left-4 xl:left-8 bottom-[28%] translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10 transition-transform duration-300 hover:scale-110">
+          <div className="hidden lg:flex absolute left-3 sm:left-5 xl:left-8 bottom-[32%] translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10">
             <Image src="/images/social/logos/google.svg" width={40} height={40} alt="Google Business Profile" className="w-10 h-10 drop-shadow-sm" />
           </div>
 
           {/* Right Standalone: YouTube */}
-          <div className="hidden lg:flex absolute right-2 sm:right-4 xl:right-8 bottom-[28%] translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10 transition-transform duration-300 hover:scale-110">
+          <div className="hidden lg:flex absolute right-3 sm:right-5 xl:right-8 bottom-[32%] translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10">
             <Image src="/images/social/logos/youtube-icon.svg" width={40} height={40} alt="YouTube" className="w-10 h-10 drop-shadow-sm" />
           </div>
 
           {/* Right Standalone: Mastodon */}
-          <div className="hidden lg:flex absolute right-2 sm:right-4 xl:right-8 top-[28%] -translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10 transition-transform duration-300 hover:scale-110">
+          <div className="hidden lg:flex absolute right-3 sm:right-5 xl:right-8 top-[32%] -translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10">
             <Image src="/images/social/logos/mastodon-icon.svg" width={40} height={40} alt="Mastodon" className="w-10 h-10 drop-shadow-sm" />
           </div>
 

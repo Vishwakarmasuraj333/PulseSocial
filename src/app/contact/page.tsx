@@ -108,7 +108,7 @@ export default function ContactPage() {
                     <a href="tel:+18007857362" className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 block hover:underline font-mono">
                       +1 (800) 785-PULSE (+1 800-785-7362)
                     </a>
-                    <span className="text-[10px] text-slate-400">Toll-free across North America</span>
+                    <span className="text-[10px] text-slate-400">Available 24/7 for supported regions</span>
                   </div>
                 </div>
 
@@ -242,8 +242,9 @@ export default function ContactPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
-                        Your Full Name
+                      <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center mb-1.5">
+                        <span>Your Full Name</span>
+                        <span className="text-rose-500 font-bold ml-1">*</span>
                       </label>
                       <input
                         type="text"
@@ -251,13 +252,14 @@ export default function ContactPage() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Alex Rivera"
-                        className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
+                        className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 placeholder:opacity-100 focus:outline-none focus:border-indigo-500"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
-                        Work Email
+                      <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center mb-1.5">
+                        <span>Work Email</span>
+                        <span className="text-rose-500 font-bold ml-1">*</span>
                       </label>
                       <input
                         type="email"
@@ -265,51 +267,61 @@ export default function ContactPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="alex@company.com"
-                        className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
+                        className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 placeholder:opacity-100 focus:outline-none focus:border-indigo-500"
                       />
                     </div>
                   </div>
 
                   {/* Phone field (especially for callbacks) */}
                   <div>
-                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
-                      Phone Number {category === "CALLBACK" ? "(Required for Callback)" : "(Optional for fast follow-up)"}
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center mb-1.5">
+                      <span>Phone Number</span>
+                      {category === "CALLBACK" ? (
+                        <>
+                          <span className="text-rose-500 font-bold ml-1">*</span>
+                          <span className="text-slate-400 text-[11px] ml-1.5">(Required for Callback)</span>
+                        </>
+                      ) : (
+                        <span className="text-slate-400 text-[11px] ml-1.5">(Optional for fast follow-up)</span>
+                      )}
                     </label>
                     <input
                       type="tel"
                       required={category === "CALLBACK"}
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      placeholder="+1 (555) 000-0000"
-                      className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 font-mono"
+                      placeholder="+Country Code Phone Number"
+                      className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 placeholder:opacity-100 focus:outline-none focus:border-indigo-500 font-mono"
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
-                      Subject
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center mb-1.5">
+                      <span>Subject</span>
+                      <span className="text-rose-500 font-bold ml-1">*</span>
                     </label>
                     <input
                       type="text"
                       required
                       value={subject}
                       onChange={(e) => setSubject(e.target.value)}
-                      placeholder="e.g. Meta Graph App Review assistance or Enterprise Plan details"
-                      className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
+                      placeholder="Enter inquiry subject"
+                      className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 placeholder:opacity-100 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
-                      Message
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center mb-1.5">
+                      <span>Message</span>
+                      <span className="text-rose-500 font-bold ml-1">*</span>
                     </label>
                     <textarea
                       rows={5}
                       required
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      placeholder="Tell us about your requirements, existing social accounts, or question..."
-                      className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 resize-none"
+                      placeholder="Describe your request or question..."
+                      className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 placeholder:opacity-100 focus:outline-none focus:border-indigo-500 resize-none"
                     />
                   </div>
 
@@ -318,6 +330,11 @@ export default function ContactPage() {
                       {errorMessage}
                     </div>
                   )}
+
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pb-1">
+                    <span>Fields marked with <span className="text-rose-500 font-bold">*</span> are required.</span>
+                    <span>Guaranteed SLA response</span>
+                  </div>
 
                   <button
                     type="submit"
@@ -331,7 +348,17 @@ export default function ContactPage() {
                       </>
                     ) : (
                       <>
-                        <span>Submit Inquiry</span>
+                        <span>
+                          {category === "SALES"
+                            ? "Submit Sales Inquiry"
+                            : category === "CALLBACK"
+                            ? "Submit Callback Request"
+                            : category === "BILLING"
+                            ? "Submit Billing Inquiry"
+                            : category === "PARTNER"
+                            ? "Submit Partner Inquiry"
+                            : "Submit Support Request"}
+                        </span>
                         <Send className="w-4 h-4" />
                       </>
                     )}

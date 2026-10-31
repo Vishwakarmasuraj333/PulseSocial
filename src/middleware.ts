@@ -154,6 +154,13 @@ export async function middleware(req: NextRequest) {
     return clearAuthCookies(res);
   }
 
+  // 3.5. Instant Registration Redirect (/register -> /signup)
+  if (pathname === "/register") {
+    const signupUrl = new URL("/signup", req.url);
+    searchParams.forEach((val, key) => signupUrl.searchParams.set(key, val));
+    return NextResponse.redirect(signupUrl);
+  }
+
   // 4. Exact Root Homepage (Always Public Landing Page)
   if (pathname === "/") {
     return NextResponse.next();

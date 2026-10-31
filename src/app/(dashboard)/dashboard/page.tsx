@@ -192,6 +192,15 @@ export default function DashboardPage() {
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [selectedConnectPlatform, setSelectedConnectPlatform] = useState<string>("youtube");
+  const [selectedPlanParam, setSelectedPlanParam] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search);
+      const plan = p.get("plan");
+      if (plan) setSelectedPlanParam(plan);
+    }
+  }, []);
   const [selectedMediaPost, setSelectedMediaPost] = useState<any | null>(null);
 
   const [livePosts, setLivePosts] = useState<any[]>([]);
@@ -442,6 +451,31 @@ export default function DashboardPage() {
     <AppLayout>
       <div className="bg-slate-50 dark:bg-[#0D0D0E] min-h-[calc(100vh-64px)] p-4 sm:p-6 lg:p-8 text-slate-800 dark:text-[#9CA3AF] font-sans space-y-6 max-w-7xl mx-auto">
         
+        {selectedPlanParam && (
+          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-purple-900/15 via-[#5846A8]/20 to-indigo-900/10 border-2 border-[#5846A8] dark:border-[#FBBF24] flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg animate-in fade-in">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#5846A8] text-white flex items-center justify-center shrink-0 shadow-md">
+                <Sparkles className="w-5 h-5 text-amber-300" />
+              </div>
+              <div>
+                <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                  You selected the <span className="uppercase text-[#5846A8] dark:text-[#FBBF24] font-black">{selectedPlanParam}</span> Plan!
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+                  Complete your checkout and choose your payment options (Credit Card or UPI) to activate all plan features.
+                </p>
+              </div>
+            </div>
+            <Link
+              href={`/billing?plan=${selectedPlanParam}&checkout=true`}
+              className="px-5 py-2.5 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white font-bold text-xs uppercase tracking-wider transition shadow-md shadow-purple-900/30 flex items-center gap-1.5 shrink-0"
+            >
+              <span>Complete Payment &amp; Checkout</span>
+              <ArrowUpRight className="w-4 h-4" />
+            </Link>
+          </div>
+        )}
+
         {/* Linear / Modern SaaS Style Capsule Tab Bar */}
         <div className="flex items-center justify-between flex-wrap gap-3 pb-1">
           <div className="flex items-center gap-1.5 p-1 rounded-full bg-slate-100 dark:bg-[#17171A] border border-slate-200/80 dark:border-white/7">

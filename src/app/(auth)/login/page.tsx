@@ -39,7 +39,13 @@ export default function LoginPage() {
 
   const getRedirectTarget = () => {
     if (typeof window !== "undefined") {
-      return new URLSearchParams(window.location.search).get("redirectTo") || "/dashboard";
+      const p = new URLSearchParams(window.location.search);
+      const explicit = p.get("redirectTo");
+      if (explicit) return explicit;
+      const plan = p.get("plan");
+      const billing = p.get("billing") || "monthly";
+      if (plan) return `/billing?plan=${plan}&billing=${billing}&checkout=true`;
+      return "/dashboard";
     }
     return "/dashboard";
   };
@@ -52,7 +58,8 @@ export default function LoginPage() {
     if (e) e.preventDefault();
     setIsFlipping(true);
     setTimeout(() => {
-      router.push("/signup");
+      const search = typeof window !== "undefined" ? window.location.search : "";
+      router.push(`/signup${search}`);
     }, 320);
   };
 

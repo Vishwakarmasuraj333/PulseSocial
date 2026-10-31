@@ -55,7 +55,8 @@ export default function SignupPage() {
     if (e) e.preventDefault();
     setIsFlipping(true);
     setTimeout(() => {
-      router.push("/login");
+      const search = typeof window !== "undefined" ? window.location.search : "";
+      router.push(`/login${search}`);
     }, 320);
   };
 
@@ -183,7 +184,14 @@ export default function SignupPage() {
           userId: userId || undefined,
           email: email.trim().toLowerCase(),
           code,
-          redirectTo: "/dashboard?setup=brand",
+          redirectTo: (() => {
+            if (typeof window !== "undefined") {
+              const p = new URLSearchParams(window.location.search);
+              if (p.get("redirectTo")) return p.get("redirectTo");
+              if (p.get("plan")) return `/billing?plan=${p.get("plan")}&billing=${p.get("billing") || "monthly"}&checkout=true`;
+            }
+            return "/dashboard?setup=brand";
+          })(),
         }),
       });
 
@@ -207,7 +215,13 @@ export default function SignupPage() {
       });
 
       setTimeout(() => {
-        window.location.href = data.redirectTo || "/dashboard?setup=brand";
+        let destination = data.redirectTo;
+        if (!destination && typeof window !== "undefined") {
+          const p = new URLSearchParams(window.location.search);
+          if (p.get("redirectTo")) destination = p.get("redirectTo");
+          else if (p.get("plan")) destination = `/billing?plan=${p.get("plan")}&billing=${p.get("billing") || "monthly"}&checkout=true`;
+        }
+        window.location.href = destination || "/dashboard?setup=brand";
       }, 500);
     } catch (err: unknown) {
       setErrorMessage((err as Error).message || "Invalid verification code");

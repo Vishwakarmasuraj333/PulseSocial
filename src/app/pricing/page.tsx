@@ -108,7 +108,7 @@ export default function PricingPage() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-indigo-500 selection:text-white font-sans">
       <MarketingHeader />
 
-      <main className="pt-24 sm:pt-28 pb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <main className="pt-20 sm:pt-24 pb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12 space-y-3 sm:space-y-4">
           <span className="text-xs font-bold uppercase tracking-wider text-[#5846A8] dark:text-[#FBBF24]">
@@ -118,7 +118,7 @@ export default function PricingPage() {
             Invest in Smarter Social Growth
           </h1>
           <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
-            All plans include official OAuth integrations, secure token vaulting, and our core universal post composer.
+            All plans include official OAuth integrations, secure token-vaulting, and our core universal post-composer.
           </p>
 
           {/* Billing Cycle Switcher with normalized spacing */}
@@ -160,9 +160,8 @@ export default function PricingPage() {
             const ctaText =
               p.ctaLabel ||
               (p.highlight ? "Choose Professional" : p.slug === "agency" ? "Start Agency Plan" : "Get Started");
-            const href = p.ctaHref
-              ? `${p.ctaHref.split("?")[0]}?plan=${p.slug || "starter"}&billing=${billingCycle}`
-              : `/signup?plan=${p.slug || "starter"}&billing=${billingCycle}`;
+            const targetSlug = p.slug || (p.highlight ? "professional" : "starter");
+            const href = `/signup?plan=${targetSlug}&billing=${billingCycle}&redirectTo=${encodeURIComponent(`/billing?plan=${targetSlug}&billing=${billingCycle}&checkout=true`)}`;
 
             return (
               <div

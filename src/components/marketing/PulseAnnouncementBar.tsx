@@ -26,7 +26,7 @@ export function PulseAnnouncementBar() {
 
       <button
         onClick={() => setIsVisible(false)}
-        className="absolute right-4 sm:right-6 lg:right-8 top-1/2 -translate-y-1/2 p-1.5 text-white/80 hover:text-white hover:bg-white/10 dark:text-[#FEF3C7]/75 dark:hover:text-[#FEF3C7] dark:hover:bg-white/10 rounded-lg transition cursor-pointer"
+        className="absolute right-6 sm:right-10 lg:right-14 top-1/2 -translate-y-1/2 p-1.5 text-white/80 hover:text-white hover:bg-white/10 dark:text-[#FEF3C7]/75 dark:hover:text-[#FEF3C7] dark:hover:bg-white/10 rounded-lg transition cursor-pointer"
         aria-label="Dismiss banner"
       >
         <X className="w-3.5 h-3.5" />

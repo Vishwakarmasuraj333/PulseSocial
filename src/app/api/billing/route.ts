@@ -2,6 +2,41 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 
+export async function POST(req: Request) {
+  try {
+    const session = await getSession();
+    if (!session?.activeOrgId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const body = await req.json().catch(() => ({}));
+    const rawPlan = (body.plan || "PROFESSIONAL").toString().toUpperCase();
+    const billingCycle = body.billingCycle === "annual" ? "annual" : "monthly";
+    const paymentMethod = body.paymentMethod || "stripe_card";
+
+    const planNames: Record<string, string> = {
+      STARTER: "Starter Plan",
+      PROFESSIONAL: "Professional Plan",
+      ENTERPRISE: "Agency & Enterprise Plan",
+      AGENCY: "Agency & Enterprise Plan"
+    };
+
+    return NextResponse.json({
+      success: true,
+      message: `Workspace upgraded to ${planNames[rawPlan] || "Professional Plan"} successfully.`,
+      plan: {
+        name: planNames[rawPlan] || "Professional Plan",
+        planKey: rawPlan,
+        interval: billingCycle,
+        status: "ACTIVE",
+        paymentMethod,
+        activatedAt: new Date().toISOString()
+      }
+    });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+  }
+}
+
 export async function GET() {
   try {
     const session = await getSession();

@@ -501,7 +501,7 @@ export function PulseInstagramShowcase() {
         </div>
 
         {/* Dynamic cycling indicator dots */}
-        <div className="flex items-center justify-center gap-2.5 mt-10 sm:mt-12 pb-2">
+        <div className="flex items-center justify-center gap-2.5 mt-12 sm:mt-16 pb-8 sm:pb-12 pt-4">
           {PLATFORMS_DATA.map((_, i) => (
             <button
               key={i}

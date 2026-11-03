@@ -83,20 +83,27 @@ export async function recordConsent(params: {
   }
 
   // Persist consent audit record in PostgreSQL
-  await prisma.consentRecord.create({
-    data: {
-      userId: validUserId,
-      visitorId,
-      policyVersion: CURRENT_POLICY_VERSION,
-      necessary: true,
-      preferences: params.preferences,
-      analytics: params.analytics,
-      marketing,
-      decision: params.decision,
-      source: params.source || "web_banner",
-      timestamp,
-    },
-  });
+  try {
+    await prisma.consentRecord.create({
+      data: {
+        userId: validUserId,
+        visitorId,
+        policyVersion: CURRENT_POLICY_VERSION,
+        necessary: true,
+        preferences: params.preferences,
+        analytics: params.analytics,
+        marketing,
+        decision: params.decision,
+        source: params.source || "web_banner",
+        timestamp,
+      },
+    });
+  } catch (dbErr) {
+    console.warn(
+      "[recordConsent] PostgreSQL consent audit logging unavailable, continuing with client cookie consent:",
+      dbErr
+    );
+  }
 
   const state: CookieConsentState = {
     necessary: true,

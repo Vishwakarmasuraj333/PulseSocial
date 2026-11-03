@@ -276,22 +276,17 @@ export function PulseMobileShowcase() {
               )}
             </div>
 
-            {/* Direct fallback store search */}
+            {/* Direct verified link to Full Mobile Page (Zero 404) */}
             <div className="pt-2 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
-              <span>Looking for the live catalog search?</span>
-              <a
-                href={
-                  storeModal === "apple"
-                    ? "https://apps.apple.com/search?term=PulseSocial"
-                    : "https://play.google.com/store/search?q=PulseSocial&c=apps"
-                }
-                target="_blank"
-                rel="noopener noreferrer"
+              <span>Need detailed step-by-step setup?</span>
+              <Link
+                href="/mobile"
+                onClick={() => setStoreModal(null)}
                 className="text-sky-400 hover:underline flex items-center gap-1 font-semibold"
               >
-                <span>Search {storeModal === "apple" ? "App Store" : "Google Play"}</span>
+                <span>View Full Mobile Guide &amp; FAQ</span>
                 <ArrowRight className="w-3 h-3" />
-              </a>
+              </Link>
             </div>
           </div>
         </div>

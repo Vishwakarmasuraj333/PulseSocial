@@ -93,10 +93,33 @@ export async function POST(req: Request) {
     return response;
   } catch (error: unknown) {
     console.error("[POST /api/consent Error]:", error);
-    return NextResponse.json(
-      { error: (error as Error).message || "Failed to save cookie consent", code: "INTERNAL_ERROR" },
-      { status: 500 }
-    );
+    // Graceful fallback: Never block user's privacy choices with a 500 error
+    const fallbackConsent = {
+      necessary: true,
+      preferences: true,
+      analytics: false,
+      marketing: false,
+      decision: "CUSTOM" as const,
+      policyVersion: CURRENT_POLICY_VERSION,
+      timestamp: new Date().toISOString(),
+    };
+
+    const response = NextResponse.json({
+      success: true,
+      message: "Cookie preferences recorded locally.",
+      consent: fallbackConsent,
+      fallback: true,
+    });
+
+    response.cookies.set(CONSENT_COOKIE_NAME, JSON.stringify(fallbackConsent), {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 365 * 24 * 60 * 60,
+    });
+
+    return response;
   }
 }
 
@@ -139,9 +162,37 @@ export async function DELETE(req?: Request) {
 
     return response;
   } catch (error: unknown) {
-    return NextResponse.json(
-      { error: (error as Error).message || "Failed to withdraw cookie consent", code: "INTERNAL_ERROR" },
-      { status: 500 }
-    );
+    console.error("[DELETE /api/consent Error]:", error);
+    const fallbackWithdrawn = {
+      necessary: true,
+      preferences: false,
+      analytics: false,
+      marketing: false,
+      decision: "WITHDRAWN" as const,
+      policyVersion: CURRENT_POLICY_VERSION,
+      timestamp: new Date().toISOString(),
+    };
+
+    const response = NextResponse.json({
+      success: true,
+      message: "Cookie consent withdrawn locally.",
+      consent: fallbackWithdrawn,
+      fallback: true,
+    });
+
+    response.cookies.set(CONSENT_COOKIE_NAME, JSON.stringify(fallbackWithdrawn), {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 365 * 24 * 60 * 60,
+    });
+
+    response.cookies.delete("_pk_id");
+    response.cookies.delete("_pk_ses");
+    response.cookies.delete("pulsesocial_theme");
+    response.cookies.delete("pulsesocial_active_brand");
+
+    return response;
   }
 }

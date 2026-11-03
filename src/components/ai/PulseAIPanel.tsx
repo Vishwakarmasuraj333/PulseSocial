@@ -116,15 +116,15 @@ export function PulseAIPanel({ isOpen, onClose, onInsertToComposer }: PulseAIPan
         <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/70">
           <div className="flex items-center gap-3">
             {/* Animated Pulse Orb */}
-            <div className="relative w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-500 p-0.5 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <div className="relative w-9 h-9 rounded-xl bg-gradient-to-tr from-[#F59E0B] via-[#E08738] to-[#D97706] p-0.5 flex items-center justify-center shadow-lg shadow-amber-500/20">
               <div className="w-full h-full rounded-[10px] bg-slate-950 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-cyan-400 animate-pulse" />
+                <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
               </div>
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-bold text-white tracking-tight">PulseAI</h3>
-                <span className="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                <span className="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
                   Assistant
                 </span>
               </div>
@@ -149,7 +149,7 @@ export function PulseAIPanel({ isOpen, onClose, onInsertToComposer }: PulseAIPan
             <select
               value={selectedPlatform}
               onChange={(e) => setSelectedPlatform(e.target.value)}
-              className="bg-slate-800 border border-slate-700 rounded-md px-2 py-1 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="bg-slate-800 border border-slate-700 rounded-md px-2 py-1 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500"
             >
               <option value="Instagram">Instagram</option>
               <option value="LinkedIn">LinkedIn</option>
@@ -165,7 +165,7 @@ export function PulseAIPanel({ isOpen, onClose, onInsertToComposer }: PulseAIPan
             <select
               value={selectedTone}
               onChange={(e) => setSelectedTone(e.target.value)}
-              className="bg-slate-800 border border-slate-700 rounded-md px-2 py-1 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="bg-slate-800 border border-slate-700 rounded-md px-2 py-1 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500"
             >
               <option value="Engaging">Engaging</option>
               <option value="Professional">Professional</option>
@@ -186,7 +186,7 @@ export function PulseAIPanel({ isOpen, onClose, onInsertToComposer }: PulseAIPan
               <div
                 className={`max-w-[90%] rounded-2xl p-3.5 text-xs leading-relaxed ${
                   msg.sender === "user"
-                    ? "bg-indigo-600 text-white rounded-br-xs"
+                    ? "bg-gradient-to-r from-[#F59E0B] via-[#E08738] to-[#D97706] text-slate-950 font-medium rounded-br-xs shadow-xs"
                     : "bg-slate-800/90 text-slate-200 border border-slate-700/60 rounded-bl-xs"
                 }`}
               >
@@ -202,8 +202,8 @@ export function PulseAIPanel({ isOpen, onClose, onInsertToComposer }: PulseAIPan
                     >
                       {copiedId === msg.id ? (
                         <>
-                          <Check className="w-3 h-3 text-purple-400" />
-                          <span className="text-purple-400">Copied</span>
+                          <Check className="w-3 h-3 text-emerald-400" />
+                          <span className="text-emerald-400">Copied</span>
                         </>
                       ) : (
                         <>
@@ -224,7 +224,7 @@ export function PulseAIPanel({ isOpen, onClose, onInsertToComposer }: PulseAIPan
                             type: "success",
                           });
                         }}
-                        className="text-[10px] font-medium text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition ml-auto"
+                        className="text-[10px] font-medium text-amber-400 hover:text-amber-300 flex items-center gap-1 transition ml-auto"
                       >
                         <Wand2 className="w-3 h-3" />
                         <span>Insert to Composer</span>
@@ -239,7 +239,7 @@ export function PulseAIPanel({ isOpen, onClose, onInsertToComposer }: PulseAIPan
 
           {/* Typing indicator */}
           {isGenerating && (
-            <div className="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-xs text-indigo-300 max-w-xs animate-pulse">
+            <div className="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-xs text-amber-300 max-w-xs animate-pulse">
               <Sparkles className="w-4 h-4 animate-spin" />
               <span>PulseAI is crafting your response...</span>
             </div>
@@ -274,12 +274,12 @@ export function PulseAIPanel({ isOpen, onClose, onInsertToComposer }: PulseAIPan
               value={inputPrompt}
               onChange={(e) => setInputPrompt(e.target.value)}
               placeholder="Ask PulseAI to write, rewrite, or brainstorm..."
-              className="flex-1 px-3 py-2 text-xs rounded-lg bg-slate-900 border border-slate-800 text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="flex-1 px-3 py-2 text-xs rounded-lg bg-slate-900 border border-slate-800 text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
             />
             <button
               type="submit"
               disabled={isGenerating || !inputPrompt.trim()}
-              className="p-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white disabled:opacity-50 transition cursor-pointer"
+              className="p-2 rounded-lg bg-gradient-to-r from-[#F59E0B] via-[#E08738] to-[#D97706] hover:brightness-105 text-slate-950 font-bold disabled:opacity-50 transition cursor-pointer"
               title="Send to PulseAI"
             >
               <Send className="w-4 h-4" />

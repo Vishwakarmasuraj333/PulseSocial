@@ -732,7 +732,7 @@ export default function CallsCollaborationHubPage() {
                 <img
                   src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
                   alt="Profile"
-                  className="w-10 h-10 rounded-xl object-cover ring-2 ring-violet-500/30 dark:ring-violet-400/30"
+                  className="w-10 h-10 rounded-xl object-cover ring-2 ring-amber-500/30 dark:ring-amber-400/30"
                 />
                 <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900 shadow-xs" />
               </div>
@@ -740,8 +740,8 @@ export default function CallsCollaborationHubPage() {
                 <h2 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
                   Pulse Collaboration
                 </h2>
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-violet-600 dark:text-violet-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-violet-600 dark:bg-violet-400 animate-pulse" />
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-amber-600 dark:text-amber-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse" />
                   <span>Team Mesh Active</span>
                 </div>
               </div>
@@ -752,7 +752,7 @@ export default function CallsCollaborationHubPage() {
               <button
                 type="button"
                 onClick={() => startVoiceCall()}
-                className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-500/10 transition cursor-pointer"
+                className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-[#FBBF24] hover:bg-amber-50 dark:hover:bg-amber-500/10 transition cursor-pointer"
                 title="Start Voice Huddle"
               >
                 <Phone className="w-4 h-4" />
@@ -760,7 +760,7 @@ export default function CallsCollaborationHubPage() {
               <button
                 type="button"
                 onClick={() => startVideoCall()}
-                className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-500/10 transition cursor-pointer"
+                className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-[#FBBF24] hover:bg-amber-50 dark:hover:bg-amber-500/10 transition cursor-pointer"
                 title="Start HD Video Call"
               >
                 <Video className="w-4 h-4" />
@@ -768,7 +768,7 @@ export default function CallsCollaborationHubPage() {
               <button
                 type="button"
                 onClick={() => handleJoinOrCreateRoom()}
-                className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-500/10 transition cursor-pointer"
+                className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-[#FBBF24] hover:bg-amber-50 dark:hover:bg-amber-500/10 transition cursor-pointer"
                 title="Instant WebRTC Room"
               >
                 <Radio className="w-4 h-4" />
@@ -783,7 +783,7 @@ export default function CallsCollaborationHubPage() {
               onClick={() => setActiveTab("chats")}
               className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === "chats"
-                  ? "bg-white dark:bg-slate-800 text-violet-700 dark:text-violet-400 shadow-xs border border-slate-200/60 dark:border-slate-700/60"
+                  ? "bg-white dark:bg-slate-800 text-amber-800 dark:text-[#FBBF24] shadow-xs border border-slate-200/60 dark:border-slate-700/60"
                   : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-800/50"
               }`}
             >
@@ -795,13 +795,13 @@ export default function CallsCollaborationHubPage() {
               onClick={() => setActiveTab("calls")}
               className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === "calls"
-                  ? "bg-white dark:bg-slate-800 text-violet-700 dark:text-violet-400 shadow-xs border border-slate-200/60 dark:border-slate-700/60"
+                  ? "bg-white dark:bg-slate-800 text-amber-800 dark:text-[#FBBF24] shadow-xs border border-slate-200/60 dark:border-slate-700/60"
                   : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-800/50"
               }`}
             >
               <PhoneCall className="w-3.5 h-3.5" />
               <span>LOGS</span>
-              <span className="px-1.5 py-0.2 rounded-full bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300 text-[10px] font-bold">
+              <span className="px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-900 dark:bg-amber-500/20 dark:text-[#FBBF24] text-[10px] font-bold">
                 {callLogs.length}
               </span>
             </button>
@@ -810,7 +810,7 @@ export default function CallsCollaborationHubPage() {
               onClick={() => setActiveTab("rooms")}
               className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === "rooms"
-                  ? "bg-white dark:bg-slate-800 text-violet-700 dark:text-violet-400 shadow-xs border border-slate-200/60 dark:border-slate-700/60"
+                  ? "bg-white dark:bg-slate-800 text-amber-800 dark:text-[#FBBF24] shadow-xs border border-slate-200/60 dark:border-slate-700/60"
                   : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-800/50"
               }`}
             >
@@ -828,7 +828,7 @@ export default function CallsCollaborationHubPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search teammates, messages, or channels..."
-                className="w-full pl-9 pr-4 py-1.5 text-xs rounded-xl bg-slate-100/80 dark:bg-slate-800/80 text-slate-900 dark:text-white placeholder:text-slate-400 border border-transparent focus:border-violet-500 dark:focus:border-violet-500 outline-none transition"
+                className="w-full pl-9 pr-4 py-1.5 text-xs rounded-xl bg-slate-100/80 dark:bg-slate-800/80 text-slate-900 dark:text-white placeholder:text-slate-400 border border-transparent focus:border-amber-500 dark:focus:border-amber-500 outline-none transition"
               />
             </div>
           </div>
@@ -848,7 +848,7 @@ export default function CallsCollaborationHubPage() {
                     }}
                     className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition ${
                       isSelected
-                        ? "bg-violet-50/80 dark:bg-violet-950/25 border-l-4 border-violet-600 dark:border-violet-400"
+                        ? "bg-amber-50/80 dark:bg-amber-950/25 border-l-4 border-amber-500 dark:border-amber-400"
                         : "hover:bg-slate-50/80 dark:hover:bg-slate-800/40"
                     }`}
                   >
@@ -862,7 +862,7 @@ export default function CallsCollaborationHubPage() {
                         <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900" title="Online" />
                       )}
                       {contact.status === "in_call" && (
-                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-violet-500 rounded-full border-2 border-white dark:border-slate-900" title="In a Huddle" />
+                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-amber-500 rounded-full border-2 border-white dark:border-slate-900" title="In a Huddle" />
                       )}
                       {contact.status === "offline" && (
                         <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-slate-400 rounded-full border-2 border-white dark:border-slate-900" title="Offline" />
@@ -888,7 +888,7 @@ export default function CallsCollaborationHubPage() {
                             : lastMsg?.text || contact.role}
                         </p>
                         {contact.unreadCount > 0 && (
-                          <span className="w-4 h-4 rounded-full bg-violet-600 text-white text-[9px] font-bold flex items-center justify-center shrink-0 shadow-xs">
+                          <span className="w-4 h-4 rounded-full bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-slate-950 text-[9px] font-bold flex items-center justify-center shrink-0 shadow-xs">
                             {contact.unreadCount}
                           </span>
                         )}
@@ -926,7 +926,7 @@ export default function CallsCollaborationHubPage() {
                           <PhoneIncoming className="w-3.5 h-3.5 text-emerald-500" />
                         )}
                         {log.direction === "outgoing" && (
-                          <PhoneOutgoing className="w-3.5 h-3.5 text-violet-500" />
+                          <PhoneOutgoing className="w-3.5 h-3.5 text-amber-500" />
                         )}
                         {log.direction === "missed" && (
                           <PhoneMissed className="w-3.5 h-3.5 text-rose-500" />
@@ -945,7 +945,7 @@ export default function CallsCollaborationHubPage() {
                           const contact = contacts.find((c) => c.id === log.contactId);
                           startVoiceCall(contact);
                         }}
-                        className="p-2 rounded-xl text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-500/10 transition cursor-pointer"
+                        className="p-2 rounded-xl text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition cursor-pointer"
                         title="Voice Call Back"
                       >
                         <Phone className="w-4 h-4" />
@@ -957,7 +957,7 @@ export default function CallsCollaborationHubPage() {
                           const contact = contacts.find((c) => c.id === log.contactId);
                           startVideoCall(contact);
                         }}
-                        className="p-2 rounded-xl text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-500/10 transition cursor-pointer"
+                        className="p-2 rounded-xl text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition cursor-pointer"
                         title="Video Call Back"
                       >
                         <Video className="w-4 h-4" />
@@ -972,16 +972,16 @@ export default function CallsCollaborationHubPage() {
           {/* TAB 3: INSTANT WebRTC CONFERENCE ROOMS */}
           {activeTab === "rooms" && (
             <div className="flex-1 p-4 space-y-4 overflow-y-auto">
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-violet-600 via-indigo-600 to-purple-700 text-white shadow-lg shadow-violet-600/20">
-                <Radio className="w-5 h-5 mb-2 text-violet-200 animate-pulse" />
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-[#F59E0B] via-[#E08738] to-[#D97706] text-slate-950 shadow-lg shadow-amber-500/20">
+                <Radio className="w-5 h-5 mb-2 text-slate-950 animate-pulse" />
                 <h3 className="font-bold text-sm text-white">Instant Team Standup Room</h3>
-                <p className="text-xs text-violet-100/80 mt-1 leading-relaxed">
+                <p className="text-xs text-slate-900/80 mt-1 leading-relaxed">
                   Spin up an isolated multi-participant WebRTC meeting room with screen sharing and encrypted audio.
                 </p>
                 <button
                   type="button"
                   onClick={() => handleJoinOrCreateRoom(`pulse-${Math.random().toString(36).substring(2, 7)}`)}
-                  className="mt-3 px-4 py-2 bg-white text-violet-700 rounded-xl font-bold text-xs shadow-sm hover:bg-violet-50 transition cursor-pointer flex items-center gap-2"
+                  className="mt-3 px-4 py-2 bg-slate-950 text-amber-400 rounded-xl font-bold text-xs shadow-sm hover:bg-slate-900 transition cursor-pointer flex items-center gap-2"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Launch New Meeting</span>
@@ -998,12 +998,12 @@ export default function CallsCollaborationHubPage() {
                     value={roomCodeInput}
                     onChange={(e) => setRoomCodeInput(e.target.value)}
                     placeholder="e.g. weekly-sync"
-                    className="flex-1 px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white outline-none focus:ring-1 focus:ring-violet-500"
+                    className="flex-1 px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white outline-none focus:ring-1 focus:ring-amber-500"
                   />
                   <button
                     type="button"
                     onClick={() => handleJoinOrCreateRoom()}
-                    className="px-4 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs transition cursor-pointer"
+                    className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] hover:brightness-105 text-slate-950 font-bold text-xs transition shadow-xs cursor-pointer"
                   >
                     Join
                   </button>
@@ -1020,10 +1020,10 @@ export default function CallsCollaborationHubPage() {
                       key={code}
                       type="button"
                       onClick={() => handleJoinOrCreateRoom(code)}
-                      className="w-full px-3 py-2 text-left rounded-xl bg-white dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800 hover:border-violet-500/40 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-violet-600 dark:hover:text-violet-400 transition flex items-center justify-between cursor-pointer"
+                      className="w-full px-3 py-2 text-left rounded-xl bg-white dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800 hover:border-amber-500/40 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-amber-600 dark:hover:text-[#FBBF24] transition flex items-center justify-between cursor-pointer"
                     >
                       <span className="font-mono">#{code}</span>
-                      <Video className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
+                      <Video className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                     </button>
                   ))}
                 </div>
@@ -1057,7 +1057,7 @@ export default function CallsCollaborationHubPage() {
                   <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900" />
                 )}
                 {activeContact.status === "in_call" && (
-                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-violet-500 rounded-full border-2 border-white dark:border-slate-900" />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-amber-500 rounded-full border-2 border-white dark:border-slate-900" />
                 )}
               </div>
 
@@ -1067,11 +1067,11 @@ export default function CallsCollaborationHubPage() {
                 </h3>
                 <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                   {isTyping ? (
-                    <span className="text-violet-600 dark:text-violet-400 font-semibold">typing...</span>
+                    <span className="text-amber-600 dark:text-amber-400 font-semibold">typing...</span>
                   ) : activeContact.status === "online" ? (
                     <span className="text-emerald-600 dark:text-emerald-400 font-semibold">online now</span>
                   ) : activeContact.status === "in_call" ? (
-                    <span className="text-violet-600 dark:text-violet-400 font-semibold">in active huddle</span>
+                    <span className="text-amber-600 dark:text-amber-400 font-semibold">in active huddle</span>
                   ) : (
                     activeContact.lastSeen || "offline"
                   )}
@@ -1089,14 +1089,14 @@ export default function CallsCollaborationHubPage() {
                 className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 text-xs font-bold transition cursor-pointer"
                 title="Start Voice Huddle"
               >
-                <Phone className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
+                <Phone className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                 <span>Voice Huddle</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => startVideoCall()}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold transition shadow-sm cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#F59E0B] via-[#E08738] to-[#D97706] hover:brightness-105 text-slate-950 text-xs font-bold transition shadow-sm cursor-pointer"
                 title="Start Video Huddle"
               >
                 <Video className="w-3.5 h-3.5" />
@@ -1136,9 +1136,9 @@ export default function CallsCollaborationHubPage() {
                   <div key={msg.id} className="flex justify-center my-3">
                     <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 text-xs text-slate-700 dark:text-slate-300 shadow-xs">
                       {msg.callType === "voice" ? (
-                        <PhoneCall className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
+                        <PhoneCall className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                       ) : (
-                        <Video className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
+                        <Video className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                       )}
                       <span className="font-semibold">
                         {msg.callType === "voice" ? "Voice huddle completed" : "Video call completed"}
@@ -1164,7 +1164,7 @@ export default function CallsCollaborationHubPage() {
                   <div
                     className={`max-w-[78%] sm:max-w-[65%] rounded-2xl px-4 py-2.5 shadow-xs text-xs relative leading-relaxed ${
                       isMe
-                        ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-tr-xs"
+                        ? "bg-gradient-to-r from-[#F59E0B] via-[#E08738] to-[#D97706] text-slate-950 font-medium rounded-tr-xs shadow-xs"
                         : "bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-200/80 dark:border-slate-700/70 rounded-tl-xs shadow-xs"
                     }`}
                   >
@@ -1173,7 +1173,7 @@ export default function CallsCollaborationHubPage() {
                         <button
                           type="button"
                           onClick={() => setPlayingAudioId((prev) => (prev === msg.id ? null : msg.id))}
-                          className="w-8 h-8 rounded-full bg-violet-700 dark:bg-violet-500 text-white flex items-center justify-center transition cursor-pointer active:scale-95 shrink-0 shadow-xs"
+                          className="w-8 h-8 rounded-full bg-amber-600 dark:bg-amber-500 text-slate-950 flex items-center justify-center transition cursor-pointer active:scale-95 shrink-0 shadow-xs"
                           title={playingAudioId === msg.id ? "Pause Voice Memo" : "Play Voice Memo"}
                         >
                           {playingAudioId === msg.id ? (
@@ -1193,7 +1193,7 @@ export default function CallsCollaborationHubPage() {
                                   }px`,
                                 }}
                                 className={`w-1 rounded-full transition-all duration-150 ${
-                                  isMe ? "bg-white/80" : "bg-violet-600 dark:bg-violet-400"
+                                  isMe ? "bg-slate-900" : "bg-amber-500 dark:bg-amber-400"
                                 }`}
                               />
                             ))}
@@ -1223,7 +1223,7 @@ export default function CallsCollaborationHubPage() {
                           className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
                             isMe
                               ? "bg-white/20 text-white"
-                              : "bg-violet-100 text-violet-600 dark:bg-violet-500/20 dark:text-violet-300"
+                              : "bg-amber-100 text-amber-900 dark:bg-amber-500/20 dark:text-[#FBBF24]"
                           }`}
                         >
                           <FileText className="w-5 h-5" />
@@ -1238,11 +1238,11 @@ export default function CallsCollaborationHubPage() {
                     )}
 
                     <div className="flex items-center gap-1 justify-end float-right -mt-2 -mr-1">
-                      <span className={`text-[10px] font-mono ${isMe ? "text-violet-200" : "text-slate-400"}`}>
+                      <span className={`text-[10px] font-mono ${isMe ? "text-slate-900/80" : "text-slate-400"}`}>
                         {msg.timestamp}
                       </span>
                       {isMe && (
-                        <CheckCheck className="w-3.5 h-3.5 text-violet-200" />
+                        <CheckCheck className="w-3.5 h-3.5 text-slate-900/80" />
                       )}
                     </div>
                   </div>
@@ -1253,9 +1253,9 @@ export default function CallsCollaborationHubPage() {
             {isTyping && (
               <div className="flex justify-start">
                 <div className="px-3.5 py-2 rounded-2xl bg-white dark:bg-slate-800 text-xs text-slate-500 dark:text-slate-400 shadow-xs flex items-center gap-1.5 border border-slate-200/60 dark:border-slate-700/50">
-                  <span className="w-1.5 h-1.5 rounded-full bg-violet-600 dark:bg-violet-400 animate-bounce" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-violet-600 dark:bg-violet-400 animate-bounce [animation-delay:0.2s]" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-violet-600 dark:bg-violet-400 animate-bounce [animation-delay:0.4s]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 animate-bounce" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 animate-bounce [animation-delay:0.2s]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 animate-bounce [animation-delay:0.4s]" />
                   <span className="text-[11px] ml-1">{activeContact.name} is typing...</span>
                 </div>
               </div>
@@ -1304,7 +1304,7 @@ export default function CallsCollaborationHubPage() {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="p-2 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 transition cursor-pointer"
+              className="p-2 text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-[#FBBF24] transition cursor-pointer"
               title="Attach File or Image"
             >
               <Paperclip className="w-4 h-4" />
@@ -1316,13 +1316,13 @@ export default function CallsCollaborationHubPage() {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder="Type a team message or meeting note... (Press Enter to send)"
-                className="flex-1 py-2 px-4 rounded-xl bg-slate-100/90 dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 text-xs border border-transparent focus:border-violet-500 outline-none transition"
+                className="flex-1 py-2 px-4 rounded-xl bg-slate-100/90 dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 text-xs border border-transparent focus:border-amber-500 outline-none transition"
               />
 
               {inputMessage.trim() ? (
                 <button
                   type="submit"
-                  className="p-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white transition shadow-sm cursor-pointer active:scale-95 flex items-center justify-center"
+                  className="p-2.5 rounded-xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-slate-950 font-bold hover:brightness-105 transition shadow-sm cursor-pointer active:scale-95 flex items-center justify-center"
                   title="Send message"
                 >
                   <Send className="w-4 h-4" />
@@ -1349,7 +1349,7 @@ export default function CallsCollaborationHubPage() {
                       [activeContact.id]: [...(prev[activeContact.id] || []), voiceMsg],
                     }));
                   }}
-                  className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 transition cursor-pointer active:scale-95 flex items-center justify-center"
+                  className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-[#FBBF24] transition cursor-pointer active:scale-95 flex items-center justify-center"
                   title="Send voice note"
                 >
                   <Mic className="w-4 h-4" />
@@ -1369,8 +1369,8 @@ export default function CallsCollaborationHubPage() {
           <div className="flex-1 flex flex-col justify-between items-center py-10 px-6 h-full">
             {/* Top header */}
             <div className="flex items-center justify-between w-full max-w-4xl">
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-violet-500/20 text-violet-300 text-xs font-semibold border border-violet-500/30">
-                <ShieldCheck className="w-3.5 h-3.5 text-violet-400" />
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-semibold border border-amber-500/30">
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
                 <span>Encrypted Voice Huddle • Peer-to-Peer</span>
               </span>
 
@@ -1379,7 +1379,7 @@ export default function CallsCollaborationHubPage() {
                 onClick={() => setIsVoiceChatOpen(!isVoiceChatOpen)}
                 className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
                   isVoiceChatOpen
-                    ? "bg-violet-600 text-white"
+                    ? "bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-slate-950 font-bold"
                     : "bg-white/10 text-slate-200 hover:bg-white/20"
                 }`}
               >
@@ -1396,12 +1396,12 @@ export default function CallsCollaborationHubPage() {
             {/* Center Contact Info with Live Audio Waves */}
             <div className="flex flex-col items-center text-center">
               <div className="relative mb-6">
-                <div className="absolute inset-0 rounded-full bg-violet-600/30 animate-ping [animation-duration:2.5s]" />
-                <div className="absolute -inset-4 rounded-full bg-violet-500/15 animate-pulse" />
+                <div className="absolute inset-0 rounded-full bg-amber-500/30 animate-ping [animation-duration:2.5s]" />
+                <div className="absolute -inset-4 rounded-full bg-amber-500/15 animate-pulse" />
                 <img
                   src={activeContact.avatar}
                   alt={activeContact.name}
-                  className="w-32 h-32 rounded-2xl object-cover relative z-10 ring-4 ring-violet-500/50 shadow-2xl"
+                  className="w-32 h-32 rounded-2xl object-cover relative z-10 ring-4 ring-amber-500/50 shadow-2xl"
                 />
               </div>
 
@@ -1416,12 +1416,12 @@ export default function CallsCollaborationHubPage() {
                   <span
                     key={i}
                     style={{ height: `${voiceCallStatus === "connected" && !isMuted ? h : 4}px` }}
-                    className="w-1 bg-violet-400 rounded-full transition-all duration-150 animate-pulse"
+                    className="w-1 bg-amber-400 rounded-full transition-all duration-150 animate-pulse"
                   />
                 ))}
               </div>
 
-              <div className="mt-4 px-4 py-1.5 rounded-full bg-white/10 text-violet-300 font-mono text-xs font-bold tracking-wider">
+              <div className="mt-4 px-4 py-1.5 rounded-full bg-white/10 text-amber-300 font-mono text-xs font-bold tracking-wider">
                 {voiceCallStatus === "ringing" ? "Calling..." : formatDuration(callTimer)}
               </div>
             </div>
@@ -1478,7 +1478,7 @@ export default function CallsCollaborationHubPage() {
             <div className="w-full sm:w-[380px] h-full bg-slate-900 border-l border-slate-800 flex flex-col z-20 animate-in slide-in-from-right duration-200">
               <div className="p-4 border-b border-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-violet-400" />
+                  <MessageSquare className="w-4 h-4 text-amber-400" />
                   <span className="text-xs font-bold text-white">Live In-Huddle Chat</span>
                 </div>
                 <button
@@ -1499,7 +1499,7 @@ export default function CallsCollaborationHubPage() {
                     <div
                       className={`px-3 py-2 rounded-xl text-xs max-w-[85%] ${
                         m.sender === "me"
-                          ? "bg-violet-600 text-white"
+                          ? "bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-slate-950 font-bold"
                           : "bg-slate-800 text-slate-200 border border-slate-700/60"
                       }`}
                     >
@@ -1516,11 +1516,11 @@ export default function CallsCollaborationHubPage() {
                   value={inCallChatInput}
                   onChange={(e) => setInCallChatInput(e.target.value)}
                   placeholder="Send note in call..."
-                  className="flex-1 px-3 py-1.5 rounded-xl bg-slate-800 text-white text-xs border border-slate-700 outline-none focus:border-violet-500"
+                  className="flex-1 px-3 py-1.5 rounded-xl bg-slate-800 text-white text-xs border border-slate-700 outline-none focus:border-amber-500"
                 />
                 <button
                   type="submit"
-                  className="px-3 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold transition cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-slate-950 font-bold hover:brightness-105 text-xs font-bold transition cursor-pointer"
                 >
                   <Send className="w-3.5 h-3.5" />
                 </button>
@@ -1554,7 +1554,7 @@ export default function CallsCollaborationHubPage() {
                       HD 1080p
                     </span>
                   </h3>
-                  <p className="text-[11px] text-violet-300 font-mono">
+                  <p className="text-[11px] text-amber-300 font-mono">
                     {videoCallStatus === "connecting"
                       ? "Establishing WebRTC handshake..."
                       : `Live • ${formatDuration(videoCallTimer)}`}
@@ -1568,7 +1568,7 @@ export default function CallsCollaborationHubPage() {
                   onClick={() => setIsVideoChatOpen(!isVideoChatOpen)}
                   className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
                     isVideoChatOpen
-                      ? "bg-violet-600 text-white"
+                      ? "bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-slate-950 font-bold"
                       : "bg-white/15 hover:bg-white/25 text-white"
                   }`}
                 >
@@ -1597,7 +1597,7 @@ export default function CallsCollaborationHubPage() {
                   <img
                     src={activeContact.avatar}
                     alt={activeContact.name}
-                    className="w-32 h-32 sm:w-44 sm:h-44 rounded-3xl object-cover ring-4 ring-violet-500/50 shadow-2xl"
+                    className="w-32 h-32 sm:w-44 sm:h-44 rounded-3xl object-cover ring-4 ring-amber-500/50 shadow-2xl"
                   />
                   <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-slate-900 flex items-center justify-center text-[10px] text-white">
                     <Check className="w-3 h-3" />
@@ -1607,8 +1607,8 @@ export default function CallsCollaborationHubPage() {
                   {activeContact.name}
                 </h2>
                 <p className="text-xs text-slate-400 mt-1">{activeContact.role}</p>
-                <div className="flex items-center gap-1.5 mt-3 px-3 py-1 rounded-full bg-violet-500/10 text-violet-300 text-xs border border-violet-500/20">
-                  <Activity className="w-3.5 h-3.5 text-violet-400 animate-pulse" />
+                <div className="flex items-center gap-1.5 mt-3 px-3 py-1 rounded-full bg-violet-500/10 text-amber-300 text-xs border border-violet-500/20">
+                  <Activity className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
                   <span>Audio &amp; Video Streams Synced</span>
                 </div>
               </div>
@@ -1669,7 +1669,7 @@ export default function CallsCollaborationHubPage() {
                   });
                 }}
                 className={`p-3.5 rounded-2xl transition cursor-pointer ${
-                  isScreenSharing ? "bg-indigo-600 text-white" : "bg-white/10 text-white hover:bg-white/20"
+                  isScreenSharing ? "bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-slate-950 font-bold" : "bg-white/10 text-white hover:bg-white/20"
                 }`}
                 title="Share Screen"
               >
@@ -1680,7 +1680,7 @@ export default function CallsCollaborationHubPage() {
                 type="button"
                 onClick={() => setIsVideoChatOpen(!isVideoChatOpen)}
                 className={`p-3.5 rounded-2xl transition cursor-pointer sm:hidden ${
-                  isVideoChatOpen ? "bg-violet-600 text-white" : "bg-white/10 text-white hover:bg-white/20"
+                  isVideoChatOpen ? "bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-slate-950 font-bold" : "bg-white/10 text-white hover:bg-white/20"
                 }`}
                 title="Toggle In-Call Chat"
               >
@@ -1703,7 +1703,7 @@ export default function CallsCollaborationHubPage() {
             <div className="w-full sm:w-[380px] h-full bg-slate-900 border-l border-slate-800 flex flex-col z-30 animate-in slide-in-from-right duration-200">
               <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
                 <div className="flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-violet-400" />
+                  <MessageSquare className="w-4 h-4 text-amber-400" />
                   <span className="text-xs font-bold text-white">Live In-Call Chat</span>
                 </div>
                 <button
@@ -1724,7 +1724,7 @@ export default function CallsCollaborationHubPage() {
                     <div
                       className={`px-3.5 py-2 rounded-xl text-xs max-w-[85%] leading-relaxed ${
                         m.sender === "me"
-                          ? "bg-violet-600 text-white"
+                          ? "bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-slate-950 font-bold"
                           : "bg-slate-800 text-slate-200 border border-slate-700/60"
                       }`}
                     >
@@ -1741,11 +1741,11 @@ export default function CallsCollaborationHubPage() {
                   value={inCallChatInput}
                   onChange={(e) => setInCallChatInput(e.target.value)}
                   placeholder="Send chat message during call..."
-                  className="flex-1 px-3 py-2 rounded-xl bg-slate-800 text-white text-xs border border-slate-700 outline-none focus:border-violet-500 placeholder:text-slate-500"
+                  className="flex-1 px-3 py-2 rounded-xl bg-slate-800 text-white text-xs border border-slate-700 outline-none focus:border-amber-500 placeholder:text-slate-500"
                 />
                 <button
                   type="submit"
-                  className="px-3.5 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold transition cursor-pointer flex items-center justify-center"
+                  className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-slate-950 font-bold hover:brightness-105 text-xs font-bold transition cursor-pointer flex items-center justify-center"
                 >
                   <Send className="w-3.5 h-3.5" />
                 </button>

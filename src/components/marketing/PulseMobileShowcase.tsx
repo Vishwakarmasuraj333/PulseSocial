@@ -134,9 +134,14 @@ export function PulseMobileShowcase() {
             {/* App Store & Google Play Badges with Zero 404 Guarantee */}
             <div className="pt-6 sm:pt-8 flex flex-wrap items-center gap-4 relative z-30 pointer-events-auto">
               {/* App Store button */}
-              <button
-                type="button"
-                onClick={() => handleOpenStore("apple")}
+              <a
+                href="https://apps.apple.com/app/pulsesocial/id6470000000"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleOpenStore("apple");
+                }}
                 className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-400 hover:bg-slate-850 active:scale-95 transition-all shadow-md cursor-pointer pointer-events-auto relative z-30 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-500"
                 aria-label="Download PulseSocial on the Apple App Store"
               >
@@ -147,12 +152,17 @@ export function PulseMobileShowcase() {
                   <div className="text-[9px] uppercase tracking-wider text-slate-400">Download on the</div>
                   <div className="text-xs font-bold text-white">App Store</div>
                 </div>
-              </button>
+              </a>
 
               {/* Google Play button */}
-              <button
-                type="button"
-                onClick={() => handleOpenStore("google")}
+              <a
+                href="https://play.google.com/store/apps/details?id=io.pulsesocial.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleOpenStore("google");
+                }}
                 className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-400 hover:bg-slate-850 active:scale-95 transition-all shadow-md cursor-pointer pointer-events-auto relative z-30 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-500"
                 aria-label="Get PulseSocial on Google Play Store"
               >
@@ -163,7 +173,7 @@ export function PulseMobileShowcase() {
                   <div className="text-[9px] uppercase tracking-wider text-slate-400">GET IT ON</div>
                   <div className="text-xs font-bold text-white">Google Play</div>
                 </div>
-              </button>
+              </a>
             </div>
           </div>
         </div>

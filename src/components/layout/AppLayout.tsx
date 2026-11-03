@@ -718,7 +718,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           <button
             type="button"
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="hidden lg:flex w-7 h-7 rounded-lg items-center justify-center text-slate-400 hover:text-[#5846A8] dark:hover:text-[#E08738] hover:bg-purple-50 dark:hover:bg-white/5 transition-all duration-150 cursor-pointer hover:scale-105"
+            className="hidden lg:flex w-7 h-7 rounded-lg items-center justify-center text-slate-400 hover:text-amber-800 dark:hover:text-[#E08738] hover:bg-amber-50 dark:hover:bg-white/5 transition-all duration-150 cursor-pointer hover:scale-105"
             title={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
           >
             {isSidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
@@ -734,7 +734,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           </button>
         </div>
 
-        {/* Sidebar Primary Action: + New Post Button (Royal Purple in Light, Golden Amber in Dark) with working Dropdown */}
+        {/* Sidebar Primary Action: + New Post Button (Unified Golden Amber) with working Dropdown */}
         <div className="px-3 pt-3 pb-1 shrink-0 relative" ref={sidebarNewPostRef}>
           {isSidebarOpen ? (
             <div className="relative">
@@ -778,9 +778,9 @@ export function AppLayout({ children }: AppLayoutProps) {
                       setComposerInitialOption("now");
                       setIsComposerOpen(true);
                     }}
-                    className="w-full px-3 py-2 text-left hover:bg-purple-50 dark:hover:bg-white/8 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer"
+                    className="w-full px-3 py-2 text-left hover:bg-amber-50/80 dark:hover:bg-white/8 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer"
                   >
-                    <Plus className="w-3.5 h-3.5 text-[#5846A8] dark:text-[#E08738]" />
+                    <Plus className="w-3.5 h-3.5 text-amber-600 dark:text-[#E08738]" />
                     <span>Create Post</span>
                   </button>
                   <button
@@ -790,9 +790,9 @@ export function AppLayout({ children }: AppLayoutProps) {
                       setComposerInitialOption("schedule");
                       setIsComposerOpen(true);
                     }}
-                    className="w-full px-3 py-2 text-left hover:bg-purple-50 dark:hover:bg-white/8 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer"
+                    className="w-full px-3 py-2 text-left hover:bg-amber-50/80 dark:hover:bg-white/8 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer"
                   >
-                    <Clock className="w-3.5 h-3.5 text-[#5846A8] dark:text-amber-500" />
+                    <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-500" />
                     <span>Schedule Post</span>
                   </button>
                   <button
@@ -802,7 +802,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                       setComposerInitialOption("now");
                       setIsComposerOpen(true);
                     }}
-                    className="w-full px-3 py-2 text-left hover:bg-purple-50 dark:hover:bg-white/8 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer"
+                    className="w-full px-3 py-2 text-left hover:bg-amber-50/80 dark:hover:bg-white/8 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer"
                   >
                     <FileText className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                     <span>Create Draft</span>
@@ -811,9 +811,9 @@ export function AppLayout({ children }: AppLayoutProps) {
                   <Link
                     href="/calendar"
                     onClick={() => setIsSidebarNewPostOpen(false)}
-                    className="w-full px-3 py-2 text-left hover:bg-purple-50 dark:hover:bg-white/8 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer"
+                    className="w-full px-3 py-2 text-left hover:bg-amber-50/80 dark:hover:bg-white/8 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer"
                   >
-                    <Calendar className="w-3.5 h-3.5 text-[#5846A8] dark:text-amber-500" />
+                    <Calendar className="w-3.5 h-3.5 text-amber-600 dark:text-amber-500" />
                     <span>Content Calendar</span>
                   </Link>
                   <button
@@ -822,9 +822,9 @@ export function AppLayout({ children }: AppLayoutProps) {
                       setIsSidebarNewPostOpen(false);
                       setIsConnectModalOpen(true);
                     }}
-                    className="w-full px-3 py-2 text-left hover:bg-purple-50 dark:hover:bg-white/8 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer"
+                    className="w-full px-3 py-2 text-left hover:bg-amber-50/80 dark:hover:bg-white/8 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer"
                   >
-                    <Share2 className="w-3.5 h-3.5 text-[#5846A8] dark:text-[#E08738]" />
+                    <Share2 className="w-3.5 h-3.5 text-amber-600 dark:text-[#E08738]" />
                     <span>Connect Channel</span>
                   </button>
                 </div>
@@ -877,8 +877,8 @@ export function AppLayout({ children }: AppLayoutProps) {
                         aria-expanded={isPostsDropdownOpen}
                         className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer ${
                           isItemActive
-                            ? "bg-purple-50 text-[#5846A8] border border-purple-200/80 font-bold shadow-2xs dark:bg-[#241C14] dark:border dark:border-[#E08738]/50 dark:text-[#FBBF24]"
-                            : "text-slate-600 dark:text-[#9CA3AF] hover:text-[#5846A8] dark:hover:text-white hover:bg-purple-50/60 dark:hover:bg-white/5"
+                            ? "bg-amber-50 text-amber-950 border border-amber-300/80 font-bold shadow-2xs dark:bg-[#241C14] dark:border dark:border-[#E08738]/50 dark:text-[#FBBF24]"
+                            : "text-slate-600 dark:text-[#9CA3AF] hover:text-amber-800 dark:hover:text-white hover:bg-amber-50/60 dark:hover:bg-white/5"
                         }`}
                         title={!isSidebarOpen ? item.label : undefined}
                       >
@@ -907,8 +907,8 @@ export function AppLayout({ children }: AppLayoutProps) {
                                 href={sub.href}
                                 className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs transition-all duration-150 ${
                                   isSubActive
-                                    ? "bg-[#5846A8] text-white font-bold shadow-2xs dark:bg-gradient-to-r dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:text-slate-950"
-                                    : "text-slate-600 dark:text-[#9CA3AF] hover:text-[#5846A8] dark:hover:text-white hover:bg-purple-50/60 dark:hover:bg-white/5 font-medium"
+                                    ? "bg-gradient-to-r from-[#F59E0B] via-[#E08738] to-[#D97706] text-slate-950 font-bold shadow-2xs"
+                                    : "text-slate-600 dark:text-[#9CA3AF] hover:text-amber-800 dark:hover:text-white hover:bg-amber-50/60 dark:hover:bg-white/5 font-medium"
                                 }`}
                               >
                                 <SubIcon className={`w-3.5 h-3.5 shrink-0 ${isSubActive ? "text-white dark:text-slate-950" : "text-slate-400 dark:text-[#9CA3AF]"}`} />
@@ -920,7 +920,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                                         ? "bg-white/25 text-white dark:bg-black/20 dark:text-slate-950 font-extrabold"
                                         : sub.badgeColor === "rose"
                                         ? "bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border border-rose-200 dark:border-rose-900"
-                                        : "bg-purple-100 text-[#5846A8] dark:bg-[#E08738]/20 dark:text-[#FBBF24]"
+                                        : "bg-amber-100 text-amber-900 dark:bg-[#E08738]/20 dark:text-[#FBBF24]"
                                     }`}
                                   >
                                     {sub.badge}
@@ -984,7 +984,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <button
               type="button"
               onClick={() => setIsConnectModalOpen(true)}
-              className="w-full py-2 rounded-xl text-[#5846A8] dark:text-[#FBBF24] hover:bg-purple-50/80 dark:hover:bg-white/8 flex items-center justify-center cursor-pointer transition"
+              className="w-full py-2 rounded-xl text-amber-700 dark:text-[#FBBF24] hover:bg-amber-50/80 dark:hover:bg-white/8 flex items-center justify-center cursor-pointer transition"
               title="Connect Platform"
             >
               <Share2 className="w-4 h-4" />
@@ -1030,7 +1030,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               <button
                 type="button"
                 onClick={() => setIsBrandMenuOpen(!isBrandMenuOpen)}
-                className="h-9 flex items-center gap-2 px-3 rounded-xl bg-slate-50 dark:bg-[#17171A] hover:bg-purple-50/60 dark:hover:bg-white/5 border border-slate-200 dark:border-white/7 transition cursor-pointer text-xs font-semibold text-slate-800 dark:text-white shrink-0"
+                className="h-9 flex items-center gap-2 px-3 rounded-xl bg-slate-50 dark:bg-[#17171A] hover:bg-amber-50/60 dark:hover:bg-white/5 border border-slate-200 dark:border-white/7 transition cursor-pointer text-xs font-semibold text-slate-800 dark:text-white shrink-0"
               >
                 <div className="w-5 h-5 rounded-md bg-gradient-to-br from-[#F59E0B] via-[#E08738] to-[#D97706] text-slate-950 font-black flex items-center justify-center text-[10px] font-extrabold overflow-hidden shrink-0 shadow-2xs">
                   {activeBrand?.avatarUrl ? (
@@ -1060,7 +1060,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                         key={b.id}
                         className={`w-full p-2.5 rounded-xl text-xs transition border ${
                           b.id === activeBrand.id
-                            ? "bg-purple-50 dark:bg-amber-500/15 border-purple-200 dark:border-amber-500/30 text-slate-900 dark:text-white font-medium"
+                            ? "bg-amber-50 dark:bg-amber-500/15 border-amber-200 dark:border-amber-500/30 text-slate-900 dark:text-white font-medium"
                             : "hover:bg-slate-50 dark:hover:bg-white/5 border-transparent text-slate-700 dark:text-slate-300"
                         }`}
                       >
@@ -1077,7 +1077,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                           }}
                           className="flex items-start gap-2.5 w-full text-left cursor-pointer"
                         >
-                          <div className="w-7 h-7 rounded-lg bg-[#5846A8] text-white dark:bg-[#E08738] dark:text-[#0F0F11] font-extrabold flex items-center justify-center text-xs shrink-0 overflow-hidden shadow-2xs mt-0.5">
+                          <div className="w-7 h-7 rounded-lg bg-gradient-to-r from-[#F59E0B] via-[#E08738] to-[#D97706] text-slate-950 font-extrabold flex items-center justify-center text-xs shrink-0 overflow-hidden shadow-2xs mt-0.5">
                             {b.avatarUrl ? (
                               <img
                                 src={b.avatarUrl}
@@ -1094,7 +1094,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                                 {b.name}
                               </span>
                               {b.id === activeBrand.id && (
-                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-purple-100 text-[#5846A8] dark:bg-[#E08738] dark:text-[#0F0F11] shrink-0 ml-1">
+                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 dark:bg-[#E08738] dark:text-[#0F0F11] shrink-0 ml-1">
                                   Current
                                 </span>
                               )}
@@ -1106,7 +1106,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                                 {(b.socialAccounts && b.socialAccounts.length > 0 ? b.socialAccounts : connectedAccounts).map((acc) => (
                                   <div
                                     key={acc.id}
-                                    className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg bg-slate-100/80 dark:bg-black/40 border border-slate-200/80 dark:border-white/10 hover:border-purple-300 dark:hover:border-amber-500/40 transition text-left"
+                                    className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg bg-slate-100/80 dark:bg-black/40 border border-slate-200/80 dark:border-white/10 hover:border-amber-400 dark:hover:border-amber-500/40 transition text-left"
                                   >
                                     <div className="flex items-center gap-2 min-w-0">
                                       <div className="w-5 h-5 rounded-md bg-white dark:bg-[#17171A] flex items-center justify-center shrink-0 shadow-2xs border border-slate-200/60 dark:border-white/10">
@@ -1148,7 +1148,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                         setIsBrandMenuOpen(false);
                         setIsCreateBrandOpen(true);
                       }}
-                      className="w-full flex items-center gap-2 p-2 rounded-lg text-xs font-semibold text-[#5846A8] dark:text-[#FBBF24] hover:bg-purple-50 dark:hover:bg-white/8 transition cursor-pointer"
+                      className="w-full flex items-center gap-2 p-2 rounded-lg text-xs font-semibold text-amber-700 dark:text-[#FBBF24] hover:bg-amber-50 dark:hover:bg-white/8 transition cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>Create New Workspace</span>
@@ -1182,10 +1182,10 @@ export function AppLayout({ children }: AppLayoutProps) {
                 </span>
               </div>
               <div className="flex items-center gap-1 shrink-0 ml-2">
-                <kbd className="px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded text-slate-500 dark:text-slate-300 shadow-2xs group-hover:border-purple-300 dark:group-hover:border-amber-500/40 transition-colors">
+                <kbd className="px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded text-slate-500 dark:text-slate-300 shadow-2xs group-hover:border-amber-400 dark:group-hover:border-amber-500/40 transition-colors">
                   Ctrl
                 </kbd>
-                <kbd className="px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded text-slate-500 dark:text-slate-300 shadow-2xs group-hover:border-purple-300 dark:group-hover:border-amber-500/40 transition-colors">
+                <kbd className="px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded text-slate-500 dark:text-slate-300 shadow-2xs group-hover:border-amber-400 dark:group-hover:border-amber-500/40 transition-colors">
                   K
                 </kbd>
               </div>
@@ -1216,8 +1216,8 @@ export function AppLayout({ children }: AppLayoutProps) {
               className="h-9 px-3 sm:px-3.5 rounded-xl border border-amber-300/80 bg-amber-50/90 text-amber-900 hover:bg-amber-100 hover:border-amber-400 shadow-2xs dark:border-white/10 dark:bg-white/5 dark:text-[#FBBF24] dark:hover:bg-[#E08738] dark:hover:text-[#0F0F11] dark:hover:border-[#E08738] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center gap-1.5 cursor-pointer font-bold text-xs shrink-0 group"
               title="Connect a new social network (14+ official platforms)"
             >
-              <div className="w-4 h-4 rounded-full bg-purple-500/15 group-hover:bg-purple-500/25 dark:bg-amber-500/20 dark:group-hover:bg-amber-500/30 flex items-center justify-center transition-colors">
-                <Plus className="w-3 h-3 text-[#5846A8] dark:text-[#FBBF24] group-hover:text-[#48388d] dark:group-hover:text-[#0F0F11] stroke-[2.5] transition-colors" />
+              <div className="w-4 h-4 rounded-full bg-amber-500/20 group-hover:bg-amber-500/30 dark:bg-amber-500/20 dark:group-hover:bg-amber-500/30 flex items-center justify-center transition-colors">
+                <Plus className="w-3 h-3 text-amber-800 dark:text-[#FBBF24] group-hover:text-amber-950 dark:group-hover:text-[#0F0F11] stroke-[2.5] transition-colors" />
               </div>
               <span className="tracking-tight">Add Social</span>
             </button>
@@ -1243,7 +1243,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               <button
                 type="button"
                 onClick={() => setIsActivityOpen(true)}
-                className="h-9 w-9 flex items-center justify-center rounded-xl text-slate-500 dark:text-[#9CA3AF] hover:text-[#5846A8] dark:hover:text-white hover:bg-purple-50/70 dark:hover:bg-white/5 transition duration-200 cursor-pointer shrink-0 hover:scale-105"
+                className="h-9 w-9 flex items-center justify-center rounded-xl text-slate-500 dark:text-[#9CA3AF] hover:text-amber-700 dark:hover:text-white hover:bg-amber-50/70 dark:hover:bg-white/5 transition duration-200 cursor-pointer shrink-0 hover:scale-105"
                 title="Live Activity Stream"
               >
                 <Activity className="w-4 h-4" />
@@ -1253,7 +1253,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               <button
                 type="button"
                 onClick={() => setIsHelpOpen(true)}
-                className="h-9 w-9 flex items-center justify-center rounded-xl text-slate-500 dark:text-[#9CA3AF] hover:text-[#5846A8] dark:hover:text-white hover:bg-purple-50/70 dark:hover:bg-white/5 transition duration-200 cursor-pointer shrink-0 hover:scale-105"
+                className="h-9 w-9 flex items-center justify-center rounded-xl text-slate-500 dark:text-[#9CA3AF] hover:text-amber-700 dark:hover:text-white hover:bg-amber-50/70 dark:hover:bg-white/5 transition duration-200 cursor-pointer shrink-0 hover:scale-105"
                 title="Help & Quick Guides"
                 aria-label="Open Help and Guides"
               >
@@ -1265,12 +1265,12 @@ export function AppLayout({ children }: AppLayoutProps) {
                 <button
                   type="button"
                   onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                  className="h-9 w-9 relative flex items-center justify-center rounded-xl text-slate-500 dark:text-[#9CA3AF] hover:text-[#5846A8] dark:hover:text-white hover:bg-purple-50/70 dark:hover:bg-white/5 transition duration-200 cursor-pointer hover:scale-105"
+                  className="h-9 w-9 relative flex items-center justify-center rounded-xl text-slate-500 dark:text-[#9CA3AF] hover:text-amber-700 dark:hover:text-white hover:bg-amber-50/70 dark:hover:bg-white/5 transition duration-200 cursor-pointer hover:scale-105"
                   title="Notifications"
                 >
                   <Bell className="w-4 h-4" />
                   {unreadNotificationsCount > 0 && (
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#5846A8] dark:bg-[#E08738] ring-2 ring-white dark:ring-[#0D0D0E]" />
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-500 dark:bg-[#E08738] ring-2 ring-white dark:ring-[#0D0D0E]" />
                   )}
                 </button>
 
@@ -1282,7 +1282,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                         <button
                           type="button"
                           onClick={handleMarkAllNotificationsRead}
-                          className="text-[10px] text-[#5846A8] hover:text-[#48388d] dark:text-[#FBBF24] dark:hover:text-[#E08738] font-semibold hover:underline cursor-pointer"
+                          className="text-[10px] text-amber-600 hover:text-amber-700 dark:text-[#FBBF24] dark:hover:text-[#E08738] font-semibold hover:underline cursor-pointer"
                         >
                           Mark all as read
                         </button>
@@ -1316,7 +1316,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               <button
                 type="button"
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="h-9 flex items-center gap-2 p-1 rounded-xl hover:bg-purple-50/70 dark:hover:bg-white/5 transition duration-200 cursor-pointer"
+                className="h-9 flex items-center gap-2 p-1 rounded-xl hover:bg-amber-50/70 dark:hover:bg-white/5 transition duration-200 cursor-pointer"
               >
                 <div className="w-7 h-7 rounded-full bg-[#E08738] text-slate-950 font-extrabold text-xs ring-2 ring-amber-500/30 shadow-xs">
                   {initial}
@@ -1344,11 +1344,11 @@ export function AppLayout({ children }: AppLayoutProps) {
                       </p>
                     )}
                     <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                      <span className="inline-block text-[9px] font-bold px-2 py-0.5 rounded bg-purple-100 text-[#5846A8] dark:bg-[#E08738] dark:text-[#0F0F11] shadow-2xs">
+                      <span className="inline-block text-[9px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-900 dark:bg-[#E08738] dark:text-[#0F0F11] shadow-2xs">
                         {realRole}
                       </span>
                       {user?.activeOrganization?.name && (
-                        <span className="inline-block text-[9px] font-semibold px-2 py-0.5 rounded bg-purple-50 text-[#5846A8] border border-purple-200 dark:bg-amber-500/15 dark:text-[#FBBF24] dark:border-amber-500/30 truncate max-w-[210px]" title={user.activeOrganization.name}>
+                        <span className="inline-block text-[9px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-900 border border-amber-200 dark:bg-amber-500/15 dark:text-[#FBBF24] dark:border-amber-500/30 truncate max-w-[210px]" title={user.activeOrganization.name}>
                           🏢 {user.activeOrganization.name}
                         </span>
                       )}
@@ -1370,7 +1370,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                         <Link
                           href="/social-accounts"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="text-[9px] font-bold text-[#5846A8] dark:text-[#FBBF24] hover:underline hover:scale-105 transition-transform"
+                          className="text-[9px] font-bold text-amber-700 dark:text-[#FBBF24] hover:underline hover:scale-105 transition-transform"
                         >
                           Manage
                         </Link>
@@ -1379,7 +1379,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                         {connectedAccounts.map((acc) => (
                           <div
                             key={acc.id}
-                            className="flex items-center justify-between p-1.5 rounded-lg bg-white dark:bg-[#111113] border border-slate-200/80 dark:border-white/10 shadow-2xs hover:border-purple-300 dark:hover:border-amber-500/40 transition-colors"
+                            className="flex items-center justify-between p-1.5 rounded-lg bg-white dark:bg-[#111113] border border-slate-200/80 dark:border-white/10 shadow-2xs hover:border-amber-400 dark:hover:border-amber-500/40 transition-colors"
                           >
                             <div className="flex items-center gap-1.5 min-w-0">
                               <div className="w-4 h-4 rounded-full overflow-hidden shrink-0">

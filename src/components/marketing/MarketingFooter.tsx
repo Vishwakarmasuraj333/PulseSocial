@@ -35,6 +35,7 @@ export function MarketingFooter() {
         { label: "Social Inbox", href: "/inbox" },
         { label: "Analytics & Reports", href: "/analytics" },
         { label: "Supported Integrations", href: "/platforms" },
+        { label: "Mobile Apps & PWA", href: "/mobile" },
         { label: "Industry Solutions", href: "/solutions" },
       ],
     },

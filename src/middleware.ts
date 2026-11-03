@@ -16,6 +16,8 @@ const PUBLIC_EXACT_ROUTES = new Set([
   "/platforms",
   "/resources",
   "/solutions",
+  "/mobile",
+  "/download",
   "/contact",
   "/terms",
   "/privacy",

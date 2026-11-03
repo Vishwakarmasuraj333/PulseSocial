@@ -738,7 +738,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         <div className="px-3 pt-3 pb-1 shrink-0 relative" ref={sidebarNewPostRef}>
           {isSidebarOpen ? (
             <div className="relative">
-              <div className="flex items-center rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 dark:bg-gradient-to-r dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:hover:brightness-105 dark:text-slate-950 font-bold dark:shadow-amber-500/25 transition-all overflow-hidden hover:-translate-y-0.5 active:translate-y-0 active:scale-95 duration-200">
+              <div className="flex items-center rounded-xl bg-gradient-to-r from-[#F59E0B] via-[#E08738] to-[#D97706] hover:brightness-105 text-slate-950 font-bold shadow-md shadow-amber-500/25 transition-all overflow-hidden hover:-translate-y-0.5 active:translate-y-0 active:scale-95 duration-200">
                 <button
                   type="button"
                   onClick={() => {
@@ -837,7 +837,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 setComposerInitialOption("now");
                 setIsComposerOpen(true);
               }}
-              className="w-10 h-10 mx-auto rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 dark:bg-gradient-to-r dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:hover:brightness-105 dark:text-slate-950 font-bold dark:shadow-amber-500/25 flex items-center justify-center cursor-pointer active:scale-95 transition-all duration-200"
+              className="w-10 h-10 mx-auto rounded-xl bg-gradient-to-r from-[#F59E0B] via-[#E08738] to-[#D97706] hover:brightness-105 text-slate-950 font-bold shadow-md shadow-amber-500/25 flex items-center justify-center cursor-pointer active:scale-95 transition-all duration-200"
               title="Create New Social Post (Modal)"
             >
               <Plus className="w-5 h-5 stroke-[2.5]" />
@@ -883,7 +883,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                         title={!isSidebarOpen ? item.label : undefined}
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <Icon className={`w-4 h-4 shrink-0 ${isItemActive ? "text-[#5846A8] dark:text-[#FBBF24]" : "text-slate-400 dark:text-[#9CA3AF] group-hover:text-[#5846A8] dark:group-hover:text-white"}`} />
+                          <Icon className={`w-4 h-4 shrink-0 ${isItemActive ? "text-amber-600 dark:text-[#FBBF24]" : "text-slate-400 dark:text-[#9CA3AF] group-hover:text-amber-600 dark:group-hover:text-white"}`} />
                           {isSidebarOpen && <span className="truncate flex-1 text-left">{item.label}</span>}
                         </div>
                         {isSidebarOpen && (
@@ -941,12 +941,12 @@ export function AppLayout({ children }: AppLayoutProps) {
                     href={item.href}
                     className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 ${
                       isItemActive
-                        ? "bg-purple-50 text-[#5846A8] font-bold border border-purple-200/80 shadow-2xs dark:bg-[#241C14] dark:border dark:border-[#E08738]/50 dark:text-[#FBBF24]"
-                        : "text-slate-600 dark:text-[#9CA3AF] hover:text-[#5846A8] dark:hover:text-white hover:bg-purple-50/60 dark:hover:bg-white/5"
+                        ? "bg-amber-50 text-amber-950 font-bold border border-amber-300/90 shadow-2xs dark:bg-[#241C14] dark:border dark:border-[#E08738]/50 dark:text-[#FBBF24]"
+                        : "text-slate-600 dark:text-[#9CA3AF] hover:text-amber-800 dark:hover:text-white hover:bg-amber-50/50 dark:hover:bg-white/5"
                     }`}
                     title={!isSidebarOpen ? item.label : undefined}
                   >
-                    <Icon className={`w-4 h-4 shrink-0 ${isItemActive ? "text-[#5846A8] dark:text-[#FBBF24]" : "text-slate-400 dark:text-[#9CA3AF] group-hover:text-[#5846A8] dark:group-hover:text-white"}`} />
+                    <Icon className={`w-4 h-4 shrink-0 ${isItemActive ? "text-amber-600 dark:text-[#FBBF24]" : "text-slate-400 dark:text-[#9CA3AF] group-hover:text-amber-600 dark:group-hover:text-white"}`} />
                     {isSidebarOpen && (
                       <span className="truncate flex-1">{item.label}</span>
                     )}
@@ -954,7 +954,8 @@ export function AppLayout({ children }: AppLayoutProps) {
                       <span
                         className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
                           isItemActive
-                            ? "bg-[#5846A8] text-white dark:bg-gradient-to-r dark:from-[#F59E0B] dark:to-[#D97706] dark:text-slate-950"
+                            ? "bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-slate-950 font-bold"
+
                             : "bg-slate-100 dark:bg-white/10 text-slate-800 dark:text-slate-300"
                         }`}
                       >
@@ -974,7 +975,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <button
               type="button"
               onClick={() => setIsConnectModalOpen(true)}
-              className="w-full py-2 px-3 rounded-xl bg-white dark:bg-[#17171A] hover:bg-purple-50/80 dark:hover:bg-white/8 text-[#5846A8] dark:text-[#FBBF24] border border-purple-200/80 dark:border-white/7 text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer hover:-translate-y-0.5 active:scale-95 duration-200"
+              className="w-full py-2 px-3 rounded-xl bg-white dark:bg-[#17171A] hover:bg-amber-50/80 dark:hover:bg-white/8 text-amber-800 dark:text-[#FBBF24] border border-amber-300/80 dark:border-white/7 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer hover:-translate-y-0.5 active:scale-95 duration-200"
             >
               <Share2 className="w-3.5 h-3.5" />
               <span>Connect Platform</span>
@@ -1031,7 +1032,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 onClick={() => setIsBrandMenuOpen(!isBrandMenuOpen)}
                 className="h-9 flex items-center gap-2 px-3 rounded-xl bg-slate-50 dark:bg-[#17171A] hover:bg-purple-50/60 dark:hover:bg-white/5 border border-slate-200 dark:border-white/7 transition cursor-pointer text-xs font-semibold text-slate-800 dark:text-white shrink-0"
               >
-                <div className="w-5 h-5 rounded-md bg-gradient-to-br from-[#7B61FF] to-[#5846A8] text-white dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:text-slate-950 flex items-center justify-center text-[10px] font-extrabold overflow-hidden shrink-0 shadow-2xs">
+                <div className="w-5 h-5 rounded-md bg-gradient-to-br from-[#F59E0B] via-[#E08738] to-[#D97706] text-slate-950 font-black flex items-center justify-center text-[10px] font-extrabold overflow-hidden shrink-0 shadow-2xs">
                   {activeBrand?.avatarUrl ? (
                     <img
                       src={activeBrand.avatarUrl}
@@ -1171,11 +1172,11 @@ export function AppLayout({ children }: AppLayoutProps) {
               type="button"
               id="global-header-search-bar"
               onClick={() => setIsCommandPaletteOpen(true)}
-              className="h-10 w-full flex items-center justify-between px-3.5 sm:px-4 text-xs rounded-xl border border-slate-200/90 dark:border-white/7 bg-slate-50/80 dark:bg-[#17171A] text-slate-500 dark:text-[#9CA3AF] hover:border-purple-400/80 dark:hover:border-[#E08738]/60 hover:bg-white dark:hover:bg-[#1C1C20] hover:shadow-xs transition-all duration-150 cursor-pointer shadow-2xs group"
+              className="h-10 w-full flex items-center justify-between px-3.5 sm:px-4 text-xs rounded-xl border border-slate-200/90 dark:border-white/7 bg-slate-50/80 dark:bg-[#17171A] text-slate-500 dark:text-[#9CA3AF] hover:border-amber-400/80 dark:hover:border-[#E08738]/60 hover:bg-white dark:hover:bg-[#1C1C20] hover:shadow-xs transition-all duration-150 cursor-pointer shadow-2xs group"
               title="Search channels, posts, analytics (Ctrl + K)"
             >
               <div className="flex items-center gap-2.5 min-w-0">
-                <Search className="w-4 h-4 text-slate-400 dark:text-[#9CA3AF] group-hover:text-[#5846A8] dark:group-hover:text-[#E08738] transition-colors shrink-0" />
+                <Search className="w-4 h-4 text-slate-400 dark:text-[#9CA3AF] group-hover:text-amber-600 dark:group-hover:text-[#E08738] transition-colors shrink-0" />
                 <span className="truncate text-slate-500 dark:text-[#9CA3AF] font-normal sm:text-xs">
                   Search channels, posts, queue, analytics...
                 </span>
@@ -1212,7 +1213,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 setSelectedConnectPlatform(undefined);
                 setIsConnectModalOpen(true);
               }}
-              className="h-9 px-3 sm:px-3.5 rounded-xl border border-purple-200 bg-purple-50/90 text-[#5846A8] hover:bg-purple-100 hover:border-purple-300 shadow-2xs hover:shadow-purple-500/20 dark:border-white/10 dark:bg-white/5 dark:text-[#FBBF24] dark:hover:bg-[#E08738] dark:hover:text-[#0F0F11] dark:hover:border-[#E08738] dark:hover:shadow-[0_0_16px_rgba(224,135,56,0.35)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center gap-1.5 cursor-pointer font-bold text-xs shrink-0 group"
+              className="h-9 px-3 sm:px-3.5 rounded-xl border border-amber-300/80 bg-amber-50/90 text-amber-900 hover:bg-amber-100 hover:border-amber-400 shadow-2xs dark:border-white/10 dark:bg-white/5 dark:text-[#FBBF24] dark:hover:bg-[#E08738] dark:hover:text-[#0F0F11] dark:hover:border-[#E08738] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center gap-1.5 cursor-pointer font-bold text-xs shrink-0 group"
               title="Connect a new social network (14+ official platforms)"
             >
               <div className="w-4 h-4 rounded-full bg-purple-500/15 group-hover:bg-purple-500/25 dark:bg-amber-500/20 dark:group-hover:bg-amber-500/30 flex items-center justify-center transition-colors">
@@ -1226,7 +1227,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               type="button"
               id="header-new-post-btn"
               onClick={() => setIsComposerOpen(true)}
-              className="h-9 px-3.5 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white shadow-md shadow-purple-900/20 hover:shadow-purple-900/35 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 dark:bg-gradient-to-r dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:hover:brightness-105 dark:text-slate-950 dark:shadow-amber-500/25 dark:hover:shadow-amber-500/40 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0"
+              className="h-9 px-3.5 rounded-xl bg-gradient-to-r from-[#F59E0B] via-[#E08738] to-[#D97706] hover:brightness-105 text-slate-950 font-bold shadow-md shadow-amber-500/25 hover:shadow-amber-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-xs transition flex items-center gap-1.5 cursor-pointer shrink-0"
               title="Create a new publication"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -1317,7 +1318,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                 className="h-9 flex items-center gap-2 p-1 rounded-xl hover:bg-purple-50/70 dark:hover:bg-white/5 transition duration-200 cursor-pointer"
               >
-                <div className="w-7 h-7 rounded-full bg-[#5846A8] text-white dark:bg-[#E08738] dark:text-[#0F0F11] flex items-center justify-center font-extrabold text-xs ring-2 ring-purple-500/30 dark:ring-amber-500/30 shadow-xs">
+                <div className="w-7 h-7 rounded-full bg-[#E08738] text-slate-950 font-extrabold text-xs ring-2 ring-amber-500/30 shadow-xs">
                   {initial}
                 </div>
                 <div className="hidden xl:flex flex-col text-left">

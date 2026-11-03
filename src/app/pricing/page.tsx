@@ -108,7 +108,7 @@ export default function PricingPage() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-indigo-500 selection:text-white font-sans">
       <MarketingHeader />
 
-      <main className="pt-20 sm:pt-24 pb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <main className="pt-10 sm:pt-14 pb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12 space-y-3 sm:space-y-4">
           <span className="text-xs font-bold uppercase tracking-wider text-[#5846A8] dark:text-[#FBBF24]">
@@ -121,8 +121,8 @@ export default function PricingPage() {
             All plans include official OAuth integrations, secure token-vaulting, and our core universal post-composer.
           </p>
 
-          {/* Billing Cycle Switcher with normalized spacing */}
-          <div className="mt-6 sm:mt-8 pt-2 flex items-center justify-center gap-3">
+          {/* Billing Cycle Switcher with calibrated breathing room */}
+          <div className="mt-8 sm:mt-10 pt-1 flex items-center justify-center gap-3">
             <div className="p-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs inline-flex items-center">
               <button
                 type="button"
@@ -202,7 +202,7 @@ export default function PricingPage() {
 
                   <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 mb-6">
                     {p.features.map((f: string) => (
-                      <li key={f} className="flex items-start gap-2">
+                      <li key={f} className="flex items-start gap-2.5">
                         <Check className="w-4 h-4 text-[#5846A8] dark:text-[#E08738] shrink-0 mt-0.5" />
                         <span className="leading-snug">{f}</span>
                       </li>

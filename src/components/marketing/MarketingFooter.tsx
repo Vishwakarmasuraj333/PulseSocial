@@ -105,27 +105,28 @@ export function MarketingFooter() {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3 shrink-0 self-center">
+          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-end gap-3 shrink-0 w-full lg:w-auto self-center">
             <a
               href={`tel:${CONTACT_CONFIG.phone.tel}`}
-              className="px-4 py-2.5 rounded-xl bg-slate-850 hover:bg-slate-800 text-white font-semibold text-xs border border-slate-700 transition flex items-center gap-2 shadow-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-purple-400"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-850 hover:bg-slate-800 text-white font-semibold text-xs border border-slate-700 transition flex items-center justify-center gap-2 shadow-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-purple-400"
             >
               <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <span>{CONTACT_CONFIG.phone.display}</span>
             </a>
             <a
               href={`mailto:${CONTACT_CONFIG.emails.support}`}
-              className="px-4 py-2.5 rounded-xl bg-slate-850 hover:bg-slate-800 text-white font-semibold text-xs border border-slate-700 transition flex items-center gap-2 shadow-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-purple-400"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-850 hover:bg-slate-800 text-white font-semibold text-xs border border-slate-700 transition flex items-center justify-center gap-2 shadow-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-purple-400"
             >
               <Mail className="w-3.5 h-3.5 text-purple-400 shrink-0" />
               <span>{CONTACT_CONFIG.emails.support}</span>
             </a>
             <Link
               href="/contact"
-              className="px-4 py-2.5 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white font-semibold text-xs transition shadow-md shadow-purple-900/30 flex items-center gap-1.5 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-purple-400"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#5846A8] hover:bg-[#48388d] text-white font-semibold text-xs transition shadow-md shadow-purple-900/30 flex items-center justify-center gap-2 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-purple-400"
             >
+              <Headphones className="w-3.5 h-3.5 text-purple-200 shrink-0" />
               <span>Contact Form</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
+              <ArrowUpRight className="w-3 h-3 opacity-80 shrink-0" />
             </Link>
           </div>
         </div>
@@ -133,9 +134,9 @@ export function MarketingFooter() {
         {/* ============================================================ */}
         {/* MAIN NAVIGATION GRID                                         */}
         {/* ============================================================ */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 pb-12 border-b border-slate-800/80">
-          {/* Brand Column (Span 4 on large screens) */}
-          <div className="lg:col-span-4 space-y-4">
+        <div className="flex flex-col lg:flex-row items-start justify-between gap-10 lg:gap-10 xl:gap-14 pb-12 border-b border-slate-800/80">
+          {/* Brand Column (Dedicated width on desktop, perfectly balanced) */}
+          <div className="w-full lg:w-[280px] xl:w-[320px] shrink-0 space-y-4">
             <PulseSocialLogo size="md" theme="dark" variant="full" href="/" />
             <p className="text-xs text-slate-300 max-w-sm leading-relaxed">
               PulseSocial is the unified social media management SaaS platform for modern teams, creators, and enterprises. Publish, schedule, collaborate, and analyze from one powerful command center.
@@ -225,10 +226,10 @@ export function MarketingFooter() {
             </div>
           </div>
 
-          {/* 5 Nav Link Columns (Span 8 on desktop, 5 clean columns) */}
-          <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 lg:gap-6 xl:gap-8 justify-between">
+          {/* 5 Nav Link Columns (Span evenly across remaining space) */}
+          <div className="flex-1 w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-6 xl:gap-8 justify-between">
             {footerSections.map((section) => (
-              <div key={section.title} className="space-y-3">
+              <div key={section.title} className="space-y-3 min-w-0">
                 <h4 className="text-xs font-bold text-white uppercase tracking-wider">
                   {section.title}
                 </h4>

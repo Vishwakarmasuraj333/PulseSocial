@@ -430,6 +430,8 @@ export default function ForgotPasswordPage() {
                   </button>
 
                   {/* Resend Cooldown Action */}
+
+                  
                   <div className="pt-2 text-center text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5">
                     <span>Didn&apos;t receive code?</span>
                     {cooldown > 0 ? (

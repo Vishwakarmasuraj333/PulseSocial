@@ -80,11 +80,11 @@ export default function SolutionsPage() {
                     {s.desc}
                   </p>
 
-                  <div className="space-y-2 mb-6 text-xs text-slate-700 dark:text-slate-300">
+                  <div className="space-y-2.5 mb-6 text-xs text-slate-700 dark:text-slate-300">
                     {s.benefits.map((b) => (
-                      <div key={b} className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-purple-500 shrink-0" />
-                        <span>{b}</span>
+                      <div key={b} className="flex items-start gap-2.5">
+                        <CheckCircle2 className="w-4 h-4 text-purple-500 shrink-0 mt-0.5" />
+                        <span className="leading-snug">{b}</span>
                       </div>
                     ))}
                   </div>

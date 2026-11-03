@@ -49,38 +49,46 @@ function FeatureDisplay({
   }, [mode, videoSrc]);
 
   return (
-    <div className={`w-full ${maxWidth} relative select-none group/display`}>
-      {/* View Switcher Controls (60fps Animation vs Interactive UI) */}
-      <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-30 flex items-center bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-full border border-slate-200/90 dark:border-slate-800 p-0.5 sm:p-1 shadow-sm text-[10px] sm:text-[11px] font-semibold">
-        <button
-          onClick={() => setMode("video")}
-          className={`px-2 sm:px-2.5 py-1 rounded-full transition-all cursor-pointer ${
-            mode === "video"
-              ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs font-bold"
-              : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
-          }`}
-          title="Watch continuous 60fps loop animation"
-        >
-          🎬 60fps Animation
-        </button>
-        <button
-          onClick={() => setMode("interactive")}
-          className={`px-2 sm:px-2.5 py-1 rounded-full transition-all cursor-pointer ${
-            mode === "interactive"
-              ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs font-bold"
-              : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
-          }`}
-          title="Interact directly with controls"
-        >
-          ⚡ Interactive
-        </button>
+    <div className={`w-full ${maxWidth} flex flex-col items-center select-none group/display`}>
+      {/* View Switcher Controls (Dedicated Top Toolbar - Zero Overlap on Graphic Content) */}
+      <div className="w-full flex items-center justify-end mb-2.5 pr-0.5">
+        <div className="inline-flex items-center bg-slate-100/90 dark:bg-slate-900/90 rounded-full border border-slate-200/90 dark:border-slate-800 p-0.5 shadow-xs text-[10px] sm:text-[11px] font-semibold backdrop-blur-md">
+          <button
+            onClick={() => setMode("video")}
+            className={`px-2.5 sm:px-3 py-1 rounded-full transition-all cursor-pointer ${
+              mode === "video"
+                ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs font-bold"
+                : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+            }`}
+            title="Watch continuous 60fps animation loop"
+          >
+            🎬 60fps Animation
+          </button>
+          <button
+            onClick={() => setMode("interactive")}
+            className={`px-2.5 sm:px-3 py-1 rounded-full transition-all cursor-pointer ${
+              mode === "interactive"
+                ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs font-bold"
+                : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+            }`}
+            title="Interact directly with controls"
+          >
+            ⚡ Live Interactive UI
+          </button>
+        </div>
       </div>
 
       {mode === "video" ? (
-        <div className="relative w-full flex items-center justify-center transition-transform duration-500 hover:scale-[1.015]">
+        <div className="relative w-full flex items-center justify-center">
           <video
             ref={videoRef}
-            className="w-full h-auto object-contain block select-none pointer-events-none drop-shadow-sm"
+            className="w-full h-auto object-contain block select-none pointer-events-none drop-shadow-sm rounded-2xl"
+            style={{
+              WebkitBackfaceVisibility: "hidden",
+              backfaceVisibility: "hidden",
+              transform: "translateZ(0)",
+              imageRendering: "-webkit-optimize-contrast",
+            }}
             autoPlay
             loop
             muted
@@ -92,7 +100,7 @@ function FeatureDisplay({
             <source src={videoSrc} type="video/mp4" />
           </video>
 
-          {/* Authentic PulseSocial PS Monogram Brand Overlays (Replaces foreign logos) */}
+          {/* Authentic PulseSocial PS Monogram Brand Overlays */}
           {brandOverlay}
         </div>
       ) : (
@@ -282,50 +290,6 @@ export function PulseFeaturesShowcase() {
               alt="PulseSocial Live Monitoring Dashboard Animation"
               maxWidth="max-w-[560px]"
               interactiveComponent={<PulseMonitorVisual />}
-              brandOverlay={
-                <>
-                  {/* Overlay for @PulseSocial in Mentions column */}
-                  <div
-                    className="absolute pointer-events-none z-20 flex items-center bg-white px-1 text-[10px] sm:text-[11px] font-bold text-[#1668e3]"
-                    style={{
-                      top: "18.3%",
-                      left: "5.8%",
-                      height: "2.8%",
-                    }}
-                  >
-                    @PulseSocial
-                  </div>
-
-                  {/* Overlay for PulseSocial's Posts column header */}
-                  <div
-                    className="absolute pointer-events-none z-20 flex items-center bg-white pl-1 text-[11px] sm:text-[12px] font-bold text-slate-800"
-                    style={{
-                      top: "13.4%",
-                      left: "56.8%",
-                      height: "2.6%",
-                      width: "35%",
-                    }}
-                  >
-                    PulseSocial&apos;s Posts
-                  </div>
-
-                  {/* Overlay for PulseSocial author name and PS avatar */}
-                  <div
-                    className="absolute pointer-events-none z-20 flex items-center gap-1.5 bg-white pl-0.5"
-                    style={{
-                      top: "18.6%",
-                      left: "53.6%",
-                      height: "4.4%",
-                      width: "36%",
-                    }}
-                  >
-                    <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-[#1E3A8A] to-[#4F46E5] flex items-center justify-center text-white text-[9px] font-black shrink-0 shadow-xs">
-                      PS
-                    </div>
-                    <span className="text-[11px] sm:text-[12px] font-bold text-slate-900">PulseSocial</span>
-                  </div>
-                </>
-              }
             />
           </div>
         </div>

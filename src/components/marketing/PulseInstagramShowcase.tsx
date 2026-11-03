@@ -312,7 +312,7 @@ export function PulseInstagramShowcase() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-10">
         
         {/* Interactive Platform Tabs with Animated Progress Fill */}
-        <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 max-w-4xl mx-auto">
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 max-w-4xl mx-auto px-1">
           {PLATFORMS_DATA.map((p, idx) => {
             const isSelected = idx === activePlatformIndex;
             return (
@@ -320,7 +320,7 @@ export function PulseInstagramShowcase() {
                 key={p.id}
                 type="button"
                 onClick={() => selectPlatform(idx)}
-                className={`relative overflow-hidden inline-flex items-center gap-2.5 px-4 sm:px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 cursor-pointer ${
+                className={`relative overflow-hidden inline-flex items-center gap-2 px-3.5 sm:px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 cursor-pointer shrink-0 ${
                   isSelected
                     ? "bg-[#5846A8] text-white shadow-lg shadow-indigo-500/25 scale-105"
                     : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:scale-102 border border-slate-200/50 dark:border-slate-800/80"

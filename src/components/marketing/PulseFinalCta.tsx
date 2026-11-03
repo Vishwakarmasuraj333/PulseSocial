@@ -8,15 +8,6 @@ export function PulseFinalCta() {
   return (
     <section className="pt-16 pb-12 sm:pt-20 sm:pb-14 bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-850 text-center">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        {/* Subtle decorative airplane vector */}
-        <div className="flex justify-center">
-          <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-800 dark:text-slate-200">
-            <svg className="w-6 h-6 transform -rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
-          </div>
-        </div>
-
         <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
           Build the best social media presence for your brands
         </h2>

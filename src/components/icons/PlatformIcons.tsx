@@ -38,10 +38,10 @@ export function LinkedInIcon({ className = "w-5 h-5", size }: IconProps) {
   const s = size || 20;
   return (
     <svg width={s} height={s} viewBox="0 0 24 24" fill="none" className={className}>
-      <circle cx="12" cy="12" r="11.5" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1" />
+      <circle cx="12" cy="12" r="12" fill="#0A66C2" />
       <path
         d="M8.2 16.5H6.2V9.8h2V16.5zM7.2 8.9c-.64 0-1.16-.52-1.16-1.16S6.56 6.58 7.2 6.58s1.16.52 1.16 1.16-.52 1.16-1.16 1.16zm9.8 7.6h-2v-3.3c0-.85-.02-1.95-1.19-1.95-1.19 0-1.37.93-1.37 1.89v3.36h-2V9.8h1.92v.91h.03c.27-.51.93-1.05 1.91-1.05 2.05 0 2.43 1.35 2.43 3.1v3.74h.27z"
-        fill="#0A66C2"
+        fill="#FFFFFF"
       />
     </svg>
   );

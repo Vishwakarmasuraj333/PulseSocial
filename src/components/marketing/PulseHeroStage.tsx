@@ -184,9 +184,10 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
 
           <Link
             href="/features"
-            className="px-8 sm:px-10 py-3.5 rounded-xl border-2 border-[#5846A8] dark:border-purple-400/80 text-[#5846A8] dark:text-purple-300 bg-white/90 dark:bg-[#171724]/80 hover:bg-[#5846A8] hover:text-white dark:hover:bg-purple-600 dark:hover:text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 shadow-md hover:shadow-2xl hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-sm flex items-center gap-2"
+            className="px-8 sm:px-10 py-3.5 rounded-xl border-2 border-[#5846A8] dark:border-purple-400/80 text-[#5846A8] dark:text-purple-300 bg-white/90 dark:bg-[#171724]/80 hover:bg-[#5846A8] hover:text-white dark:hover:bg-purple-600 dark:hover:text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 shadow-md hover:shadow-2xl hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-sm flex items-center gap-2 group"
           >
             <span>EXPLORE FEATURES</span>
+            <span className="group-hover:translate-x-1 transition-transform">→</span>
           </Link>
         </div>
 
@@ -223,25 +224,25 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           {/* ------------------------------------------------------ */}
-          {/* STANDALONE BACKGROUND FLOATING ICONS (Only 4, on edges)*/}
+          {/* STANDALONE BACKGROUND FLOATING ICONS (Only on desktop >= 1280px)*/}
           {/* ------------------------------------------------------ */}
           {/* Left Standalone: Telegram */}
-          <div className="hidden lg:flex absolute left-3 sm:left-5 xl:left-8 top-[32%] -translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10">
+          <div className="hidden xl:flex absolute left-3 sm:left-5 xl:left-8 top-[32%] -translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10">
             <Image src="/images/social/logos/telegram-icon.svg" width={40} height={40} alt="Telegram" className="w-10 h-10 drop-shadow-sm" />
           </div>
 
           {/* Left Standalone: Google Business */}
-          <div className="hidden lg:flex absolute left-3 sm:left-5 xl:left-8 bottom-[32%] translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10">
+          <div className="hidden xl:flex absolute left-3 sm:left-5 xl:left-8 bottom-[32%] translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10">
             <Image src="/images/social/logos/google.svg" width={40} height={40} alt="Google Business Profile" className="w-10 h-10 drop-shadow-sm" />
           </div>
 
           {/* Right Standalone: YouTube */}
-          <div className="hidden lg:flex absolute right-3 sm:right-5 xl:right-8 bottom-[32%] translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10">
+          <div className="hidden xl:flex absolute right-3 sm:right-5 xl:right-8 bottom-[32%] translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10">
             <Image src="/images/social/logos/youtube-icon.svg" width={40} height={40} alt="YouTube" className="w-10 h-10 drop-shadow-sm" />
           </div>
 
           {/* Right Standalone: Mastodon */}
-          <div className="hidden lg:flex absolute right-3 sm:right-5 xl:right-8 top-[32%] -translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10">
+          <div className="hidden xl:flex absolute right-3 sm:right-5 xl:right-8 top-[32%] -translate-y-1/2 w-11 h-11 items-center justify-center pointer-events-none z-10">
             <Image src="/images/social/logos/mastodon-icon.svg" width={40} height={40} alt="Mastodon" className="w-10 h-10 drop-shadow-sm" />
           </div>
 

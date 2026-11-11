@@ -138,10 +138,6 @@ export function PulseMobileShowcase() {
                 href="https://apps.apple.com/app/pulsesocial/id6470000000"
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleOpenStore("apple");
-                }}
                 className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-400 hover:bg-slate-850 active:scale-95 transition-all shadow-md cursor-pointer pointer-events-auto relative z-30 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-500"
                 aria-label="Download PulseSocial on the Apple App Store"
               >
@@ -159,10 +155,6 @@ export function PulseMobileShowcase() {
                 href="https://play.google.com/store/apps/details?id=io.pulsesocial.app"
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleOpenStore("google");
-                }}
                 className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-400 hover:bg-slate-850 active:scale-95 transition-all shadow-md cursor-pointer pointer-events-auto relative z-30 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-500"
                 aria-label="Get PulseSocial on Google Play Store"
               >
@@ -174,6 +166,17 @@ export function PulseMobileShowcase() {
                   <div className="text-xs font-bold text-white">Google Play</div>
                 </div>
               </a>
+
+              {/* PWA & Beta Early Access Guide Link */}
+              <div className="w-full sm:w-auto flex items-center pt-1">
+                <button
+                  type="button"
+                  onClick={() => handleOpenStore("apple")}
+                  className="text-xs text-purple-400 hover:text-purple-300 underline underline-offset-4 cursor-pointer font-medium"
+                >
+                  Join VIP Beta &amp; 1-Click Install Guide →
+                </button>
+              </div>
             </div>
           </div>
         </div>

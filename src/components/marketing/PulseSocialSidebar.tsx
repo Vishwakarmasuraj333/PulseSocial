@@ -345,10 +345,10 @@ export function PulseSocialSidebar() {
   return (
     <>
       {/* ======================================================== */}
-      {/* 1. FLOATING SLEEK TOGGLE PILL (Hidden on mobile & tablet to avoid overlap) */}
+      {/* 1. FLOATING SLEEK TOGGLE PILL (Visible only on ultra-wide screens to prevent content overlap) */}
       {/* ======================================================== */}
       {!isOpen && (
-        <div className="hidden xl:block fixed right-2 sm:right-3.5 top-1/2 -translate-y-1/2 z-40 select-none">
+        <div className="hidden 2xl:block fixed right-3.5 top-1/2 -translate-y-1/2 z-40 select-none">
           <button
             onClick={() => setIsOpen(true)}
             className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-white dark:bg-[#17171A] text-slate-800 dark:text-white border border-slate-200/90 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:scale-105 hover:shadow-2xl transition-all duration-300 group cursor-pointer"
@@ -370,7 +370,7 @@ export function PulseSocialSidebar() {
       {isOpen && (
         <aside
           aria-label="PulseSocial Connected Networks Dock"
-          className="hidden xl:block fixed right-2 sm:right-3.5 top-1/2 -translate-y-1/2 z-40 select-none animate-in slide-in-from-right-4 fade-in duration-300"
+          className="hidden 2xl:block fixed right-3.5 top-1/2 -translate-y-1/2 z-40 select-none animate-in slide-in-from-right-4 fade-in duration-300"
         >
           <div className="relative flex items-center">
             {/* Close / Collapse Button on Left Tab */}

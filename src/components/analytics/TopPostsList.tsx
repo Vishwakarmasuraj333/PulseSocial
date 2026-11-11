@@ -148,7 +148,7 @@ export function TopPostsList({ posts = [], isLoading = false }: TopPostsListProp
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e: React.MouseEvent) => e.stopPropagation()}
               className="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4"
             >
               <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">

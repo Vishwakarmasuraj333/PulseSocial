@@ -115,10 +115,16 @@
   border-color: var(--border);
 }
 
+html {
+  overflow-x: clip;
+}
+
 body {
   background-color: var(--background);
   color: var(--text);
   font-feature-settings: "rlig" 1, "calt" 1;
+  overflow-x: clip;
+  min-height: 100vh;
 }
 
 /* Custom modern scrollbar */

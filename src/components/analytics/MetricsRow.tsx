@@ -234,11 +234,10 @@ export function MetricsRow({ timeframe = "30d", summary, isLoading = false }: Me
             {/* Bottom: Real Telemetry Indicator */}
             <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-1.5 text-[11px]">
               <span
-                className={`font-bold flex items-center gap-0.5 ${
-                  hasRealNumber
+                className={`font-bold flex items-center gap-0.5 ${hasRealNumber
                     ? "text-emerald-600 dark:text-emerald-400"
                     : "text-slate-400 dark:text-slate-500"
-                }`}
+                  }`}
               >
                 <CheckCircle2 className="w-3 h-3 stroke-[2.5]" />
                 {item.trend}

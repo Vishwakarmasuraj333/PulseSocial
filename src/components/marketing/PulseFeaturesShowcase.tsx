@@ -135,8 +135,8 @@ export function PulseFeaturesShowcase() {
         {/* ========================================================= */}
         {/* FEATURE 1: SCHEDULE (Text Left, Graphic Right)             */}
         {/* ========================================================= */}
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-14 group/sec">
-          <div className="w-full lg:w-[460px] text-left shrink-0 space-y-4">
+        <div className="flex flex-col xl:flex-row items-center justify-between gap-10 xl:gap-12 group/sec">
+          <div className="w-full max-w-2xl xl:max-w-none xl:w-[440px] text-left shrink-0 space-y-4">
             <span className="inline-flex items-center gap-1.5 text-[14px] sm:text-[15px] font-bold uppercase tracking-[1.5px] text-[#DF3024] group-hover/sec:scale-105 transition-transform">
               <span className="w-2 h-2 rounded-full bg-[#DF3024] animate-pulse" />
               Schedule
@@ -160,7 +160,7 @@ export function PulseFeaturesShowcase() {
             </div>
           </div>
 
-          <div className="w-full lg:max-w-[700px] flex items-center justify-center">
+          <div className="w-full xl:max-w-[700px] flex items-center justify-center">
             <FeatureDisplay
               id="schedule"
               videoSrc="/videos/social-schedule-time.mp4"
@@ -175,8 +175,8 @@ export function PulseFeaturesShowcase() {
         {/* ========================================================= */}
         {/* FEATURE 2: CALENDAR (Graphic Left, Text Right)             */}
         {/* ========================================================= */}
-        <div className="flex flex-col lg:flex-row-reverse items-center justify-between gap-10 lg:gap-14 group/sec">
-          <div className="w-full lg:w-[460px] text-left shrink-0 space-y-4">
+        <div className="flex flex-col xl:flex-row-reverse items-center justify-between gap-10 xl:gap-12 group/sec">
+          <div className="w-full max-w-2xl xl:max-w-none xl:w-[440px] text-left shrink-0 space-y-4">
             <span className="inline-flex items-center gap-1.5 text-[14px] sm:text-[15px] font-bold uppercase tracking-[1.5px] text-[#C84A00] group-hover/sec:scale-105 transition-transform">
               <span className="w-2 h-2 rounded-full bg-[#C84A00] animate-pulse" />
               Calendar
@@ -200,7 +200,7 @@ export function PulseFeaturesShowcase() {
             </div>
           </div>
 
-          <div className="w-full lg:max-w-[620px] flex items-center justify-center">
+          <div className="w-full xl:max-w-[620px] flex items-center justify-center">
             <FeatureDisplay
               id="calendar"
               videoSrc="/videos/social-calendar.mp4"
@@ -215,8 +215,8 @@ export function PulseFeaturesShowcase() {
         {/* ========================================================= */}
         {/* FEATURE 3: MONITOR (Text Left, Graphic Right)              */}
         {/* ========================================================= */}
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-14 group/sec">
-          <div className="w-full lg:w-[460px] text-left shrink-0 space-y-4">
+        <div className="flex flex-col xl:flex-row items-center justify-between gap-10 xl:gap-12 group/sec">
+          <div className="w-full max-w-2xl xl:max-w-none xl:w-[440px] text-left shrink-0 space-y-4">
             <span className="inline-flex items-center gap-1.5 text-[14px] sm:text-[15px] font-bold uppercase tracking-[1.5px] text-[#048052] group-hover/sec:scale-105 transition-transform">
               <span className="w-2 h-2 rounded-full bg-[#048052] animate-pulse" />
               Monitor
@@ -240,7 +240,7 @@ export function PulseFeaturesShowcase() {
             </div>
           </div>
 
-          <div className="w-full lg:max-w-[580px] flex items-center justify-center">
+          <div className="w-full xl:max-w-[580px] flex items-center justify-center">
             <FeatureDisplay
               id="monitor"
               videoSrc="/videos/social-monitor.mp4"
@@ -255,8 +255,8 @@ export function PulseFeaturesShowcase() {
         {/* ========================================================= */}
         {/* FEATURE 4: ANALYTICS (Graphic Left, Text Right)            */}
         {/* ========================================================= */}
-        <div className="flex flex-col lg:flex-row-reverse items-center justify-between gap-10 lg:gap-14 group/sec">
-          <div className="w-full lg:w-[460px] text-left shrink-0 space-y-4">
+        <div className="flex flex-col xl:flex-row-reverse items-center justify-between gap-10 xl:gap-12 group/sec">
+          <div className="w-full max-w-2xl xl:max-w-none xl:w-[440px] text-left shrink-0 space-y-4">
             <span className="inline-flex items-center gap-1.5 text-[14px] sm:text-[15px] font-bold uppercase tracking-[1.5px] text-[#C84A00] group-hover/sec:scale-105 transition-transform">
               <span className="w-2 h-2 rounded-full bg-[#C84A00] animate-pulse" />
               Analytics
@@ -280,7 +280,7 @@ export function PulseFeaturesShowcase() {
             </div>
           </div>
 
-          <div className="w-full lg:max-w-[580px] flex items-center justify-center">
+          <div className="w-full xl:max-w-[580px] flex items-center justify-center">
             <FeatureDisplay
               id="analytics"
               videoSrc="/videos/social-analytics.mp4"

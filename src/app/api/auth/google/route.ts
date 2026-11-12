@@ -12,11 +12,11 @@ export async function GET(req: Request) {
   const clientId = process.env.GOOGLE_CLIENT_ID?.trim().replace(/^["']|["']$/g, "");
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim().replace(/^["']|["']$/g, "");
 
-  // If OAuth credentials are not set in the environment, seamlessly direct
-  // to the authentic Google Account Chooser portal without throwing raw error banners.
+  // Strict OAuth requirement: redirect cleanly to /login with configuration guidance if env credentials are absent
   if (!clientId || !clientSecret) {
-    const selectorUrl = new URL("/google", req.url);
-    return NextResponse.redirect(selectorUrl);
+    const loginUrl = new URL("/login", req.url);
+    loginUrl.searchParams.set("error", "google_not_configured");
+    return NextResponse.redirect(loginUrl);
   }
 
   // Determine authorized redirect URI (ensures https scheme on production/Vercel)

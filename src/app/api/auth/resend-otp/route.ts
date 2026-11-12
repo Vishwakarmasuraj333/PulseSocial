@@ -34,6 +34,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User account not found" }, { status: 404 });
     }
 
+    if (user.status === "SUSPENDED") {
+      return NextResponse.json(
+        {
+          error: "Your account has been suspended by an administrator. Please contact support.",
+          code: "FORBIDDEN",
+        },
+        { status: 403 }
+      );
+    }
+
     // Dispatch fresh 6-digit OTP via Gmail SMTP
     await createAndSendOTP(user.id, user.email, true);
 

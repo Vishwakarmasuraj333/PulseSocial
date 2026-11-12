@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 
 export interface BrandSocialAccount {
   id: string;
@@ -56,9 +56,23 @@ const BrandContext = createContext<BrandContextType | undefined>(undefined);
 export function BrandProvider({ children }: { children: React.ReactNode }) {
   const [brands, setBrands] = useState<Brand[]>(DEFAULT_BRANDS);
   const [activeBrandId, setActiveBrandId] = useState<string>("brand-primary");
+  const activeBrandIdRef = useRef<string>(activeBrandId);
+  activeBrandIdRef.current = activeBrandId;
 
   const syncActiveBrandFromBackend = async () => {
     try {
+      // 0. Check public-safe session status first so anonymous marketing pages never emit 401 console errors
+      const sessionRes = await fetch("/api/auth/session", {
+        cache: "no-store",
+        credentials: "include",
+        headers: { "Cache-Control": "no-cache" },
+      });
+      if (!sessionRes.ok) return;
+      const sessionData = await sessionRes.json();
+      if (!sessionData?.authenticated || !sessionData?.user) {
+        return;
+      }
+
       // 1. Fetch user brands from /api/brand/all
       const resAll = await fetch("/api/brand/all", {
         headers: { "Cache-Control": "no-cache" },
@@ -98,36 +112,31 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      // 2. Fallback to /api/auth/me
-      const res = await fetch("/api/auth/me", {
-        headers: { "Cache-Control": "no-cache" },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.user?.activeOrganization) {
-          const org = data.user.activeOrganization;
+      // 2. Fallback to activeOrganization from /api/auth/session
+      const user = sessionData.user;
+      if (user?.activeOrganization) {
+        const org = user.activeOrganization;
 
-          const orgBrand: Brand = {
-            id: org.id,
-            name: org.name,
-            slug: org.slug,
-            handle: `@${org.slug}`,
-            avatarUrl: org.logoUrl || data.user.avatarUrl || "",
-            coverUrl: org.coverUrl || "",
-            connectedAccountsCount: org._count?.socialAccounts || 0,
-            industry: "Enterprise Media",
-            description: "",
-            timezone: org.timezone || "Asia/Kolkata",
-            color: org.color || "#E08738",
-            createdAt: org.createdAt || new Date().toISOString(),
-          };
+        const orgBrand: Brand = {
+          id: org.id,
+          name: org.name,
+          slug: org.slug,
+          handle: `@${org.slug}`,
+          avatarUrl: org.logoUrl || user.avatarUrl || "",
+          coverUrl: org.coverUrl || "",
+          connectedAccountsCount: org._count?.socialAccounts || 0,
+          industry: "Enterprise Media",
+          description: "",
+          timezone: org.timezone || "Asia/Kolkata",
+          color: org.color || "#E08738",
+          createdAt: org.createdAt || new Date().toISOString(),
+        };
 
-          setBrands((prev) => {
-            const filtered = prev.filter((b) => b.id !== org.id);
-            return [orgBrand, ...filtered];
-          });
-          setActiveBrandId(org.id);
-        }
+        setBrands((prev) => {
+          const filtered = prev.filter((b) => b.id !== org.id);
+          return [orgBrand, ...filtered];
+        });
+        setActiveBrandId(org.id);
       }
     } catch {}
   };
@@ -137,15 +146,24 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
 
     const handleExternalUpdate = (e: any) => {
       if (e.detail) {
+        const currentId = activeBrandIdRef.current;
         setBrands((prev) =>
-          prev.map((b) => (b.id === activeBrandId ? { ...b, ...e.detail } : b))
+          prev.map((b) => (b.id === currentId ? { ...b, ...e.detail } : b))
         );
       }
     };
 
+    const handleAuthChanged = () => {
+      syncActiveBrandFromBackend();
+    };
+
     window.addEventListener("pulsesocial_brand_updated", handleExternalUpdate);
-    return () => window.removeEventListener("pulsesocial_brand_updated", handleExternalUpdate);
-  }, [activeBrandId]);
+    window.addEventListener("pulsesocial_auth_changed", handleAuthChanged);
+    return () => {
+      window.removeEventListener("pulsesocial_brand_updated", handleExternalUpdate);
+      window.removeEventListener("pulsesocial_auth_changed", handleAuthChanged);
+    };
+  }, []);
 
   const activeBrand = brands.find((b) => b.id === activeBrandId) || brands[0] || DEFAULT_BRANDS[0];
 

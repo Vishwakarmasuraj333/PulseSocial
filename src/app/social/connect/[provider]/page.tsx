@@ -444,21 +444,11 @@ export default function SocialChannelConnectPopupPage() {
 
                       <button
                         type="button"
-                        onClick={() => handleConnect()}
-                        disabled={isSubmitting}
+                        onClick={() => setActiveTab("secondary")}
                         className="w-full py-2.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/20 active:scale-98"
                       >
-                        {isSubmitting ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>Pairing WhatsApp...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Check className="w-4 h-4 stroke-[2.5]" />
-                            <span>Pair &amp; Link Device (+1 555-0199)</span>
-                          </>
-                        )}
+                        <Smartphone className="w-4 h-4 stroke-[2.2]" />
+                        <span>Enter WhatsApp Business Cloud API Credentials</span>
                       </button>
                     </div>
                   ) : (

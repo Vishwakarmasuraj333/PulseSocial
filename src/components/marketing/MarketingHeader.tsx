@@ -36,10 +36,10 @@ export function MarketingHeader() {
   const resourcesRef = useRef<HTMLDivElement>(null);
 
   const checkAuth = () => {
-    fetch("/api/auth/me", { cache: "no-store", credentials: "include" })
+    fetch("/api/auth/session", { cache: "no-store", credentials: "include" })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (data?.user && typeof data.user.id === "string" && data.user.id.length > 0) {
+        if (data?.authenticated && data?.user && typeof data.user.id === "string" && data.user.id.length > 0) {
           setIsLoggedIn(true);
           setCurrentUser(data.user);
           try {

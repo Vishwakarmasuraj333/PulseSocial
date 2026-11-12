@@ -13,12 +13,22 @@ export async function GET(
   { params }: { params: Promise<{ provider: string }> }
 ) {
   try {
+    const url = new URL(req.url);
+    const wantsJson =
+      url.searchParams.get("format") === "json" ||
+      req.headers.get("accept")?.includes("application/json");
+
     const session = await getSession();
     if (!session) {
+      if (wantsJson) {
+        return NextResponse.json(
+          { error: "Unauthorized: Active session required." },
+          { status: 401 }
+        );
+      }
       return NextResponse.redirect(new URL(`/login?redirectTo=${encodeURIComponent(req.url)}`, req.url));
     }
 
-    const url = new URL(req.url);
     const rawKey = (await params).provider.toLowerCase();
     const platformKey = (
       rawKey === "google" || rawKey === "google-business"
@@ -28,10 +38,6 @@ export async function GET(
         : rawKey
     ) as SupportedPlatform;
     const socialProvider = getSocialProvider(platformKey);
-
-    const wantsJson =
-      url.searchParams.get("format") === "json" ||
-      req.headers.get("accept")?.includes("application/json");
 
     let host = req.headers.get("x-forwarded-host") || req.headers.get("host") || "";
     if (host.includes(",")) host = host.split(",")[0].trim();

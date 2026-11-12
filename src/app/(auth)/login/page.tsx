@@ -83,7 +83,6 @@ export default function LoginPage() {
   const [shakeError, setShakeError] = useState(false);
   const [showOtpBanner, setShowOtpBanner] = useState(false);
   const [isOtpSending, setIsOtpSending] = useState(false);
-  const [devCode, setDevCode] = useState<string | null>(null);
 
   // UI state
   const [isLoading, setIsLoading] = useState(false);
@@ -147,27 +146,6 @@ export default function LoginPage() {
       setErrorMessage(message || "Authentication could not be completed. Please try again.");
     }
   }, []);
-
-  // Auto-fetch dev code when entering OTP step for quick seamless testing
-  useEffect(() => {
-    if (authStep !== "otp") {
-      setDevCode(null);
-      return;
-    }
-
-    const targetQuery = otpUserId
-      ? `userId=${encodeURIComponent(otpUserId)}`
-      : `email=${encodeURIComponent(otpEmail || email)}`;
-
-    fetch(`/api/auth/dev-otp?${targetQuery}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && data.code) {
-          setDevCode(data.code);
-        }
-      })
-      .catch(() => {});
-  }, [authStep, otpUserId, otpEmail, email]);
 
   // 60-second Resend Cooldown Timer
   useEffect(() => {
@@ -375,13 +353,6 @@ export default function LoginPage() {
     }
   };
 
-  const handleAutoFillDevCode = () => {
-    if (!devCode) return;
-    const splitDigits = devCode.slice(0, 6).split("");
-    setDigits(splitDigits);
-    handleVerifyOtp(devCode);
-  };
-
   // ==========================================
   // Resend OTP Action
   // ==========================================
@@ -410,17 +381,6 @@ export default function LoginPage() {
       setTimeLeft(300); // Reset to 5 minutes
       setDigits(["", "", "", "", "", ""]);
       setShowOtpBanner(true);
-
-      // Refresh dev code
-      const targetQuery = otpUserId
-        ? `userId=${encodeURIComponent(otpUserId)}`
-        : `email=${encodeURIComponent(otpEmail || email)}`;
-      fetch(`/api/auth/dev-otp?${targetQuery}`)
-        .then((r) => r.json())
-        .then((d) => {
-          if (d && d.code) setDevCode(d.code);
-        })
-        .catch(() => {});
 
       toast({
         title: "OTP sent successfully",

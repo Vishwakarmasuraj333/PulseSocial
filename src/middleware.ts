@@ -43,7 +43,6 @@ const PUBLIC_PREFIXES = [
   "/api/webhooks/",
   "/api/health/",
   "/api/consent",
-  "/api/dev-login",
   "/icons/",
   "/images/",
   "/fonts/",

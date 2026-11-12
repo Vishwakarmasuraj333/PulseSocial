@@ -40,6 +40,23 @@ export default function BillingPage() {
   };
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const rawPlan = (params.get("plan") || "").toUpperCase();
+      if (rawPlan === "STARTER") setSelectedPlan("STARTER");
+      else if (rawPlan === "PROFESSIONAL" || rawPlan === "PRO") setSelectedPlan("PROFESSIONAL");
+      else if (rawPlan === "AGENCY" || rawPlan === "ENTERPRISE") setSelectedPlan("AGENCY");
+
+      const rawBilling = (params.get("billing") || "").toLowerCase();
+      if (rawBilling === "annual" || rawBilling === "yearly") setSelectedBilling("annual");
+      else if (rawBilling === "monthly") setSelectedBilling("monthly");
+
+      if (params.get("checkout") === "true" || rawPlan) {
+        setTimeout(() => {
+          document.getElementById("checkout-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 150);
+      }
+    }
     loadBilling();
   }, []);
 
@@ -119,27 +136,45 @@ export default function BillingPage() {
               </p>
             </div>
 
-            {/* Plan Tier Selector Pills */}
-            <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-xs self-start sm:self-auto">
-              {[
-                { key: "STARTER", name: "Starter", price: selectedBilling === "annual" ? "$12" : "$15" },
-                { key: "PROFESSIONAL", name: "Professional", price: selectedBilling === "annual" ? "$31" : "$39", popular: true },
-                { key: "AGENCY", name: "Agency", price: selectedBilling === "annual" ? "$63" : "$79" },
-              ].map((tier) => (
-                <button
-                  key={tier.key}
-                  type="button"
-                  onClick={() => setSelectedPlan(tier.key)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
-                    selectedPlan === tier.key
-                      ? "bg-[#5846A8] text-white dark:bg-gradient-to-r dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:text-slate-950 shadow-md"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                  }`}
-                >
-                  <span>{tier.name}</span>
-                  <span className="text-[10px] opacity-80">({tier.price})</span>
-                </button>
-              ))}
+            {/* Plan Tier & Billing Cycle Selector Pills */}
+            <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+              <div className="flex items-center gap-1 p-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-xs">
+                {(["monthly", "annual"] as const).map((cycle) => (
+                  <button
+                    key={cycle}
+                    type="button"
+                    onClick={() => setSelectedBilling(cycle)}
+                    className={`px-2.5 py-1.5 rounded-xl text-xs font-bold capitalize transition cursor-pointer ${
+                      selectedBilling === cycle
+                        ? "bg-slate-900 text-white dark:bg-white/15 dark:text-white shadow-xs"
+                        : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                    }`}
+                  >
+                    {cycle}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-xs">
+                {[
+                  { key: "STARTER", name: "Starter", price: selectedBilling === "annual" ? "$15" : "$19" },
+                  { key: "PROFESSIONAL", name: "Professional", price: selectedBilling === "annual" ? "$39" : "$49", popular: true },
+                  { key: "AGENCY", name: "Agency", price: selectedBilling === "annual" ? "$79" : "$99" },
+                ].map((tier) => (
+                  <button
+                    key={tier.key}
+                    type="button"
+                    onClick={() => setSelectedPlan(tier.key)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                      selectedPlan === tier.key
+                        ? "bg-[#5846A8] text-white dark:bg-gradient-to-r dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:text-slate-950 shadow-md"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                    }`}
+                  >
+                    <span>{tier.name}</span>
+                    <span className="text-[10px] opacity-80">({tier.price})</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -271,17 +306,17 @@ export default function BillingPage() {
                   <div className="flex justify-between text-slate-600 dark:text-slate-300">
                     <span>Subtotal:</span>
                     <span className="font-mono">
-                      {selectedPlan === "STARTER" ? (selectedBilling === "annual" ? "$144/yr" : "$15/mo")
-                        : selectedPlan === "AGENCY" ? (selectedBilling === "annual" ? "$756/yr" : "$79/mo")
-                        : (selectedBilling === "annual" ? "$372/yr" : "$39/mo")}
+                      {selectedPlan === "STARTER" ? (selectedBilling === "annual" ? "$180/yr" : "$19/mo")
+                        : selectedPlan === "AGENCY" ? (selectedBilling === "annual" ? "$948/yr" : "$99/mo")
+                        : (selectedBilling === "annual" ? "$468/yr" : "$49/mo")}
                     </span>
                   </div>
                   <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-semibold pt-1 border-t border-slate-100 dark:border-white/5">
                     <span>Total Due Today:</span>
                     <span className="font-mono text-base font-black">
-                      {selectedPlan === "STARTER" ? (selectedBilling === "annual" ? "$144" : "$15")
-                        : selectedPlan === "AGENCY" ? (selectedBilling === "annual" ? "$756" : "$79")
-                        : (selectedBilling === "annual" ? "$372" : "$39")}
+                      {selectedPlan === "STARTER" ? (selectedBilling === "annual" ? "$180" : "$19")
+                        : selectedPlan === "AGENCY" ? (selectedBilling === "annual" ? "$948" : "$99")
+                        : (selectedBilling === "annual" ? "$468" : "$49")}
                     </span>
                   </div>
                 </div>
@@ -315,11 +350,10 @@ export default function BillingPage() {
                       }
                     } catch (err) {
                       toast({
-                        title: "Payment Note",
-                        message: "Plan updated in workspace test mode.",
-                        type: "info"
+                        title: "Payment Failed",
+                        message: (err as Error)?.message || "Unable to process payment. Please check your payment configuration.",
+                        type: "error"
                       });
-                      setCheckoutComplete(true);
                     } finally {
                       setIsCheckingOut(false);
                     }

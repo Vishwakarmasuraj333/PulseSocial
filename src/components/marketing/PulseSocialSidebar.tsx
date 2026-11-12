@@ -40,10 +40,10 @@ export function PulseSocialSidebar() {
   // Auth check for dynamic state
   useEffect(() => {
     const checkAuth = () => {
-      fetch("/api/auth/me", { cache: "no-store", credentials: "include" })
+      fetch("/api/auth/session", { cache: "no-store", credentials: "include" })
         .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
-          setIsLoggedIn(Boolean(data?.user));
+          setIsLoggedIn(Boolean(data?.authenticated && data?.user));
         })
         .catch(() => setIsLoggedIn(false));
     };

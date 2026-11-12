@@ -26,6 +26,24 @@ export async function POST(req: Request) {
       where: { email: normalizedEmail },
     });
 
+    if (user && user.status === "SUSPENDED") {
+      await logAudit({
+        userId: user.id,
+        action: "LOGIN_BLOCKED_SUSPENDED",
+        resourceType: "User",
+        resourceId: user.id,
+        details: { email: user.email, reason: "Account is suspended (OTP requested)" },
+      }).catch(() => {});
+
+      return NextResponse.json(
+        {
+          error: "Your account has been suspended by an administrator. Please contact support.",
+          code: "FORBIDDEN",
+        },
+        { status: 403 }
+      );
+    }
+
     // If user does not exist yet, create a pending user registration
     if (!user) {
       const defaultName = normalizedEmail.split("@")[0];

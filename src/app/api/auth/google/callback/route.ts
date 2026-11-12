@@ -142,7 +142,25 @@ export async function GET(req: Request) {
     const now = new Date();
 
     if (user) {
-      // Update existing user with latest verified Google identity
+      if (user.status === "SUSPENDED") {
+        await logAudit({
+          userId: user.id,
+          action: "LOGIN_BLOCKED_SUSPENDED",
+          resourceType: "User",
+          resourceId: user.id,
+          details: { email: user.email, provider: "google" },
+        }).catch(() => {});
+
+        const loginUrl = new URL("/login", req.url);
+        loginUrl.searchParams.set("error", "account_suspended");
+        loginUrl.searchParams.set(
+          "message",
+          "Your account has been suspended by an administrator. Please contact support."
+        );
+        return NextResponse.redirect(loginUrl);
+      }
+
+      // Update existing active user with latest verified Google identity
       user = await prisma.user.update({
         where: { id: user.id },
         data: {
@@ -155,7 +173,6 @@ export async function GET(req: Request) {
           avatarUrl: googleProfile.picture || user.avatarUrl,
           locale: googleProfile.locale || undefined,
           lastLoginAt: now,
-          status: "ACTIVE",
         },
         include: {
           memberships: {

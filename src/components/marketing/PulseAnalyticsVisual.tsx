@@ -13,7 +13,7 @@ export function PulseAnalyticsVisual() {
   ];
 
   return (
-    <div className="relative w-full max-w-[560px] h-[360px] sm:h-[400px] select-none flex items-center justify-center">
+    <div className="relative w-full max-w-[560px] min-h-[360px] sm:min-h-[400px] select-none flex items-center justify-center pt-10 sm:pt-8 pb-6">
       {/* ======================================================== */}
       {/* 1. BACKGROUND SVG GRID WITH CLEAR VISIBLE Y-AXIS & CURVE */}
       {/* ======================================================== */}
@@ -77,16 +77,67 @@ export function PulseAnalyticsVisual() {
       </svg>
 
       {/* ======================================================== */}
-      {/* 2. FOREGROUND CARD: PAGE VIEWS VIA INTERNAL REFERRER     */}
-      {/* Positioned at left: 88px so it never overlaps the axis   */}
+      {/* 2. FOREGROUND CARD + DEDICATED 2.5K DONUT (Zero Overlap) */}
       {/* ======================================================== */}
-      <div className="absolute left-[84px] sm:left-[96px] top-[45px] z-10 w-[300px] sm:w-[340px] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-[0_12px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_12px_32px_rgba(0,0,0,0.35)] p-5 sm:p-6 transition-all duration-300 hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)]">
-        {/* Clean Title */}
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100">
-            Page Views via Internal Referrer
-          </h3>
-          <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+      <div className="relative z-10 w-[calc(100%-2.5rem)] max-w-[380px] ml-8 sm:ml-14 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-[0_12px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_12px_32px_rgba(0,0,0,0.35)] p-5 sm:p-6 transition-all duration-300 hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)]">
+        {/* Top Row: Clean Title Left + 2.5K 3-Color Donut Right */}
+        <div className="flex items-center justify-between gap-4 mb-5">
+          <div className="space-y-1 text-left">
+            <div className="inline-flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse shrink-0" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
+                Traffic Breakdown
+              </span>
+            </div>
+            <h3 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 leading-snug">
+              Page Views via Internal Referrer
+            </h3>
+          </div>
+
+          <div className="shrink-0 transition-transform duration-300 hover:scale-105 group cursor-pointer">
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center bg-slate-50 dark:bg-slate-950 rounded-full shadow-md border border-slate-100 dark:border-slate-800 p-1.5">
+              {/* Circular Donut Ring (Coral, Yellow, Teal) */}
+              <svg className="w-full h-full transform -rotate-90 group-hover:rotate-0 transition-transform duration-700 ease-out" viewBox="0 0 36 36">
+                <path
+                  className="text-slate-200 dark:text-slate-800"
+                  strokeWidth="4.2"
+                  stroke="currentColor"
+                  fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                <path
+                  strokeDasharray="42, 100"
+                  strokeWidth="4.2"
+                  stroke="#F43F5E"
+                  fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                <path
+                  strokeDasharray="32, 100"
+                  strokeDashoffset="-42"
+                  strokeWidth="4.2"
+                  stroke="#FBBF24"
+                  fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                <path
+                  strokeDasharray="26, 100"
+                  strokeDashoffset="-74"
+                  strokeWidth="4.2"
+                  stroke="#2DD4BF"
+                  fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+              </svg>
+
+              {/* Centered 2.5K Counter */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white leading-none">
+                  2.5K
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* 4 Horizontal Data Bars */}
@@ -100,7 +151,7 @@ export function PulseAnalyticsVisual() {
             >
               {/* Category Label */}
               <span
-                className={`w-24 shrink-0 transition-colors font-medium ${
+                className={`w-24 shrink-0 transition-colors font-medium text-left ${
                   hoveredIndex === idx
                     ? "text-blue-600 dark:text-blue-400 font-semibold"
                     : "text-slate-600 dark:text-slate-400"
@@ -123,58 +174,6 @@ export function PulseAnalyticsVisual() {
               </span>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* ======================================================== */}
-      {/* 3. 2.5K 3-COLOR DONUT PIE CHART (Top Right of Card)      */}
-      {/* ======================================================== */}
-      <div className="absolute right-[40px] sm:right-[50px] top-[15px] z-20 transition-transform duration-300 hover:scale-105 group cursor-pointer">
-        <div className="relative w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center bg-white dark:bg-slate-900 rounded-full shadow-[0_8px_24px_rgba(0,0,0,0.12)] border border-slate-100 dark:border-slate-800 p-2">
-          {/* Circular Donut Ring (Coral, Yellow, Teal) */}
-          <svg className="w-full h-full transform -rotate-90 group-hover:rotate-0 transition-transform duration-700 ease-out" viewBox="0 0 36 36">
-            {/* Background ring */}
-            <path
-              className="text-slate-100 dark:text-slate-800"
-              strokeWidth="4.2"
-              stroke="currentColor"
-              fill="none"
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-            />
-            {/* Coral / Rose Segment */}
-            <path
-              strokeDasharray="42, 100"
-              strokeWidth="4.2"
-              stroke="#F43F5E"
-              fill="none"
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-            />
-            {/* Yellow Segment */}
-            <path
-              strokeDasharray="32, 100"
-              strokeDashoffset="-42"
-              strokeWidth="4.2"
-              stroke="#FBBF24"
-              fill="none"
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-            />
-            {/* Teal / Cyan Segment */}
-            <path
-              strokeDasharray="26, 100"
-              strokeDashoffset="-74"
-              strokeWidth="4.2"
-              stroke="#2DD4BF"
-              fill="none"
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-            />
-          </svg>
-
-          {/* Centered 2.5K Counter */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white leading-none">
-              2.5K
-            </span>
-          </div>
         </div>
       </div>
     </div>

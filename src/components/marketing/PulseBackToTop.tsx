@@ -43,13 +43,13 @@ export function PulseBackToTop() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-6 right-5 sm:bottom-7 sm:right-7 z-40 select-none animate-in fade-in slide-in-from-bottom-3 duration-300">
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 select-none animate-in fade-in slide-in-from-bottom-3 duration-300">
       <button
         type="button"
         onClick={scrollToTop}
         aria-label="Scroll back to top"
         title="Scroll to top of page"
-        className="group relative flex items-center gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#D97706] via-[#E08738] to-[#F59E0B] hover:brightness-105 text-slate-950 border border-amber-300/40 shadow-[0_10px_25px_-3px_rgba(224,135,56,0.45)] hover:shadow-[0_16px_35px_-4px_rgba(224,135,56,0.6)] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer overflow-hidden ring-1 ring-white/20"
+        className="group relative flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#D97706] via-[#E08738] to-[#F59E0B] hover:brightness-105 text-slate-950 border border-amber-300/40 shadow-[0_10px_25px_-3px_rgba(224,135,56,0.45)] hover:shadow-[0_16px_35px_-4px_rgba(224,135,56,0.6)] transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer overflow-hidden ring-1 ring-white/20"
       >
         {/* Sleek horizontal progress line at bottom */}
         <div

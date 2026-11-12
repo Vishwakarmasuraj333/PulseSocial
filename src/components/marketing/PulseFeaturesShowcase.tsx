@@ -30,10 +30,9 @@ function FeatureDisplay({
   posterSrc,
   alt,
   interactiveComponent,
-  brandOverlay,
   maxWidth = "max-w-[620px]",
 }: FeatureDisplayProps) {
-  const [mode, setMode] = useState<"video" | "interactive">("video");
+  const [mode, setMode] = useState<"interactive" | "video">("interactive");
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -51,57 +50,50 @@ function FeatureDisplay({
   return (
     <div className={`w-full ${maxWidth} flex flex-col items-center select-none group/display`}>
       {/* View Switcher Controls (Dedicated Top Toolbar - Zero Overlap on Graphic Content) */}
-      <div className="w-full flex items-center justify-end mb-2.5 pr-0.5">
-        <div className="inline-flex items-center bg-slate-100/90 dark:bg-slate-900/90 rounded-full border border-slate-200/90 dark:border-slate-800 p-0.5 shadow-xs text-[10px] sm:text-[11px] font-semibold backdrop-blur-md">
+      <div className="w-full flex items-center justify-center sm:justify-end mb-4">
+        <div className="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-900 rounded-full border border-slate-200 dark:border-slate-800 p-1 shadow-xs text-[11px] font-semibold">
           <button
-            onClick={() => setMode("video")}
-            className={`px-2.5 sm:px-3 py-1 rounded-full transition-all cursor-pointer ${
-              mode === "video"
-                ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs font-bold"
-                : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
-            }`}
-            title="Watch continuous 60fps animation loop"
-          >
-            🎬 60fps Animation
-          </button>
-          <button
+            type="button"
             onClick={() => setMode("interactive")}
-            className={`px-2.5 sm:px-3 py-1 rounded-full transition-all cursor-pointer ${
+            className={`px-3 py-1.5 rounded-full transition-colors cursor-pointer whitespace-nowrap ${
               mode === "interactive"
                 ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs font-bold"
-                : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
             }`}
-            title="Interact directly with controls"
+            title="Interact directly with sharp live controls"
           >
-            ⚡ Live Interactive UI
+            Interactive Preview
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("video")}
+            className={`px-3 py-1.5 rounded-full transition-colors cursor-pointer whitespace-nowrap ${
+              mode === "video"
+                ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs font-bold"
+                : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+            }`}
+            title="Watch animated walkthrough loop"
+          >
+            Video Demo
           </button>
         </div>
       </div>
 
       {mode === "video" ? (
-        <div className="relative w-full flex items-center justify-center">
+        <div className="relative w-full flex items-center justify-center rounded-2xl overflow-hidden border border-slate-200/80 dark:border-slate-800 bg-white">
           <video
             ref={videoRef}
-            className="w-full h-auto object-contain block select-none pointer-events-none drop-shadow-sm rounded-2xl"
-            style={{
-              WebkitBackfaceVisibility: "hidden",
-              backfaceVisibility: "hidden",
-              transform: "translateZ(0)",
-              imageRendering: "-webkit-optimize-contrast",
-            }}
+            className="w-full h-auto object-contain block select-none pointer-events-none"
             autoPlay
             loop
             muted
             playsInline
-            preload="auto"
+            preload="metadata"
             poster={posterSrc}
             aria-label={alt}
           >
             <source src={videoSrc} type="video/mp4" />
           </video>
-
-          {/* Authentic PulseSocial PS Monogram Brand Overlays */}
-          {brandOverlay}
         </div>
       ) : (
         <div className="w-full flex items-center justify-center animate-in fade-in duration-300">
@@ -176,40 +168,6 @@ export function PulseFeaturesShowcase() {
               alt="PulseSocial Flexible Scheduling UI Animation"
               maxWidth="max-w-[660px]"
               interactiveComponent={<PulseScheduleVisual />}
-              brandOverlay={
-                /* Seamless PulseSocial PS Logo Channel Row overlaying video */
-                <div
-                  className="absolute pointer-events-none z-20 flex items-center gap-1.5 bg-white px-2 py-1 rounded-xl shadow-xs"
-                  style={{
-                    top: "20.4%",
-                    left: "5.8%",
-                    width: "33.5%",
-                    height: "5.8%",
-                  }}
-                >
-                  {[
-                    { icon: <FacebookIcon size={9} />, bg: "#1877F2" },
-                    { icon: <XIcon size={9} />, bg: "#000000" },
-                    { icon: <LinkedInIcon size={9} />, bg: "#0A66C2" },
-                    { icon: <GoogleBusinessIcon size={9} />, bg: "#1668e3" },
-                    { icon: <InstagramIcon size={9} />, bg: "#E1306C" },
-                    { icon: <YouTubeIcon size={9} />, bg: "#FF0000" },
-                  ].map((ch, idx) => (
-                    <div
-                      key={idx}
-                      className="relative w-4.5 h-4.5 sm:w-5.5 sm:h-5.5 rounded-full bg-gradient-to-tr from-[#1E3A8A] to-[#4F46E5] flex items-center justify-center text-white text-[8px] font-black shrink-0"
-                    >
-                      <span className="scale-75">PS</span>
-                      <span
-                        className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full text-white flex items-center justify-center p-0.5"
-                        style={{ backgroundColor: ch.bg }}
-                      >
-                        {ch.icon}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              }
             />
           </div>
         </div>

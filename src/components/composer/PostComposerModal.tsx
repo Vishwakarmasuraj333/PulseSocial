@@ -188,12 +188,12 @@ export const HASHTAG_CATEGORIES = [
 const STOCK_MEDIA = [
   {
     title: "Brand Campaign Hero Showcase",
-    url: "/images/post_office_scene.jpg",
+    url: "/images/pulsesocial_hero_banner.jpg",
     type: "image",
   },
   {
     title: "Official Brand Identity Asset",
-    url: "/icons/pulse-logo.svg",
+    url: "/icon.svg",
     type: "image",
   },
   {
@@ -2284,7 +2284,7 @@ export function PostComposerModal({
             {[
               ...STOCK_MEDIA,
               { title: "Brand Multi-Channel Hero", url: "/images/auth_illustration.png", type: "image" },
-              { title: "Suraj Vishwakarma Profile", url: "/images/founder.jpg", type: "image" },
+              { title: "Suraj Vishwakarma Profile", url: "/images/founder_suraj.jpg", type: "image" },
             ]
               .filter((m) =>
                 !mediaLibrarySearch

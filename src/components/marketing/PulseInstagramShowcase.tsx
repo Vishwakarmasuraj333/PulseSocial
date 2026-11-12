@@ -446,25 +446,37 @@ export function PulseInstagramShowcase() {
                   </div>
                 </div>
 
-                {/* Photo Media */}
+                  {/* Photo Media */}
                 <div className="w-full h-64 sm:h-72 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 relative group">
                   <img
                     src={card.image}
                     alt={card.caption}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    loading="lazy"
+                    loading="eager"
+                    onError={(e) => {
+                      const fallbacks = [
+                        "/images/social/social-post1.png",
+                        "/images/social/social-post2.png",
+                        "/images/social/social-post3.png",
+                      ];
+                      const el = e.currentTarget;
+                      if (!el.dataset.fallbackApplied) {
+                        el.dataset.fallbackApplied = "1";
+                        el.src = fallbacks[idx % fallbacks.length];
+                      }
+                    }}
                   />
                   <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors" />
+                </div>
 
-                  {/* Floating badge */}
-                  <div className="absolute top-2.5 right-2.5 bg-black/70 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md">
-                    <Sparkles className="w-3 h-3 text-amber-300" />
-                    <span>Scheduled with PulseSocial</span>
-                  </div>
+                {/* Status pill placed cleanly below image so nothing obscures the photo */}
+                <div className="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-800/80 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold">
+                  <Sparkles className="w-3 h-3 text-amber-500 shrink-0" />
+                  <span>Scheduled with PulseSocial</span>
                 </div>
 
                 {/* Caption text */}
-                <p className="mt-3 text-xs text-slate-800 dark:text-slate-200 font-medium text-left line-clamp-2 leading-relaxed">
+                <p className="mt-2 text-xs text-slate-800 dark:text-slate-200 font-medium text-left line-clamp-2 leading-relaxed">
                   {card.caption}
                 </p>
 

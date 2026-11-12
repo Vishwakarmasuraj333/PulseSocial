@@ -86,7 +86,7 @@ export function MarketingFooter() {
   return (
     <footer
       aria-label="PulseSocial Site Footer"
-      className="bg-slate-950 text-slate-400 border-t border-slate-800/80 pt-16 pb-12 select-none relative z-10"
+      className="bg-slate-950 text-slate-400 border-t border-slate-800/80 pt-14 pb-24 sm:pb-20 select-none relative z-10"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* ============================================================ */}
@@ -137,7 +137,7 @@ export function MarketingFooter() {
         {/* ============================================================ */}
         <div className="flex flex-col lg:flex-row items-start justify-between gap-10 lg:gap-10 xl:gap-14 pb-12 border-b border-slate-800/80">
           {/* Brand Column (Dedicated width on desktop, perfectly balanced) */}
-          <div className="w-full lg:w-[280px] xl:w-[320px] shrink-0 space-y-4">
+          <div className="w-full lg:w-[300px] xl:w-[320px] shrink-0 space-y-4">
             <PulseSocialLogo size="md" theme="dark" variant="full" href="/" />
             <p className="text-xs text-slate-300 max-w-sm leading-relaxed">
               PulseSocial is the unified social media management SaaS platform for modern teams, creators, and enterprises. Publish, schedule, collaborate, and analyze from one powerful command center.
@@ -145,17 +145,17 @@ export function MarketingFooter() {
 
             {/* Direct Contact Details */}
             <div className="pt-3 space-y-2 text-xs text-slate-300 border-t border-slate-850">
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-white">Support:</span>
+              <div className="flex items-start gap-2">
+                <span className="font-semibold text-white whitespace-nowrap shrink-0">Support:</span>
                 <a
                   href={`mailto:${CONTACT_CONFIG.emails.support}`}
-                  className="hover:text-purple-400 transition underline underline-offset-2"
+                  className="hover:text-purple-400 transition underline underline-offset-2 break-all"
                 >
                   {CONTACT_CONFIG.emails.support}
                 </a>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-white">Direct Line:</span>
+              <div className="flex items-start gap-2">
+                <span className="font-semibold text-white whitespace-nowrap shrink-0">Direct Line:</span>
                 <a
                   href={`tel:${CONTACT_CONFIG.phone.tel}`}
                   className="hover:text-purple-400 transition font-mono"
@@ -163,11 +163,11 @@ export function MarketingFooter() {
                   {CONTACT_CONFIG.phone.display} ({CONTACT_CONFIG.phone.numeric})
                 </a>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-white">Sales:</span>
+              <div className="flex items-start gap-2">
+                <span className="font-semibold text-white whitespace-nowrap shrink-0">Sales:</span>
                 <a
                   href={`mailto:${CONTACT_CONFIG.emails.sales}`}
-                  className="hover:text-purple-400 transition underline underline-offset-2"
+                  className="hover:text-purple-400 transition underline underline-offset-2 break-all"
                 >
                   {CONTACT_CONFIG.emails.sales}
                 </a>
@@ -228,23 +228,23 @@ export function MarketingFooter() {
           </div>
 
           {/* 5 Nav Link Columns (Span evenly across remaining space) */}
-          <div className="flex-1 w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-6 xl:gap-8 justify-between">
+          <div className="flex-1 w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-5 xl:gap-8 justify-between">
             {footerSections.map((section) => (
               <div key={section.title} className="space-y-3 min-w-0">
                 <h4 className="text-xs font-bold text-white uppercase tracking-wider">
                   {section.title}
                 </h4>
-                <ul className="space-y-2 text-xs">
+                <ul className="space-y-2.5 text-xs">
                   {section.links.map((link: any) => (
                     <li key={link.label}>
                       {link.isCookieSettings ? (
                         <button
                           type="button"
                           onClick={handleOpenCookieSettings}
-                          className="hover:text-white transition-colors cursor-pointer text-left focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-purple-400 rounded flex items-center gap-1.5"
+                          className="hover:text-white transition-colors cursor-pointer text-left focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-purple-400 rounded inline-flex items-center gap-1.5"
                         >
-                          <Sliders className="w-3 h-3 text-purple-400" />
                           <span>{link.label}</span>
+                          <Sliders className="w-3 h-3 text-purple-400 shrink-0" />
                         </button>
                       ) : (
                         <Link

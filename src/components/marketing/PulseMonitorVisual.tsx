@@ -18,35 +18,7 @@ export function PulseMonitorVisual() {
   }, []);
 
   return (
-    <div className="relative w-full max-w-[580px] pt-4 pb-12 sm:pb-16 select-none">
-      {/* ---------------------------------------------------- */}
-      {/* HAND-DRAWN DOODLES (Monitor, Coffee Cup, Plant)     */}
-      {/* ---------------------------------------------------- */}
-      <div className="absolute bottom-0 right-0 sm:right-4 pointer-events-none z-30 opacity-90 animate-float-reverse">
-        <svg width="180" height="90" viewBox="0 0 180 90" fill="none">
-          {/* Potted Plant (Left) */}
-          <path d="M 20 82 L 32 82 L 30 65 L 22 65 Z" stroke="#0F172A" strokeWidth="2" fill="#FFFFFF" />
-          <path d="M 26 65 Q 20 50 12 52 M 26 65 Q 26 44 26 40 M 26 65 Q 32 50 40 52" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" />
-
-          {/* Desktop Computer Monitor (Center) */}
-          <rect x="52" y="10" width="76" height="52" rx="4" stroke="#0F172A" strokeWidth="2.5" fill="#FFFFFF" />
-          {/* Stand */}
-          <path d="M 85 62 L 77 78 L 103 78 L 95 62" stroke="#0F172A" strokeWidth="2.5" fill="#FFFFFF" strokeLinejoin="round" />
-          <line x1="70" y1="78" x2="110" y2="78" stroke="#0F172A" strokeWidth="2.5" strokeLinecap="round" />
-          {/* PulseSocial Logo on Screen with Live Beacon */}
-          <g transform="translate(76, 22) scale(0.42)">
-            <rect width="64" height="64" rx="16" fill="#1E3A8A" />
-            <path d="M18 46 L18 18 L28 18 C33.5 18 37 21.5 37 26.5 C37 31.5 33.5 35 28 35 L18 35" fill="none" stroke="#FFFFFF" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M47 22 C44 18 38 18 35 21 C32 24 34.5 28 40.5 30.5 C46.5 33 48.5 36.5 46.5 41 C44.5 45.5 37.5 46.5 31.5 44" fill="none" stroke="#38BDF8" strokeWidth="6" strokeLinecap="round" />
-          </g>
-
-          {/* Coffee Mug with Animated Steam (Right) */}
-          <rect x="140" y="54" width="18" height="24" rx="2" stroke="#0F172A" strokeWidth="2" fill="#FFFFFF" />
-          <path d="M 158 58 Q 166 64 158 72" stroke="#0F172A" strokeWidth="2" fill="none" />
-          <path d="M 145 48 Q 148 42 144 38 M 151 46 Q 154 40 150 36" stroke="#0F172A" strokeWidth="1.5" strokeLinecap="round" className="animate-pulse" />
-        </svg>
-      </div>
-
+    <div className="relative w-full max-w-[580px] pt-2 pb-4 sm:pb-8 select-none">
       {/* ---------------------------------------------------- */}
       {/* 2 STAGGERED LISTENING COLUMNS                        */}
       {/* ---------------------------------------------------- */}
@@ -131,8 +103,8 @@ export function PulseMonitorVisual() {
 
             {/* Post 1: Eric Upzzfun */}
             <div className="mt-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
                   <div className="w-6 h-6 rounded-full bg-slate-200 overflow-hidden relative shrink-0">
                     <Image
                       src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&auto=format&fit=crop&q=80"
@@ -141,12 +113,12 @@ export function PulseMonitorVisual() {
                       className="object-cover"
                     />
                   </div>
-                  <div>
-                    <span className="font-bold text-[11px] text-slate-900 dark:text-white">Eric Upzzfun</span>
-                    <span className="text-[9px] text-slate-400 ml-1.5">6 Jan 2026 04:47 PM</span>
+                  <div className="min-w-0 leading-tight">
+                    <div className="font-bold text-[11px] text-slate-900 dark:text-white truncate">Eric Upzzfun</div>
+                    <div className="text-[9px] text-slate-400">6 Jan 2026 &bull; 04:47 PM</div>
                   </div>
                 </div>
-                <span className="px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-extrabold text-[8px] uppercase">
+                <span className="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-extrabold text-[8px] uppercase shrink-0">
                   Lead
                 </span>
               </div>
@@ -161,8 +133,8 @@ export function PulseMonitorVisual() {
 
             {/* Post 2: Anudeep Srikanth */}
             <div className="mt-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
                   <div className="w-6 h-6 rounded-full bg-slate-200 overflow-hidden relative shrink-0">
                     <Image
                       src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&auto=format&fit=crop&q=80"
@@ -171,12 +143,12 @@ export function PulseMonitorVisual() {
                       className="object-cover"
                     />
                   </div>
-                  <div>
-                    <span className="font-bold text-[11px] text-slate-900 dark:text-white">Anudeep Srikanth</span>
-                    <span className="text-[9px] text-slate-400 ml-1.5">7 Feb 2026 04:05 PM</span>
+                  <div className="min-w-0 leading-tight">
+                    <div className="font-bold text-[11px] text-slate-900 dark:text-white truncate">Anudeep Srikanth</div>
+                    <div className="text-[9px] text-slate-400">7 Feb 2026 &bull; 04:05 PM</div>
                   </div>
                 </div>
-                <span className="px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-extrabold text-[8px] uppercase">
+                <span className="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-extrabold text-[8px] uppercase shrink-0">
                   Lead
                 </span>
               </div>

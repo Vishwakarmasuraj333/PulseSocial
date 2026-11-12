@@ -33,49 +33,24 @@ export function PulseCalendarVisual() {
 
   return (
     <div
-      className="relative w-full max-w-[620px] py-4 sm:py-6 select-none"
+      className="relative w-full max-w-[620px] py-2 sm:py-4 select-none"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* ---------------------------------------------------- */}
-      {/* HAND-DRAWN DOODLES (Paper Plane & Calendar Block 28) */}
-      {/* ---------------------------------------------------- */}
-      {/* Paper airplane with curved red dashed trail (Top Left) */}
-      <div className="absolute top-0 left-2 sm:left-6 pointer-events-none z-30 opacity-90 animate-float-slow">
-        <svg width="120" height="90" viewBox="0 0 120 90" fill="none">
-          <path d="M 15 15 Q 40 45 75 70" stroke="#EF4444" strokeWidth="1.5" strokeDasharray="4 4" fill="none" />
-          <g transform="translate(10, 8) rotate(-45) scale(0.85)">
-            <path d="M 0 25 L 35 0 L 18 38 L 14 26 L 0 25 Z" fill="#FFFFFF" stroke="#0F172A" strokeWidth="2" strokeLinejoin="round" />
-            <path d="M 35 0 L 14 26" stroke="#0F172A" strokeWidth="1.8" />
-          </g>
-        </svg>
-      </div>
-
-      {/* Desk Calendar block doodle showing '28' (Bottom Right) */}
-      <div className="absolute -bottom-3 right-2 sm:right-6 pointer-events-none z-30 opacity-90 animate-float-reverse">
-        <svg width="70" height="70" viewBox="0 0 70 70" fill="none">
-          <rect x="12" y="14" width="46" height="48" rx="4" stroke="#0F172A" strokeWidth="2.5" fill="#FFFFFF" />
-          <path d="M 12 26 L 58 26" stroke="#0F172A" strokeWidth="2" />
-          <line x1="22" y1="8" x2="22" y2="16" stroke="#0F172A" strokeWidth="2.5" strokeLinecap="round" />
-          <line x1="48" y1="8" x2="48" y2="16" stroke="#0F172A" strokeWidth="2.5" strokeLinecap="round" />
-          <text x="35" y="50" textAnchor="middle" fontSize="20" fontWeight="900" fill="#EF4444" fontFamily="sans-serif">28</text>
-        </svg>
-      </div>
-
-      {/* ---------------------------------------------------- */}
-      {/* CALENDAR MAIN CARD WITH OVERLAPPING LEFT CONTEXT MENU*/}
+      {/* CALENDAR MAIN CARD WITH LEFT CONTEXT MENU            */}
       {/* ---------------------------------------------------- */}
       <div className="flex items-center justify-center relative">
-        {/* Main Calendar Viewport Card with pl-52 so left menu never covers dates */}
-        <div className="w-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xl p-4 sm:p-6 text-left pl-6 sm:pl-48 lg:pl-52 transition-transform duration-300 hover:scale-[1.01]">
+        {/* Main Calendar Viewport Card with left padding so context menu never covers dates */}
+        <div className="w-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xl p-3.5 sm:p-6 text-left sm:pl-44 lg:pl-48">
           {/* Header Controls */}
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-            <div className="flex items-center gap-2">
-              <button className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700">
+          <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="flex items-center gap-1 sm:gap-2 min-w-0">
+              <button className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 shrink-0">
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-white">January 2026</span>
-              <button className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700">
+              <span className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-white whitespace-nowrap">January 2026</span>
+              <button className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 shrink-0">
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
@@ -120,9 +95,10 @@ export function PulseCalendarVisual() {
               }`}
             >
               <div className="text-[10px] font-bold text-slate-500">1</div>
-              <div className="mt-1 px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/80 border border-amber-300/50 text-[9px] font-bold text-amber-800 dark:text-amber-300 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
-                <span>07:35 PM</span>
+              <div className="mt-1 px-1 sm:px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/80 border border-amber-300/50 text-[8px] sm:text-[9px] font-bold text-amber-800 dark:text-amber-300 flex items-center gap-1 whitespace-nowrap overflow-hidden">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                <span className="sm:hidden">7:35p</span>
+                <span className="hidden sm:inline">07:35 PM</span>
               </div>
             </div>
 
@@ -140,10 +116,11 @@ export function PulseCalendarVisual() {
               }`}
             >
               <div className="text-[10px] font-bold text-slate-500">6</div>
-              <div className="mt-1 px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/70 border border-blue-200 text-blue-800 dark:text-blue-300 text-[9px] font-semibold flex items-center gap-1 truncate shadow-xs">
+              <div className="mt-1 px-1 sm:px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/70 border border-blue-200 text-blue-800 dark:text-blue-300 text-[8px] sm:text-[9px] font-semibold flex items-center gap-1 shadow-xs overflow-hidden">
                 {/* PS Avatar Dot */}
                 <span className="w-2.5 h-2.5 rounded-full bg-[#1E3A8A] shrink-0 flex items-center justify-center text-[5px] text-white font-black">P</span>
-                <span className="truncate">Feature Drop</span>
+                <span className="truncate sm:hidden">Drop</span>
+                <span className="truncate hidden sm:inline">Feature Drop</span>
               </div>
             </div>
 
@@ -156,9 +133,10 @@ export function PulseCalendarVisual() {
               }`}
             >
               <div className="text-[10px] font-bold text-slate-500">7</div>
-              <div className="mt-1 px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/70 border border-blue-200 text-blue-800 dark:text-blue-300 text-[9px] font-semibold flex items-center gap-1 truncate shadow-xs">
+              <div className="mt-1 px-1 sm:px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/70 border border-blue-200 text-blue-800 dark:text-blue-300 text-[8px] sm:text-[9px] font-semibold flex items-center gap-1 shadow-xs overflow-hidden">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#1E3A8A] shrink-0 flex items-center justify-center text-[5px] text-white font-black">P</span>
-                <span className="truncate">Amalfi Reel</span>
+                <span className="truncate sm:hidden">Reel</span>
+                <span className="truncate hidden sm:inline">Amalfi Reel</span>
               </div>
             </div>
 
@@ -212,8 +190,8 @@ export function PulseCalendarVisual() {
           </div>
         </div>
 
-        {/* Floating Left Context Menu (Exact Zoho Style) */}
-        <div className="absolute left-0 sm:-left-6 top-1/2 -translate-y-1/2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-2xl p-2.5 w-44 sm:w-48 z-20 space-y-1 text-left hidden sm:block">
+        {/* Floating Left Context Menu */}
+        <div className="absolute left-0 sm:-left-3 top-1/2 -translate-y-1/2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-2xl p-2 w-40 lg:w-44 z-20 space-y-1 text-left hidden sm:block">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isSelected = activeMenu === item.id;

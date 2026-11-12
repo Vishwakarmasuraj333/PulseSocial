@@ -56,7 +56,7 @@ const DEFAULT_BOARDS: BrandBoardItem[] = [
     title: "Seasonal Promotion & Campaign Creatives",
     category: "Promotional",
     itemsCount: 9,
-    coverImage: "/images/post_office_scene.jpg",
+    coverImage: "/images/pulsesocial_hero_banner.jpg",
     updatedAt: "Updated 3 days ago",
     tags: ["Discounts", "Q4 Campaign", "Banners"],
   },

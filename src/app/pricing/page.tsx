@@ -145,7 +145,13 @@ export default function PricingPage() {
                 }`}
               >
                 <span>Annual</span>
-                <span className="text-[10px] px-1.5 py-0.2 rounded bg-purple-100 dark:bg-amber-500/20 text-[#5846A8] dark:text-[#FBBF24] font-bold">
+                <span
+                  className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+                    billingCycle === "annual"
+                      ? "bg-white/20 text-white dark:bg-slate-950/15 dark:text-slate-950"
+                      : "bg-purple-100 dark:bg-amber-500/20 text-[#5846A8] dark:text-[#FBBF24]"
+                  }`}
+                >
                   Save 20%
                 </span>
               </button>
@@ -200,11 +206,11 @@ export default function PricingPage() {
                     )}
                   </div>
 
-                  <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 mb-6">
+                  <ul className="space-y-2.5 text-xs leading-5 text-slate-700 dark:text-slate-300 mb-6">
                     {p.features.map((f: string) => (
                       <li key={f} className="flex items-start gap-2.5">
-                        <Check className="w-4 h-4 text-[#5846A8] dark:text-[#E08738] shrink-0 mt-0.5" />
-                        <span className="leading-snug">{f}</span>
+                        <Check className="w-4 h-4 text-[#5846A8] dark:text-[#E08738] shrink-0 mt-[2px]" />
+                        <span>{f}</span>
                       </li>
                     ))}
                   </ul>

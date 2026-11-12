@@ -266,13 +266,14 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
                     } group`}
                   >
                     {/* Icon A */}
-                    <div className="mb-3 sm:mb-4 flex items-center justify-center h-10 transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-110">
+                    <div className="mb-3 sm:mb-4 flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white shadow-md border border-purple-100/90 p-2 transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-110 shrink-0">
                       <Image
                         src={col.itemA.logo}
-                        width={40}
-                        height={40}
+                        width={28}
+                        height={28}
                         alt={`${col.itemA.platform} icon`}
-                        className="w-8 sm:w-10 h-8 sm:h-10 drop-shadow-sm"
+                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain"
+                        priority
                       />
                     </div>
 
@@ -307,13 +308,14 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
                     } group`}
                   >
                     {/* Icon B */}
-                    <div className="mb-3 sm:mb-4 flex items-center justify-center h-10 transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-110">
+                    <div className="mb-3 sm:mb-4 flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white shadow-md border border-purple-100/90 p-2 transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-110 shrink-0">
                       <Image
                         src={col.itemB.logo}
-                        width={40}
-                        height={40}
+                        width={28}
+                        height={28}
                         alt={`${col.itemB.platform} icon`}
-                        className="w-8 sm:w-10 h-8 sm:h-10 drop-shadow-sm"
+                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain"
+                        priority
                       />
                     </div>
 

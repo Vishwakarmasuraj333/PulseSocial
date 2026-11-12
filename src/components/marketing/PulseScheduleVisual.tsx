@@ -100,80 +100,15 @@ export function PulseScheduleVisual() {
       onMouseLeave={() => setIsUserHovering(false)}
     >
       {/* ---------------------------------------------------- */}
-      {/* HAND-DRAWN DOODLES (Paper Plane & Hourglass)         */}
+      {/* CARDS CONTAINER                                      */}
       {/* ---------------------------------------------------- */}
-      {/* Flying Paper Airplane with live floating animation */}
-      <div className="absolute -top-3 sm:top-1 right-2 sm:right-6 pointer-events-none z-30 opacity-90 animate-float-slow">
-        <svg width="120" height="90" viewBox="0 0 120 90" fill="none">
-          <path
-            d="M 10 75 Q 45 60 70 30"
-            stroke="#EF4444"
-            strokeWidth="1.5"
-            strokeDasharray="4 4"
-            fill="none"
-          />
-          <g transform="translate(68, 8) rotate(-15) scale(0.85)">
-            <path
-              d="M 0 25 L 35 0 L 18 38 L 14 26 L 0 25 Z"
-              fill="#FFFFFF"
-              stroke="#0F172A"
-              strokeWidth="2"
-              strokeLinejoin="round"
-            />
-            <path d="M 35 0 L 14 26" stroke="#0F172A" strokeWidth="1.8" />
-          </g>
-        </svg>
-      </div>
-
-      {/* Hourglass positioned cleanly below without overlapping the button */}
-      <div className="absolute -bottom-8 right-2 sm:right-6 pointer-events-none z-30 opacity-90">
-        <svg width="65" height="85" viewBox="0 0 75 95" fill="none">
-          <path
-            d="M 12 10 L 62 10 M 12 85 L 62 85"
-            stroke="#0F172A"
-            strokeWidth="3.5"
-            strokeLinecap="round"
-          />
-          <path
-            d="M 18 10 C 18 35 32 45 37 47.5 C 42 45 56 35 56 10 M 18 85 C 18 60 32 50 37 47.5 C 42 50 56 60 56 85"
-            stroke="#0F172A"
-            strokeWidth="3"
-            fill="none"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M 24 28 C 24 35 32 40 37 45 C 42 40 50 35 50 28 Z"
-            fill="#F59E0B"
-            opacity="0.9"
-          />
-          <line
-            x1="37"
-            y1="46"
-            x2="37"
-            y2="70"
-            stroke="#F59E0B"
-            strokeWidth="2.5"
-            strokeDasharray="4 2"
-            className="animate-sand"
-          />
-          <path
-            d="M 23 83 C 26 73 34 71 37 71 C 40 71 48 73 51 83 Z"
-            fill="#F59E0B"
-            opacity="0.9"
-          />
-        </svg>
-      </div>
-
-      {/* ---------------------------------------------------- */}
-      {/* OVERLAPPING CARDS CONTAINER                          */}
-      {/* ---------------------------------------------------- */}
-      <div className="flex flex-col sm:flex-row items-center sm:items-start justify-center gap-4 sm:gap-2 relative">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start justify-center gap-4 sm:gap-3 relative">
         {/* =================================================== */}
         {/* CARD 1: POST COMPOSER PREVIEW (Left Card)           */}
         {/* =================================================== */}
-        <div className="w-full max-w-[360px] sm:max-w-[385px] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xl p-4 sm:p-5 z-10 transition-transform duration-300 hover:scale-[1.01]">
-          {/* 1. ROW OF 7 CHANNEL AVATARS WITH PS LOGO (All 7 fully visible) */}
-          <div className="flex items-center justify-between gap-1 sm:gap-1.5 pb-3.5 border-b border-slate-100 dark:border-slate-800">
+        <div className="w-full max-w-[360px] sm:max-w-[385px] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xl p-4 sm:p-5 z-10">
+          {/* 1. ROW OF 6 CHANNEL AVATARS WITH PS LOGO */}
+          <div className="flex items-center justify-between gap-1.5 sm:gap-2 pb-3.5 border-b border-slate-100 dark:border-slate-800">
             {channels.map((ch, idx) => {
               const isActive = activeChannelIdx === idx;
               return (
@@ -185,20 +120,20 @@ export function PulseScheduleVisual() {
                 >
                   {/* Character limit counter pill for X */}
                   {ch.counter && (
-                    <span className="absolute -top-3 -right-1 px-1.5 py-0.2 rounded-full bg-slate-800 text-white text-[9px] font-bold z-20 shadow-xs border border-white dark:border-slate-800 leading-tight">
+                    <span className="absolute -top-2.5 -right-1 px-1.5 py-0.2 rounded-full bg-slate-800 text-white text-[9px] font-bold z-20 shadow-xs border border-white dark:border-slate-800 leading-tight">
                       {ch.counter}
                     </span>
                   )}
 
                   {/* Circular Avatar with Authentic PulseSocial 'PS' Logo */}
                   <div
-                    className={`w-8.5 h-8.5 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-[#1E3A8A] via-[#2E3788] to-[#4F46E5] flex items-center justify-center p-0.5 shadow-sm border transition-all duration-300 ${
+                    className={`w-9 h-9 rounded-full bg-gradient-to-tr from-[#1E3A8A] via-[#2E3788] to-[#4F46E5] flex items-center justify-center shadow-sm border transition-all duration-300 ${
                       isActive
-                        ? "border-purple-500 scale-110 ring-2 ring-purple-400/40"
+                        ? "border-purple-500 scale-105 ring-2 ring-purple-400/40"
                         : "border-white dark:border-slate-800 group-hover:scale-105"
                     }`}
                   >
-                    <svg width="20" height="20" viewBox="0 0 64 64" fill="none">
+                    <svg width="16" height="16" viewBox="0 0 64 64" fill="none">
                       <path
                         d="M18 46 L18 18 L28 18 C33.5 18 37 21.5 37 26.5 C37 31.5 33.5 35 28 35 L18 35"
                         fill="none"
@@ -219,10 +154,10 @@ export function PulseScheduleVisual() {
 
                   {/* Social Network Icon Badge at Bottom-Right */}
                   <div
-                    className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center text-white shadow-xs border border-white dark:border-slate-800"
+                    className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-white shadow-xs border border-white dark:border-slate-900"
                     style={{ backgroundColor: ch.badgeBg }}
                   >
-                    {ch.icon(9)}
+                    {ch.icon(8)}
                   </div>
                 </div>
               );

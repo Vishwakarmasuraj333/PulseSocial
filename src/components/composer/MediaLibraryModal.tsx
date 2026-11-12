@@ -18,7 +18,7 @@ const DEFAULT_MEDIA_ITEMS: MediaItem[] = [
   {
     id: "m1",
     title: "Brand Campaign Hero Showcase",
-    url: "/images/post_office_scene.jpg",
+    url: "/images/pulsesocial_hero_banner.jpg",
     type: "image",
     size: "1.8 MB",
     dimensions: "1920x1080",
@@ -26,7 +26,7 @@ const DEFAULT_MEDIA_ITEMS: MediaItem[] = [
   {
     id: "m2",
     title: "Official Brand Identity Asset",
-    url: "/icons/pulse-logo.svg",
+    url: "/icon.svg",
     type: "image",
     size: "480 KB",
     dimensions: "800x800",

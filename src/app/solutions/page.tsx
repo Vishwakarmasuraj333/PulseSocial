@@ -42,8 +42,8 @@ export default function SolutionsPage() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-indigo-500 selection:text-white font-sans">
       <MarketingHeader />
 
-      <main className="pt-32 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+      <main className="pt-10 sm:pt-14 pb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12 space-y-3 sm:space-y-4">
           <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
             Tailored Solutions
           </span>
@@ -55,20 +55,20 @@ export default function SolutionsPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           {solutions.map((s) => {
             const Icon = s.icon;
             return (
               <div
                 key={s.title}
-                className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-xl hover:border-indigo-500/40 transition-all duration-200 flex flex-col justify-between"
+                className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-xl hover:border-indigo-500/40 transition-all duration-200 flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-xs">
-                      <Icon className="w-6 h-6" />
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-xs shrink-0">
+                      <Icon className="w-6 h-6 shrink-0" />
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shrink-0">
                       {s.tag}
                     </span>
                   </div>
@@ -80,11 +80,11 @@ export default function SolutionsPage() {
                     {s.desc}
                   </p>
 
-                  <div className="space-y-2.5 mb-6 text-xs text-slate-700 dark:text-slate-300">
+                  <div className="space-y-2.5 mb-6 text-xs leading-5 text-slate-700 dark:text-slate-300">
                     {s.benefits.map((b) => (
                       <div key={b} className="flex items-start gap-2.5">
-                        <CheckCircle2 className="w-4 h-4 text-purple-500 shrink-0 mt-0.5" />
-                        <span className="leading-snug">{b}</span>
+                        <CheckCircle2 className="w-4 h-4 text-purple-500 shrink-0 mt-[2px]" />
+                        <span>{b}</span>
                       </div>
                     ))}
                   </div>
@@ -96,7 +96,7 @@ export default function SolutionsPage() {
                     className="inline-flex items-center gap-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
                   >
                     <span>Get started with this workflow</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                   </Link>
                 </div>
               </div>

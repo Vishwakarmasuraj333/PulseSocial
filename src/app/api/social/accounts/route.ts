@@ -138,13 +138,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Social provider identifier is required." }, { status: 400 });
     }
 
-    // 1. STRICT PROHIBITION: Never allow an Instagram connection via typed username alone.
-    // Instagram accounts must authenticate via official Instagram Login for Business.
-    if (normalizedProvider === "instagram") {
+    // 1. Instagram accounts require official OAuth authorization or a valid Graph API access token.
+    const providedToken =
+      body.accessToken?.trim() ||
+      body.token?.trim() ||
+      body.metadata?.customField?.trim();
+
+    if (normalizedProvider === "instagram" && !providedToken) {
       return NextResponse.json(
         {
           error:
-            "Instagram accounts cannot be connected via username alone. You must authenticate through official Instagram Login for Professional accounts.",
+            "Instagram accounts cannot be connected via username alone. You must authenticate through official Instagram Login for Professional accounts or provide a valid access token.",
         },
         { status: 400 }
       );
@@ -169,7 +173,7 @@ export async function POST(req: Request) {
     const cleanAccessToken =
       body.accessToken?.trim() ||
       body.token?.trim() ||
-      (normalizedProvider === "telegram" || normalizedProvider === "mastodon"
+      (normalizedProvider === "telegram" || normalizedProvider === "mastodon" || normalizedProvider === "instagram"
         ? body.metadata?.customField?.trim()
         : "");
 

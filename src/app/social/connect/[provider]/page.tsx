@@ -179,18 +179,6 @@ export default function SocialChannelConnectPopupPage() {
   const queryError = searchParams?.get("error");
   const [errorMsg, setErrorMsg] = useState<string | null>(queryError || null);
 
-  // Auto-redirect to live OAuth if accessed directly and no error is present
-  useEffect(() => {
-    if (!queryError) {
-      if (provider === "instagram") {
-        const timer = setTimeout(() => {
-          window.location.href = "/api/social/instagram/connect";
-        }, 400);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [provider, queryError]);
-
   const handleConnect = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (errorMsg) return; // Disallow submission when credentials are unconfigured
@@ -559,12 +547,12 @@ export default function SocialChannelConnectPopupPage() {
                 /* LIVE OAUTH REDIRECTION SCREEN */
                 <div className="space-y-4 text-center py-4">
                   <div className="w-14 h-14 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto shadow-lg">
-                    <Loader2 className="w-7 h-7 text-white animate-spin" />
+                    {renderPlatformIcon(provider, 32)}
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-sm font-bold text-white">Opening {config.name} Authorization...</h3>
+                    <h3 className="text-sm font-bold text-white">Connect {config.name}</h3>
                     <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                      Connecting to official {config.name} OAuth server for workspace access.
+                      Authorize PulseSocial to publish posts, schedule reels, and view insights on your official {config.name} account.
                     </p>
                   </div>
                   <button

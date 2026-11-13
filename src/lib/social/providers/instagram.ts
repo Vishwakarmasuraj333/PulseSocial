@@ -38,6 +38,18 @@ export class InstagramProvider implements SocialProvider {
     return process.env.INSTAGRAM_API_VERSION || process.env.META_API_VERSION || SOCIAL_API_VERSIONS.META_GRAPH || "v21.0";
   }
 
+  /**
+   * Returns true when an Instagram-specific App ID is configured.
+   * When false (only META_APP_ID is configured), authentication must route through
+   * Meta's official OAuth Dialog to avoid "Invalid Request: Request parameters are invalid: Invalid platform app".
+   */
+  private isDedicatedInstagramApp(): boolean {
+    return Boolean(
+      (process.env.INSTAGRAM_APP_ID && process.env.INSTAGRAM_APP_ID.trim()) ||
+      (process.env.INSTAGRAM_CLIENT_ID && process.env.INSTAGRAM_CLIENT_ID.trim())
+    );
+  }
+
   private getAppCredentials(): { appId: string; appSecret: string } {
     const appId = (
       process.env.INSTAGRAM_APP_ID ||
@@ -87,8 +99,10 @@ export class InstagramProvider implements SocialProvider {
   }
 
   /**
-   * Generates the official direct Instagram authorization URL.
-   * NEVER opens or redirects to facebook.com/dialog/oauth.
+   * Generates the official Instagram authorization URL:
+   * 1. If a dedicated INSTAGRAM_APP_ID is present, routes to instagram.com/oauth/authorize.
+   * 2. If configured via META_APP_ID, routes to Meta's official OAuth Dialog (facebook.com/dialog/oauth).
+   *    This permanently prevents Meta's "Invalid Request: Request parameters are invalid: Invalid platform app" error.
    */
   getAuthorizationUrl(
     state: string,
@@ -97,40 +111,69 @@ export class InstagramProvider implements SocialProvider {
     _options?: Record<string, any>
   ): string {
     const { appId } = this.getAppCredentials();
+    const version = this.getApiVersion();
 
-    // Meta's official scopes for Instagram Login with Professional Accounts
-    const defaultScopes = [
-      "instagram_business_basic",
-      "instagram_business_content_publish",
-      "instagram_business_manage_messages",
-      "instagram_business_manage_comments",
-      "instagram_business_manage_insights",
+    if (this.isDedicatedInstagramApp()) {
+      const defaultScopes = [
+        "instagram_business_basic",
+        "instagram_business_content_publish",
+        "instagram_business_manage_messages",
+        "instagram_business_manage_comments",
+        "instagram_business_manage_insights",
+      ].join(",");
+
+      const scopes = process.env.INSTAGRAM_SCOPES?.trim() || defaultScopes;
+
+      const params = new URLSearchParams({
+        client_id: appId,
+        redirect_uri: redirectUri,
+        response_type: "code",
+        scope: scopes,
+        state,
+        enable_fb_login: "0",
+        force_authentication: "1",
+      });
+
+      return `https://www.instagram.com/oauth/authorize?${params.toString()}`;
+    }
+
+    // Official Meta OAuth Dialog with Instagram Graph API permissions
+    const defaultMetaScopes = [
+      "public_profile",
+      "instagram_basic",
+      "instagram_content_publish",
+      "instagram_manage_comments",
+      "instagram_manage_insights",
+      "pages_show_list",
+      "pages_read_engagement",
     ].join(",");
 
-    const scopes = process.env.INSTAGRAM_SCOPES?.trim() || defaultScopes;
+    const scopes =
+      process.env.META_SCOPES_INSTAGRAM?.trim() ||
+      process.env.INSTAGRAM_SCOPES?.trim() ||
+      defaultMetaScopes;
 
     const params = new URLSearchParams({
       client_id: appId,
       redirect_uri: redirectUri,
-      response_type: "code",
-      scope: scopes,
       state,
-      // Official Meta parameter: enable_fb_login=0 ensures ONLY Instagram login is presented,
-      // preventing redirection to personal Facebook login screens.
-      enable_fb_login: "0",
-      force_authentication: "1",
+      scope: scopes,
+      response_type: "code",
+      auth_type: "rerequest",
     });
 
-    return `https://www.instagram.com/oauth/authorize?${params.toString()}`;
+    return `https://www.facebook.com/${version}/dialog/oauth?${params.toString()}`;
   }
 
   /**
    * Exchanges an authorization code for an Instagram access token:
-   * 1. Short-lived token via https://api.instagram.com/oauth/access_token
-   * 2. 60-day long-lived token via https://graph.instagram.com/access_token?grant_type=ig_exchange_token
+   * - Supports dedicated Instagram App authentication (api.instagram.com)
+   * - Supports Meta Graph App authentication (graph.facebook.com)
+   * - Gracefully falls back if one endpoint encounters an error
    */
   async exchangeCode(code: string, redirectUri: string): Promise<OAuthTokenResult> {
     const { appId, appSecret } = this.getAppCredentials();
+    const version = this.getApiVersion();
 
     // Instagram redirects append '#_' to the authorization code in the URL
     const sanitizedCode = (code || "").replace(/#_$/, "").trim();
@@ -138,83 +181,133 @@ export class InstagramProvider implements SocialProvider {
       throw new Error("Missing or invalid authorization code from Instagram OAuth callback.");
     }
 
-    // Step 1: Exchange code for short-lived access token
-    const tokenUrl = "https://api.instagram.com/oauth/access_token";
-    const bodyParams = new URLSearchParams({
+    // Path A: Dedicated Instagram App
+    if (this.isDedicatedInstagramApp()) {
+      try {
+        const tokenUrl = "https://api.instagram.com/oauth/access_token";
+        const bodyParams = new URLSearchParams({
+          client_id: appId,
+          client_secret: appSecret,
+          grant_type: "authorization_code",
+          redirect_uri: redirectUri,
+          code: sanitizedCode,
+        });
+
+        const res = await fetch(tokenUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: bodyParams.toString(),
+        });
+
+        if (res.ok) {
+          const shortLivedData = await res.json();
+          const shortLivedToken = shortLivedData.access_token;
+          const userId = shortLivedData.user_id ? String(shortLivedData.user_id) : undefined;
+
+          if (shortLivedToken && typeof shortLivedToken === "string") {
+            let finalToken = shortLivedToken;
+            let expiresIn = 5184000; // 60 days default
+            let isLongLived = false;
+
+            try {
+              const exchangeUrl = new URL("https://graph.instagram.com/access_token");
+              exchangeUrl.searchParams.set("grant_type", "ig_exchange_token");
+              exchangeUrl.searchParams.set("client_secret", appSecret);
+              exchangeUrl.searchParams.set("access_token", shortLivedToken);
+
+              const longLivedRes = await fetch(exchangeUrl.toString(), {
+                headers: { Accept: "application/json" },
+              });
+
+              if (longLivedRes.ok) {
+                const longLivedData = await longLivedRes.json();
+                if (longLivedData.access_token) {
+                  finalToken = longLivedData.access_token;
+                  expiresIn = typeof longLivedData.expires_in === "number" ? longLivedData.expires_in : 5184000;
+                  isLongLived = true;
+                }
+              }
+            } catch (exchangeErr) {
+              console.warn("Instagram long-lived token exchange warning, falling back to short-lived token:", exchangeErr);
+            }
+
+            const grantedScopes = [
+              "instagram_business_basic",
+              "instagram_business_content_publish",
+              "instagram_business_manage_messages",
+              "instagram_business_manage_comments",
+              "instagram_business_manage_insights",
+            ];
+
+            return {
+              accessToken: finalToken,
+              expiresIn,
+              scopes: grantedScopes,
+              metadata: {
+                userId,
+                tokenType: "Bearer",
+                isLongLived,
+                connectedAt: new Date().toISOString(),
+              },
+            };
+          }
+        }
+      } catch (igErr) {
+        console.warn("Dedicated Instagram token exchange failed, attempting Meta Graph exchange:", igErr);
+      }
+    }
+
+    // Path B: Meta Graph OAuth Exchange (graph.facebook.com)
+    const metaParams = new URLSearchParams({
       client_id: appId,
       client_secret: appSecret,
-      grant_type: "authorization_code",
       redirect_uri: redirectUri,
       code: sanitizedCode,
     });
 
-    const res = await fetch(tokenUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: bodyParams.toString(),
-    });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
+    const metaRes = await fetch(`https://graph.facebook.com/${version}/oauth/access_token?${metaParams.toString()}`);
+    if (!metaRes.ok) {
+      const err = await metaRes.json().catch(() => ({}));
       const msg =
-        err.error_message ||
         err.error?.message ||
+        err.error_message ||
         err.message ||
-        "Failed to exchange authorization code with Instagram API.";
+        "Failed to exchange authorization code with Meta/Instagram API.";
       throw new Error(msg);
     }
 
-    const shortLivedData = await res.json();
-    const shortLivedToken = shortLivedData.access_token;
-    const userId = shortLivedData.user_id ? String(shortLivedData.user_id) : undefined;
-
+    const metaData = await metaRes.json();
+    const shortLivedToken = metaData.access_token;
     if (!shortLivedToken || typeof shortLivedToken !== "string") {
-      throw new Error("Instagram OAuth exchange did not return a valid access token.");
+      throw new Error("Meta OAuth exchange did not return a valid access token.");
     }
 
-    // Step 2: Exchange for long-lived 60-day Instagram access token
-    let finalToken = shortLivedToken;
-    let expiresIn = 5184000; // 60 days default
-    let isLongLived = false;
+    // Step 2: Exchange for long-lived 60-day token
+    const exchangeParams = new URLSearchParams({
+      grant_type: "fb_exchange_token",
+      client_id: appId,
+      client_secret: appSecret,
+      fb_exchange_token: shortLivedToken,
+    });
 
-    try {
-      const exchangeUrl = new URL("https://graph.instagram.com/access_token");
-      exchangeUrl.searchParams.set("grant_type", "ig_exchange_token");
-      exchangeUrl.searchParams.set("client_secret", appSecret);
-      exchangeUrl.searchParams.set("access_token", shortLivedToken);
-
-      const longLivedRes = await fetch(exchangeUrl.toString(), {
-        headers: { Accept: "application/json" },
-      });
-
-      if (longLivedRes.ok) {
-        const longLivedData = await longLivedRes.json();
-        if (longLivedData.access_token) {
-          finalToken = longLivedData.access_token;
-          expiresIn = typeof longLivedData.expires_in === "number" ? longLivedData.expires_in : 5184000;
-          isLongLived = true;
-        }
-      }
-    } catch (exchangeErr) {
-      console.warn("Instagram long-lived token exchange warning, falling back to short-lived token:", exchangeErr);
-    }
-
-    const grantedScopes = [
-      "instagram_business_basic",
-      "instagram_business_content_publish",
-      "instagram_business_manage_messages",
-      "instagram_business_manage_comments",
-      "instagram_business_manage_insights",
-    ];
+    const longLivedRes = await fetch(`https://graph.facebook.com/${version}/oauth/access_token?${exchangeParams.toString()}`);
+    const longLivedData = longLivedRes.ok ? await longLivedRes.json().catch(() => metaData) : metaData;
+    const finalToken = longLivedData?.access_token || shortLivedToken;
 
     return {
       accessToken: finalToken,
-      expiresIn,
-      scopes: grantedScopes,
+      expiresIn: typeof longLivedData?.expires_in === "number" ? longLivedData.expires_in : 5184000,
+      scopes: [
+        "instagram_basic",
+        "instagram_content_publish",
+        "instagram_manage_comments",
+        "instagram_manage_insights",
+        "pages_show_list",
+        "pages_read_engagement",
+      ],
       metadata: {
-        userId,
         tokenType: "Bearer",
-        isLongLived,
+        isLongLived: true,
         connectedAt: new Date().toISOString(),
       },
     };
@@ -225,14 +318,47 @@ export class InstagramProvider implements SocialProvider {
    * Long-lived tokens can be refreshed if they are at least 24 hours old and not yet expired.
    */
   async refreshToken(currentAccessToken: string): Promise<OAuthTokenResult> {
-    const refreshUrl = new URL("https://graph.instagram.com/refresh_access_token");
-    refreshUrl.searchParams.set("grant_type", "ig_refresh_token");
-    refreshUrl.searchParams.set("access_token", currentAccessToken);
+    const { appId, appSecret } = this.getAppCredentials();
+    const version = this.getApiVersion();
 
-    const res = await fetch(refreshUrl.toString(), {
-      headers: { Accept: "application/json" },
+    if (this.isDedicatedInstagramApp()) {
+      try {
+        const refreshUrl = new URL("https://graph.instagram.com/refresh_access_token");
+        refreshUrl.searchParams.set("grant_type", "ig_refresh_token");
+        refreshUrl.searchParams.set("access_token", currentAccessToken);
+
+        const res = await fetch(refreshUrl.toString(), {
+          headers: { Accept: "application/json" },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          return {
+            accessToken: data.access_token,
+            expiresIn: data.expires_in || 5184000,
+            scopes: [
+              "instagram_business_basic",
+              "instagram_business_content_publish",
+              "instagram_business_manage_messages",
+              "instagram_business_manage_comments",
+              "instagram_business_manage_insights",
+            ],
+            metadata: { tokenType: "Bearer", refreshedAt: new Date().toISOString() },
+          };
+        }
+      } catch {
+        // Fall back to Meta exchange
+      }
+    }
+
+    const exchangeParams = new URLSearchParams({
+      grant_type: "fb_exchange_token",
+      client_id: appId,
+      client_secret: appSecret,
+      fb_exchange_token: currentAccessToken,
     });
 
+    const res = await fetch(`https://graph.facebook.com/${version}/oauth/access_token?${exchangeParams.toString()}`);
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error?.message || "Failed to refresh Instagram access token.");
@@ -243,19 +369,20 @@ export class InstagramProvider implements SocialProvider {
       accessToken: data.access_token,
       expiresIn: data.expires_in || 5184000,
       scopes: [
-        "instagram_business_basic",
-        "instagram_business_content_publish",
-        "instagram_business_manage_messages",
-        "instagram_business_manage_comments",
-        "instagram_business_manage_insights",
+        "instagram_basic",
+        "instagram_content_publish",
+        "instagram_manage_comments",
+        "instagram_manage_insights",
+        "pages_show_list",
+        "pages_read_engagement",
       ],
       metadata: { tokenType: "Bearer", refreshedAt: new Date().toISOString() },
     };
   }
 
   /**
-   * Fetches official authenticated Instagram Professional / Business account details
-   * from graph.instagram.com/v21.0/me.
+   * Fetches official authenticated Instagram Professional / Business account details.
+   * Supports both direct graph.instagram.com tokens and Meta graph.facebook.com tokens.
    */
   async getAccounts(accessToken: string): Promise<SocialAccountInfo[]> {
     if (!accessToken || typeof accessToken !== "string" || accessToken.trim() === "") {
@@ -263,65 +390,141 @@ export class InstagramProvider implements SocialProvider {
     }
 
     const version = this.getApiVersion();
-    const primaryUrl = `https://graph.instagram.com/${version}/me?fields=id,username,name,account_type,profile_picture_url,followers_count,media_count&access_token=${encodeURIComponent(
-      accessToken
-    )}`;
 
-    let res = await fetch(primaryUrl, {
-      headers: { Accept: "application/json" },
-    });
-
-    if (!res.ok) {
-      // Fallback without version prefix
-      const fallbackUrl = `https://graph.instagram.com/me?fields=id,username,name,account_type,profile_picture_url,followers_count,media_count&access_token=${encodeURIComponent(
+    // 1. Try graph.instagram.com/me
+    try {
+      const primaryUrl = `https://graph.instagram.com/${version}/me?fields=id,username,name,account_type,profile_picture_url,followers_count,media_count&access_token=${encodeURIComponent(
         accessToken
       )}`;
-      res = await fetch(fallbackUrl, {
+
+      let res = await fetch(primaryUrl, {
         headers: { Accept: "application/json" },
       });
+
+      if (!res.ok) {
+        // Fallback without version prefix
+        const fallbackUrl = `https://graph.instagram.com/me?fields=id,username,name,account_type,profile_picture_url,followers_count,media_count&access_token=${encodeURIComponent(
+          accessToken
+        )}`;
+        res = await fetch(fallbackUrl, {
+          headers: { Accept: "application/json" },
+        });
+      }
+
+      if (!res.ok) {
+        // Basic fallback fields in case permissions for extended fields are not granted
+        const basicUrl = `https://graph.instagram.com/me?fields=id,username,account_type,profile_picture_url&access_token=${encodeURIComponent(
+          accessToken
+        )}`;
+        res = await fetch(basicUrl, {
+          headers: { Accept: "application/json" },
+        });
+      }
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.id) {
+          const accountType = data.account_type || "BUSINESS";
+          const displayName = data.name || data.username || "Instagram Professional";
+
+          return [
+            {
+              providerAccountId: String(data.id),
+              displayName,
+              username: data.username || undefined,
+              profileImageUrl: data.profile_picture_url || undefined,
+              accountType,
+              platform: "instagram",
+              metadata: {
+                instagramUserId: String(data.id),
+                accountType,
+                followersCount: typeof data.followers_count === "number" ? data.followers_count : null,
+                mediaCount: typeof data.media_count === "number" ? data.media_count : null,
+                connectedVia: "instagram_login_for_business",
+              },
+            },
+          ];
+        }
+      }
+    } catch {
+      // Continue to Meta Graph fallback
     }
 
-    if (!res.ok) {
-      // Basic fallback fields in case permissions for extended fields (name, insights) are not granted
-      const basicUrl = `https://graph.instagram.com/me?fields=id,username,account_type,profile_picture_url&access_token=${encodeURIComponent(
-        accessToken
-      )}`;
-      res = await fetch(basicUrl, {
-        headers: { Accept: "application/json" },
-      });
-    }
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      const msg = err.error?.message || "Failed to fetch Instagram account details from graph.instagram.com.";
-      throw new Error(msg);
-    }
-
-    const data = await res.json();
-    if (!data.id) {
-      throw new Error("Instagram API did not return a valid user ID for this account.");
-    }
-
-    const accountType = data.account_type || "BUSINESS";
-    const displayName = data.name || data.username || "Instagram Professional";
-
-    return [
-      {
-        providerAccountId: String(data.id),
-        displayName,
-        username: data.username || undefined,
-        profileImageUrl: data.profile_picture_url || undefined,
-        accountType,
-        platform: "instagram",
-        metadata: {
-          instagramUserId: String(data.id),
-          accountType,
-          followersCount: typeof data.followers_count === "number" ? data.followers_count : null,
-          mediaCount: typeof data.media_count === "number" ? data.media_count : null,
-          connectedVia: "instagram_login_for_business",
+    // 2. Query Meta Graph API (graph.facebook.com) for linked Instagram Business accounts
+    try {
+      const fbUrl = `https://graph.facebook.com/${version}/me/accounts?fields=id,name,picture{url},access_token,tasks,instagram_business_account{id,username,profile_picture_url,name}&limit=50`;
+      const res = await fetch(fbUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/json",
         },
-      },
-    ];
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const accounts: SocialAccountInfo[] = [];
+        const seen = new Set<string>();
+
+        for (const page of data.data || []) {
+          if (page.instagram_business_account && page.instagram_business_account.id) {
+            const ig = page.instagram_business_account;
+            if (!seen.has(ig.id)) {
+              seen.add(ig.id);
+              accounts.push({
+                providerAccountId: String(ig.id),
+                displayName: ig.username || ig.name || page.name,
+                username: ig.username || undefined,
+                profileImageUrl: ig.profile_picture_url || page.picture?.data?.url || undefined,
+                accountType: "BUSINESS",
+                platform: "instagram",
+                metadata: {
+                  instagramUserId: String(ig.id),
+                  linkedPageId: page.id,
+                  linkedPageName: page.name,
+                  pageAccessToken: page.access_token,
+                  connectedVia: "meta_graph_api",
+                },
+              });
+            }
+          }
+        }
+
+        if (accounts.length > 0) {
+          return accounts;
+        }
+      }
+    } catch {
+      // Continue to /me fallback
+    }
+
+    // 3. Meta user profile fallback
+    try {
+      const meUrl = `https://graph.facebook.com/${version}/me?fields=id,name,picture{url}&access_token=${encodeURIComponent(
+        accessToken
+      )}`;
+      const res = await fetch(meUrl, { headers: { Accept: "application/json" } });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.id) {
+          return [
+            {
+              providerAccountId: String(data.id),
+              displayName: data.name || "Instagram Account",
+              profileImageUrl: data.picture?.data?.url || undefined,
+              accountType: "BUSINESS",
+              platform: "instagram",
+              metadata: {
+                connectedVia: "meta_user_profile",
+              },
+            },
+          ];
+        }
+      }
+    } catch {
+      // Continue
+    }
+
+    throw new Error("Failed to fetch Instagram account details from Graph API. Ensure the account has an Instagram Professional profile connected.");
   }
 
   /**
@@ -386,11 +589,18 @@ export class InstagramProvider implements SocialProvider {
       attempts++;
       delayMs = Math.min(delayMs * 1.2, 4000);
 
-      const statusRes = await fetch(
+      let statusRes = await fetch(
         `https://graph.instagram.com/${version}/${creationId}?fields=status_code,status&access_token=${encodeURIComponent(
           accessToken
         )}`
       );
+      if (!statusRes.ok) {
+        statusRes = await fetch(
+          `https://graph.facebook.com/${version}/${creationId}?fields=status_code,status&access_token=${encodeURIComponent(
+            accessToken
+          )}`
+        );
+      }
       const statusData = await statusRes.json().catch(() => ({}));
 
       if (statusData.status_code === "FINISHED") {
@@ -452,7 +662,7 @@ export class InstagramProvider implements SocialProvider {
 
     try {
       // Step 1: Create media container
-      const containerUrl = `https://graph.instagram.com/${version}/${targetAccountId}/media`;
+      let containerUrl = `https://graph.instagram.com/${version}/${targetAccountId}/media`;
       const containerParams = new URLSearchParams({
         caption: post.content || "",
         access_token: accessToken,
@@ -461,12 +671,28 @@ export class InstagramProvider implements SocialProvider {
           : { image_url: firstMedia.url }),
       });
 
-      const containerRes = await fetch(containerUrl, {
+      let containerRes = await fetch(containerUrl, {
         method: "POST",
         body: containerParams,
       });
 
-      const containerData = await containerRes.json().catch(() => ({}));
+      let containerData = await containerRes.json().catch(() => ({}));
+
+      // Fallback to Meta Graph if graph.instagram.com failed
+      if (!containerRes.ok || !containerData.id) {
+        containerUrl = `https://graph.facebook.com/${version}/${targetAccountId}/media`;
+        const fbRes = await fetch(containerUrl, {
+          method: "POST",
+          body: containerParams,
+        });
+        if (fbRes.ok) {
+          const fbData = await fbRes.json().catch(() => ({}));
+          if (fbData.id) {
+            containerRes = fbRes;
+            containerData = fbData;
+          }
+        }
+      }
 
       if (!containerRes.ok || !containerData.id) {
         const errCode = containerData.error?.code;
@@ -502,15 +728,34 @@ export class InstagramProvider implements SocialProvider {
       }
 
       // Step 3: Publish media container
-      const publishRes = await fetch(`https://graph.instagram.com/${version}/${targetAccountId}/media_publish`, {
-        method: "POST",
-        body: new URLSearchParams({
-          creation_id: creationId,
-          access_token: accessToken,
-        }),
+      let publishUrl = `https://graph.instagram.com/${version}/${targetAccountId}/media_publish`;
+      const publishParams = new URLSearchParams({
+        creation_id: creationId,
+        access_token: accessToken,
       });
 
-      const publishData = await publishRes.json().catch(() => ({}));
+      let publishRes = await fetch(publishUrl, {
+        method: "POST",
+        body: publishParams,
+      });
+
+      let publishData = await publishRes.json().catch(() => ({}));
+
+      // Fallback to Meta Graph endpoint if graph.instagram.com fails
+      if (!publishRes.ok || !publishData.id) {
+        publishUrl = `https://graph.facebook.com/${version}/${targetAccountId}/media_publish`;
+        const fbPubRes = await fetch(publishUrl, {
+          method: "POST",
+          body: publishParams,
+        });
+        if (fbPubRes.ok) {
+          const fbPubData = await fbPubRes.json().catch(() => ({}));
+          if (fbPubData.id) {
+            publishRes = fbPubRes;
+            publishData = fbPubData;
+          }
+        }
+      }
       if (!publishRes.ok || !publishData.id) {
         return {
           success: false,

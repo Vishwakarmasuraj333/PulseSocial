@@ -105,9 +105,10 @@ export class MetaProvider implements SocialProvider {
       }
     }
 
-    // Instagram must use official Instagram Login for Business with enable_fb_login=0
-    if (this.platform === "instagram") {
-      const igAppId = process.env.INSTAGRAM_APP_ID || process.env.INSTAGRAM_CLIENT_ID || appId;
+    // If a dedicated Instagram App ID exists, use Instagram's direct OAuth endpoint
+    const hasDedicatedIgApp = Boolean(process.env.INSTAGRAM_APP_ID || process.env.INSTAGRAM_CLIENT_ID);
+    if (this.platform === "instagram" && hasDedicatedIgApp) {
+      const igAppId = (process.env.INSTAGRAM_APP_ID || process.env.INSTAGRAM_CLIENT_ID)!.trim();
       const igParams = new URLSearchParams({
         client_id: igAppId,
         redirect_uri: redirectUri,

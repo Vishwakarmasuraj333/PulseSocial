@@ -27,6 +27,7 @@ const PUBLIC_EXACT_ROUTES = new Set([
   "/changelog",
   "/manifest.json",
   "/login",
+  "/google",
   "/signup",
   "/register",
   "/forgot-password",
@@ -52,6 +53,7 @@ const PUBLIC_PREFIXES = [
 // Auth routes where already-logged-in users should be sent directly to /dashboard
 const AUTH_ROUTES = [
   "/login",
+  "/google",
   "/signup",
   "/register",
   "/forgot-password",

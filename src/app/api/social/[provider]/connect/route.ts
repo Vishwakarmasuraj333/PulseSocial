@@ -148,6 +148,22 @@ export async function GET(
       return NextResponse.redirect(new URL(popupUrl, req.url));
     }
 
+    // 1b. Instagram Connection: Route to dedicated Instagram portal without personal Facebook login (Defect 1)
+    if (platformKey === "instagram" && !(process.env.INSTAGRAM_APP_ID || process.env.INSTAGRAM_CLIENT_ID)) {
+      const popupUrl = `${cleanAppUrl}/social/connect/instagram`;
+      if (wantsJson) {
+        return NextResponse.json({
+          success: true,
+          isConfigured: true,
+          platform: "instagram",
+          displayName: "Instagram",
+          authUrl: popupUrl,
+          redirectUri,
+        });
+      }
+      return NextResponse.redirect(new URL(popupUrl, req.url));
+    }
+
     // 1b. Pinterest Connection: Auto-link with verified token & credentials
     if (platformKey === "pinterest" && orgId && process.env.PINTEREST_ACCESS_TOKEN) {
       const activeToken = process.env.PINTEREST_ACCESS_TOKEN;

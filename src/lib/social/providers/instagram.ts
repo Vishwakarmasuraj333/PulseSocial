@@ -99,10 +99,8 @@ export class InstagramProvider implements SocialProvider {
   }
 
   /**
-   * Generates the official Instagram authorization URL:
-   * 1. If a dedicated INSTAGRAM_APP_ID is present, routes to instagram.com/oauth/authorize.
-   * 2. If configured via META_APP_ID, routes to Meta's official OAuth Dialog (facebook.com/dialog/oauth).
-   *    This permanently prevents Meta's "Invalid Request: Request parameters are invalid: Invalid platform app" error.
+   * Generates the official direct Instagram authorization URL.
+   * NEVER opens or redirects to facebook.com/dialog/oauth (enforcing Defect 1).
    */
   getAuthorizationUrl(
     state: string,
@@ -111,58 +109,31 @@ export class InstagramProvider implements SocialProvider {
     _options?: Record<string, any>
   ): string {
     const { appId } = this.getAppCredentials();
-    const version = this.getApiVersion();
 
-    if (this.isDedicatedInstagramApp()) {
-      const defaultScopes = [
-        "instagram_business_basic",
-        "instagram_business_content_publish",
-        "instagram_business_manage_messages",
-        "instagram_business_manage_comments",
-        "instagram_business_manage_insights",
-      ].join(",");
-
-      const scopes = process.env.INSTAGRAM_SCOPES?.trim() || defaultScopes;
-
-      const params = new URLSearchParams({
-        client_id: appId,
-        redirect_uri: redirectUri,
-        response_type: "code",
-        scope: scopes,
-        state,
-        enable_fb_login: "0",
-        force_authentication: "1",
-      });
-
-      return `https://www.instagram.com/oauth/authorize?${params.toString()}`;
-    }
-
-    // Official Meta OAuth Dialog with Instagram Graph API permissions
-    const defaultMetaScopes = [
-      "public_profile",
-      "instagram_basic",
-      "instagram_content_publish",
-      "instagram_manage_comments",
-      "instagram_manage_insights",
-      "pages_show_list",
-      "pages_read_engagement",
+    // Meta's official scopes for Instagram Login with Professional Accounts
+    const defaultScopes = [
+      "instagram_business_basic",
+      "instagram_business_content_publish",
+      "instagram_business_manage_messages",
+      "instagram_business_manage_comments",
+      "instagram_business_manage_insights",
     ].join(",");
 
-    const scopes =
-      process.env.META_SCOPES_INSTAGRAM?.trim() ||
-      process.env.INSTAGRAM_SCOPES?.trim() ||
-      defaultMetaScopes;
+    const scopes = process.env.INSTAGRAM_SCOPES?.trim() || defaultScopes;
 
     const params = new URLSearchParams({
       client_id: appId,
       redirect_uri: redirectUri,
-      state,
-      scope: scopes,
       response_type: "code",
-      auth_type: "rerequest",
+      scope: scopes,
+      state,
+      // Official Meta parameter: enable_fb_login=0 ensures ONLY Instagram login is presented,
+      // strictly preventing redirection to personal Facebook login screens (Defect 1).
+      enable_fb_login: "0",
+      force_authentication: "1",
     });
 
-    return `https://www.facebook.com/${version}/dialog/oauth?${params.toString()}`;
+    return `https://www.instagram.com/oauth/authorize?${params.toString()}`;
   }
 
   /**

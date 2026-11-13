@@ -416,7 +416,19 @@ export function UniversalSocialConnectModal({
             window.dispatchEvent(new Event("pulsesocial_account_connected"));
             return;
           }
-          if (data.success && data.authUrl && !data.authUrl.includes("/social/connect/")) {
+          // Instagram & WhatsApp must NEVER land on Facebook login page (Defect 1)
+          if (targetApiId === "instagram" || targetApiId === "whatsapp") {
+            // Keep popup on the official dedicated Instagram/WhatsApp connection window
+            setConnectingChannelId(null);
+            return;
+          }
+
+          if (
+            data.success &&
+            data.authUrl &&
+            !data.authUrl.includes("/social/connect/") &&
+            !data.authUrl.includes("facebook.com")
+          ) {
             if (popup && !popup.closed) {
               popup.location.href = data.authUrl;
             }

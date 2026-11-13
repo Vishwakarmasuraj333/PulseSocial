@@ -486,11 +486,10 @@ export function GeminiAiModal({
               <button
                 type="button"
                 onClick={() => setActiveTab("copy")}
-                className={`py-3 px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition cursor-pointer ${
-                  activeTab === "copy"
+                className={`py-3 px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition cursor-pointer ${activeTab === "copy"
                     ? "border-purple-600 text-purple-700 bg-white"
                     : "border-transparent text-slate-600 hover:text-slate-900"
-                }`}
+                  }`}
               >
                 <PenTool className="w-3.5 h-3.5" />
                 <span>Captions & Social Copy</span>
@@ -498,11 +497,10 @@ export function GeminiAiModal({
               <button
                 type="button"
                 onClick={() => setActiveTab("image")}
-                className={`py-3 px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition cursor-pointer ${
-                  activeTab === "image"
+                className={`py-3 px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition cursor-pointer ${activeTab === "image"
                     ? "border-purple-600 text-purple-700 bg-white"
                     : "border-transparent text-slate-600 hover:text-slate-900"
-                }`}
+                  }`}
               >
                 <ImageIcon className="w-3.5 h-3.5" />
                 <span>AI Image Generator</span>
@@ -544,11 +542,10 @@ export function GeminiAiModal({
                         key={m.id}
                         type="button"
                         onClick={() => setSelectedTextModel(m.id)}
-                        className={`p-2 rounded-lg border text-left transition cursor-pointer ${
-                          selectedTextModel === m.id
+                        className={`p-2 rounded-lg border text-left transition cursor-pointer ${selectedTextModel === m.id
                             ? "border-purple-600 bg-purple-50/50 text-purple-900"
                             : "border-slate-200 hover:border-slate-300 text-slate-700"
-                        }`}
+                          }`}
                       >
                         <p className="text-xs font-semibold leading-tight">{m.name}</p>
                         <p className="text-[10px] text-slate-500 mt-0.5">{m.desc}</p>
@@ -689,11 +686,10 @@ export function GeminiAiModal({
                                 setActiveAltIndex(-1);
                                 setActiveUniversalTab(ch);
                               }}
-                              className={`px-2.5 py-1 rounded-md capitalize font-semibold transition cursor-pointer ${
-                                activeAltIndex === -1 && activeUniversalTab === ch
+                              className={`px-2.5 py-1 rounded-md capitalize font-semibold transition cursor-pointer ${activeAltIndex === -1 && activeUniversalTab === ch
                                   ? "bg-purple-600 text-white shadow-xs"
                                   : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
-                              }`}
+                                }`}
                             >
                               {ch === "x" ? "X (Twitter)" : ch}
                             </button>
@@ -707,11 +703,10 @@ export function GeminiAiModal({
                           <button
                             type="button"
                             onClick={() => setActiveAltIndex(-1)}
-                            className={`px-2 py-0.5 rounded text-[10px] font-semibold transition cursor-pointer ${
-                              activeAltIndex === -1
+                            className={`px-2 py-0.5 rounded text-[10px] font-semibold transition cursor-pointer ${activeAltIndex === -1
                                 ? "bg-purple-100 text-purple-800 border border-purple-300"
                                 : "bg-white text-slate-500 border border-slate-200 hover:bg-slate-50"
-                            }`}
+                              }`}
                           >
                             Primary Hook
                           </button>
@@ -720,11 +715,10 @@ export function GeminiAiModal({
                               key={idx}
                               type="button"
                               onClick={() => setActiveAltIndex(idx)}
-                              className={`px-2 py-0.5 rounded text-[10px] font-semibold transition cursor-pointer ${
-                                activeAltIndex === idx
+                              className={`px-2 py-0.5 rounded text-[10px] font-semibold transition cursor-pointer ${activeAltIndex === idx
                                   ? "bg-purple-100 text-purple-800 border border-purple-300"
                                   : "bg-white text-slate-500 border border-slate-200 hover:bg-slate-50"
-                              }`}
+                                }`}
                             >
                               Variation {idx + 1}
                             </button>
@@ -876,11 +870,10 @@ export function GeminiAiModal({
                           key={m.id}
                           type="button"
                           onClick={() => setImageModel(m.id)}
-                          className={`p-2 rounded-lg border text-left transition cursor-pointer ${
-                            imageModel === m.id
+                          className={`p-2 rounded-lg border text-left transition cursor-pointer ${imageModel === m.id
                               ? "border-purple-600 bg-purple-50 text-purple-900 font-semibold"
                               : "border-slate-200 hover:border-slate-300 text-slate-600"
-                          }`}
+                            }`}
                         >
                           <p className="text-xs leading-tight truncate">{m.name}</p>
                           <p className="text-[9px] text-slate-400 mt-0.5 line-clamp-1">{m.desc}</p>
@@ -900,11 +893,10 @@ export function GeminiAiModal({
                           key={st.id}
                           type="button"
                           onClick={() => setImageStyle(st.id)}
-                          className={`p-2 rounded-lg border text-left transition flex items-center gap-1.5 cursor-pointer ${
-                            imageStyle === st.id
+                          className={`p-2 rounded-lg border text-left transition flex items-center gap-1.5 cursor-pointer ${imageStyle === st.id
                               ? "border-purple-600 bg-purple-50 text-purple-900 font-semibold"
                               : "border-slate-200 hover:border-slate-300 text-slate-600"
-                          }`}
+                            }`}
                         >
                           <span className="text-sm">{st.icon}</span>
                           <span className="text-[11px] truncate">{st.label}</span>
@@ -924,11 +916,10 @@ export function GeminiAiModal({
                           key={ar.id}
                           type="button"
                           onClick={() => setImageAspect(ar.id)}
-                          className={`p-2 rounded-lg border text-left transition cursor-pointer ${
-                            imageAspect === ar.id
+                          className={`p-2 rounded-lg border text-left transition cursor-pointer ${imageAspect === ar.id
                               ? "border-purple-600 bg-purple-50 text-purple-900 font-semibold"
                               : "border-slate-200 hover:border-slate-300 text-slate-600"
-                          }`}
+                            }`}
                         >
                           <p className="text-xs leading-tight">{ar.label}</p>
                           <p className="text-[9px] text-slate-400 mt-0.5 truncate">{ar.desc}</p>
@@ -941,11 +932,10 @@ export function GeminiAiModal({
                           key={ar.id}
                           type="button"
                           onClick={() => setImageAspect(ar.id)}
-                          className={`p-2 rounded-lg border text-left transition cursor-pointer ${
-                            imageAspect === ar.id
+                          className={`p-2 rounded-lg border text-left transition cursor-pointer ${imageAspect === ar.id
                               ? "border-purple-600 bg-purple-50 text-purple-900 font-semibold"
                               : "border-slate-200 hover:border-slate-300 text-slate-600"
-                          }`}
+                            }`}
                         >
                           <p className="text-xs leading-tight">{ar.label}</p>
                           <p className="text-[9px] text-slate-400 mt-0.5 truncate">{ar.desc}</p>

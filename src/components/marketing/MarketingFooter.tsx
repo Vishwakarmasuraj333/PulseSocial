@@ -135,9 +135,9 @@ export function MarketingFooter() {
         {/* ============================================================ */}
         {/* MAIN NAVIGATION GRID                                         */}
         {/* ============================================================ */}
-        <div className="flex flex-col lg:flex-row items-start justify-between gap-10 lg:gap-10 xl:gap-14 pb-12 border-b border-slate-800/80">
+        <div className="flex flex-col xl:flex-row items-start justify-between gap-10 xl:gap-14 pb-12 border-b border-slate-800/80">
           {/* Brand Column (Dedicated width on desktop, perfectly balanced) */}
-          <div className="w-full lg:w-[300px] xl:w-[320px] shrink-0 space-y-4">
+          <div className="w-full xl:w-[320px] shrink-0 space-y-4">
             <PulseSocialLogo size="md" theme="dark" variant="full" href="/" />
             <p className="text-xs text-slate-300 max-w-sm leading-relaxed">
               PulseSocial is the unified social media management SaaS platform for modern teams, creators, and enterprises. Publish, schedule, collaborate, and analyze from one powerful command center.
@@ -228,7 +228,7 @@ export function MarketingFooter() {
           </div>
 
           {/* 5 Nav Link Columns (Span evenly across remaining space) */}
-          <div className="flex-1 w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-5 xl:gap-8 justify-between">
+          <div className="flex-1 w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 sm:gap-8 md:gap-4 lg:gap-6 xl:gap-8 justify-between">
             {footerSections.map((section) => (
               <div key={section.title} className="space-y-3 min-w-0">
                 <h4 className="text-xs font-bold text-white uppercase tracking-wider">

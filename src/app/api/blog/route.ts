@@ -126,10 +126,49 @@ export async function GET(req: Request) {
       categories,
     });
   } catch (error: unknown) {
-    console.error("Blog fetch error:", error);
-    return NextResponse.json(
-      { error: (error as Error).message || "Failed to fetch blog posts" },
-      { status: 500 }
-    );
+    console.warn("Blog DB offline, using high-availability fallback:", (error as Error)?.message || error);
+    const { searchParams } = new URL(req.url);
+    const categorySlug = searchParams.get("category");
+    const search = searchParams.get("search");
+
+    let filteredPosts = DEFAULT_BLOG_POSTS.map((p, idx) => ({
+      id: `fallback-${idx}`,
+      title: p.title,
+      slug: p.slug,
+      excerpt: p.excerpt,
+      content: p.content,
+      coverImage: p.coverImage,
+      authorName: p.authorName,
+      readingTime: p.readingTime,
+      tags: p.tags,
+      isFeatured: p.isFeatured,
+      publishedAt: new Date(Date.now() - idx * 86400000).toISOString(),
+      category: {
+        name: DEFAULT_CATEGORIES.find((c) => c.slug === p.categorySlug)?.name || "General",
+        slug: p.categorySlug,
+      },
+    }));
+
+    if (categorySlug && categorySlug !== "all") {
+      filteredPosts = filteredPosts.filter((p) => p.category.slug === categorySlug);
+    }
+    if (search) {
+      const q = search.toLowerCase();
+      filteredPosts = filteredPosts.filter(
+        (p) => p.title.toLowerCase().includes(q) || p.excerpt.toLowerCase().includes(q)
+      );
+    }
+
+    return NextResponse.json({
+      posts: filteredPosts,
+      categories: DEFAULT_CATEGORIES.map((c, i) => ({
+        id: `c-${i}`,
+        name: c.name,
+        slug: c.slug,
+        _count: {
+          blogPosts: DEFAULT_BLOG_POSTS.filter((p) => p.categorySlug === c.slug).length,
+        },
+      })),
+    });
   }
 }

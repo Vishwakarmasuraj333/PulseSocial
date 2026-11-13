@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PostComposerModal } from "@/components/composer/PostComposerModal";
+import { BulkScheduleModal } from "@/components/composer/BulkScheduleModal";
 import { renderPlatformIcon } from "@/components/icons/PlatformIcons";
 import { useToast } from "@/components/ui/toast";
 import { useBrand } from "@/context/BrandContext";
@@ -40,6 +41,7 @@ import {
   Layers,
   ArrowUpDown,
   Sparkles,
+  FileSpreadsheet,
 } from "lucide-react";
 import { UniversalSocialConnectModal } from "@/components/social/UniversalSocialConnectModal";
 import { PostEngagementDetailsModal } from "@/components/social/PostEngagementDetailsModal";
@@ -166,6 +168,7 @@ export default function PostsPage() {
   const [sortBy, setSortBy] = useState<"date-desc" | "date-asc" | "likes" | "comments">("date-desc");
   const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
   const [isNewPostMenuOpen, setIsNewPostMenuOpen] = useState(false);
+  const [isBulkScheduleOpen, setIsBulkScheduleOpen] = useState(false);
 
   // Date filter
   const [dateFilterLabel, setDateFilterLabel] = useState<string>("Choose Date");
@@ -742,6 +745,17 @@ export default function PostsPage() {
                     >
                       <Clock className="w-3.5 h-3.5 text-[#5846A8] dark:text-amber-500" />
                       <span>Schedule Post</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsNewPostMenuOpen(false);
+                        setIsBulkScheduleOpen(true);
+                      }}
+                      className="w-full px-3.5 py-2 text-left hover:bg-purple-50 dark:hover:bg-white/5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer transition-colors"
+                    >
+                      <FileSpreadsheet className="w-3.5 h-3.5 text-[#5846A8] dark:text-[#C4B5FD]" />
+                      <span>Bulk Schedule (CSV)</span>
                     </button>
                     <button
                       type="button"
@@ -1745,6 +1759,12 @@ export default function PostsPage() {
         }}
         totalPostsCount={posts.length}
         filteredPostsCount={filteredPosts.length}
+      />
+      {/* Bulk Schedule Modal */}
+      <BulkScheduleModal
+        isOpen={isBulkScheduleOpen}
+        onClose={() => setIsBulkScheduleOpen(false)}
+        onSuccess={loadPostsAndChannels}
       />
     </AppLayout>
   );

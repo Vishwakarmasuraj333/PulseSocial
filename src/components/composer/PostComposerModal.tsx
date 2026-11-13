@@ -7,6 +7,8 @@ import { useToast } from "@/components/ui/toast";
 import { useBrand } from "@/context/BrandContext";
 import { UniversalSocialConnectModal } from "@/components/social/UniversalSocialConnectModal";
 import { CanvaConnectModal } from "@/components/composer/CanvaConnectModal";
+import { CloudPickerModal } from "@/components/composer/CloudPickerModal";
+import { MediaLibraryModal } from "@/components/composer/MediaLibraryModal";
 import { renderPlatformIcon, CanvaIcon } from "@/components/icons/PlatformIcons";
 import {
   X,
@@ -47,6 +49,7 @@ interface PostComposerModalProps {
   initialContent?: string;
   initialMediaUrl?: string;
   initialPublishingOption?: "now" | "schedule" | "queue" | "smartq";
+  initialScheduledFor?: string;
 }
 
 // Categorized comprehensive real emoji library
@@ -230,6 +233,7 @@ export function PostComposerModal({
   initialContent,
   initialMediaUrl,
   initialPublishingOption,
+  initialScheduledFor,
 }: PostComposerModalProps) {
   const { toast } = useToast();
   const { activeBrand } = useBrand();
@@ -245,10 +249,7 @@ export function PostComposerModal({
 
   // Dynamic Media Library and Cloud Picker states
   const [isMediaLibraryOpen, setIsMediaLibraryOpen] = useState(false);
-  const [mediaLibrarySearch, setMediaLibrarySearch] = useState("");
-  const [mediaLibraryTab, setMediaLibraryTab] = useState<"all" | "brand" | "ai">("all");
   const [isCloudPickerOpen, setIsCloudPickerOpen] = useState(false);
-  const [cloudPickerUrl, setCloudPickerUrl] = useState("");
   const [modalActiveTab, setModalActiveTab] = useState<"editor" | "scheduling" | "preview">("editor");
 
   const fetchChannels = async () => {
@@ -379,6 +380,21 @@ export function PostComposerModal({
       setPublishingOption(initialPublishingOption);
     }
   }, [initialPublishingOption]);
+
+  useEffect(() => {
+    if (initialScheduledFor) {
+      try {
+        const d = new Date(initialScheduledFor);
+        if (!isNaN(d.getTime())) {
+          setScheduledDate(d.toISOString().split("T")[0]);
+          const hh = String(d.getHours()).padStart(2, "0");
+          const mm = String(d.getMinutes()).padStart(2, "0");
+          setScheduledTime(`${hh}:${mm}`);
+          setPublishingOption("schedule");
+        }
+      } catch {}
+    }
+  }, [initialScheduledFor]);
   const [sendForApproval, setSendForApproval] = useState(false);
   const [scheduledDate, setScheduledDate] = useState(() => {
     const d = new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -850,6 +866,30 @@ export function PostComposerModal({
       message: title ? `Attached "${title}" to your post.` : "Design attached successfully.",
       type: "success",
     });
+  };
+
+  const handleCloudMediaSelected = (url: string) => {
+    setMedia((prev) => [
+      ...prev,
+      {
+        id: `cloud-${Date.now()}`,
+        url,
+        type: url.match(/\.(mp4|mov|webm)$/i) ? "video" : "image",
+        name: "Cloud Asset",
+      },
+    ]);
+  };
+
+  const handleMediaLibrarySelected = (url: string) => {
+    setMedia((prev) => [
+      ...prev,
+      {
+        id: `lib-${Date.now()}`,
+        url,
+        type: url.match(/\.(mp4|mov|webm)$/i) ? "video" : "image",
+        name: "Library Asset",
+      },
+    ]);
   };
 
 
@@ -2232,184 +2272,20 @@ export function PostComposerModal({
 
     {/* Media Library Modal */}
     {isMediaLibraryOpen && (
-      <div className="fixed inset-0 z-[70] bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-slate-900 dark:text-white flex flex-col max-h-[85vh]">
-          {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
-            <div className="flex items-center gap-2">
-              <ImageIcon className="w-5 h-5 text-rose-500" />
-              <h3 className="text-sm font-bold">Media Library</h3>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsMediaLibraryOpen(false)}
-              className="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Search & Tabs */}
-          <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
-            <div className="relative flex-1">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={mediaLibrarySearch}
-                onChange={(e) => setMediaLibrarySearch(e.target.value)}
-                placeholder="Search brand media assets..."
-                className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 outline-none focus:border-blue-500 text-slate-900 dark:text-white"
-              />
-            </div>
-            <div className="flex items-center gap-1 text-xs">
-              {(["all", "brand", "ai"] as const).map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setMediaLibraryTab(tab)}
-                  className={`px-3 py-1 rounded-lg font-medium transition cursor-pointer capitalize ${
-                    mediaLibraryTab === tab
-                      ? "bg-blue-600 text-white font-semibold"
-                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
-                  }`}
-                >
-                  {tab === "all" ? "All Assets" : tab === "brand" ? "Brand Assets" : "AI Generated"}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Media Grid */}
-          <div className="p-4 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-3 flex-1">
-            {[
-              ...STOCK_MEDIA,
-              { title: "Brand Multi-Channel Hero", url: "/images/auth_illustration.png", type: "image" },
-              { title: "Suraj Vishwakarma Profile", url: "/images/founder_suraj.jpg", type: "image" },
-            ]
-              .filter((m) =>
-                !mediaLibrarySearch
-                  ? true
-                  : m.title.toLowerCase().includes(mediaLibrarySearch.toLowerCase())
-              )
-              .map((item, idx) => (
-                <div
-                  key={`${item.url}-${idx}`}
-                  onClick={() => {
-                    setMedia((prev) => [
-                      ...prev,
-                      {
-                        id: `lib-${Date.now()}-${idx}`,
-                        url: item.url,
-                        type: item.type === "video" ? "video" : "image",
-                        name: item.title,
-                      },
-                    ]);
-                    setIsMediaLibraryOpen(false);
-                    toast({
-                      title: "Media Selected",
-                      message: `Attached ${item.title} to post.`,
-                      type: "success",
-                    });
-                  }}
-                  className="group relative rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden cursor-pointer hover:border-blue-500 hover:shadow-md transition aspect-video bg-slate-100 dark:bg-slate-800 flex items-center justify-center"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={item.url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-200" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition flex items-end p-2.5">
-                    <span className="text-[11px] font-semibold text-white truncate">{item.title}</span>
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
-      </div>
+      <MediaLibraryModal
+        isOpen={isMediaLibraryOpen}
+        onClose={() => setIsMediaLibraryOpen(false)}
+        onSelectMedia={handleMediaLibrarySelected}
+      />
     )}
 
-    {/* Cloud Picker Modal */}
+    {/* Cloud Storage & Asset Picker Modal */}
     {isCloudPickerOpen && (
-      <div className="fixed inset-0 z-[70] bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-slate-900 dark:text-white p-6 space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-            <div className="flex items-center gap-2">
-              <Cloud className="w-5 h-5 text-sky-500" />
-              <h3 className="text-sm font-bold">Cloud Media Picker</h3>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsCloudPickerOpen(false)}
-              className="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Enter a public media link from Google Drive, Unsplash, Dropbox, or any CDN URL to import into your post.
-          </p>
-
-          <div>
-            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
-              Public Cloud Media URL
-            </label>
-            <input
-              type="url"
-              value={cloudPickerUrl}
-              onChange={(e) => setCloudPickerUrl(e.target.value)}
-              placeholder="https://images.unsplash.com/... or cloud media link"
-              className="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 outline-none focus:border-blue-500 text-slate-900 dark:text-white"
-            />
-          </div>
-
-          {cloudPickerUrl.trim() && (
-            <div className="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden aspect-video bg-slate-100 relative">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={cloudPickerUrl}
-                alt="Cloud preview"
-                className="w-full h-full object-cover"
-                onError={() => {}}
-              />
-            </div>
-          )}
-
-          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-            <button
-              type="button"
-              onClick={() => setIsCloudPickerOpen(false)}
-              className="px-4 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              disabled={!cloudPickerUrl.trim()}
-              onClick={() => {
-                if (cloudPickerUrl.trim()) {
-                  const url = cloudPickerUrl.trim();
-                  setMedia((prev) => [
-                    ...prev,
-                    {
-                      id: `cloud-${Date.now()}`,
-                      url,
-                      type: url.match(/\.(mp4|webm|mov)$/i) ? "video" : "image",
-                      name: "Cloud Asset",
-                    },
-                  ]);
-                  setIsCloudPickerOpen(false);
-                  toast({
-                    title: "Cloud Media Attached",
-                    message: "Imported cloud asset into your post.",
-                    type: "success",
-                  });
-                }
-              }}
-              className="px-5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold disabled:opacity-50 transition cursor-pointer shadow-xs"
-            >
-              Import to Post
-            </button>
-          </div>
-        </div>
-      </div>
+      <CloudPickerModal
+        isOpen={isCloudPickerOpen}
+        onClose={() => setIsCloudPickerOpen(false)}
+        onSelectMedia={handleCloudMediaSelected}
+      />
     )}
 
     {/* Real Location Map Modal */}

@@ -32,7 +32,10 @@ import {
   CheckCircle2,
   AlertCircle,
   Loader2,
+  FileSpreadsheet,
 } from "lucide-react";
+import { PostComposerModal } from "@/components/composer/PostComposerModal";
+import { BulkScheduleModal } from "@/components/composer/BulkScheduleModal";
 import { UniversalSocialConnectModal } from "@/components/social/UniversalSocialConnectModal";
 import {
   AdvancedFiltersModal,
@@ -96,6 +99,11 @@ export default function CalendarPage() {
   const [expandedDay, setExpandedDay] = useState<number | null>(null);
   const [selectedPostForDetails, setSelectedPostForDetails] = useState<CalendarPostItem | null>(null);
   const [activeMenuPostId, setActiveMenuPostId] = useState<string | null>(null);
+
+  // Composer & Bulk Schedule Modals
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
+  const [isBulkScheduleOpen, setIsBulkScheduleOpen] = useState(false);
+  const [composerPrefill, setComposerPrefill] = useState<{ content?: string; scheduledFor?: string } | null>(null);
 
   // Fetch real posts and accounts from API
   const loadPostsAndChannels = useCallback(async () => {
@@ -549,6 +557,29 @@ export default function CalendarPage() {
               Week
             </button>
           </div>
+
+          {/* Action Buttons: Bulk Schedule CSV + New Post */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsBulkScheduleOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#17171A] hover:bg-slate-50 dark:hover:bg-white/5 text-xs font-semibold text-slate-700 dark:text-slate-300 transition cursor-pointer shadow-2xs"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-[#5846A8] dark:text-[#C4B5FD]" />
+              <span>Bulk Schedule</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setComposerPrefill(null);
+                setIsComposerOpen(true);
+              }}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#5846A8] hover:bg-[#48378A] text-white text-xs font-bold transition cursor-pointer shadow-xs"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>New Post</span>
+            </button>
+          </div>
         </div>
 
         {/* ============================================================ */}
@@ -605,8 +636,24 @@ export default function CalendarPage() {
                         isToday ? "bg-indigo-50/20 dark:bg-purple-950/20" : ""
                       }`}
                     >
-                      {/* Top Date Number right-aligned */}
-                      <div className="flex justify-end mb-1">
+                      {/* Top Date Number & Quick Schedule Button */}
+                      <div className="flex items-center justify-between mb-1">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const targetIso = new Date(year, month, day, 12, 0).toISOString();
+                            setComposerPrefill({
+                              content: "",
+                              scheduledFor: targetIso,
+                            });
+                            setIsComposerOpen(true);
+                          }}
+                          className="w-5 h-5 rounded-md text-slate-400 hover:text-white hover:bg-[#5846A8] flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer"
+                          title={`Schedule post for ${monthName} ${day}`}
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
                         <span
                           className={`text-xs font-semibold px-1.5 py-0.5 rounded-md ${
                             isToday
@@ -1142,6 +1189,28 @@ export default function CalendarPage() {
           totalPostsCount={posts.length}
           filteredPostsCount={filteredPosts.length}
         />
+        {/* Post Composer Modal */}
+        {isComposerOpen && (
+          <PostComposerModal
+            isOpen={isComposerOpen}
+            onClose={() => {
+              setIsComposerOpen(false);
+              setComposerPrefill(null);
+            }}
+            initialContent={composerPrefill?.content}
+            initialScheduledFor={composerPrefill?.scheduledFor}
+            initialPublishingOption={composerPrefill?.scheduledFor ? "schedule" : "now"}
+          />
+        )}
+
+        {/* Bulk Schedule Modal */}
+        {isBulkScheduleOpen && (
+          <BulkScheduleModal
+            isOpen={isBulkScheduleOpen}
+            onClose={() => setIsBulkScheduleOpen(false)}
+            onSuccess={loadPostsAndChannels}
+          />
+        )}
       </div>
     </AppLayout>
   );

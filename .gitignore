@@ -31,6 +31,7 @@ scratch/
 test-results/
 playwright-report/
 blob-report/
+SCREENSHOT_EVIDENCE/
 
 # Local backups
 backups/

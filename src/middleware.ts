@@ -193,7 +193,7 @@ export async function middleware(req: NextRequest) {
       loginUrl.searchParams.set("redirectTo", pathname);
     }
     const res = NextResponse.redirect(loginUrl);
-    if (!isAuthenticated && sessionCookie) {
+    if (sessionCookie) {
       clearAuthCookies(res);
     }
     return res;
@@ -209,8 +209,11 @@ export async function middleware(req: NextRequest) {
   }
 
   // 9. If Visiting Auth Pages (/login, /signup) While Already Authenticated -> Send to /dashboard
+  // Never redirect to /dashboard if error or redirectTo params are present to prevent redirect loops
   if (AUTH_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`))) {
-    if (isAuthenticated && isEmailVerified) {
+    const hasError = searchParams.has("error") || searchParams.has("message");
+    const hasRedirectParam = searchParams.has("redirectTo");
+    if (isAuthenticated && isEmailVerified && !hasError && !hasRedirectParam) {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
   }

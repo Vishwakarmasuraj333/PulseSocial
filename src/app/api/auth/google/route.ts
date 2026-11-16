@@ -6,11 +6,11 @@ import {
   createSignedOAuthState,
   buildGoogleAuthUrl,
   getGoogleRedirectUri,
+  getGoogleCredentials,
 } from "@/lib/auth/google-oauth";
 
 export async function GET(req: Request) {
-  const clientId = process.env.GOOGLE_CLIENT_ID?.trim().replace(/^["']|["']$/g, "");
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim().replace(/^["']|["']$/g, "");
+  const { clientId, clientSecret } = getGoogleCredentials();
 
   // If OAuth credentials are not set in the environment, seamlessly direct
   // to the authentic Google Account Chooser portal without throwing raw error banners.

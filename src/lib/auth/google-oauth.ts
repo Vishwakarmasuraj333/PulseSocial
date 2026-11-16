@@ -1,4 +1,29 @@
 import crypto from "crypto";
+import fs from "fs";
+import path from "path";
+
+export function getGoogleCredentials() {
+  let clientId = process.env.GOOGLE_CLIENT_ID?.trim().replace(/^["']|["']$/g, "");
+  let clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim().replace(/^["']|["']$/g, "");
+  let redirectUri = process.env.GOOGLE_REDIRECT_URI?.trim().replace(/^["']|["']$/g, "");
+
+  if (!clientId || !clientSecret) {
+    try {
+      const envPath = path.resolve(process.cwd(), ".env");
+      if (fs.existsSync(envPath)) {
+        const content = fs.readFileSync(envPath, "utf-8");
+        const idMatch = content.match(/^GOOGLE_CLIENT_ID\s*=\s*["']?([^"'\r\n]+)["']?/m);
+        const secMatch = content.match(/^GOOGLE_CLIENT_SECRET\s*=\s*["']?([^"'\r\n]+)["']?/m);
+        const redMatch = content.match(/^GOOGLE_REDIRECT_URI\s*=\s*["']?([^"'\r\n]+)["']?/m);
+        if (idMatch && idMatch[1]) clientId = idMatch[1].trim();
+        if (secMatch && secMatch[1]) clientSecret = secMatch[1].trim();
+        if (redMatch && redMatch[1]) redirectUri = redMatch[1].trim();
+      }
+    } catch {}
+  }
+
+  return { clientId, clientSecret, redirectUri };
+}
 
 export interface GoogleOAuthConfig {
   clientId: string;
@@ -245,9 +270,9 @@ export async function fetchGoogleUserInfo(accessToken: string): Promise<GoogleUs
 export function getGoogleRedirectUri(req: Request): string {
   const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
   const isLocal = !host || host.includes("localhost") || host.includes("127.0.0.1");
+  const { redirectUri: configured } = getGoogleCredentials();
 
   if (isLocal) {
-    const configured = process.env.GOOGLE_REDIRECT_URI?.trim().replace(/^["']|["']$/g, "");
     if (configured && (configured.includes("localhost") || configured.includes("127.0.0.1"))) {
       return configured;
     }
@@ -257,7 +282,6 @@ export function getGoogleRedirectUri(req: Request): string {
 
   // Production environment (Vercel or custom domain)
   // Check if an explicit production redirect URI is configured in environment
-  const configured = process.env.GOOGLE_REDIRECT_URI?.trim().replace(/^["']|["']$/g, "");
   if (configured && !configured.includes("localhost") && !configured.includes("127.0.0.1")) {
     return configured;
   }

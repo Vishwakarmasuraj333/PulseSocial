@@ -638,7 +638,7 @@ export default function NewPostPage() {
         {/* ============================================================ */}
         {/* SECTION 5: MASTER PAGE HEADER & WORKSPACE ACTION TOOLBAR    */}
         {/* ============================================================ */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-200/80 dark:border-white/10">
           <div>
             <div className="flex items-center gap-2.5">
               <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
@@ -675,7 +675,7 @@ export default function NewPostPage() {
               onClick={() => handleAction("DRAFT")}
               isLoading={isSavingDraft}
               disabled={isSavingDraft || isPublishing}
-              className="text-xs font-semibold rounded-xl border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+              className="text-xs font-semibold rounded-xl border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer"
             >
               <Save className="w-3.5 h-3.5 mr-1.5 text-slate-500" />
               <span>Save Draft</span>
@@ -685,7 +685,7 @@ export default function NewPostPage() {
               variant="outline"
               onClick={() => setIsScheduleModalOpen(true)}
               disabled={isPublishing || isSavingDraft}
-              className="text-xs font-semibold rounded-xl border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer text-[#5846A8] dark:text-[#E08738]"
+              className="text-xs font-semibold rounded-xl border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer text-[#5846A8] dark:text-[#E08738]"
             >
               <Clock className="w-3.5 h-3.5 mr-1.5" />
               <span>Schedule</span>
@@ -800,8 +800,8 @@ export default function NewPostPage() {
           >
 
             {/* SECTION 6: COMPACT, POLISHED DESTINATION SELECTOR */}
-            <div className="p-4 sm:p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+            <div className="p-4 sm:p-5 bg-white dark:bg-[#17171A] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-2xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100 dark:border-white/10">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
                     Destination Channels
@@ -854,7 +854,7 @@ export default function NewPostPage() {
                     className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition cursor-pointer ${
                       platformCategoryFilter === cat.id
                         ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900"
-                        : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200"
+                        : "bg-slate-100 text-slate-600 dark:bg-[#111113] dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/5"
                     }`}
                   >
                     {cat.label}
@@ -905,13 +905,13 @@ export default function NewPostPage() {
                         className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-2 ${
                           isSelected
                             ? "bg-purple-50/80 dark:bg-[#241C14] border-purple-300 dark:border-[#E08738]/60 ring-2 ring-[#5846A8]/20 dark:ring-[#E08738]/25 shadow-xs"
-                            : "bg-slate-50/60 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+                            : "bg-slate-50/60 dark:bg-[#111113]/50 border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20"
                         }`}
                       >
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-2.5 min-w-0">
                             <div className="relative shrink-0">
-                              <div className="w-8 h-8 rounded-full overflow-hidden bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center">
+                              <div className="w-8 h-8 rounded-full overflow-hidden bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 flex items-center justify-center">
                                 {acc.profileImageUrl ? (
                                   <img
                                     src={acc.profileImageUrl}
@@ -922,7 +922,7 @@ export default function NewPostPage() {
                                   renderPlatformIcon(acc.provider, 18)
                                 )}
                               </div>
-                              <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-white dark:bg-slate-900 ring-1 ring-white dark:ring-slate-900 flex items-center justify-center">
+                              <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-white dark:bg-[#17171A] ring-1 ring-white dark:ring-white/10 flex items-center justify-center">
                                 {renderPlatformIcon(acc.provider, 10)}
                               </div>
                             </div>
@@ -941,7 +941,7 @@ export default function NewPostPage() {
                             className={`w-4 h-4 rounded-md border flex items-center justify-center transition ${
                               isSelected
                                 ? "bg-[#5846A8] border-[#5846A8] text-white dark:bg-[#E08738] dark:border-[#E08738] dark:text-[#0F0F11]"
-                                : "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800"
+                                : "border-slate-300 dark:border-white/20 bg-white dark:bg-[#111113]"
                             }`}
                           >
                             {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
@@ -949,7 +949,7 @@ export default function NewPostPage() {
                         </div>
 
                         {/* Health Status Pill */}
-                        <div className="flex items-center justify-between gap-1 pt-1 border-t border-slate-200/50 dark:border-slate-700/50 text-[10px]">
+                        <div className="flex items-center justify-between gap-1 pt-1 border-t border-slate-200/50 dark:border-white/10 text-[10px]">
                           {isExpired ? (
                             <span className="font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1">
                               <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
@@ -989,8 +989,8 @@ export default function NewPostPage() {
             </div>
 
             {/* SECTION 7: PROFESSIONAL POST CONTENT EDITOR */}
-            <div className="p-4 sm:p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-3">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+            <div className="p-4 sm:p-5 bg-white dark:bg-[#17171A] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-2xs space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/10">
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
                   Post Content
                 </span>
@@ -1034,22 +1034,22 @@ export default function NewPostPage() {
               )}
 
               {/* Editor Formatting & Generation Toolbar */}
-              <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 flex-wrap gap-2">
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-white/10 flex-wrap gap-2">
                 <div className="flex items-center gap-1.5 relative" ref={emojiRef}>
                   
                   {/* Emoji Picker Popover */}
                   <button
                     type="button"
                     onClick={() => setIsEmojiPickerOpen(!isEmojiPickerOpen)}
-                    className="p-2 rounded-xl text-slate-500 hover:text-[#5846A8] hover:bg-purple-50 dark:hover:bg-slate-800 transition cursor-pointer"
+                    className="p-2 rounded-xl text-slate-500 hover:text-[#5846A8] hover:bg-purple-50 dark:hover:bg-white/10 transition cursor-pointer"
                     title="Insert Emojis"
                   >
                     <Smile className="w-4 h-4" />
                   </button>
 
                   {isEmojiPickerOpen && (
-                    <div className="absolute left-0 bottom-10 w-72 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
-                      <div className="flex items-center gap-1 border-b border-slate-100 dark:border-slate-800 pb-2 mb-2">
+                    <div className="absolute left-0 bottom-10 w-72 rounded-2xl bg-white dark:bg-[#1C1C20] border border-slate-200 dark:border-white/10 shadow-2xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+                      <div className="flex items-center gap-1 border-b border-slate-100 dark:border-white/10 pb-2 mb-2">
                         {EMOJI_CATEGORIES.map((cat, idx) => (
                           <button
                             key={cat.name}
@@ -1058,7 +1058,7 @@ export default function NewPostPage() {
                             className={`px-2 py-1 rounded-lg text-xs font-semibold cursor-pointer ${
                               activeEmojiTab === idx
                                 ? "bg-purple-50 text-[#5846A8] dark:bg-purple-950/60 dark:text-purple-300"
-                                : "text-slate-400 hover:text-slate-700"
+                                : "text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                             }`}
                           >
                             {cat.name}
@@ -1071,7 +1071,7 @@ export default function NewPostPage() {
                             key={emoji}
                             type="button"
                             onClick={() => insertEmoji(emoji)}
-                            className="w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-lg cursor-pointer transition active:scale-90"
+                            className="w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 flex items-center justify-center text-lg cursor-pointer transition active:scale-90"
                           >
                             {emoji}
                           </button>
@@ -1084,7 +1084,7 @@ export default function NewPostPage() {
                   <button
                     type="button"
                     onClick={() => insertHashtags("#PulseSocial #SocialGrowth #Marketing2026")}
-                    className="p-2 rounded-xl text-slate-500 hover:text-[#5846A8] hover:bg-purple-50 dark:hover:bg-slate-800 transition cursor-pointer"
+                    className="p-2 rounded-xl text-slate-500 hover:text-[#5846A8] hover:bg-purple-50 dark:hover:bg-white/10 transition cursor-pointer"
                     title="Insert Hashtags"
                   >
                     <Hash className="w-4 h-4" />
@@ -1097,7 +1097,7 @@ export default function NewPostPage() {
                     className={`p-2 rounded-xl transition cursor-pointer ${
                       selectedLocation
                         ? "text-[#5846A8] bg-purple-50 dark:bg-purple-950/60"
-                        : "text-slate-500 hover:text-[#5846A8] hover:bg-purple-50 dark:hover:bg-slate-800"
+                        : "text-slate-500 hover:text-[#5846A8] hover:bg-purple-50 dark:hover:bg-white/10"
                     }`}
                     title={selectedLocation ? `Location: ${selectedLocation.formattedAddress}` : "Add Location"}
                   >
@@ -1111,7 +1111,7 @@ export default function NewPostPage() {
                     className={`p-2 rounded-xl transition cursor-pointer ${
                       showFirstComment
                         ? "text-[#5846A8] bg-purple-50 dark:bg-purple-950/60"
-                        : "text-slate-500 hover:text-[#5846A8] hover:bg-purple-50 dark:hover:bg-slate-800"
+                        : "text-slate-500 hover:text-[#5846A8] hover:bg-purple-50 dark:hover:bg-white/10"
                     }`}
                     title="Auto First Comment"
                   >
@@ -1132,7 +1132,7 @@ export default function NewPostPage() {
 
               {/* Location Tagged Display */}
               {selectedLocation && (
-                <div className="pt-2 flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs text-slate-700 dark:text-slate-300">
+                <div className="pt-2 flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-[#111113] border border-transparent dark:border-white/5 text-xs text-slate-700 dark:text-slate-300">
                   <div className="flex items-center gap-2 truncate">
                     <MapPin className="w-3.5 h-3.5 text-[#5846A8] shrink-0" />
                     <span className="truncate">{selectedLocation.formattedAddress}</span>
@@ -1174,10 +1174,10 @@ export default function NewPostPage() {
             </div>
 
             {/* SECTION 8: PRODUCTION-READY MEDIA ATTACHMENTS */}
-            <div className="p-4 sm:p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+            <div className="p-4 sm:p-5 bg-white dark:bg-[#17171A] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-2xs space-y-4">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/10">
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                  <ImageIcon className="w-4 h-4 text-[#5846A8]" />
+                  <ImageIcon className="w-4 h-4 text-[#5846A8] dark:text-[#E08738]" />
                   <span>Media Visuals ({media.length})</span>
                 </span>
 
@@ -1217,7 +1217,7 @@ export default function NewPostPage() {
                       }
                     }
                   }}
-                  className="p-6 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-[#5846A8] dark:hover:border-purple-600 bg-slate-50/50 dark:bg-slate-800/30 transition-all flex flex-col items-center justify-center gap-2 cursor-pointer text-center group"
+                  className="p-6 rounded-2xl border-2 border-dashed border-slate-200 dark:border-white/10 hover:border-[#5846A8] dark:hover:border-[#E08738] bg-slate-50/50 dark:bg-[#111113]/50 transition-all flex flex-col items-center justify-center gap-2 cursor-pointer text-center group"
                 >
                   <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-[#5846A8] dark:text-purple-300 flex items-center justify-center group-hover:scale-110 transition-transform">
                     {isUploadingMedia ? (
@@ -1272,7 +1272,7 @@ export default function NewPostPage() {
                   {media.map((item, idx) => (
                     <div
                       key={item.id || idx}
-                      className="relative w-28 h-24 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 shrink-0 group shadow-2xs"
+                      className="relative w-28 h-24 rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#111113] shrink-0 group shadow-2xs"
                     >
                       {item.type?.toUpperCase() === "VIDEO" ? (
                         <div className="w-full h-full bg-slate-900 flex items-center justify-center text-white">
@@ -1318,7 +1318,7 @@ export default function NewPostPage() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-28 h-24 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-[#5846A8] text-slate-400 hover:text-[#5846A8] flex flex-col items-center justify-center gap-1 shrink-0 transition cursor-pointer"
+                    className="w-28 h-24 rounded-xl border-2 border-dashed border-slate-200 dark:border-white/10 hover:border-[#5846A8] text-slate-400 hover:text-[#5846A8] flex flex-col items-center justify-center gap-1 shrink-0 transition cursor-pointer"
                   >
                     <Plus className="w-4 h-4" />
                     <span className="text-[10px] font-semibold">+ Add More</span>
@@ -1330,7 +1330,7 @@ export default function NewPostPage() {
             {/* YouTube Specific Settings */}
             {(previewPlatform === "youtube" ||
               selectedAccounts.some((a) => a.provider === "youtube")) && (
-              <div className="p-4 sm:p-5 bg-white dark:bg-slate-900 rounded-2xl border border-red-200 dark:border-red-950/60 shadow-2xs space-y-3">
+              <div className="p-4 sm:p-5 bg-white dark:bg-[#17171A] rounded-2xl border border-red-200 dark:border-red-950/60 shadow-2xs space-y-3">
                 <span className="text-xs font-bold text-red-600 uppercase tracking-wider flex items-center gap-1.5">
                   {renderPlatformIcon("youtube", 16)}
                   <span>YouTube Broadcast Configuration</span>
@@ -1391,9 +1391,9 @@ export default function NewPostPage() {
             />
 
               {/* Truthful Platform Validation Summary Card */}
-              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 space-y-2">
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#111113] border border-slate-200/80 dark:border-white/10 space-y-2">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                  <ShieldAlert className="w-3 h-3 text-[#5846A8]" />
+                  <ShieldAlert className="w-3 h-3 text-[#5846A8] dark:text-[#E08738]" />
                   <span>Validation & Readiness Summary</span>
                 </span>
 
@@ -1406,7 +1406,7 @@ export default function NewPostPage() {
                     platformValidationList.map((item) => (
                       <div
                         key={item.id}
-                        className="flex items-center justify-between p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60"
+                        className="flex items-center justify-between p-1.5 rounded-lg bg-white dark:bg-[#17171A] border border-slate-200/60 dark:border-white/10"
                       >
                         <div className="flex items-center gap-1.5 min-w-0">
                           <div className="w-4 h-4 shrink-0">
@@ -1446,10 +1446,10 @@ export default function NewPostPage() {
         {/* ============================================================ */}
         {isScheduleModalOpen && (
           <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-5 space-y-4 animate-in fade-in zoom-in-95 duration-150">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="w-full max-w-md rounded-2xl bg-white dark:bg-[#17171A] border border-slate-200/80 dark:border-white/10 shadow-2xl p-5 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-white/10">
                 <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-[#5846A8]" />
+                  <Clock className="w-4 h-4 text-[#5846A8] dark:text-[#E08738]" />
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white">
                     Schedule Broadcast
                   </h3>
@@ -1483,7 +1483,7 @@ export default function NewPostPage() {
                       setScheduledDate(d.toISOString().split("T")[0]);
                       setScheduledTime("09:00");
                     }}
-                    className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-[#5846A8] text-left transition cursor-pointer"
+                    className="p-2 rounded-xl border border-slate-200 dark:border-white/10 hover:border-[#5846A8] dark:hover:border-[#E08738] bg-slate-50/50 dark:bg-[#111113] text-left transition cursor-pointer"
                   >
                     <p className="font-semibold text-slate-800 dark:text-slate-200">Tomorrow Morning</p>
                     <p className="text-[10px] text-slate-400">9:00 AM</p>
@@ -1497,7 +1497,7 @@ export default function NewPostPage() {
                       setScheduledDate(d.toISOString().split("T")[0]);
                       setScheduledTime("17:00");
                     }}
-                    className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-[#5846A8] text-left transition cursor-pointer"
+                    className="p-2 rounded-xl border border-slate-200 dark:border-white/10 hover:border-[#5846A8] dark:hover:border-[#E08738] bg-slate-50/50 dark:bg-[#111113] text-left transition cursor-pointer"
                   >
                     <p className="font-semibold text-slate-800 dark:text-slate-200">Tomorrow Evening</p>
                     <p className="text-[10px] text-slate-400">5:00 PM</p>
@@ -1534,7 +1534,7 @@ export default function NewPostPage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-slate-100 dark:border-white/10 flex items-center justify-end gap-2">
                 <Button
                   variant="outline"
                   onClick={() => setIsScheduleModalOpen(false)}
@@ -1545,7 +1545,7 @@ export default function NewPostPage() {
                 <Button
                   onClick={() => handleAction("SCHEDULE")}
                   disabled={!scheduledDate || isPublishing}
-                  className="bg-[#5846A8] hover:bg-[#48388d] text-white rounded-xl text-xs font-bold cursor-pointer"
+                  className="bg-[#5846A8] hover:bg-[#48388d] dark:bg-[#E08738] dark:hover:bg-[#d97706] text-white dark:text-[#0F0F11] rounded-xl text-xs font-bold cursor-pointer"
                 >
                   Confirm Schedule
                 </Button>
@@ -1559,8 +1559,8 @@ export default function NewPostPage() {
         {/* ============================================================ */}
         {publicationResults.isOpen && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="w-full max-w-lg rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="w-full max-w-lg rounded-2xl bg-white dark:bg-[#17171A] border border-slate-200/80 dark:border-white/10 shadow-2xl p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-white/10">
                 <div className="flex items-center gap-2">
                   {publicationResults.overallStatus === "SUCCESS" ? (
                     <CheckCircle2 className="w-5 h-5 text-emerald-500" />
@@ -1595,10 +1595,10 @@ export default function NewPostPage() {
                 {publicationResults.results.map((r, i) => (
                   <div
                     key={i}
-                    className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 flex items-start justify-between gap-3"
+                    className="p-3 rounded-xl bg-slate-50 dark:bg-[#111113] border border-slate-200/80 dark:border-white/10 flex items-start justify-between gap-3"
                   >
                     <div className="flex items-start gap-2.5 min-w-0">
-                      <div className="w-6 h-6 rounded-lg bg-white dark:bg-slate-800 flex items-center justify-center shrink-0 mt-0.5">
+                      <div className="w-6 h-6 rounded-lg bg-white dark:bg-[#17171A] flex items-center justify-center shrink-0 mt-0.5">
                         {renderPlatformIcon(r.provider, 16)}
                       </div>
                       <div className="min-w-0">
@@ -1621,8 +1621,8 @@ export default function NewPostPage() {
                     <span
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
                         r.status === "PUBLISHED"
-                          ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200"
-                          : "bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200"
+                          ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
+                          : "bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800"
                       }`}
                     >
                       {r.status}
@@ -1632,7 +1632,7 @@ export default function NewPostPage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-slate-100 dark:border-white/10 flex items-center justify-end gap-2">
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -1645,7 +1645,7 @@ export default function NewPostPage() {
                 </Button>
                 <Button
                   onClick={() => setPublicationResults((prev) => ({ ...prev, isOpen: false }))}
-                  className="bg-[#5846A8] text-white rounded-xl text-xs font-bold cursor-pointer"
+                  className="bg-[#5846A8] hover:bg-[#48388d] dark:bg-[#E08738] dark:hover:bg-[#d97706] text-white dark:text-[#0F0F11] rounded-xl text-xs font-bold cursor-pointer"
                 >
                   Done
                 </Button>
@@ -1659,7 +1659,7 @@ export default function NewPostPage() {
         {/* ============================================================ */}
         {editingAltIndex !== null && (
           <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-5 space-y-3 animate-in fade-in zoom-in-95 duration-150">
+            <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-[#17171A] border border-slate-200/80 dark:border-white/10 shadow-2xl p-5 space-y-3 animate-in fade-in zoom-in-95 duration-150">
               <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
                 Visual Alt Text (Accessibility)
               </h4>

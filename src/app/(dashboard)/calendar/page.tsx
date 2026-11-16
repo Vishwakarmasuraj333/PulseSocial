@@ -397,7 +397,7 @@ export default function CalendarPage() {
 
                 {/* Channel Popover */}
                 {isChannelPopoverOpen && (
-                  <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-3">
+                  <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-[#1C1C20] rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-3">
                     <div className="relative">
                       <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
                       <input
@@ -405,7 +405,7 @@ export default function CalendarPage() {
                         value={channelSearchQuery}
                         onChange={(e) => setChannelSearchQuery(e.target.value)}
                         placeholder="Search channels..."
-                        className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 text-slate-800 dark:text-slate-200 focus:outline-none"
+                        className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#111113] text-slate-800 dark:text-white focus:outline-none"
                       />
                     </div>
 
@@ -422,7 +422,7 @@ export default function CalendarPage() {
                       </button>
                     </div>
 
-                    <div className="max-h-48 overflow-y-auto space-y-1 divide-y divide-slate-50 dark:divide-slate-800/60">
+                    <div className="max-h-48 overflow-y-auto space-y-1 divide-y divide-slate-50 dark:divide-white/[0.06]">
                       {connectedChannels.length === 0 ? (
                         <p className="text-[11px] text-slate-400 text-center py-4">
                           No connected channels yet
@@ -435,7 +435,7 @@ export default function CalendarPage() {
                           .map((channel) => (
                             <label
                               key={channel.id}
-                              className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-850 cursor-pointer text-xs"
+                              className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-white/[0.05] cursor-pointer text-xs"
                             >
                               <div className="flex items-center gap-2">
                                 <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center">
@@ -455,7 +455,7 @@ export default function CalendarPage() {
                       )}
                     </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] font-semibold">
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-white/10 text-[11px] font-semibold">
                       <button
                         type="button"
                         onClick={() => setSelectedPlatform("ALL")}
@@ -673,7 +673,7 @@ export default function CalendarPage() {
                             <div
                               key={post.id}
                               onClick={() => setSelectedPostForDetails(post)}
-                              className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 shadow-2xs hover:shadow-md transition cursor-pointer space-y-2 group"
+                              className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#17171A] p-2.5 shadow-2xs hover:shadow-md transition cursor-pointer space-y-2 group"
                             >
                               {/* Header: Time & Three-dots */}
                               <div className="flex items-center justify-between text-[11px] font-semibold text-slate-700 dark:text-slate-300">
@@ -696,7 +696,7 @@ export default function CalendarPage() {
 
                                   {activeMenuPostId === post.id && (
                                     <div
-                                      className="absolute right-0 mt-1 w-36 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl py-1 z-30 text-xs"
+                                      className="absolute right-0 mt-1 w-36 bg-white dark:bg-[#1C1C20] rounded-xl border border-slate-200 dark:border-white/10 shadow-xl py-1 z-30 text-xs"
                                       onClick={(e) => e.stopPropagation()}
                                     >
                                       <button
@@ -705,7 +705,7 @@ export default function CalendarPage() {
                                           setSelectedPostForDetails(post);
                                           setActiveMenuPostId(null);
                                         }}
-                                        className="w-full px-3 py-1.5 text-left hover:bg-slate-50 flex items-center gap-2"
+                                        className="w-full px-3 py-1.5 text-left hover:bg-slate-50 dark:hover:bg-white/5 flex items-center gap-2"
                                       >
                                         <Eye className="w-3.5 h-3.5 text-slate-500" />
                                         <span>Preview</span>
@@ -772,7 +772,7 @@ export default function CalendarPage() {
                                               </span>
                                             )}
                                           </div>
-                                          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-white dark:bg-slate-900 flex items-center justify-center shadow-xs">
+                                          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-white dark:bg-[#17171A] flex items-center justify-center shadow-xs">
                                             {renderPlatformIcon(
                                               acc?.provider || "facebook",
                                               9
@@ -802,7 +802,7 @@ export default function CalendarPage() {
                               </div>
 
                               {/* Engagement Metrics Footer: Likes, Shares, Comments */}
-                              <div className="flex items-center gap-4 text-[10px] text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800">
+                              <div className="flex items-center gap-4 text-[10px] text-slate-400 pt-1 border-t border-slate-100 dark:border-white/10">
                                 <span className="flex items-center gap-1">
                                   <ThumbsUp className="w-3 h-3 text-slate-400" />
                                   <span>{post.likes || 0}</span>
@@ -841,8 +841,8 @@ export default function CalendarPage() {
             /* ============================================================ */
             /* WEEK VIEW (Matching Screenshot)                              */
             /* ============================================================ */
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
-              <div className="grid grid-cols-7 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-center py-3 text-xs font-bold divide-x divide-slate-100 dark:divide-slate-800">
+            <div className="bg-white dark:bg-[#17171A] rounded-2xl border border-slate-200 dark:border-white/10 shadow-xs overflow-hidden">
+              <div className="grid grid-cols-7 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-[#17171A] text-center py-3 text-xs font-bold divide-x divide-slate-100 dark:divide-white/[0.07]">
                 {weekDays.map((d, i) => {
                   const isSun = d.getDay() === 0;
                   return (
@@ -854,7 +854,7 @@ export default function CalendarPage() {
                 })}
               </div>
 
-              <div className="grid grid-cols-7 divide-x divide-slate-100 dark:divide-slate-800 min-h-[420px]">
+              <div className="grid grid-cols-7 divide-x divide-slate-100 dark:divide-white/[0.07] min-h-[420px]">
                 {weekDays.map((d, i) => {
                   const dayPosts = getPostsForDate(d);
                   return (
@@ -913,7 +913,7 @@ export default function CalendarPage() {
                                           </span>
                                         )}
                                       </div>
-                                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-white dark:bg-slate-900 flex items-center justify-center shadow-xs">
+                                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-white dark:bg-[#17171A] flex items-center justify-center shadow-xs">
                                         {renderPlatformIcon(acc?.provider || "facebook", 9)}
                                       </div>
                                     </div>
@@ -954,18 +954,18 @@ export default function CalendarPage() {
             onClick={() => setSelectedPostForDetails(null)}
           >
             <div
-              className="w-full sm:w-[480px] lg:w-[520px] bg-white dark:bg-slate-900 h-full shadow-2xl border-l border-slate-200 dark:border-slate-800 flex flex-col justify-between animate-in slide-in-from-right duration-200 overflow-y-auto"
+              className="w-full sm:w-[480px] lg:w-[520px] bg-white dark:bg-[#17171A] h-full shadow-2xl border-l border-slate-200 dark:border-white/10 flex flex-col justify-between animate-in slide-in-from-right duration-200 overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <div>
-                <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <div className="p-5 border-b border-slate-100 dark:border-white/10 flex items-center justify-between">
                   <h3 className="text-base font-bold text-slate-900 dark:text-white">
                     Post details
                   </h3>
                   <button
                     type="button"
                     onClick={() => setSelectedPostForDetails(null)}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 transition"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 transition"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -973,7 +973,7 @@ export default function CalendarPage() {
 
                 <div className="p-6 space-y-6">
                   {/* Status, Date & Preview link button */}
-                  <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/10">
                     <div>
                       <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#EAF8ED] text-[#22C55E]">
                         ✓ Published
@@ -996,7 +996,7 @@ export default function CalendarPage() {
                           type: "info",
                         });
                       }}
-                      className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition flex items-center gap-1.5"
+                      className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 transition flex items-center gap-1.5"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
                       <span>Preview Link</span>
@@ -1005,19 +1005,19 @@ export default function CalendarPage() {
 
                   {/* Quick Metrics */}
                   <div className="grid grid-cols-3 gap-3">
-                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-850 text-center">
+                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#111113] text-center">
                       <span className="text-xs text-slate-400">Likes</span>
                       <p className="text-base font-bold text-slate-900 dark:text-white">
                         {selectedPostForDetails.likes || 0}
                       </p>
                     </div>
-                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-850 text-center">
+                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#111113] text-center">
                       <span className="text-xs text-slate-400">Shares</span>
                       <p className="text-base font-bold text-slate-900 dark:text-white">
                         {selectedPostForDetails.shares || 0}
                       </p>
                     </div>
-                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-850 text-center">
+                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#111113] text-center">
                       <span className="text-xs text-slate-400">Comments</span>
                       <p className="text-base font-bold text-slate-900 dark:text-white">
                         {selectedPostForDetails.comments || 0}
@@ -1035,7 +1035,7 @@ export default function CalendarPage() {
                         {selectedPostForDetails.targets.map((tgt) => (
                           <div
                             key={tgt.id}
-                            className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 text-xs font-medium text-slate-800 dark:text-slate-200 shadow-2xs"
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#111113] text-xs font-medium text-slate-800 dark:text-slate-200 shadow-2xs"
                           >
                             <div className="w-5 h-5 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-700 flex items-center justify-center shrink-0">
                               {tgt.socialAccount?.profileImageUrl ? (

@@ -175,9 +175,9 @@ export default function MeetingRoomPage() {
   if (isLoading) {
     return (
       <AppLayout>
-        <div className="min-h-[calc(100vh-64px)] flex flex-col items-center justify-center bg-slate-950 text-white">
-          <div className="w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin mb-3" />
-          <p className="text-sm text-slate-400">Connecting to secure WebRTC meeting room...</p>
+        <div className="min-h-[calc(100vh-64px)] flex flex-col items-center justify-center bg-slate-50 dark:bg-[#0D0D0E] text-slate-900 dark:text-white">
+          <div className="w-8 h-8 border-3 border-amber-500 border-t-transparent rounded-full animate-spin mb-3" />
+          <p className="text-sm text-slate-500 dark:text-[#9CA3AF]">Connecting to secure WebRTC meeting room...</p>
         </div>
       </AppLayout>
     );
@@ -205,11 +205,11 @@ export default function MeetingRoomPage() {
   // Pre-join Lobby View
   return (
     <AppLayout>
-      <div className="min-h-[calc(100vh-64px)] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white flex flex-col items-center justify-center p-4 sm:p-6 select-none font-sans">
+      <div className="min-h-[calc(100vh-64px)] bg-slate-50 dark:bg-[#0D0D0E] text-slate-900 dark:text-white flex flex-col items-center justify-center p-4 sm:p-6 select-none font-sans">
         <div className="w-full max-w-4xl flex flex-col lg:flex-row items-center gap-8">
           {/* Left: Interactive Media Preview Stage */}
           <div className="flex-1 w-full max-w-lg">
-            <div className="relative aspect-video rounded-2xl bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
+            <div className="relative aspect-video rounded-2xl bg-[#111113] border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden">
               <video
                 ref={previewVideoRef}
                 autoPlay
@@ -221,8 +221,8 @@ export default function MeetingRoomPage() {
               />
 
               {!isVideoEnabled && (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-950 text-white">
-                  <div className="w-20 h-20 rounded-full bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-2xl font-bold text-white mb-2">
+                <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#111113] to-[#0D0D0E] text-white">
+                  <div className="w-20 h-20 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl font-bold text-white mb-2">
                     {sessionUser?.name ? sessionUser.name.charAt(0).toUpperCase() : "U"}
                   </div>
                   <span className="text-xs text-slate-400">Camera is turned off</span>
@@ -275,26 +275,26 @@ export default function MeetingRoomPage() {
           <div className="flex-1 w-full max-w-md flex flex-col justify-center">
             <button
               onClick={() => router.push("/calls")}
-              className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-all mb-4 self-start"
+              className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 dark:text-[#9CA3AF] dark:hover:text-white transition-all mb-4 self-start"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back to Calls Hub</span>
             </button>
 
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 self-start mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 self-start mb-3">
               <Radio className="w-3.5 h-3.5 animate-pulse" /> Live WebRTC Direct HD
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
               {roomData?.name || "Video Call Room"}
             </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 font-mono">
-              Room Code: <span className="text-indigo-600 dark:text-indigo-400 font-semibold">{roomData?.code}</span>
+            <p className="text-xs text-slate-500 dark:text-[#9CA3AF] mb-6 font-mono">
+              Room Code: <span className="text-[#5846A8] dark:text-[#FBBF24] font-semibold">{roomData?.code}</span>
             </p>
 
             {/* Participants inside */}
-            <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 mb-6 flex items-center gap-3 shadow-xs">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 dark:bg-indigo-600/20 dark:text-indigo-400 flex items-center justify-center shrink-0">
+            <div className="p-4 rounded-xl bg-white dark:bg-[#17171A] border border-slate-200 dark:border-white/10 mb-6 flex items-center gap-3 shadow-xs">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-[#FBBF24] flex items-center justify-center shrink-0">
                 <Users className="w-5 h-5" />
               </div>
               <div>
@@ -305,7 +305,7 @@ export default function MeetingRoomPage() {
                     <span>No one is in the call yet</span>
                   )}
                 </div>
-                <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                <div className="text-[11px] text-slate-500 dark:text-[#9CA3AF]">
                   {roomData?.participants?.length
                     ? "Your teammates are waiting for you."
                     : "You will be the first participant in this meeting."}
@@ -316,14 +316,14 @@ export default function MeetingRoomPage() {
             {/* Join Button */}
             <button
               onClick={handleJoinMeeting}
-              className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold text-sm transition-all shadow-xl shadow-indigo-600/30 cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#F59E0B] via-[#E08738] to-[#D97706] hover:brightness-105 text-slate-950 font-bold text-sm transition-all shadow-xl shadow-amber-500/20 cursor-pointer"
             >
               <Video className="w-5 h-5" />
               <span>Join Meeting Now</span>
             </button>
 
-            <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 mt-4">
-              <ShieldCheck className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+            <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500 dark:text-[#9CA3AF] mt-4">
+              <ShieldCheck className="w-3.5 h-3.5 text-amber-600 dark:text-[#FBBF24]" />
               <span>Encrypted peer-to-peer real-time communication</span>
             </div>
           </div>

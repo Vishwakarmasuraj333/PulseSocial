@@ -720,13 +720,13 @@ export default function CallsCollaborationHubPage() {
 
   return (
     <AppLayout>
-      <div className="h-[calc(100vh-4rem)] w-full flex bg-slate-50 dark:bg-[#0B0F19] text-slate-900 dark:text-white font-sans overflow-hidden select-none">
+      <div className="h-[calc(100vh-4rem)] w-full flex bg-slate-50 dark:bg-[#0D0D0E] text-slate-900 dark:text-white font-sans overflow-hidden select-none">
         {/* ============================================================ */}
         {/* LEFT COLUMN: Team Channels & Collaborators Directory          */}
         {/* ============================================================ */}
-        <div className={`${isMobileChatOpen ? "hidden sm:flex" : "flex"} w-full sm:w-[380px] lg:w-[420px] shrink-0 flex-col bg-white dark:bg-slate-900/90 border-r border-slate-200/80 dark:border-slate-800/80 h-full backdrop-blur-md`}>
+        <div className={`${isMobileChatOpen ? "hidden sm:flex" : "flex"} w-full sm:w-[380px] lg:w-[420px] shrink-0 flex-col bg-white dark:bg-[#111113] border-r border-slate-200/80 dark:border-white/7 h-full backdrop-blur-md`}>
           {/* Executive Header */}
-          <div className="h-16 px-4 bg-white/95 dark:bg-slate-900/95 flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80">
+          <div className="h-16 px-4 bg-white/95 dark:bg-[#111113]/95 flex items-center justify-between border-b border-slate-200/80 dark:border-white/7">
             <div className="flex items-center gap-3">
               <div className="relative">
                 <img
@@ -734,7 +734,7 @@ export default function CallsCollaborationHubPage() {
                   alt="Profile"
                   className="w-10 h-10 rounded-xl object-cover ring-2 ring-amber-500/30 dark:ring-amber-400/30"
                 />
-                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900 shadow-xs" />
+                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-[#111113] shadow-xs" />
               </div>
               <div>
                 <h2 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
@@ -777,14 +777,14 @@ export default function CallsCollaborationHubPage() {
           </div>
 
           {/* Navigation Tabs (Chats, Call History, Multi-Party Rooms) */}
-          <div className="flex border-b border-slate-200/80 dark:border-slate-800/80 bg-slate-50/60 dark:bg-slate-900/60 px-2 pt-1.5 gap-1">
+          <div className="flex border-b border-slate-200/80 dark:border-white/7 bg-slate-50/60 dark:bg-[#0D0D0E]/60 px-2 pt-1.5 gap-1">
             <button
               type="button"
               onClick={() => setActiveTab("chats")}
               className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === "chats"
-                  ? "bg-white dark:bg-slate-800 text-amber-800 dark:text-[#FBBF24] shadow-xs border border-slate-200/60 dark:border-slate-700/60"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-800/50"
+                  ? "bg-white dark:bg-[#17171A] text-amber-800 dark:text-[#FBBF24] shadow-xs border border-slate-200/60 dark:border-white/10"
+                  : "text-slate-500 dark:text-[#9CA3AF] hover:text-slate-800 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/[0.05]"
               }`}
             >
               <MessageSquare className="w-3.5 h-3.5" />
@@ -795,8 +795,8 @@ export default function CallsCollaborationHubPage() {
               onClick={() => setActiveTab("calls")}
               className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === "calls"
-                  ? "bg-white dark:bg-slate-800 text-amber-800 dark:text-[#FBBF24] shadow-xs border border-slate-200/60 dark:border-slate-700/60"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-800/50"
+                  ? "bg-white dark:bg-[#17171A] text-amber-800 dark:text-[#FBBF24] shadow-xs border border-slate-200/60 dark:border-white/10"
+                  : "text-slate-500 dark:text-[#9CA3AF] hover:text-slate-800 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/[0.05]"
               }`}
             >
               <PhoneCall className="w-3.5 h-3.5" />
@@ -810,8 +810,8 @@ export default function CallsCollaborationHubPage() {
               onClick={() => setActiveTab("rooms")}
               className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === "rooms"
-                  ? "bg-white dark:bg-slate-800 text-amber-800 dark:text-[#FBBF24] shadow-xs border border-slate-200/60 dark:border-slate-700/60"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-800/50"
+                  ? "bg-white dark:bg-[#17171A] text-amber-800 dark:text-[#FBBF24] shadow-xs border border-slate-200/60 dark:border-white/10"
+                  : "text-slate-500 dark:text-[#9CA3AF] hover:text-slate-800 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/[0.05]"
               }`}
             >
               <Radio className="w-3.5 h-3.5" />
@@ -820,7 +820,7 @@ export default function CallsCollaborationHubPage() {
           </div>
 
           {/* Search Bar */}
-          <div className="p-2.5 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/50">
+          <div className="p-2.5 bg-white dark:bg-[#111113] border-b border-slate-100 dark:border-white/7">
             <div className="relative flex items-center">
               <Search className="absolute left-3 w-4 h-4 text-slate-400" />
               <input
@@ -828,14 +828,14 @@ export default function CallsCollaborationHubPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search teammates, messages, or channels..."
-                className="w-full pl-9 pr-4 py-1.5 text-xs rounded-xl bg-slate-100/80 dark:bg-slate-800/80 text-slate-900 dark:text-white placeholder:text-slate-400 border border-transparent focus:border-amber-500 dark:focus:border-amber-500 outline-none transition"
+                className="w-full pl-9 pr-4 py-1.5 text-xs rounded-xl bg-slate-100/80 dark:bg-[#17171A] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#6B7280] border border-transparent dark:border-white/10 focus:border-amber-500 dark:focus:border-amber-500 outline-none transition"
               />
             </div>
           </div>
 
           {/* TAB 1: TEAM CHATS DIRECTORY */}
           {activeTab === "chats" && (
-            <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/40">
+            <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-white/[0.06]">
               {filteredContacts.map((contact) => {
                 const isSelected = contact.id === selectedContactId;
                 const lastMsg = conversations[contact.id]?.slice(-1)[0];
@@ -848,24 +848,24 @@ export default function CallsCollaborationHubPage() {
                     }}
                     className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition ${
                       isSelected
-                        ? "bg-amber-50/80 dark:bg-amber-950/25 border-l-4 border-amber-500 dark:border-amber-400"
-                        : "hover:bg-slate-50/80 dark:hover:bg-slate-800/40"
+                        ? "bg-amber-50/80 dark:bg-amber-500/10 border-l-4 border-amber-500 dark:border-amber-400"
+                        : "hover:bg-slate-50/80 dark:hover:bg-white/[0.04]"
                     }`}
                   >
                     <div className="relative shrink-0">
                       <img
                         src={contact.avatar}
                         alt={contact.name}
-                        className="w-11 h-11 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-slate-700"
+                        className="w-11 h-11 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-white/10"
                       />
                       {contact.status === "online" && (
-                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900" title="Online" />
+                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-[#111113]" title="Online" />
                       )}
                       {contact.status === "in_call" && (
-                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-amber-500 rounded-full border-2 border-white dark:border-slate-900" title="In a Huddle" />
+                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-amber-500 rounded-full border-2 border-white dark:border-[#111113]" title="In a Huddle" />
                       )}
                       {contact.status === "offline" && (
-                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-slate-400 rounded-full border-2 border-white dark:border-slate-900" title="Offline" />
+                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-slate-400 rounded-full border-2 border-white dark:border-[#111113]" title="Offline" />
                       )}
                     </div>
 
@@ -880,7 +880,7 @@ export default function CallsCollaborationHubPage() {
                       </div>
 
                       <div className="flex items-center justify-between mt-1">
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate pr-2">
+                        <p className="text-[11px] text-slate-500 dark:text-[#9CA3AF] truncate pr-2">
                           {lastMsg?.type === "voice"
                             ? "🎤 Voice memo (0:24)"
                             : lastMsg?.type === "call_log"
@@ -902,26 +902,26 @@ export default function CallsCollaborationHubPage() {
 
           {/* TAB 2: CALL LOGS */}
           {activeTab === "calls" && (
-            <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/40">
-              <div className="px-4 py-2.5 bg-slate-50/70 dark:bg-slate-800/40 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-white/[0.06]">
+              <div className="px-4 py-2.5 bg-slate-50/70 dark:bg-white/[0.03] text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#6B7280]">
                 Recent Telemetry &amp; Logs
               </div>
               {callLogs.map((log) => (
                 <div
                   key={log.id}
-                  className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition"
+                  className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/80 dark:hover:bg-white/[0.04] transition"
                 >
                   <div className="flex items-center gap-3">
                     <img
                       src={log.contactAvatar}
                       alt={log.contactName}
-                      className="w-10 h-10 rounded-xl object-cover shrink-0 ring-1 ring-slate-200 dark:ring-slate-700"
+                      className="w-10 h-10 rounded-xl object-cover shrink-0 ring-1 ring-slate-200 dark:ring-white/10"
                     />
                     <div>
                       <h4 className="text-xs font-bold text-slate-900 dark:text-white">
                         {log.contactName}
                       </h4>
-                      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-[#9CA3AF] mt-0.5">
                         {log.direction === "incoming" && (
                           <PhoneIncoming className="w-3.5 h-3.5 text-emerald-500" />
                         )}
@@ -988,7 +988,7 @@ export default function CallsCollaborationHubPage() {
                 </button>
               </div>
 
-              <div className="space-y-2 p-3.5 rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800">
+              <div className="space-y-2 p-3.5 rounded-2xl bg-white dark:bg-[#17171A] border border-slate-200/80 dark:border-white/7">
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
                   Enter Meeting Room Code:
                 </label>
@@ -998,7 +998,7 @@ export default function CallsCollaborationHubPage() {
                     value={roomCodeInput}
                     onChange={(e) => setRoomCodeInput(e.target.value)}
                     placeholder="e.g. weekly-sync"
-                    className="flex-1 px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white outline-none focus:ring-1 focus:ring-amber-500"
+                    className="flex-1 px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#111113] text-slate-900 dark:text-white outline-none focus:ring-1 focus:ring-amber-500"
                   />
                   <button
                     type="button"
@@ -1011,7 +1011,7 @@ export default function CallsCollaborationHubPage() {
               </div>
 
               <div className="space-y-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#6B7280]">
                   Workspace Standup Channels:
                 </span>
                 <div className="space-y-1.5">
@@ -1020,7 +1020,7 @@ export default function CallsCollaborationHubPage() {
                       key={code}
                       type="button"
                       onClick={() => handleJoinOrCreateRoom(code)}
-                      className="w-full px-3 py-2 text-left rounded-xl bg-white dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800 hover:border-amber-500/40 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-amber-600 dark:hover:text-[#FBBF24] transition flex items-center justify-between cursor-pointer"
+                      className="w-full px-3 py-2 text-left rounded-xl bg-white dark:bg-[#17171A] border border-slate-200/60 dark:border-white/7 hover:border-amber-500/40 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-amber-600 dark:hover:text-[#FBBF24] transition flex items-center justify-between cursor-pointer"
                     >
                       <span className="font-mono">#{code}</span>
                       <Video className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
@@ -1035,14 +1035,14 @@ export default function CallsCollaborationHubPage() {
         {/* ============================================================ */}
         {/* RIGHT COLUMN: Executive Active Collaboration Workspace        */}
         {/* ============================================================ */}
-        <div className={`${isMobileChatOpen ? "flex" : "hidden sm:flex"} flex-1 flex-col h-full bg-slate-50/70 dark:bg-[#0B0F19] relative`}>
+        <div className={`${isMobileChatOpen ? "flex" : "hidden sm:flex"} flex-1 flex-col h-full bg-slate-50/70 dark:bg-[#0D0D0E] relative`}>
           {/* Active Teammate Header */}
-          <div className="h-16 px-4 sm:px-6 bg-white/95 dark:bg-slate-900/95 flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80 z-10 backdrop-blur-md">
+          <div className="h-16 px-4 sm:px-6 bg-white/95 dark:bg-[#111113]/95 flex items-center justify-between border-b border-slate-200/80 dark:border-white/7 z-10 backdrop-blur-md">
             <div className="flex items-center gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={() => setIsMobileChatOpen(false)}
-                className="sm:hidden p-1.5 -ml-1 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="sm:hidden p-1.5 -ml-1 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer"
                 title="Back to Directory"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -1051,13 +1051,13 @@ export default function CallsCollaborationHubPage() {
                 <img
                   src={activeContact.avatar}
                   alt={activeContact.name}
-                  className="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-slate-700"
+                  className="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-white/10"
                 />
                 {activeContact.status === "online" && (
-                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900" />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-[#111113]" />
                 )}
                 {activeContact.status === "in_call" && (
-                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-amber-500 rounded-full border-2 border-white dark:border-slate-900" />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-amber-500 rounded-full border-2 border-white dark:border-[#111113]" />
                 )}
               </div>
 
@@ -1065,7 +1065,7 @@ export default function CallsCollaborationHubPage() {
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
                   {activeContact.name}
                 </h3>
-                <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                <p className="text-[11px] font-medium text-slate-500 dark:text-[#9CA3AF]">
                   {isTyping ? (
                     <span className="text-amber-600 dark:text-amber-400 font-semibold">typing...</span>
                   ) : activeContact.status === "online" ? (
@@ -1086,7 +1086,7 @@ export default function CallsCollaborationHubPage() {
               <button
                 type="button"
                 onClick={() => startVoiceCall()}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 text-xs font-bold transition cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-[#17171A] dark:hover:bg-white/10 text-slate-800 dark:text-slate-100 dark:border dark:border-white/10 text-xs font-bold transition cursor-pointer"
                 title="Start Voice Huddle"
               >
                 <Phone className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
@@ -1103,12 +1103,12 @@ export default function CallsCollaborationHubPage() {
                 <span>HD Video Call</span>
               </button>
 
-              <div className="h-5 w-px bg-slate-200 dark:bg-slate-800 mx-1" />
+              <div className="h-5 w-px bg-slate-200 dark:bg-white/10 mx-1" />
 
               <button
                 type="button"
                 onClick={() => handleJoinOrCreateRoom()}
-                className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-[#9CA3AF] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer"
                 title="Open Team Meeting Room"
               >
                 <Radio className="w-4 h-4" />
@@ -1125,7 +1125,7 @@ export default function CallsCollaborationHubPage() {
             }}
           >
             {/* Security banner */}
-            <div className="w-fit max-w-md mx-auto text-center px-4 py-1.5 rounded-full bg-slate-200/60 dark:bg-slate-800/60 border border-slate-300/50 dark:border-slate-700/50 text-[10px] font-semibold text-slate-600 dark:text-slate-400">
+            <div className="w-fit max-w-md mx-auto text-center px-4 py-1.5 rounded-full bg-slate-200/60 dark:bg-[#17171A]/80 border border-slate-300/50 dark:border-white/10 text-[10px] font-semibold text-slate-600 dark:text-[#9CA3AF]">
               🔒 End-to-end encrypted peer stream • Pulse Enterprise Mesh
             </div>
 
@@ -1134,7 +1134,7 @@ export default function CallsCollaborationHubPage() {
               if (msg.type === "call_log") {
                 return (
                   <div key={msg.id} className="flex justify-center my-3">
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 text-xs text-slate-700 dark:text-slate-300 shadow-xs">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-[#17171A] border border-slate-200/80 dark:border-white/10 text-xs text-slate-700 dark:text-slate-300 shadow-xs">
                       {msg.callType === "voice" ? (
                         <PhoneCall className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                       ) : (
@@ -1165,7 +1165,7 @@ export default function CallsCollaborationHubPage() {
                     className={`max-w-[78%] sm:max-w-[65%] rounded-2xl px-4 py-2.5 shadow-xs text-xs relative leading-relaxed ${
                       isMe
                         ? "bg-gradient-to-r from-[#F59E0B] via-[#E08738] to-[#D97706] text-slate-950 font-medium rounded-tr-xs shadow-xs"
-                        : "bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-200/80 dark:border-slate-700/70 rounded-tl-xs shadow-xs"
+                        : "bg-white dark:bg-[#17171A] text-slate-900 dark:text-slate-100 border border-slate-200/80 dark:border-white/10 rounded-tl-xs shadow-xs"
                     }`}
                   >
                     {msg.type === "voice" ? (
@@ -1252,7 +1252,7 @@ export default function CallsCollaborationHubPage() {
 
             {isTyping && (
               <div className="flex justify-start">
-                <div className="px-3.5 py-2 rounded-2xl bg-white dark:bg-slate-800 text-xs text-slate-500 dark:text-slate-400 shadow-xs flex items-center gap-1.5 border border-slate-200/60 dark:border-slate-700/50">
+                <div className="px-3.5 py-2 rounded-2xl bg-white dark:bg-[#17171A] text-xs text-slate-500 dark:text-[#9CA3AF] shadow-xs flex items-center gap-1.5 border border-slate-200/60 dark:border-white/10">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 animate-bounce" />
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 animate-bounce [animation-delay:0.2s]" />
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 animate-bounce [animation-delay:0.4s]" />
@@ -1264,7 +1264,7 @@ export default function CallsCollaborationHubPage() {
 
           {/* Quick Reaction Emojis Popup */}
           {showEmojiPicker && (
-            <div className="absolute bottom-20 left-4 p-2 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl flex items-center gap-2 z-20 animate-in fade-in zoom-in-95">
+            <div className="absolute bottom-20 left-4 p-2 rounded-2xl bg-white dark:bg-[#1C1C20] border border-slate-200 dark:border-white/10 shadow-xl flex items-center gap-2 z-20 animate-in fade-in zoom-in-95">
               {["👍", "❤️", "🔥", "🚀", "👏", "🎉", "🙏", "✅"].map((emoji) => (
                 <button
                   key={emoji}
@@ -1273,7 +1273,7 @@ export default function CallsCollaborationHubPage() {
                     setInputMessage((prev) => prev + emoji);
                     setShowEmojiPicker(false);
                   }}
-                  className="w-8 h-8 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 text-base flex items-center justify-center transition cursor-pointer"
+                  className="w-8 h-8 rounded-xl hover:bg-slate-100 dark:hover:bg-white/10 text-base flex items-center justify-center transition cursor-pointer"
                 >
                   {emoji}
                 </button>
@@ -1282,7 +1282,7 @@ export default function CallsCollaborationHubPage() {
           )}
 
           {/* Message Input Bar */}
-          <div className="px-4 py-3 bg-white/95 dark:bg-slate-900/95 flex items-center gap-2 z-10 border-t border-slate-200/80 dark:border-slate-800/80">
+          <div className="px-4 py-3 bg-white/95 dark:bg-[#111113]/95 flex items-center gap-2 z-10 border-t border-slate-200/80 dark:border-white/7">
             {/* Hidden File Picker */}
             <input
               ref={fileInputRef}
@@ -1295,7 +1295,7 @@ export default function CallsCollaborationHubPage() {
             <button
               type="button"
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
+              className="p-2 text-slate-500 dark:text-[#9CA3AF] hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
               title="Add Emoji"
             >
               <Smile className="w-4 h-4" />
@@ -1304,7 +1304,7 @@ export default function CallsCollaborationHubPage() {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="p-2 text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-[#FBBF24] transition cursor-pointer"
+              className="p-2 text-slate-500 dark:text-[#9CA3AF] hover:text-amber-600 dark:hover:text-[#FBBF24] transition cursor-pointer"
               title="Attach File or Image"
             >
               <Paperclip className="w-4 h-4" />
@@ -1316,7 +1316,7 @@ export default function CallsCollaborationHubPage() {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder="Type a team message or meeting note... (Press Enter to send)"
-                className="flex-1 py-2 px-4 rounded-xl bg-slate-100/90 dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 text-xs border border-transparent focus:border-amber-500 outline-none transition"
+                className="flex-1 py-2 px-4 rounded-xl bg-slate-100/90 dark:bg-[#17171A] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#6B7280] text-xs border border-transparent dark:border-white/10 focus:border-amber-500 dark:focus:border-amber-500 outline-none transition"
               />
 
               {inputMessage.trim() ? (
@@ -1349,7 +1349,7 @@ export default function CallsCollaborationHubPage() {
                       [activeContact.id]: [...(prev[activeContact.id] || []), voiceMsg],
                     }));
                   }}
-                  className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-[#FBBF24] transition cursor-pointer active:scale-95 flex items-center justify-center"
+                  className="p-2.5 rounded-xl bg-slate-100 dark:bg-[#17171A] text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-[#FBBF24] dark:border dark:border-white/10 transition cursor-pointer active:scale-95 flex items-center justify-center"
                   title="Send voice note"
                 >
                   <Mic className="w-4 h-4" />
@@ -1475,8 +1475,8 @@ export default function CallsCollaborationHubPage() {
 
           {/* REAL IN-CALL CHAT SIDE DRAWER (VOICE HUDDLE) */}
           {isVoiceChatOpen && (
-            <div className="w-full sm:w-[380px] h-full bg-slate-900 border-l border-slate-800 flex flex-col z-20 animate-in slide-in-from-right duration-200">
-              <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+            <div className="w-full sm:w-[380px] h-full bg-[#111113] border-l border-white/10 flex flex-col z-20 animate-in slide-in-from-right duration-200">
+              <div className="p-4 border-b border-white/10 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-amber-400" />
                   <span className="text-xs font-bold text-white">Live In-Huddle Chat</span>
@@ -1500,7 +1500,7 @@ export default function CallsCollaborationHubPage() {
                       className={`px-3 py-2 rounded-xl text-xs max-w-[85%] ${
                         m.sender === "me"
                           ? "bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-slate-950 font-bold"
-                          : "bg-slate-800 text-slate-200 border border-slate-700/60"
+                          : "bg-[#17171A] text-slate-200 border border-white/10"
                       }`}
                     >
                       {m.text}
@@ -1510,13 +1510,13 @@ export default function CallsCollaborationHubPage() {
                 ))}
               </div>
 
-              <form onSubmit={handleSendInCallMessage} className="p-3 border-t border-slate-800 flex gap-2">
+              <form onSubmit={handleSendInCallMessage} className="p-3 border-t border-white/10 flex gap-2">
                 <input
                   type="text"
                   value={inCallChatInput}
                   onChange={(e) => setInCallChatInput(e.target.value)}
                   placeholder="Send note in call..."
-                  className="flex-1 px-3 py-1.5 rounded-xl bg-slate-800 text-white text-xs border border-slate-700 outline-none focus:border-amber-500"
+                  className="flex-1 px-3 py-1.5 rounded-xl bg-[#17171A] text-white text-xs border border-white/10 outline-none focus:border-amber-500"
                 />
                 <button
                   type="submit"
@@ -1700,8 +1700,8 @@ export default function CallsCollaborationHubPage() {
 
           {/* REAL IN-CALL CHAT SIDE DRAWER (VIDEO CALL) */}
           {isVideoChatOpen && (
-            <div className="w-full sm:w-[380px] h-full bg-slate-900 border-l border-slate-800 flex flex-col z-30 animate-in slide-in-from-right duration-200">
-              <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
+            <div className="w-full sm:w-[380px] h-full bg-[#111113] border-l border-white/10 flex flex-col z-30 animate-in slide-in-from-right duration-200">
+              <div className="p-4 border-b border-white/10 flex items-center justify-between bg-[#111113]/90">
                 <div className="flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-amber-400" />
                   <span className="text-xs font-bold text-white">Live In-Call Chat</span>
@@ -1725,7 +1725,7 @@ export default function CallsCollaborationHubPage() {
                       className={`px-3.5 py-2 rounded-xl text-xs max-w-[85%] leading-relaxed ${
                         m.sender === "me"
                           ? "bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-slate-950 font-bold"
-                          : "bg-slate-800 text-slate-200 border border-slate-700/60"
+                          : "bg-[#17171A] text-slate-200 border border-white/10"
                       }`}
                     >
                       {m.text}
@@ -1735,13 +1735,13 @@ export default function CallsCollaborationHubPage() {
                 ))}
               </div>
 
-              <form onSubmit={handleSendInCallMessage} className="p-3 border-t border-slate-800 flex gap-2 bg-slate-900/95">
+              <form onSubmit={handleSendInCallMessage} className="p-3 border-t border-white/10 flex gap-2 bg-[#111113]/95">
                 <input
                   type="text"
                   value={inCallChatInput}
                   onChange={(e) => setInCallChatInput(e.target.value)}
                   placeholder="Send chat message during call..."
-                  className="flex-1 px-3 py-2 rounded-xl bg-slate-800 text-white text-xs border border-slate-700 outline-none focus:border-amber-500 placeholder:text-slate-500"
+                  className="flex-1 px-3 py-2 rounded-xl bg-[#17171A] text-white text-xs border border-white/10 outline-none focus:border-amber-500 placeholder:text-slate-500"
                 />
                 <button
                   type="submit"

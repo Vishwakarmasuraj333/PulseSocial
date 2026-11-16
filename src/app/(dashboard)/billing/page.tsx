@@ -138,7 +138,7 @@ export default function BillingPage() {
 
             {/* Plan Tier & Billing Cycle Selector Pills */}
             <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
-              <div className="flex items-center gap-1 p-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-xs">
+              <div className="flex items-center gap-1 p-1 bg-white dark:bg-[#17171A] border border-slate-200 dark:border-white/10 rounded-2xl shadow-xs">
                 {(["monthly", "annual"] as const).map((cycle) => (
                   <button
                     key={cycle}
@@ -147,14 +147,14 @@ export default function BillingPage() {
                     className={`px-2.5 py-1.5 rounded-xl text-xs font-bold capitalize transition cursor-pointer ${
                       selectedBilling === cycle
                         ? "bg-slate-900 text-white dark:bg-white/15 dark:text-white shadow-xs"
-                        : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                        : "text-slate-500 dark:text-[#9CA3AF] hover:text-slate-900 dark:hover:text-white"
                     }`}
                   >
                     {cycle}
                   </button>
                 ))}
               </div>
-              <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-xs">
+              <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-[#17171A] border border-slate-200 dark:border-white/10 rounded-2xl shadow-xs">
                 {[
                   { key: "STARTER", name: "Starter", price: selectedBilling === "annual" ? "$15" : "$19" },
                   { key: "PROFESSIONAL", name: "Professional", price: selectedBilling === "annual" ? "$39" : "$49", popular: true },
@@ -167,7 +167,7 @@ export default function BillingPage() {
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
                       selectedPlan === tier.key
                         ? "bg-[#5846A8] text-white dark:bg-gradient-to-r dark:from-[#F59E0B] dark:via-[#E08738] dark:to-[#D97706] dark:text-slate-950 shadow-md"
-                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                        : "text-slate-600 dark:text-[#9CA3AF] hover:text-slate-900 dark:hover:text-white"
                     }`}
                   >
                     <span>{tier.name}</span>
@@ -203,8 +203,8 @@ export default function BillingPage() {
                     onClick={() => setPaymentMethod("stripe")}
                     className={`p-4 rounded-2xl border-2 transition cursor-pointer flex flex-col justify-between space-y-3 ${
                       paymentMethod === "stripe"
-                        ? "border-[#5846A8] dark:border-[#FBBF24] bg-white dark:bg-slate-900 shadow-md ring-2 ring-[#5846A8]/20"
-                        : "border-slate-200 dark:border-white/10 bg-white/60 dark:bg-slate-900/40 hover:border-slate-300"
+                        ? "border-[#5846A8] dark:border-[#FBBF24] bg-white dark:bg-[#17171A] shadow-md ring-2 ring-[#5846A8]/20"
+                        : "border-slate-200 dark:border-white/10 bg-white/60 dark:bg-[#111113]/50 hover:border-slate-300"
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -222,8 +222,8 @@ export default function BillingPage() {
                     onClick={() => setPaymentMethod("razorpay")}
                     className={`p-4 rounded-2xl border-2 transition cursor-pointer flex flex-col justify-between space-y-3 ${
                       paymentMethod === "razorpay"
-                        ? "border-[#5846A8] dark:border-[#FBBF24] bg-white dark:bg-slate-900 shadow-md ring-2 ring-[#5846A8]/20"
-                        : "border-slate-200 dark:border-white/10 bg-white/60 dark:bg-slate-900/40 hover:border-slate-300"
+                        ? "border-[#5846A8] dark:border-[#FBBF24] bg-white dark:bg-[#17171A] shadow-md ring-2 ring-[#5846A8]/20"
+                        : "border-slate-200 dark:border-white/10 bg-white/60 dark:bg-[#111113]/50 hover:border-slate-300"
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -241,8 +241,8 @@ export default function BillingPage() {
                     onClick={() => setPaymentMethod("sandbox")}
                     className={`p-4 rounded-2xl border-2 transition cursor-pointer flex flex-col justify-between space-y-3 ${
                       paymentMethod === "sandbox"
-                        ? "border-[#5846A8] dark:border-[#FBBF24] bg-white dark:bg-slate-900 shadow-md ring-2 ring-[#5846A8]/20"
-                        : "border-slate-200 dark:border-white/10 bg-white/60 dark:bg-slate-900/40 hover:border-slate-300"
+                        ? "border-[#5846A8] dark:border-[#FBBF24] bg-white dark:bg-[#17171A] shadow-md ring-2 ring-[#5846A8]/20"
+                        : "border-slate-200 dark:border-white/10 bg-white/60 dark:bg-[#111113]/50 hover:border-slate-300"
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -258,7 +258,7 @@ export default function BillingPage() {
 
                 {/* Simulated Payment Card Inputs for Card Mode */}
                 {paymentMethod === "stripe" && (
-                  <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 space-y-3">
+                  <div className="p-4 rounded-2xl bg-white dark:bg-[#17171A] border border-slate-200 dark:border-white/10 space-y-3">
                     <div className="text-[11px] font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
                       <span>Card Details</span>
                       <span className="text-[10px] text-slate-400 font-normal">Encrypted 256-bit TLS</span>
@@ -267,20 +267,20 @@ export default function BillingPage() {
                       <input
                         type="text"
                         defaultValue="•••• •••• •••• 4242"
-                        className="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono"
+                        className="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#111113] text-slate-900 dark:text-white font-mono"
                         placeholder="Card Number"
                       />
                       <div className="grid grid-cols-2 gap-2">
                         <input
                           type="text"
                           defaultValue="12/28"
-                          className="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono"
+                          className="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#111113] text-slate-900 dark:text-white font-mono"
                           placeholder="MM/YY"
                         />
                         <input
                           type="text"
                           defaultValue="•••"
-                          className="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono"
+                          className="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#111113] text-slate-900 dark:text-white font-mono"
                           placeholder="CVC"
                         />
                       </div>
@@ -290,7 +290,7 @@ export default function BillingPage() {
               </div>
 
               {/* Order Summary Column */}
-              <div className="lg:col-span-5 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-lg space-y-4">
+              <div className="lg:col-span-5 p-5 rounded-2xl bg-white dark:bg-[#17171A] border border-slate-200 dark:border-white/10 shadow-lg space-y-4">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 pb-2 border-b border-slate-100 dark:border-white/5">
                   2. Order Summary
                 </h3>

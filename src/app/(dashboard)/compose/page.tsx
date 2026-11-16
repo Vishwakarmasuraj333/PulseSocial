@@ -317,7 +317,7 @@ export default function ComposePage() {
                           ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800"
                           : status === "Reauthorization required"
                           ? "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800"
-                          : "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700";
+                          : "bg-slate-50 text-slate-700 border-slate-200 dark:bg-[#111113] dark:text-[#9CA3AF] dark:border-white/10";
 
                       return (
                         <div key={acc.id} className="flex flex-col gap-1">
@@ -326,8 +326,8 @@ export default function ComposePage() {
                             onClick={() => togglePlatform(acc.platform)}
                             className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium border transition cursor-pointer ${
                               isSelected
-                                ? "bg-[#f5f3ff] dark:bg-purple-950/60 border-[#5846A8] text-[#5846A8] dark:text-purple-300 shadow-xs ring-1 ring-[#5846A8]"
-                                : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:bg-slate-50"
+                                ? "bg-[#f5f3ff] dark:bg-amber-500/15 border-[#5846A8] dark:border-[#E08738]/50 text-[#5846A8] dark:text-[#FBBF24] shadow-xs ring-1 ring-[#5846A8] dark:ring-[#E08738]/30"
+                                : "border-slate-200 dark:border-white/10 bg-white dark:bg-[#111113] text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/[0.05]"
                             }`}
                           >
                             <div className="w-4 h-4 rounded-full flex items-center justify-center">

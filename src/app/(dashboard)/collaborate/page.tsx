@@ -176,7 +176,7 @@ export default function CollaboratePage() {
                 {filteredFeeds.map((feed) => (
                   <div
                     key={feed.id}
-                    className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850 space-y-2 shadow-2xs"
+                    className="p-4 rounded-xl border border-slate-100 dark:border-white/7 bg-slate-50/50 dark:bg-[#111113] space-y-2 shadow-2xs"
                   >
                     <div className="flex items-center gap-2.5">
                       <div className="w-7 h-7 rounded-full bg-[#8c6b54] text-white font-bold text-xs flex items-center justify-center">

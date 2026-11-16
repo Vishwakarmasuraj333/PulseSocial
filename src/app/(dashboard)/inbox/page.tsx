@@ -492,7 +492,7 @@ export default function InboxPage() {
                 <div className="flex-1 p-5 overflow-y-auto space-y-4 max-h-[440px]">
                   {/* Initial Welcome / Info Banner */}
                   <div className="text-center py-2">
-                    <span className="text-[11px] text-slate-400 bg-white dark:bg-slate-900 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-800 font-medium shadow-2xs">
+                    <span className="text-[11px] text-slate-400 dark:text-[#9CA3AF] bg-white dark:bg-[#111113] px-3 py-1 rounded-full border border-slate-200 dark:border-white/10 font-medium shadow-2xs">
                       Conversation started via {selectedConversation.platform.toUpperCase()}
                     </span>
                   </div>

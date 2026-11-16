@@ -301,11 +301,11 @@ export default function CalendarPage() {
   return (
     <AppLayout>
       <div className="bg-slate-50 dark:bg-[#0D0D0E] min-h-[calc(100vh-64px)] font-sans text-slate-800 dark:text-[#9CA3AF]">
-        
+
         {/* Top Control Toolbar */}
         <div className="bg-white dark:bg-[#111113] border-b border-slate-200 dark:border-white/7">
           <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
-            
+
             {/* Left Tools: Filter views All & Filters */}
             <div className="flex items-center gap-2">
               <button
@@ -320,14 +320,13 @@ export default function CalendarPage() {
               <button
                 type="button"
                 onClick={() => setIsAdvancedFiltersOpen(true)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition cursor-pointer ${
-                  filterCriteria.platforms.length > 0 ||
-                  filterCriteria.approvalStatuses.length > 0 ||
-                  filterCriteria.campaigns.length > 0 ||
-                  filterCriteria.contentTypes.length > 0
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition cursor-pointer ${filterCriteria.platforms.length > 0 ||
+                    filterCriteria.approvalStatuses.length > 0 ||
+                    filterCriteria.campaigns.length > 0 ||
+                    filterCriteria.contentTypes.length > 0
                     ? "bg-purple-50 dark:bg-amber-500/15 border-[#5846A8] dark:border-amber-500/30 text-[#5846A8] dark:text-[#FBBF24] shadow-2xs font-bold"
                     : "border-slate-200 dark:border-white/10 text-slate-700 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-white/5"
-                }`}
+                  }`}
               >
                 <Filter className="w-3.5 h-3.5 text-[#5846A8] dark:text-[#FBBF24]" />
                 <span>Filters</span>
@@ -335,13 +334,13 @@ export default function CalendarPage() {
                   filterCriteria.approvalStatuses.length > 0 ||
                   filterCriteria.campaigns.length > 0 ||
                   filterCriteria.contentTypes.length > 0) && (
-                  <span className="w-4 h-4 rounded-full bg-[#5846A8] dark:bg-[#E08738] text-white dark:text-[#0F0F11] text-[10px] flex items-center justify-center font-bold">
-                    {filterCriteria.platforms.length +
-                      filterCriteria.approvalStatuses.length +
-                      filterCriteria.campaigns.length +
-                      filterCriteria.contentTypes.length}
-                  </span>
-                )}
+                    <span className="w-4 h-4 rounded-full bg-[#5846A8] dark:bg-[#E08738] text-white dark:text-[#0F0F11] text-[10px] flex items-center justify-center font-bold">
+                      {filterCriteria.platforms.length +
+                        filterCriteria.approvalStatuses.length +
+                        filterCriteria.campaigns.length +
+                        filterCriteria.contentTypes.length}
+                    </span>
+                  )}
               </button>
 
               {/* Quick Clear Filter Pill */}
@@ -349,21 +348,21 @@ export default function CalendarPage() {
                 filterCriteria.approvalStatuses.length > 0 ||
                 filterCriteria.campaigns.length > 0 ||
                 filterCriteria.contentTypes.length > 0) && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setFilterCriteria(DEFAULT_FILTER_CRITERIA);
-                    toast({
-                      title: "Filters Reset",
-                      message: "Showing all calendar posts.",
-                      type: "info",
-                    });
-                  }}
-                  className="text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 underline cursor-pointer"
-                >
-                  Clear all
-                </button>
-              )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFilterCriteria(DEFAULT_FILTER_CRITERIA);
+                      toast({
+                        title: "Filters Reset",
+                        message: "Showing all calendar posts.",
+                        type: "info",
+                      });
+                    }}
+                    className="text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 underline cursor-pointer"
+                  >
+                    Clear all
+                  </button>
+                )}
             </div>
 
             {/* Right Tools: Channel Popover Pill + View Switcher */}
@@ -537,22 +536,20 @@ export default function CalendarPage() {
             <button
               type="button"
               onClick={() => setView("month")}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                view === "month"
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${view === "month"
                   ? "bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white shadow-2xs"
                   : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
-              }`}
+                }`}
             >
               Month
             </button>
             <button
               type="button"
               onClick={() => setView("week")}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                view === "week"
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${view === "week"
                   ? "bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white shadow-2xs"
                   : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
-              }`}
+                }`}
             >
               Week
             </button>
@@ -595,7 +592,7 @@ export default function CalendarPage() {
             </div>
           ) : view === "month" ? (
             <div className="bg-white dark:bg-[#17171A] rounded-2xl border border-slate-200/90 dark:border-white/7 shadow-xs overflow-hidden">
-              
+
               {/* Day Header Row */}
               <div className="grid grid-cols-7 border-b border-slate-200 dark:border-white/7 bg-white dark:bg-[#111113] text-center py-3 text-xs font-bold divide-x divide-slate-100 dark:divide-white/7">
                 <div className="text-rose-500">Sun</div>
@@ -620,6 +617,8 @@ export default function CalendarPage() {
                 {/* Real Days of Month */}
                 {Array.from({ length: daysInMonth }).map((_, idx) => {
                   const day = idx + 1;
+
+
                   const dayPosts = getPostsForDay(day);
                   const isToday =
                     new Date().getDate() === day &&
@@ -632,9 +631,8 @@ export default function CalendarPage() {
                   return (
                     <div
                       key={`day-${day}`}
-                      className={`min-h-[190px] p-2 sm:p-2.5 flex flex-col justify-between transition hover:bg-slate-50/50 dark:hover:bg-slate-850/40 relative ${
-                        isToday ? "bg-indigo-50/20 dark:bg-purple-950/20" : ""
-                      }`}
+                      className={`min-h-[190px] p-2 sm:p-2.5 flex flex-col justify-between transition hover:bg-slate-50/50 dark:hover:bg-slate-850/40 relative ${isToday ? "bg-indigo-50/20 dark:bg-purple-950/20" : ""
+                        }`}
                     >
                       {/* Top Date Number & Quick Schedule Button */}
                       <div className="flex items-center justify-between mb-1">
@@ -655,11 +653,10 @@ export default function CalendarPage() {
                           <Plus className="w-3.5 h-3.5" />
                         </button>
                         <span
-                          className={`text-xs font-semibold px-1.5 py-0.5 rounded-md ${
-                            isToday
+                          className={`text-xs font-semibold px-1.5 py-0.5 rounded-md ${isToday
                               ? "bg-indigo-600 text-white font-bold"
                               : "text-slate-500 dark:text-slate-400"
-                          }`}
+                            }`}
                         >
                           {day}
                         </span>
@@ -798,8 +795,8 @@ export default function CalendarPage() {
                                     {post.status === "PUBLISHED"
                                       ? "Published"
                                       : post.status === "SCHEDULED"
-                                      ? "Scheduled"
-                                      : "Draft"}
+                                        ? "Scheduled"
+                                        : "Draft"}
                                   </span>
                                 </span>
                               </div>
@@ -984,8 +981,8 @@ export default function CalendarPage() {
                       <p className="text-xs text-slate-500 mt-1.5">
                         {new Date(
                           selectedPostForDetails.scheduledFor ||
-                            selectedPostForDetails.publishedAt ||
-                            selectedPostForDetails.createdAt
+                          selectedPostForDetails.publishedAt ||
+                          selectedPostForDetails.createdAt
                         ).toLocaleString()}
                       </p>
                     </div>

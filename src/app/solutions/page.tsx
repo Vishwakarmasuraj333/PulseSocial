@@ -42,8 +42,8 @@ export default function SolutionsPage() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-indigo-500 selection:text-white font-sans">
       <MarketingHeader />
 
-      <main className="pt-10 sm:pt-14 pb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12 space-y-3 sm:space-y-4">
+      <main className="pt-6 sm:pt-8 pb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-8 space-y-2 sm:space-y-3">
           <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
             Tailored Solutions
           </span>
@@ -83,7 +83,7 @@ export default function SolutionsPage() {
                   <div className="space-y-2.5 mb-6 text-xs leading-5 text-slate-700 dark:text-slate-300">
                     {s.benefits.map((b) => (
                       <div key={b} className="flex items-start gap-2.5">
-                        <CheckCircle2 className="w-4 h-4 text-purple-500 shrink-0 mt-[2px]" />
+                        <CheckCircle2 className="w-4 h-4 text-purple-500 shrink-0 mt-0.5" />
                         <span>{b}</span>
                       </div>
                     ))}

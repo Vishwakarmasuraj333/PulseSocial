@@ -199,7 +199,7 @@ export function PulseScheduleVisual() {
         {/* =================================================== */}
         {/* CARD 2: QUEUE & SMARTQ PANEL (Right Overlapping)   */}
         {/* =================================================== */}
-        <div className="w-full max-w-[320px] sm:max-w-[335px] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-2xl p-4 sm:p-5 sm:-ml-2 sm:mt-6 z-20 text-left transition-transform duration-300 hover:scale-[1.01]">
+        <div className="w-full max-w-[320px] sm:max-w-[335px] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-2xl p-4 sm:p-5 sm:-ml-2 sm:mt-6 z-20 text-left transition-all duration-200 [backface-visibility:hidden] [transform:translateZ(0)]">
           {/* Header Tabs: Schedule | Queue */}
           <div className="flex items-center gap-6 border-b border-slate-100 dark:border-slate-800 pb-2 text-xs">
             <button

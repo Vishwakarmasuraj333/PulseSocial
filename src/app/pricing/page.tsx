@@ -209,7 +209,7 @@ export default function PricingPage() {
                   <ul className="space-y-2.5 text-xs leading-5 text-slate-700 dark:text-slate-300 mb-6">
                     {p.features.map((f: string) => (
                       <li key={f} className="flex items-start gap-2.5">
-                        <Check className="w-4 h-4 text-[#5846A8] dark:text-[#E08738] shrink-0 mt-[2px]" />
+                        <Check className="w-4 h-4 text-[#5846A8] dark:text-[#E08738] shrink-0 mt-0.5" />
                         <span>{f}</span>
                       </li>
                     ))}

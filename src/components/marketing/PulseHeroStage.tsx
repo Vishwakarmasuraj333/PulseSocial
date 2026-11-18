@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { X, CheckCircle2, Eye, Heart, MessageSquare, Share2, Bookmark, Lock } from "lucide-react";
+import { X, CheckCircle2, Eye, Heart, MessageSquare, Share2, Bookmark, Lock, ArrowRight } from "lucide-react";
 import { PulseInteractiveDotGrid } from "./PulseInteractiveDotGrid";
 
 interface PulseHeroStageProps {
@@ -176,18 +176,18 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
         <div className="pt-3 sm:pt-5 flex flex-wrap items-center justify-center gap-3.5 sm:gap-5">
           <Link
             href="/signup"
-            className="px-8 sm:px-10 py-3.5 rounded-xl bg-gradient-to-r from-purple-600 via-[#6366F1] to-[#5846A8] hover:opacity-95 text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 shadow-xl shadow-purple-600/30 hover:shadow-purple-600/50 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2 group"
+            className="px-7 sm:px-9 py-3.5 rounded-xl bg-gradient-to-r from-purple-600 via-[#6366F1] to-[#5846A8] hover:opacity-95 text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 shadow-xl shadow-purple-600/30 hover:shadow-purple-600/50 hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center gap-2 group"
           >
             <span>START FREE TRIAL</span>
-            <span className="group-hover:translate-x-1 transition-transform">→</span>
+            <ArrowRight className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-1" />
           </Link>
 
           <Link
             href="/features"
-            className="px-8 sm:px-10 py-3.5 rounded-xl border-2 border-[#5846A8] dark:border-purple-400/80 text-[#5846A8] dark:text-purple-300 bg-white/90 dark:bg-[#171724]/80 hover:bg-[#5846A8] hover:text-white dark:hover:bg-purple-600 dark:hover:text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 shadow-md hover:shadow-2xl hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-sm flex items-center gap-2 group"
+            className="px-7 sm:px-9 py-3.5 rounded-xl border-2 border-[#5846A8] dark:border-purple-400/80 text-[#5846A8] dark:text-purple-300 bg-white/90 dark:bg-[#171724]/80 hover:bg-[#5846A8] hover:text-white dark:hover:bg-purple-600 dark:hover:text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 shadow-md hover:shadow-2xl hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-sm flex items-center justify-center gap-2 group"
           >
             <span>EXPLORE FEATURES</span>
-            <span className="group-hover:translate-x-1 transition-transform">→</span>
+            <ArrowRight className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
 
@@ -407,10 +407,10 @@ export function PulseHeroStage({ onWatchVideo, onBookDemo }: PulseHeroStageProps
                   </span>
                 </div>
                 <div>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 flex-wrap min-w-0">
                     <span className="font-extrabold text-sm text-slate-900 dark:text-white">PulseSocial</span>
-                    <CheckCircle2 className="w-3.5 h-3.5 fill-[#1668e3] text-white" />
-                    <span className="text-[11px] text-slate-400 font-mono">@pulsesocial_app</span>
+                    <CheckCircle2 className="w-3.5 h-3.5 fill-[#1668e3] text-white shrink-0" />
+                    <span className="text-[11px] text-slate-400 font-mono truncate">@pulsesocial_app</span>
                   </div>
                   <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                     <span>{previewPost.platform} {previewPost.networkTag}</span>

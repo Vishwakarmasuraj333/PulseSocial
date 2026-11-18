@@ -69,17 +69,17 @@ export default function BlogIndexPage() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
       <MarketingHeader />
 
-      <main className="pt-10 sm:pt-14 pb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-semibold mb-3">
+      <main className="pt-6 sm:pt-8 pb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header with calibrated, balanced spacing */}
+        <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-semibold mb-2.5">
             <BookOpen className="w-3.5 h-3.5 shrink-0" />
             <span>PulseSocial Insights</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-950 dark:text-white">
             The Social Strategy Journal
           </h1>
-          <p className="text-base text-slate-600 dark:text-slate-300 mt-3 leading-relaxed">
+          <p className="text-base text-slate-600 dark:text-slate-300 mt-2.5 leading-relaxed">
             Architectural guides, platform updates, and content methodologies to scale your organic social footprint.
           </p>
         </div>
@@ -159,11 +159,24 @@ export default function BlogIndexPage() {
 
                     <div className="lg:col-span-5 space-y-4">
                       <div className="flex flex-wrap items-center gap-2.5 text-xs text-indigo-600 dark:text-indigo-400 font-semibold">
-                        <span className="px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200/80 dark:border-indigo-800/80">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setSelectedCategory(featuredPost.category.slug);
+                          }}
+                          className="px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200/80 dark:border-indigo-800/80 hover:bg-indigo-100 dark:hover:bg-indigo-900 transition cursor-pointer"
+                          title={`Filter by ${featuredPost.category.name}`}
+                        >
                           {featuredPost.category.name}
+                        </button>
+                        <span className="text-slate-400">&bull;</span>
+                        <span className="text-slate-500 font-normal">
+                          {selectedCategory === "all" ? "All Articles" : featuredPost.category.name}
                         </span>
                         <span className="text-slate-400">&bull;</span>
-                        <span className="flex items-center gap-1 text-slate-500">
+                        <span className="flex items-center gap-1 text-slate-500 font-normal">
                           <Clock className="w-3.5 h-3.5 shrink-0" />
                           {featuredPost.readingTime}
                         </span>

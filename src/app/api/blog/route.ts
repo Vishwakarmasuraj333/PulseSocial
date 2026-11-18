@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 const DEFAULT_CATEGORIES = [
+  { name: "AI & Automation", slug: "ai-automation", description: "Omnichannel publishing, AI assistants, and automation" },
   { name: "Social Media", slug: "social-media", description: "Trends and platform strategies" },
   { name: "Content Strategy", slug: "content-strategy", description: "Planning and scheduling excellence" },
   { name: "Marketing", slug: "marketing", description: "Audience acquisition and branding" },
@@ -13,6 +14,20 @@ const DEFAULT_CATEGORIES = [
 
 const DEFAULT_BLOG_POSTS = [
   {
+    title: "Omnichannel Social Publishing with AI: Scaling Multi-Network Presence Automatically",
+    slug: "omnichannel-social-publishing-ai-automation",
+    excerpt: "How modern AI copy generators, automated channel format adaptation, and smart queues scale presence across 15+ verified networks.",
+    content: `Managing an omnichannel social media presence across 15+ official platforms requires speed, consistency, and format specialization. By pairing AI-driven copy adaptation with unified scheduling, growth marketing teams can multiply organic reach without burning out.
+
+PulseSocial integrates Gemini 2.5 Flash to automatically rewrite hashtags, adjust character counts, and optimize multimedia for LinkedIn, X, Instagram, Facebook, and YouTube simultaneously from a single draft.`,
+    coverImage: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80",
+    authorName: "Sarah Chen",
+    readingTime: "5 min read",
+    tags: "AI & Automation, Omnichannel, Scheduling",
+    isFeatured: true,
+    categorySlug: "ai-automation",
+  },
+  {
     title: "The 2026 Social Architecture: Why Direct OAuth 2.0 Matters",
     slug: "2026-social-architecture-oauth-matters",
     excerpt: "Why modern marketing teams must abandon fragile scraper extensions and embrace hardware-grade OAuth tokens.",
@@ -23,7 +38,7 @@ With PulseSocial's official API architecture, your tokens are encrypted with AES
     authorName: "Sarah Chen",
     readingTime: "5 min read",
     tags: "OAuth, Security, Architecture",
-    isFeatured: true,
+    isFeatured: false,
     categorySlug: "social-media",
   },
   {

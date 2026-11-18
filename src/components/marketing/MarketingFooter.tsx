@@ -227,16 +227,16 @@ export function MarketingFooter() {
             </div>
           </div>
 
-          {/* 5 Nav Link Columns (Span evenly across remaining space) */}
-          <div className="flex-1 w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 sm:gap-8 md:gap-4 lg:gap-6 xl:gap-8 justify-between">
+          {/* 5 Nav Link Columns (Span evenly across remaining space with calibrated baseline alignment) */}
+          <div className="flex-1 w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 xl:gap-8 justify-between items-start">
             {footerSections.map((section) => (
-              <div key={section.title} className="space-y-3 min-w-0">
-                <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+              <div key={section.title} className="space-y-3.5 min-w-0">
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider h-5 flex items-center">
                   {section.title}
                 </h4>
                 <ul className="space-y-2.5 text-xs">
                   {section.links.map((link: any) => (
-                    <li key={link.label}>
+                    <li key={link.label} className="leading-tight">
                       {link.isCookieSettings ? (
                         <button
                           type="button"
